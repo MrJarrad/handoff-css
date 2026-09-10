@@ -17,6 +17,7 @@
     "src",
     "presets",
     "schema",
+    "docs",
     "README.md"
   ],
   "scripts": {
