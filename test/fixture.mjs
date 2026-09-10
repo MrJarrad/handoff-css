@@ -75,6 +75,19 @@ export const docV8 = () =>
   );
 
 /**
+ * A FOURTH real export, `fixtures/jhd-v8b-2026-09-10/export.json` — schema 8,
+ * exported 2026-09-10T21:19Z, the plugin's next revision: every
+ * `responsiveBehavior` rule now carries its own `viewportFraction` alongside
+ * `strategy` and `css` (Workstream C's ask, one step further than `docV8`'s
+ * export). It is the fixture for consuming that field as a fraction source —
+ * see `test/responsive.test.mjs`.
+ */
+export const docV8b = () =>
+  JSON.parse(
+    readFileSync(path.join(path.dirname(FIXTURE), "jhd-v8b-2026-09-10", "export.json"), "utf8"),
+  );
+
+/**
  * The house preset's stylesheet minus the hand-authored `--screen-height-*` /
  * `--height-screen-*` block, which is the deletion the consumer makes when it
  * adopts 0.2.0: a hand-authored GLOBAL declaration suppresses generation (P2)

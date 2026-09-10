@@ -146,10 +146,14 @@ its mode count:
 
 The class comes from a `responsive` block on the variable, else a description
 matching exactly `N% of screen height` / `N% of screen width`, else the
-export's own `responsiveBehavior.rules[].strategy` (published per layout
-variant), else the per-mode default. The description convention is a supported
-input rather than a stopgap: Figma variables carry no viewport semantics, so it
-is the only place a designer can currently state the fraction.
+export's own `responsiveBehavior.rules[].viewportFraction` (a fraction stated
+by the rule itself, source `rule`), else a bare `.strategy` with no fraction
+(a hint only), else the per-mode default. The description convention is a
+supported input rather than a stopgap: Figma variables carry no viewport
+semantics, so it is the only place a designer can currently state the
+fraction — which is also why it beats a rule fraction on disagreement (more
+than 0.005 apart): a `VIEWPORT_FRACTION_DISAGREES` warning names both values
+and the description wins.
 
 `responsive.honourClasses` lists the classes allowed to change your output —
 `[]` pins the per-mode behaviour of 0.1.0 exactly, so you adopt one class at a

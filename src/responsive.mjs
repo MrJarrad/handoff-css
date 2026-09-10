@@ -104,38 +104,70 @@ function fromDescription(v, cfg) {
   const m = DESCRIPTION.exec(String(v.description ?? "").trim());
   if (!m) return null;
   const [, percent, axis] = m;
-  return { cls: axisClass(axis), source: "description", value: `${percent}${axisUnit(axis, cfg)}` };
+  return {
+    cls: axisClass(axis),
+    source: "description",
+    value: `${percent}${axisUnit(axis, cfg)}`,
+    fraction: Number(percent) / 100,
+  };
 }
 
-/** `layoutVariant` -> { cls, css } from the export's own `responsiveBehavior`. */
+/** `layoutVariant` -> { cls, css, viewportFraction } from the export's own `responsiveBehavior`. */
 function ruleClasses(v) {
   const rules = new Map();
   for (const r of v.responsiveBehavior?.rules ?? []) {
     if (!CLASSES.includes(r.strategy)) continue; // a class this version does not know: default path
-    rules.set(r.layoutVariant ?? "default", { cls: r.strategy, css: r.css ?? null });
+    const viewportFraction =
+      typeof r.viewportFraction === "number" && Number.isFinite(r.viewportFraction) ? r.viewportFraction : null;
+    rules.set(r.layoutVariant ?? "default", { cls: r.strategy, css: r.css ?? null, viewportFraction });
   }
   return rules;
 }
 
 /**
+ * The rule's own `viewportFraction` — the fraction the 2026-09-10 plugin now
+ * emits directly on `responsiveBehavior.rules[]` (source of truth: the
+ * `device/screen-height/100` "20% of screen height" → `viewportFraction: 0.2`
+ * shape). Picked from the `default` variant (or the first rule, same as the
+ * export-strategy fallback below), and only honoured when that rule's own
+ * `strategy` names a viewport class — a `fixed` rule's stray fraction is not
+ * this variable's fraction. A `viewportFraction` of exactly 0 is treated as
+ * no signal at all, not "0% of the screen" — a genuinely viewport-relative
+ * variable is never zero, so a rule reporting 0 (schema-8 exports do this on
+ * mis-tagged non-viewport variables, e.g. a letter-spacing rule the export
+ * wrongly strategised as `viewport-width`) is noise the description
+ * convention has no wrong value to disagree with either; it stays a hint.
+ */
+function ruleFraction(rules) {
+  const rule = rules.get("default") ?? [...rules.values()][0] ?? null;
+  if (rule == null || !isViewportClass(rule.cls) || !rule.viewportFraction) return null;
+  return { cls: rule.cls, fraction: rule.viewportFraction };
+}
+
+/**
  * Classify one variable.
  *
- * Precedence: an explicit `responsive` field, then the description convention,
- * then the export's `responsiveBehavior` strategy, then the per-mode default.
- * The description beats `responsiveBehavior` deliberately — every
- * `device/screen-height/*` variable is `mode-stepped` there (it IS stepped, as
- * four per-breakpoint samples) while its description states the fraction those
- * samples are samples OF. Only the fraction can be emitted as one declaration
- * that holds at every viewport, so the more specific statement wins.
+ * Precedence: an explicit `responsive.viewport.fraction` field, then the
+ * description convention, then the export's own `responsiveBehavior[].viewportFraction`
+ * (P13, Workstream C's next ask — the 2026-09-10 plugin now emits this), then
+ * a bare `responsiveBehavior` strategy with no fraction at all (a hint, never
+ * a value — see `emit-tokens.mjs`), then the per-mode default.
  *
- * The generator does not second-guess a stated fraction. A description of
- * "20% of screen width" on a full-bleed variable yields `20vw` — a wrong token
- * from a wrong description, correctable in Figma in one edit, and visible in
- * the report's §10 source column. Inventing a plausibility check here would
- * make the export stop being the contract.
+ * The description beats a rule's `viewportFraction` deliberately: export 4
+ * carried a wrong `screen-height/100` rule fraction (0.222161) alongside a
+ * correct "20% of screen height" description. When the two disagree by more
+ * than 0.005, the description wins and a `VIEWPORT_FRACTION_DISAGREES`
+ * warning names both values — the rule fraction is new and unproven, the
+ * description convention stays warning-free on its own.
  *
- * @returns {{ cls: string|null, source: "field"|"description"|"export"|"default",
- *             value: string|null, rules: Map<string, {cls: string, css: string|null}>,
+ * The generator does not second-guess a stated fraction otherwise. A
+ * description of "20% of screen width" on a full-bleed variable yields `20vw`
+ * — a wrong token from a wrong description, correctable in Figma in one edit,
+ * and visible in the report's §10 source column. Inventing a plausibility
+ * check here would make the export stop being the contract.
+ *
+ * @returns {{ cls: string|null, source: "field"|"description"|"rule"|"export"|"default",
+ *             value: string|null, rules: Map<string, {cls: string, css: string|null, viewportFraction: number|null}>,
  *             override: string|null, warning: string|null }}
  */
 export function classify(v, cfg) {
@@ -151,7 +183,37 @@ export function classify(v, cfg) {
     // class and never a value.
     return { ...viewport, rules, override: viewport.cls, warning: null };
   }
-  if (isViewport) return { ...viewport, rules, override: null, warning: null };
+  if (isViewport) {
+    // P13, disagreement check — only the description path can disagree with
+    // the rule's own fraction; an explicit `responsive` field is the
+    // operator's deliberate override and is never second-guessed against it.
+    let warning = null;
+    let fractionDisagree = null;
+    if (viewport.source === "description") {
+      const rf = ruleFraction(rules);
+      if (rf != null && rf.cls === viewport.cls && Math.abs(rf.fraction - viewport.fraction) > 0.005) {
+        warning = "VIEWPORT_FRACTION_DISAGREES";
+        fractionDisagree = { rule: rf.fraction, description: viewport.fraction };
+      }
+    }
+    return { ...viewport, rules, override: null, warning, fractionDisagree };
+  }
+
+  // No field, no description: the export's own `responsiveBehavior[].viewportFraction`
+  // (P13, precedence step 3) — a rule that STATES a fraction, not merely names
+  // a class.
+  const rf = ruleFraction(rules);
+  if (rf != null) {
+    const axis = rf.cls === "viewport-height" ? "height" : "width";
+    return {
+      cls: rf.cls,
+      source: "rule",
+      value: `${num(rf.fraction * 100)}${axisUnit(axis, cfg)}`,
+      rules,
+      override: null,
+      warning: null,
+    };
+  }
 
   const fromExport = rules.get("default") ?? [...rules.values()][0] ?? null;
   const unflagged = (cfg.viewport.groups ?? []).some((g) => String(v.name ?? "").startsWith(g));

@@ -13,7 +13,7 @@ import assert from "node:assert/strict";
 
 import { generate } from "../src/index.mjs";
 import { classify, honours } from "../src/responsive.mjs";
-import { config, consumerCss, doc as exportDoc, docV7c, preset } from "./fixture.mjs";
+import { config, consumerCss, doc as exportDoc, docV7c, docV8b, preset } from "./fixture.mjs";
 
 const emit = (doc, cfg = preset) => generate(doc, cfg, { handAuthoredCss: consumerCss() });
 
@@ -252,6 +252,89 @@ test("a `fixed` whose modes disagree is not collapsed — the export is wrong, n
   assert.match(out.tokensCss, /--grid-columns: 6;/);
   assert.ok(out.warnings.some(
     (w) => w.code === "FIXED_VARIES_BY_MODE" && w.name === "--grid-columns"));
+});
+
+// --- responsiveBehavior[].viewportFraction (P13, Workstream C) -------------
+//
+// `fixtures/jhd-v8b-2026-09-10` is a real export whose plugin now emits
+// `viewportFraction` directly on every `responsiveBehavior` rule, alongside
+// `strategy` and `css`. It carries no `responsive` field and every viewport
+// variable's description agrees with the rule fraction (within tolerance) —
+// so this is the fixture for the new "rule" source, not for the description
+// path, which `docV7c`/`exportDoc` already cover.
+
+test("a viewportFraction on responsiveBehavior is honoured, once, on jhd-v8b", () => {
+  const { tokensCss, untrustedRows } = emit(docV8b());
+  for (const [name, value] of [
+    ["--device-screen-height-100", "20dvh"],
+    ["--device-screen-height-200", "30dvh"],
+    ["--device-screen-height-500", "70dvh"],
+    ["--device-screen-height-700", "90dvh"],
+    ["--device-screen-height-full", "100dvh"],
+    ["--device-width", "100vw"],
+  ]) {
+    assert.deepEqual(declarations(tokensCss, name), [`${name}: ${value};`], name);
+    assert.deepEqual(insideMedia(tokensCss, name), [], name);
+  }
+  assert.deepEqual(declarations(tokensCss, "--device-container-max-width"),
+    Array.from({ length: 11 }, () => "--device-container-max-width: 2156px;"));
+  assert.equal(untrustedRows.length, 0, "§10 untrusted cells must be 0 on this export");
+});
+
+test("a rule fraction close to its description (0.300493 vs 30%) is within tolerance — no disagreement", () => {
+  const doc = docV8b();
+  const v = doc.collections.find((c) => c.name === "layout").variables
+    .find((x) => x.name === "device/screen-height/200");
+  assert.equal(v.responsiveBehavior.rules[0].viewportFraction, 0.300493);
+  assert.equal(v.description, "30% of screen height");
+  const c = classify(v, preset);
+  assert.equal(c.source, "description");
+  assert.equal(c.value, "30dvh");
+  assert.equal(c.warning, null);
+});
+
+test("a rule fraction with no description at all is used, as the `rule` source", () => {
+  const doc = docV8b();
+  const v = doc.collections.find((c) => c.name === "layout").variables
+    .find((x) => x.name === "device/screen-height/100");
+  v.description = "";
+  // Only the rule states a fraction now: 0.22.
+  for (const r of v.responsiveBehavior.rules) {
+    if (r.strategy === "viewport-height") { r.viewportFraction = 0.22; r.css = "22dvh"; }
+  }
+  const c = classify(v, preset);
+  assert.equal(c.cls, "viewport-height");
+  assert.equal(c.source, "rule");
+  assert.equal(c.value, "22dvh");
+  assert.equal(c.warning, null);
+  const { tokensCss } = emit(doc);
+  assert.deepEqual(declarations(tokensCss, "--device-screen-height-100"),
+    ["--device-screen-height-100: 22dvh;"]);
+});
+
+test("a rule fraction that disagrees with the description by more than 0.005 yields the description, and a warning naming both", () => {
+  // Export 4's `screen-height/100` carried a wrong rule fraction (0.222161)
+  // alongside a correct "20% of screen height" description.
+  const doc = docV8b();
+  const v = doc.collections.find((c) => c.name === "layout").variables
+    .find((x) => x.name === "device/screen-height/100");
+  for (const r of v.responsiveBehavior.rules) {
+    if (r.strategy === "viewport-height") r.viewportFraction = 0.222161;
+  }
+  const c = classify(v, preset);
+  assert.equal(c.source, "description");
+  assert.equal(c.value, "20dvh");
+  assert.equal(c.warning, "VIEWPORT_FRACTION_DISAGREES");
+  assert.deepEqual(c.fractionDisagree, { rule: 0.222161, description: 0.2 });
+
+  const out = emit(doc);
+  assert.deepEqual(declarations(out.tokensCss, "--device-screen-height-100"),
+    ["--device-screen-height-100: 20dvh;"]);
+  const w = out.warnings.find((x) => x.code === "VIEWPORT_FRACTION_DISAGREES");
+  assert.ok(w, "the warning must be reported");
+  assert.equal(w.name, "--device-screen-height-100");
+  assert.match(w.detail, /22\.2161%/);
+  assert.match(w.detail, /20%/);
 });
 
 // --- the report -------------------------------------------------------------

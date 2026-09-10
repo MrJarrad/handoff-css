@@ -462,8 +462,14 @@ For the same reason a responsive **class** is not a value. `viewport-width` /
 `viewport-height` say "a fraction of the screen" and the class name says nothing
 about which fraction, so a class arriving from `responsiveBehavior[].strategy`
 or a bare `responsive.strategy` is a **hint**: it is reported
-(`VIEWPORT_CLASS_WITHOUT_FRACTION`) and changes nothing on its own. Only a
-`responsive.viewport.fraction` or a description states a fraction.
+(`VIEWPORT_CLASS_WITHOUT_FRACTION`) and changes nothing on its own. A fraction
+is stated by, in order, an explicit `responsive.viewport.fraction`, the
+description convention, or the export's own `responsiveBehavior[].viewportFraction`
+(source `rule`; a `viewportFraction` of exactly 0 is treated as no signal, not
+"0% of the screen"). A rule fraction that disagrees with the description by
+more than 0.005 loses to the description, with a `VIEWPORT_FRACTION_DISAGREES`
+warning naming both values — the rule fraction is unproven where the
+description is the deliberate, human-stated convention.
 
 The report's §10 lists every untrusted cell with its raw/converted pair. The
 count is a property of the export, not of your config: when the plugin stops

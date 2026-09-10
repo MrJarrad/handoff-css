@@ -5,7 +5,7 @@ import path from "node:path";
 import { aliasBlock } from "./aliases.mjs";
 import { aliasedByNames, isExcluded, isHidden, privateIds } from "./exclude.mjs";
 import { layoutBreakpoints, placementsFor, renderGroups, themeModeIds, variantBase } from "./modes.mjs";
-import { cmp, resolveValue, untrustedCells } from "./resolve.mjs";
+import { cmp, num, resolveValue, untrustedCells } from "./resolve.mjs";
 import { classify, honours, isViewportClass } from "./responsive.mjs";
 import { assertSchema, indexById, webName } from "./schema.mjs";
 
@@ -107,7 +107,15 @@ export function emitTokens(doc, handDeclared, cfg) {
       const resp = classify(v, cfg);
       const row = { collection: c.name, name, cls: resp.cls, source: resp.source, honoured: false, effect: "per-mode" };
       responsiveRows.push(row);
-      if (resp.warning) {
+      if (resp.warning === "VIEWPORT_FRACTION_DISAGREES") {
+        const { rule, description } = resp.fractionDisagree;
+        warnings.push({
+          code: resp.warning,
+          name,
+          collection: c.name,
+          detail: `responsiveBehavior's viewportFraction (${num(rule * 100)}%) disagrees with the description's stated fraction (${num(description * 100)}%) by more than 0.5 — the description wins, ${resp.value} emitted`,
+        });
+      } else if (resp.warning) {
         warnings.push({
           code: resp.warning,
           name,
