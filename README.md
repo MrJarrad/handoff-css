@@ -16,7 +16,7 @@ export.json  ──▶  handoff-css  ──▶  tokens.generated.css
               your styles.css
 ```
 
-> **Status: 0.1.0, not on npm yet.** Consume it with a local link
+> **Status: 0.2.0, not on npm yet.** Consume it with a local link
 > (`"handoff-css": "file:../handoff-css"`) until it is published.
 
 ---
