@@ -57,3 +57,31 @@ export const config = {
   viewport: { ...preset.viewport, descriptionFallback: false },
   aliases: {},
 };
+
+/**
+ * A THIRD real export, `fixtures/jhd-v8-2026-09-10/export.json` — schema 8,
+ * exported 2026-09-10T20:03Z, copied verbatim from the plugin's own artifact
+ * (sha256 7622dde8…). It is the fixture for CELL TRUST: 100 of its `device/*`
+ * build cells are self-contradicting (`conversionStrategy: "identity"` with
+ * `rawValue !== convertedValue` — e.g. `device/container-max-width` raw 2156px,
+ * converted 100, `css: "100vw"`), and 60-odd of its `responsiveBehavior` rules
+ * name a viewport class for a `grid/col-span/*` or a `text` letter-spacing
+ * variable that is not a fraction of the screen at all. Both are what
+ * `test/cell-trust.test.mjs` holds the generator to.
+ */
+export const docV8 = () =>
+  JSON.parse(
+    readFileSync(path.join(path.dirname(FIXTURE), "jhd-v8-2026-09-10", "export.json"), "utf8"),
+  );
+
+/**
+ * The house preset's stylesheet minus the hand-authored `--screen-height-*` /
+ * `--height-screen-*` block, which is the deletion the consumer makes when it
+ * adopts 0.2.0: a hand-authored GLOBAL declaration suppresses generation (P2)
+ * and collides with the alias block (P12).
+ */
+export const consumerCss = () =>
+  handAuthoredCss()
+    .split("\n")
+    .filter((l) => !/^\s*--(?:screen-height|height-screen)-[a-z0-9]+:/.test(l))
+    .join("\n");

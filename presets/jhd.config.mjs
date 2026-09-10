@@ -8,7 +8,7 @@ export default {
   // Which export contract this consumer has vendored and read.
   schema: {
     name: "design-system-handoff",
-    versions: ["7"],
+    versions: ["7", "8"],
   },
 
   // Every path is relative to the consuming repo root.

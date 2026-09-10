@@ -13,20 +13,7 @@ import assert from "node:assert/strict";
 
 import { generate } from "../src/index.mjs";
 import { classify, honours } from "../src/responsive.mjs";
-import { config, doc as exportDoc, docV7c, handAuthoredCss, preset } from "./fixture.mjs";
-
-/**
- * The house preset, plus the deletion jhd-design-system makes in the same
- * release: `styles.css` hand-authors `--screen-height-*` / `--height-screen-*`
- * today (lines ~781-798), and a hand-authored GLOBAL declaration suppresses
- * generation (P2) and collides with the alias block (P12). Removing those
- * lines here is what the consumer does when it adopts 0.2.0.
- */
-const consumerCss = () =>
-  handAuthoredCss()
-    .split("\n")
-    .filter((l) => !/^\s*--(?:screen-height|height-screen)-[a-z0-9]+:/.test(l))
-    .join("\n");
+import { config, consumerCss, doc as exportDoc, docV7c, preset } from "./fixture.mjs";
 
 const emit = (doc, cfg = preset) => generate(doc, cfg, { handAuthoredCss: consumerCss() });
 
