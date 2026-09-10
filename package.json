@@ -18,6 +18,7 @@
     "presets",
     "schema",
     "docs",
+    "skills",
     "README.md"
   ],
   "scripts": {

@@ -221,6 +221,26 @@ handoff-css [--config <mjs>]        default: ./handoff.config.mjs
 Flags override `paths.*`. `--check` writes nothing and exits 1 on any
 difference.
 
+## Pair it with the skill
+
+`skills/handoff-to-code/SKILL.md` ships in this package. It is the procedure for the other
+half of the job — turning the generated tokens into code that matches the handoff — written
+for a coding agent (Claude Code, Cursor, or anything that reads a `SKILL.md`) and readable
+by a person in five minutes.
+
+It covers what the generator cannot: reconciling the `design-handoff` markdown's companion
+hashes against the JSON's own before you build, reading each warning as a decision rather
+than noise, mapping every `$variable` in the handoff through its **`codeSyntax.WEB`** name
+(no emitted token is a defect, not a guess), treating the handoff's own Build standards as
+the mechanism each value must be produced by, and returning a deviation table that stops for
+a ruling instead of quietly picking a side.
+
+Point your agent at it:
+
+```
+skills/handoff-to-code/SKILL.md      # or copy it into .claude/skills/ / your agent's skills dir
+```
+
 ## Guarantees
 
 - **Deterministic.** Collections sorted by name, variables by name, floats
