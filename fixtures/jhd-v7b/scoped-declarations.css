@@ -1,0 +1,45 @@
+/* Fixture for the hand-authored SCOPE rule (policy P2).
+ *
+ * "Hand-authored wins" is a cascade argument, and the cascade argument only
+ * holds for declarations that are GLOBAL and UNCONDITIONAL — a top-level
+ * `:root` or a `@theme` block. A declaration inside `.dark`, `@media`,
+ * `@supports` or `@utility` applies only when that condition holds, so it
+ * cannot supersede the generated token everywhere and must not suppress it.
+ *
+ * Six real export names, one per scope, so the generator's scope reader is
+ * exercised against every shape styles.css actually uses.
+ */
+
+:root {
+  /* GLOBAL — must suppress generation. */
+  --dimension-1000: 2rem;
+}
+
+@theme inline {
+  /* GLOBAL — must suppress generation. */
+  --dimension-1100: 2.25rem;
+}
+
+.dark {
+  /* SCOPED (class) — must NOT suppress generation. */
+  --dimension-1200: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    /* SCOPED (conditional at-rule) — must NOT suppress generation. */
+    --dimension-1300: 3rem;
+  }
+}
+
+@utility fixture-thing {
+  /* SCOPED (utility recipe) — must NOT suppress generation. */
+  --dimension-1400: 4rem;
+}
+
+@supports (color: lab(0 0 0)) {
+  :root {
+    /* SCOPED (conditional at-rule) — must NOT suppress generation. */
+    --dimension-1500: 4.5rem;
+  }
+}
