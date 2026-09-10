@@ -172,7 +172,9 @@ function ruleFraction(rules) {
  */
 export function classify(v, cfg) {
   const rules = ruleClasses(v);
-  const viewport = fromField(v, cfg) ?? fromDescription(v, cfg);
+  const { declared, allowed } = viewportGate(v, cfg);
+  const stated = fromField(v, cfg) ?? fromDescription(v, cfg);
+  const viewport = stated != null && !allowed && isViewportClass(stated.cls) ? null : stated;
   const isViewport = viewport != null && viewport.cls.startsWith("viewport-");
 
   if (viewport && !isViewport) {
@@ -202,7 +204,7 @@ export function classify(v, cfg) {
   // No field, no description: the export's own `responsiveBehavior[].viewportFraction`
   // (P13, precedence step 3) — a rule that STATES a fraction, not merely names
   // a class.
-  const rf = ruleFraction(rules);
+  const rf = allowed ? ruleFraction(rules) : null;
   if (rf != null) {
     const axis = rf.cls === "viewport-height" ? "height" : "width";
     return {
@@ -216,7 +218,7 @@ export function classify(v, cfg) {
   }
 
   const fromExport = rules.get("default") ?? [...rules.values()][0] ?? null;
-  const unflagged = (cfg.viewport.groups ?? []).some((g) => String(v.name ?? "").startsWith(g));
+  const gated = !allowed && (stated != null || ruleFraction(rules) != null);
 
   return {
     cls: fromExport?.cls ?? null,
@@ -224,9 +226,39 @@ export function classify(v, cfg) {
     value: null,
     rules,
     override: null,
-    // A variable in a group the consumer declared viewport-relative, with
-    // neither a field nor a matching description, keeps its px samples — and
-    // says so, rather than being quietly guessed into `vw`/`dvh`.
-    warning: unflagged ? "VIEWPORT_UNFLAGGED" : null,
+    // Two ways a viewport fraction ends up unused, and both are reported:
+    //   VIEWPORT_OUTSIDE_GROUPS  a fraction was STATED for a variable the
+    //                            consumer never declared viewport-relative.
+    //   VIEWPORT_UNFLAGGED       a variable the consumer DID declare
+    //                            viewport-relative stated no fraction.
+    // Either way the per-mode px samples are emitted unchanged: the generator
+    // never guesses a unit, and never guesses one away silently.
+    warning: gated ? "VIEWPORT_OUTSIDE_GROUPS" : declared ? "VIEWPORT_UNFLAGGED" : null,
   };
+}
+
+/**
+ * P11's gate — may this variable become a viewport unit at all?
+ *
+ * `viewport.groups` is a WHITELIST, not a warning filter. A `viewportFraction`
+ * or a "N% of screen …" description on a variable outside every declared group
+ * is a HINT, treated exactly as a bare class is: keep the per-mode samples,
+ * report it. The 2026-09-10 schema-8 export states one on ~20 rules that are
+ * not fractions of the screen in any design sense — a title letter-spacing, a
+ * body font size, an icon radius, a grid column start — and honouring those
+ * scales type with the viewport, which no house policy asked for.
+ *
+ * Two flags, deliberately not one:
+ *   `declared` — this variable matches a declared prefix. Drives
+ *                `VIEWPORT_UNFLAGGED`: the consumer said this group is
+ *                viewport-relative and the export stated no fraction.
+ *   `allowed`  — the gate is open for this variable. An EMPTY `groups` list
+ *                opts out of the gate entirely (every stated fraction is
+ *                honoured, nothing is reported unflagged), which is what a
+ *                consumer with no group convention wants.
+ */
+function viewportGate(v, cfg) {
+  const groups = cfg.viewport?.groups ?? [];
+  const declared = groups.some((g) => String(v.name ?? "").startsWith(g));
+  return { declared, allowed: groups.length === 0 || declared };
 }

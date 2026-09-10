@@ -352,3 +352,88 @@ test("§10 states each variable's class, where the class came from, and the effe
   assert.match(section, /\| `--grid-columns` \| layout \| fixed \| export \| per-mode \|/);
   assert.match(section, /\| `--grid-col-start-2` \| layout \| fluid-clamp \| export \| per-mode \|/);
 });
+
+// --- P11, the group gate ----------------------------------------------------
+//
+// `viewport.groups` is the consumer's declaration of WHICH variables may
+// become viewport units at all — not merely which ones get a warning when they
+// don't. The v8b export states a `viewportFraction` on 20-odd rules that are
+// not fractions of the screen in any design sense: a title letter-spacing, a
+// body font size, an icon radius, a grid column start. Honouring those turns
+// type into viewport-scaled type, which no house policy ever asked for.
+//
+// So a rule fraction outside every declared group is a HINT, treated exactly
+// as a bare class is: keep the per-mode px samples, and report it. The
+// description and field paths are gated the same way, for the same reason —
+// one gate, not three, or a filled-in description on a text variable would
+// walk straight through the one path nobody remembered to close.
+
+const namesIn = (css, prefix) =>
+  css.split("\n").map((l) => l.trim())
+    .filter((l) => l.startsWith(prefix))
+    .map((l) => l.split(":")[0]);
+
+test("a rule fraction outside every `viewport.groups` prefix does not become a viewport unit", () => {
+  const { tokensCss } = emit(docV8b());
+
+  // These four are the export's own viewport-classed rules on variables the
+  // house never declared viewport-relative. Each keeps px/rem samples.
+  for (const name of [
+    "--text-title-font-size-100",
+    "--text-title-letter-spacing-400",
+    "--icon-radius-100",
+    "--grid-col-start-2",
+  ]) {
+    const decls = declarations(tokensCss, name);
+    assert.ok(decls.length > 0, `${name} must still be emitted`);
+    for (const d of decls) {
+      assert.doesNotMatch(d, /\d(dvh|vh|vw|dvw)\s*;/, `${name} must not carry a viewport unit: ${d}`);
+    }
+  }
+
+  // And the gate is stated as a whole, not spot-checked: the ONLY tokens in
+  // the shipped output carrying a viewport unit are the ten `--device-*` ones
+  // the house declared, plus the aliases that point at them.
+  const viewportNames = tokensCss.split("\n").map((l) => l.trim())
+    .filter((l) => /^--[a-z0-9-]+:\s*[\d.]+(dvh|vh|vw|dvw)\s*;/.test(l))
+    .map((l) => l.split(":")[0]);
+  assert.deepEqual([...new Set(viewportNames)].sort(), [
+    "--device-screen-height-100",
+    "--device-screen-height-200",
+    "--device-screen-height-300",
+    "--device-screen-height-400",
+    "--device-screen-height-500",
+    "--device-screen-height-600",
+    "--device-screen-height-700",
+    "--device-screen-height-full",
+    "--device-width",
+  ]);
+  assert.equal(namesIn(tokensCss, "--device-container-max-width").length > 0, true);
+});
+
+test("the gate is the group, not the source: a description outside the groups is a hint too", () => {
+  const doc = docV8b();
+  const v = doc.collections.find((c) => c.name === "layout").variables
+    .find((x) => x.name === "text/title/font-size-100");
+  assert.ok(v, "the fixture must have layout/text/title/font-size-100");
+  v.description = "100% of screen height";
+  const c = classify(v, preset);
+  assert.notEqual(c.source, "description");
+  assert.equal(c.value, null);
+  assert.equal(c.warning, "VIEWPORT_OUTSIDE_GROUPS");
+});
+
+test("a consumer that declares no groups is not gated — every stated fraction is honoured", () => {
+  const cfg = { ...preset, viewport: { ...preset.viewport, groups: [] } };
+  const { tokensCss } = generate(docV8b(), cfg, { handAuthoredCss: consumerCss() });
+  assert.deepEqual(declarations(tokensCss, "--text-title-font-size-100"),
+    ["--text-title-font-size-100: 1.7241dvh;"]);
+});
+
+test("§10 reports each gated variable, so a mis-stated fraction in Figma is visible", () => {
+  const { report, warnings } = emit(docV8b());
+  const gated = warnings.filter((w) => w.code === "VIEWPORT_OUTSIDE_GROUPS");
+  assert.ok(gated.length >= 4, `expected the gated rules to be reported, got ${gated.length}`);
+  assert.ok(gated.some((w) => w.name === "--text-title-font-size-100"));
+  assert.match(report, /VIEWPORT_OUTSIDE_GROUPS/);
+});

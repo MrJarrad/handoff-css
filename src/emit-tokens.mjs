@@ -115,6 +115,13 @@ export function emitTokens(doc, handDeclared, cfg) {
           collection: c.name,
           detail: `responsiveBehavior's viewportFraction (${num(rule * 100)}%) disagrees with the description's stated fraction (${num(description * 100)}%) by more than 0.5 — the description wins, ${resp.value} emitted`,
         });
+      } else if (resp.warning === "VIEWPORT_OUTSIDE_GROUPS") {
+        warnings.push({
+          code: resp.warning,
+          name,
+          collection: c.name,
+          detail: `states a viewport fraction but sits outside every \`viewport.groups\` prefix (${(cfg.viewport?.groups ?? []).map((g) => `\`${g}\``).join(", ") || "none"}) — treated as a hint, per-mode samples emitted unchanged. Correct the class in Figma, or declare the group.`,
+        });
       } else if (resp.warning) {
         warnings.push({
           code: resp.warning,

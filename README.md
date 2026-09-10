@@ -157,10 +157,20 @@ and the description wins.
 
 `responsive.honourClasses` lists the classes allowed to change your output —
 `[]` pins the per-mode behaviour of 0.1.0 exactly, so you adopt one class at a
-time. Nothing is guessed: a `viewport.groups` member with no stated fraction
-stays px and is reported as `VIEWPORT_UNFLAGGED`, and a wrong description
-yields a wrong token on purpose (the export is the contract; the fix is in
-Figma). Full rules: [P11](docs/POLICIES.md).
+time.
+
+`viewport.groups` is the whitelist of variable-name prefixes that may become
+viewport units at all — every source above is gated by it, because an export
+can state a fraction for a variable that is not a fraction of the screen (the
+2026-09-10 schema-8 export does so for a font size, a letter-spacing, an icon
+radius and a grid column start). A stated fraction outside every declared
+prefix keeps its per-mode samples and is reported as
+`VIEWPORT_OUTSIDE_GROUPS`; `groups: []` opts out of the gate entirely.
+
+Nothing is guessed either way: a `viewport.groups` member with no stated
+fraction stays px and is reported as `VIEWPORT_UNFLAGGED`, and a wrong
+description yields a wrong token on purpose (the export is the contract; the
+fix is in Figma). Full rules: [P11](docs/POLICIES.md).
 
 ### Cell trust
 

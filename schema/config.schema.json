@@ -151,7 +151,7 @@
         "groups": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Variable-name prefixes the consumer declares viewport-relative. A member with neither a `responsive` field nor a matching description stays px and is reported as `VIEWPORT_UNFLAGGED`."
+          "description": "Variable-name prefixes the consumer declares viewport-relative. A WHITELIST: only these variables may be emitted in viewport units, whatever the export states — a stated fraction outside every prefix keeps its per-mode samples and is reported as `VIEWPORT_OUTSIDE_GROUPS`. A member matching a prefix with neither a `responsive` field nor a matching description also stays px, reported as `VIEWPORT_UNFLAGGED`. An empty list opts out of the gate entirely."
         }
       },
       "description": "P11 — how a viewport fraction becomes CSS."

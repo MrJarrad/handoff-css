@@ -419,8 +419,26 @@ path, so listing them changes nothing; an empty list pins pre-0.2.0 output
 exactly. This is how a consumer adopts one class at a time instead of taking
 every behavioural change in one release.
 
-**Nothing is guessed.** `viewport.groups` names variable-name prefixes the
-consumer declares viewport-relative; a member with neither a field nor a
+**`viewport.groups` is a whitelist, not a warning filter.** It names the
+variable-name prefixes the consumer declares viewport-relative, and that
+declaration decides which variables may become viewport units **at all** —
+every source above is gated by it, so closing the gate on one path and leaving
+another open is not possible. A stated fraction outside every declared prefix
+is a HINT, treated exactly as a bare class is: the per-mode samples are emitted
+unchanged and the variable is reported as `VIEWPORT_OUTSIDE_GROUPS`.
+
+This is not defensive tidying. The 2026-09-10 schema-8 export states a
+`viewportFraction` on ~20 rules that are not fractions of the screen in any
+design sense — `text/title/letter-spacing-400`, `text/title/font-size-100`,
+`icon/radius/100`, `grid/col-start/col-start-2`. Honouring them emits type
+whose size and tracking scale with the viewport, which no design decision ever
+asked for; the export is wrong about those variables, and the consumer's group
+declaration is the only statement in the system that knows it. An empty
+`groups` list opts out of the gate entirely — every stated fraction is
+honoured, and nothing is reported either way — which is the right default for a
+consumer with no group convention.
+
+**Nothing is guessed.** A `viewport.groups` member with neither a field nor a
 matching description keeps its px samples and is reported as
 `VIEWPORT_UNFLAGGED` — the fix is one description in Figma, not a heuristic
 here. Likewise a `fluid-clamp` with no `css` expression
