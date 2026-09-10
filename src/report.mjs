@@ -8,6 +8,7 @@
 // supplies none still gets the whole report; it just carries no narrative.
 import { layoutBreakpoints } from "./modes.mjs";
 import { cmp, num } from "./resolve.mjs";
+import { changesOutput } from "./responsive.mjs";
 
 /** `{{name}}` -> `vars.name`. An unknown placeholder is left alone, not blanked. */
 const fillIn = (text, vars) =>
@@ -261,11 +262,13 @@ ${(() => {
   for (const r of classified) tally[`${r.cls} (${r.source})`] = (tally[`${r.cls} (${r.source})`] ?? 0) + 1;
   const summary = Object.entries(tally).sort((a, b) => cmp(a[0], b[0]))
     .map(([k, n]) => `${k}: ${n}`).join(" · ");
-  const table = classified.filter((r) => r.honoured || r.source !== "export");
+  // Listed individually: every variable whose class WOULD change its output if
+  // honoured. The rest are `mode-stepped`/`sample-only` — the per-mode path
+  // either way — and there are too many to be worth a row each.
+  const table = classified.filter((r) => changesOutput(r.cls));
   return `${classified.length} of ${responsiveRows.length} emitted variables carry a class — ${summary || "none"}.
-The ${classified.length - table.length} \`mode-stepped\`/\`sample-only\` rows the export
-classified and this run emitted per-mode are not listed individually; they are
-unchanged from the pre-P11 output.
+The other ${classified.length - table.length} are \`mode-stepped\` or \`sample-only\`, which IS the
+per-mode path, so they are not listed individually: their output is unchanged.
 
 ${table.length
   ? ["| Token | Collection | Class | Source | Effect |", "| --- | --- | --- | --- | --- |",

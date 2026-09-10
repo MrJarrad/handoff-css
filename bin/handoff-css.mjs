@@ -25,7 +25,9 @@ try {
   process.exit(1);
 }
 
-const { rows, privateRows, hiddenRows, excludedRows, warnings, opts } = run(argv, { cwd, config });
+const { rows, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings, opts } =
+  run(argv, { cwd, config });
+const honoured = responsiveRows.filter((r) => r.honoured).length;
 const count = (s) => rows.filter((r) => r.status === s).length;
 process.stdout.write(
   [
@@ -37,7 +39,9 @@ process.stdout.write(
     `  PRIVATE                 ${privateRows.length}  (hidden, alias-reachable — emitted)`,
     `  HIDDEN                  ${hiddenRows.length}  (hidden, unreachable — dropped)`,
     `  EXCLUDED                ${excludedRows.length}`,
-    ...warnings.map((w) => `  warning                 ${w.code}: ${w.message}`),
+    `  responsive classes      ${honoured} honoured (${config.responsive.honourClasses.join(", ") || "none"})`,
+    `  aliases                 ${aliasRows.length}`,
+    ...warnings.map((w) => `  warning                 ${w.code}  ${w.name}`),
     `  out                     ${opts.out}`,
     `  theme                   ${opts.theme}`,
     `  report                  ${opts.report}`,

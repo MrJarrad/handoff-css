@@ -23,12 +23,17 @@ export const CLASSES = [
   "sample-only",
 ];
 
-/** Classes whose handling differs from the per-mode default path. */
-const CHANGES_OUTPUT = new Set(["viewport-width", "viewport-height", "fluid-clamp", "fixed"]);
+/**
+ * Whether this class emits anything other than the per-mode default path.
+ * `mode-stepped` and `sample-only` ARE that path, so honouring them is a
+ * no-op — which is why an empty `honourClasses` pins pre-0.2.0 output exactly.
+ */
+export const changesOutput = (cls) =>
+  cls === "viewport-width" || cls === "viewport-height" || cls === "fluid-clamp" || cls === "fixed";
 
 /** Is this class allowed to change what is emitted? `responsive.honourClasses`. */
 export const honours = (cfg, cls) =>
-  cls != null && CHANGES_OUTPUT.has(cls) && cfg.responsive.honourClasses.includes(cls);
+  cls != null && changesOutput(cls) && cfg.responsive.honourClasses.includes(cls);
 
 /**
  * The description convention, a FIRST-CLASS input rather than a fallback: it

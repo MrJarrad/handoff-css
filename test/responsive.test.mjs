@@ -277,4 +277,8 @@ test("§10 states each variable's class, where the class came from, and the effe
   assert.match(section,
     /\| `--device-screen-height-100` \| layout \| viewport-height \| description \| 20dvh once on the base scope \|/);
   assert.match(section, /\| `VIEWPORT_UNFLAGGED` \| `--device-width` \|/);
+  // A class the preset HOLDS is still listed, with `per-mode` as its effect —
+  // the report is where a consumer sees what adopting it would change.
+  assert.match(section, /\| `--grid-columns` \| layout \| fixed \| export \| per-mode \|/);
+  assert.match(section, /\| `--grid-col-start-2` \| layout \| fluid-clamp \| export \| per-mode \|/);
 });
