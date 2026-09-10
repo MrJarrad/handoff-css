@@ -16,7 +16,8 @@ const fillIn = (text, vars) =>
 
 export function report(doc, rows, handNames, handScoped, themeRows, handDeclared, cfg,
                        privateRows = [], hiddenRows = [], excludedRows = [],
-                       responsiveRows = [], aliasRows = [], warnings = []) {
+                       responsiveRows = [], aliasRows = [], warnings = [],
+                       untrustedRows = []) {
   const handFile = cfg.paths.handAuthored.split("/").pop();
   const by = (s) => rows.filter((r) => r.status === s);
   const drift = by("VALUE-DRIFT");
@@ -275,6 +276,20 @@ ${table.length
      ...table.map((r) => `| \`${r.name}\` | ${r.collection} | ${r.cls} | ${r.source} | ${r.effect} |`)].join("\n")
   : "None."}`;
 })()}
+
+**Untrusted build cells (${untrustedRows.length})** (P13) — cells that contradict
+themselves, so the generator will not let them state the value: an
+\`identity\` conversion whose \`rawValue\` and \`convertedValue\` differ, or a
+\`css\` unit that is not the \`buildUnit\` the same cell published. Each one
+emits the raw source value instead — unless a \`responsive\` field or a
+\`"N% of screen height|width"\` description states the fraction, which outranks
+the cell entirely. This is a property of the EXPORT, not of this run: a fixed
+plugin export takes the count to zero.
+
+${untrustedRows.length
+  ? ["| Token | Collection | Mode | Raw | Converted | Code |", "| --- | --- | --- | --- | --- | --- |",
+     ...untrustedRows.map((r) => `| \`${r.name}\` | ${r.collection} | ${r.mode} | \`${r.raw ?? "—"}\` | \`${r.converted ?? "—"}\` | \`${r.code}\` |`)].join("\n")
+  : "None."}
 
 **Warnings (${warnings.length})** — what the generator would not guess at. A
 variable in a \`viewport.groups\` group with no stated fraction keeps its px

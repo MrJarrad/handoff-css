@@ -5,8 +5,8 @@ import path from "node:path";
 import { aliasBlock } from "./aliases.mjs";
 import { aliasedByNames, isExcluded, isHidden, privateIds } from "./exclude.mjs";
 import { layoutBreakpoints, placementsFor, renderGroups, themeModeIds, variantBase } from "./modes.mjs";
-import { cmp, resolveValue } from "./resolve.mjs";
-import { classify, honours } from "./responsive.mjs";
+import { cmp, resolveValue, untrustedCells } from "./resolve.mjs";
+import { classify, honours, isViewportClass } from "./responsive.mjs";
 import { assertSchema, indexById, webName } from "./schema.mjs";
 
 const handAuthoredName = (cfg) => path.basename(cfg.paths.handAuthored);
@@ -24,9 +24,23 @@ export function emitTokens(doc, handDeclared, cfg) {
   const hiddenRows = []; // P7 — hidden AND unreachable: never emitted
   const excludedRows = []; // P7 — EXCLUDE_PATHS policy list
   const responsiveRows = []; // P11 — one row per emitted variable: class, source, effect
-  const warnings = []; // P11 — what the generator would not guess at
+  // P13 — every self-contradicting build cell in the export, scanned once and
+  // independently of what is emitted, so the count is a property of the EXPORT
+  // (a fixed plugin export takes it to zero) rather than of this run's config.
+  const untrustedRows = untrustedCells(doc);
+  const warnings = []; // P11/P13 — what the generator would not guess at
   const emitted = new Set(); // every name declared below, for the alias block
   const blocks = []; // rendered CSS blocks
+
+  for (const row of untrustedRows) {
+    warnings.push({
+      code: row.code,
+      name: row.name,
+      collection: row.collection,
+      mode: row.mode,
+      detail: `mode \`${row.mode}\`: ${row.detail} — its \`css\` is not emitted (P13)`,
+    });
+  }
 
   for (const c of collections) {
     const variables = [...c.variables].sort((a, b) => cmp(webName(a), webName(b)));
@@ -122,6 +136,7 @@ export function emitTokens(doc, handDeclared, cfg) {
       // honoured `fluid-clamp` or `fixed` emits once at that variant's base
       // scope instead of once per width.
       const collapsed = new Set();
+      const hinted = new Set(); // P13 — one hint warning per layout variant
       for (const mode of c.modes) {
         const mv = v.modes.find((m) => m.modeId === mode.id);
         if (!mv || mv.effective === false) continue;
@@ -136,6 +151,28 @@ export function emitTokens(doc, handDeclared, cfg) {
           : resp.override
             ? { cls: resp.override, css: resp.rules.get(variant)?.css ?? null }
             : resp.rules.get(variant);
+        // P13 — a viewport class is a claim that this variable is a FRACTION
+        // of the screen, and the class name alone carries no fraction. Only a
+        // `responsive` field or the description convention states one, and both
+        // are handled above; a class arriving from the export's own
+        // `responsiveBehavior` is therefore a hint about intent, never a value.
+        // Left to the `fixed`/`fluid-clamp` collapse below it would either
+        // collapse ten samples into one on the strength of a name, or report
+        // FIXED_VARIES_BY_MODE about a class that is not `fixed`.
+        if (rule && isViewportClass(rule.cls) && honours(cfg, rule.cls)) {
+          if (!hinted.has(variant)) {
+            hinted.add(variant);
+            warnings.push({
+              code: "VIEWPORT_CLASS_WITHOUT_FRACTION",
+              name,
+              collection: c.name,
+              detail: `\`${rule.cls}\` at layout variant \`${variant}\` with no \`responsive.viewport.fraction\` and no "N% of screen height|width" description — treated as a hint, per-mode samples emitted unchanged`,
+            });
+          }
+          for (const p of placementsFor(c, mode, ctx, cfg)) push(p, decl);
+          continue;
+        }
+
         if (rule && honours(cfg, rule.cls) && collapse(v, rule, variant, ctx, byId, cfg, warnings)) {
           if (collapsed.has(variant)) continue;
           collapsed.add(variant);
@@ -202,7 +239,7 @@ export function emitTokens(doc, handDeclared, cfg) {
   return {
     css: `${header}${blocks.join("\n\n")}\n`,
     rows, privateRows, hiddenRows, excludedRows,
-    responsiveRows, aliasRows: aliases.rows, warnings,
+    responsiveRows, aliasRows: aliases.rows, warnings, untrustedRows,
   };
 }
 

@@ -31,6 +31,15 @@ export const CLASSES = [
 export const changesOutput = (cls) =>
   cls === "viewport-width" || cls === "viewport-height" || cls === "fluid-clamp" || cls === "fixed";
 
+/**
+ * P13 — the two classes whose whole content is a FRACTION of the screen. The
+ * class NAME is not a value: `viewport-width` says "some fraction of the
+ * viewport", and only a `responsive.viewport.fraction` or the description
+ * convention says which. A rule that names one without a fraction is a hint
+ * about intent, and a hint never changes output — see `emit-tokens.mjs`.
+ */
+export const isViewportClass = (cls) => cls === "viewport-width" || cls === "viewport-height";
+
 /** Is this class allowed to change what is emitted? `responsive.honourClasses`. */
 export const honours = (cfg, cls) =>
   cls != null && changesOutput(cls) && cfg.responsive.honourClasses.includes(cls);

@@ -38,15 +38,16 @@ export { validateConfig, configSchema } from "./config.mjs";
 export function generate(doc, config, { handAuthoredCss = "" } = {}) {
   const cfg = assertConfig(config);
   const { declared: handDeclared, scoped: handScoped } = readHandAuthored(handAuthoredCss);
-  const { css, rows, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings } =
-    emitTokens(doc, handDeclared, cfg);
+  const { css, rows, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings,
+          untrustedRows } = emitTokens(doc, handDeclared, cfg);
 
   const byId = indexById(doc);
   const themeRows = themeEntries(doc, byId, cfg);
   const theme = themeCss(doc, themeRows, cfg);
 
   const md = report(doc, rows, new Set(handDeclared.keys()), handScoped, themeRows, handDeclared,
-                    cfg, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings);
+                    cfg, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings,
+                    untrustedRows);
 
   // Single source of truth for a downstream conformance checker (P7): it must
   // not keep its own copy of the exclude list or re-derive either list.
@@ -87,6 +88,9 @@ export function generate(doc, config, { handAuthoredCss = "" } = {}) {
     excludedRows,
     responsiveRows,
     aliasRows,
+    // P13 — every self-contradicting build cell found in the export, whether or
+    // not this run emitted the variable it belongs to.
+    untrustedRows,
     // P11/P12 — what the generator would not guess at: a `viewport.groups`
     // member it could not classify, a `fluid-clamp` with no expression, a
     // `fixed` whose modes disagree. Reported, never silently resolved.

@@ -96,7 +96,13 @@ test("an untrusted cell with no raw source value is a hard failure", () => {
   const doc = docV8();
   const layout = doc.collections.find((c) => c.name === "layout");
   const v = layout.variables.find((x) => x.name === "device/container-max-width");
-  for (const m of v.modes) m.unitHint = { ...m.unitHint, rawValue: undefined };
+  // A cell that is untrusted on the unit clause (`css: "100vw"`, `buildUnit:
+  // "px"`) and carries no `rawValue` to fall back on: there is no value the
+  // export states about this mode, so there is nothing to emit.
+  for (const m of v.modes) {
+    m.unitHint = { ...m.unitHint, buildUnit: "px", rawValue: undefined, convertedValue: undefined };
+    m.build = { ...m.build, unit: "px", css: "100vw" };
+  }
   assert.throws(
     () => generate(doc, preset, { handAuthoredCss: consumerCss() }),
     /device-container-max-width.*no `rawValue`|no `rawValue`/s,

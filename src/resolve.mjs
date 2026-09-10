@@ -56,6 +56,85 @@ const BUILD_UNIT_SUFFIX = {
   unitless: "",
 };
 
+/**
+ * P13 — CELL TRUST. A `build` cell that contradicts itself does not get to
+ * state the value.
+ *
+ * Two contradictions are detectable from the cell alone, needing no house
+ * knowledge and no plausibility judgement about the number itself:
+ *
+ *   an `identity` that converted  `conversionStrategy: "identity"` means the
+ *                                 build value IS the source value, so a
+ *                                 `rawValue` differing from `convertedValue` is
+ *                                 the cell disagreeing with its own strategy
+ *                                 (2156px -> 100, `css: "100vw"`).
+ *   a unit the cell did not name  `css` carrying a unit other than the
+ *                                 `buildUnit` the same cell published.
+ *
+ * Both comparisons go through `num()`, so float32 representation noise
+ * (`162.39999389648438` stored, `162.399994` converted) is NOT a
+ * contradiction — it is one number written twice, and counting it as one would
+ * condemn 12 healthy cells in every export of this family.
+ *
+ * @returns {{ code: string, detail: string }|null} null when the cell is trustworthy
+ */
+export function cellTrust(hint = {}, build = {}) {
+  const { rawValue, convertedValue, sourceUnit, buildUnit, conversionStrategy, source } = hint;
+  if (
+    conversionStrategy === "identity" &&
+    typeof rawValue === "number" &&
+    typeof convertedValue === "number" &&
+    num(rawValue) !== num(convertedValue)
+  ) {
+    return {
+      code: "BUILD_CELL_CONTRADICTORY",
+      detail: `\`conversionStrategy: "identity"\` but rawValue ${num(rawValue)}${sourceUnit ?? ""} != convertedValue ${num(convertedValue)}${buildUnit ?? ""} — the cell publishes \`css: "${build.css}"\`, source \`${source ?? "?"}\``,
+    };
+  }
+  const emitted = String(build.css ?? "").replace(/^[-+.\d\s]+/, "");
+  const stated = buildUnit === "unitless" ? "" : String(buildUnit ?? "");
+  if (build.status === "resolved" && buildUnit != null && emitted !== stated) {
+    return {
+      code: "BUILD_CELL_UNIT_MISMATCH",
+      detail: `\`css: "${build.css}"\` is in \`${emitted || "no unit"}\` while the same cell publishes \`buildUnit: "${buildUnit}"\``,
+    };
+  }
+  return null;
+}
+
+/**
+ * Every cell in the export that P13 will not let state its own value — the
+ * export-health number the report publishes, and the one a fixed plugin export
+ * takes to zero. Scanned over the whole document independently of what is
+ * emitted, so an excluded or hand-superseded variable's bad cell still counts.
+ *
+ * @returns {Array<{ collection: string, name: string, mode: string, code: string,
+ *                   detail: string, raw: string|null, converted: string|null }>}
+ */
+export function untrustedCells(doc) {
+  const out = [];
+  for (const c of doc.collections) {
+    for (const v of c.variables) {
+      if (v.type !== "FLOAT") continue;
+      for (const m of v.modes) {
+        if (m.alias) continue;
+        const hint = m.unitHint ?? {};
+        const t = cellTrust(hint, m.build ?? {});
+        if (!t) continue;
+        out.push({
+          collection: c.name,
+          name: webName(v),
+          mode: m.modeName,
+          raw: typeof hint.rawValue === "number" ? `${num(hint.rawValue)}${hint.sourceUnit ?? ""}` : null,
+          converted: typeof hint.convertedValue === "number" ? `${num(hint.convertedValue)}${hint.buildUnit ?? ""}` : null,
+          ...t,
+        });
+      }
+    }
+  }
+  return out.sort((a, b) => cmp(a.name + a.mode, b.name + b.mode));
+}
+
 /** Render an alias chain's terminal value the way the token itself would read. */
 const terminalNote = (v, mode, terminal, byId, cfg) => {
   if (v.type === "FLOAT" && mode.build?.status === "resolved") return mode.build.css;
@@ -219,6 +298,28 @@ export function resolveValue(v, mode, byId, cfg) {
         fail(`${webName(v)} mode ${mode.modeName}: build.raw ${b.raw} disagrees with raw ${raw}`);
       }
 
+      // P13 — an untrusted cell never emits its `css`. Nothing here invents a
+      // replacement either: the raw source value the same cell published, in
+      // the unit it published it in, is the only value the export actually
+      // states about this mode. A stated fraction (a `responsive` field or the
+      // description convention) outranks this path and never reaches it — see
+      // `responsive.mjs` and P11's precedence.
+      const trust = cellTrust(u, b);
+      if (trust) {
+        if (typeof u.rawValue !== "number") {
+          fail(
+            `${webName(v)} mode ${mode.modeName}: ${trust.code} and the cell carries no \`rawValue\` to fall back on — ${trust.detail}`,
+          );
+        }
+        return {
+          ...plain(
+            `${num(u.rawValue)}${BUILD_UNIT_SUFFIX[u.sourceUnit] ?? ""}`,
+            `${trust.code}: ${trust.detail}; raw ${u.sourceUnit ?? "value"} emitted`,
+          ),
+          untrusted: { ...trust, mode: mode.modeName },
+        };
+      }
+
       if (b.status === "resolved") {
         const note = u.sourceUnit === "px" && b.unit !== "px" ? `${num(raw)}px` : null;
         return plain(b.css, note);
@@ -253,4 +354,5 @@ const plain = (value, note = null) => ({
   unresolvedAlias: false,
   terminal: null,
   unconverted: null,
+  untrusted: null,
 });
