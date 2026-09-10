@@ -6,14 +6,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { generate } from "../src/index.mjs";
-import { doc as exportDoc, handAuthoredCss, preset } from "./fixture.mjs";
-
-/** `styles.css` minus the eighteen lines the consumer deletes to adopt this. */
-const consumerCss = () =>
-  handAuthoredCss()
-    .split("\n")
-    .filter((l) => !/^\s*--(?:screen-height|height-screen)-[a-z0-9]+:/.test(l))
-    .join("\n");
+import { consumerCss, doc as exportDoc, handAuthoredCss, preset } from "./fixture.mjs";
 
 const emit = (cfg = preset, css = consumerCss()) =>
   generate(exportDoc(), cfg, { handAuthoredCss: css });

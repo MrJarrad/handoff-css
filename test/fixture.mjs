@@ -87,14 +87,40 @@ export const docV8b = () =>
     readFileSync(path.join(path.dirname(FIXTURE), "jhd-v8b-2026-09-10", "export.json"), "utf8"),
   );
 
+export const V8B = path.join(path.dirname(FIXTURE), "jhd-v8b-2026-09-10");
+
 /**
- * The house preset's stylesheet minus the hand-authored `--screen-height-*` /
- * `--height-screen-*` block, which is the deletion the consumer makes when it
- * adopts 0.2.0: a hand-authored GLOBAL declaration suppresses generation (P2)
- * and collides with the alias block (P12).
+ * `fixtures/jhd-v8b-2026-09-10/styles.css` — the CONSUMER'S stylesheet as it
+ * ships after adopting 0.2.0, copied verbatim from `jhd-design-system`'s
+ * `src/styles.css` at the commit that adopted it (WS-B step 7). It is the same
+ * file as `jhd-v7b/styles.css` minus the eighteen hand-authored
+ * `--screen-height-*` / `--height-screen-*` declarations, whose comment block
+ * became a pointer at the `aliases` config: a hand-authored GLOBAL declaration
+ * suppresses generation (P2) and collides with the alias block (P12), so the
+ * deletion is not optional.
+ *
+ * This was a filter over `jhd-v7b/styles.css` until the consumer actually
+ * landed the deletion. A derived fixture could only ever prove the generator
+ * against a stylesheet no repo shipped; this one is pinned byte-for-byte in
+ * both directions — `jhd-design-system`'s own
+ * `test/handoff-css-fixture-parity.test.mjs` fails if the two drift.
+ * (Generation is identical either way, which is how the swap was verified.)
  */
-export const consumerCss = () =>
-  handAuthoredCss()
-    .split("\n")
-    .filter((l) => !/^\s*--(?:screen-height|height-screen)-[a-z0-9]+:/.test(l))
-    .join("\n");
+export const consumerCss = () => readFileSync(path.join(V8B, "styles.css"), "utf8");
+
+/** `expected/*` for the v8b fixture — see `expectedV8b`'s note below. */
+export const expectedV8b = (file) =>
+  readFileSync(path.join(V8B, "expected", file), "utf8");
+
+/**
+ * The consumer's config as `jhd-design-system/handoff.config.mjs` actually
+ * resolves it: the house preset, with the two strings the generator writes
+ * into its own output as pointers back at the consuming repo. Neither can be
+ * correct in a preset other consumers copy, and the v8b `expected/*` files are
+ * that repo's committed artifacts, so reproducing them needs the real pair.
+ */
+export const consumerConfig = {
+  ...preset,
+  report: { ...preset.report, policyRef: "docs/handoff-css.md" },
+  header: { ...preset.header, regenerateCommand: "pnpm run tokens" },
+};
