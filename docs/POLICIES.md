@@ -376,6 +376,96 @@ block does. That edit is in the consumer's stylesheet, not here.
 
 ---
 
+## P11 — Responsive classes
+
+A dimensional variable is published with a **responsive class**, and the class —
+not the number of modes — decides how many declarations it gets.
+
+| Class | Emitted as |
+| --- | --- |
+| `viewport-width` / `viewport-height` | ONE declaration on the base scope, the fraction in `viewport.widthUnit` / `viewport.heightUnit` (`vw` / `dvh`). The per-mode px samples are dropped and listed in the report. |
+| `fluid-clamp` | The export's own `clamp()` expression, once per layout variant. Never recomputed here — the export publishes `preferred.slopeRemPerPx`, `interceptRem` and the finished `css`. |
+| `fixed` | One declaration per layout variant, instead of one per width. |
+| `mode-stepped` | Per-mode, in ascending `@media (min-width)` blocks — the default path (P3, P6). |
+| `sample-only` | Per-mode, from the one published sample. |
+
+**Where the class comes from**, in precedence order:
+
+1. A `responsive` block on the variable —
+   `{ kind: "viewport", viewport: { axis: "height" \| "width", fraction } }`, or
+   `{ kind: "<class name>" }`. The preferred signal; a block this package only
+   half-understands stops the run rather than falling through to the default
+   path.
+2. The **description convention**: a description matching exactly
+   `N% of screen height` or `N% of screen width`. A supported first-class
+   input, not a stopgap — Figma variables carry no viewport semantics, so a
+   description is the only place a designer can currently state the fraction.
+   Anchored: "roughly 20% of screen height on mobile" is not a signal. Switched
+   with `viewport.descriptionFallback`.
+3. The export's own `responsiveBehavior.rules[].strategy`, which is published
+   **per `layoutVariant`** — `col-span-1` is `mode-stepped` at the default
+   variant and `fluid-clamp` at `flush`, and each is honoured on its own.
+4. Nothing: the per-mode default path.
+
+The description beats `responsiveBehavior` deliberately. Every
+`device/screen-height/*` variable is `mode-stepped` there — it genuinely IS four
+per-breakpoint samples — while its description states the fraction those samples
+are samples OF. Only the fraction can be emitted as one declaration that holds
+at every viewport, so the more specific statement wins.
+
+**What is honoured is config.** `responsive.honourClasses` lists the classes
+allowed to change the output. `mode-stepped` and `sample-only` ARE the default
+path, so listing them changes nothing; an empty list pins pre-0.2.0 output
+exactly. This is how a consumer adopts one class at a time instead of taking
+every behavioural change in one release.
+
+**Nothing is guessed.** `viewport.groups` names variable-name prefixes the
+consumer declares viewport-relative; a member with neither a field nor a
+matching description keeps its px samples and is reported as
+`VIEWPORT_UNFLAGGED` — the fix is one description in Figma, not a heuristic
+here. Likewise a `fluid-clamp` with no `css` expression
+(`CLAMP_WITHOUT_EXPRESSION`) and a `fixed` whose modes do not actually agree
+(`FIXED_VARIES_BY_MODE`) fall back to the samples and say so.
+
+And nothing is second-guessed. A description of "20% of screen width" on a
+full-bleed variable emits `20vw`. That is a wrong token from a wrong
+description, correctable in Figma in one edit and named in the report's §10; a
+plausibility check here would make the export stop being the contract.
+
+`responsive.honourClasses`, `viewport.*` · `src/responsive.mjs`
+
+---
+
+## P12 — Alias block
+
+`aliases` maps a name pattern to a target pattern, each ending in exactly one
+`*`:
+
+```js
+aliases: {
+  "--screen-height-*": "--device-screen-height-*",
+  "--height-screen-*": "--screen-height-*",
+}
+```
+
+The `*` binds to the leaf of every **emitted** name matching the target, so the
+alias set is derived from what was generated rather than maintained by hand.
+Patterns expand in declaration order and may target an earlier pattern's
+output, which is how a two-hop convention stays two one-line rules. The result
+is one `:root` block after the collections.
+
+An alias is a `var()` hop, never a second copy of the value — the token above
+stays the single place the value is stated. A collision with a generated name,
+with a hand-authored global declaration (P2), or with another pattern's output
+is a **hard failure**: whichever declaration lost would be silently dead, and
+one of the two is a real design-system token. A pattern that matches nothing is
+also a hard failure — a config statement about names that no longer exist is
+exactly the drift a generated alias block exists to catch.
+
+`aliases` · `src/aliases.mjs`
+
+---
+
 ## Determinism
 
 Collections sorted by name, variables by WEB name, numbers rounded to 6 decimal

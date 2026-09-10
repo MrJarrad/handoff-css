@@ -123,10 +123,56 @@ before it is rendered, so you can build your own checks on them.
 | `tailwind.namespaces` | Which Tailwind namespaces you populate, and which name segment each claims. |
 | `tailwind.held` | Namespaces deliberately **not** reset, each with its blocker stated. |
 | `tailwind.rootFontSizePx` | px→rem divisor; `null` reads the export's own `units.policy.rootFontSizePx`. |
+| `responsive.honourClasses` | Which responsive classes may change the output (see below). |
+| `viewport.heightUnit` / `viewport.widthUnit` | The units a viewport fraction is emitted in — `dvh` / `vw`. |
+| `viewport.descriptionFallback` | Read the `"N% of screen height\|width"` description convention as a viewport signal. |
+| `viewport.groups` | Variable-name prefixes you declare viewport-relative; an unstated member is reported, not guessed. |
+| `aliases` | Name-pattern → target-pattern alias block (see below). |
 | `report.*` | Report title, where your policy write-up lives, and the narrative paragraphs. |
 | `header.regenerateCommand` | Printed into every generated file, so a reader knows how to reproduce it. |
 
-`viewport.*` and `aliases` are declared from 0.1.0 and consumed from 0.2.0.
+### Responsive classes
+
+A dimensional variable's **class** decides how many declarations it gets, not
+its mode count:
+
+| Class | Emitted as |
+| --- | --- |
+| `viewport-width` / `viewport-height` | One declaration on the base scope, the fraction in `vw` / `dvh`. The per-mode px samples are dropped. |
+| `fluid-clamp` | The export's own `clamp()`, once per layout variant. |
+| `fixed` | One declaration per layout variant. |
+| `mode-stepped` | Per-mode, in ascending `@media (min-width)` blocks. |
+| `sample-only` | Per-mode, from the one published sample. |
+
+The class comes from a `responsive` block on the variable, else a description
+matching exactly `N% of screen height` / `N% of screen width`, else the
+export's own `responsiveBehavior.rules[].strategy` (published per layout
+variant), else the per-mode default. The description convention is a supported
+input rather than a stopgap: Figma variables carry no viewport semantics, so it
+is the only place a designer can currently state the fraction.
+
+`responsive.honourClasses` lists the classes allowed to change your output —
+`[]` pins the per-mode behaviour of 0.1.0 exactly, so you adopt one class at a
+time. Nothing is guessed: a `viewport.groups` member with no stated fraction
+stays px and is reported as `VIEWPORT_UNFLAGGED`, and a wrong description
+yields a wrong token on purpose (the export is the contract; the fix is in
+Figma). Full rules: [P11](docs/POLICIES.md).
+
+### Aliases
+
+```js
+aliases: {
+  "--screen-height-*": "--device-screen-height-*",
+  "--height-screen-*": "--screen-height-*",
+}
+```
+
+Each pattern ends in exactly one `*`, which binds to the leaf of every emitted
+name matching the target — so the alias set is derived from what was generated,
+not maintained by hand. Patterns may target an earlier pattern's output. The
+result is one `:root` block of `var()` hops after the collections; the token
+stays the single place the value is stated. A collision with a generated or
+hand-authored name is a hard failure. Full rules: [P12](docs/POLICIES.md).
 
 ### Report narrative
 
@@ -166,9 +212,12 @@ difference.
 node --test 'test/**/*.test.mjs'
 ```
 
-`test/parity.test.mjs` asserts all four outputs byte-identical against a real
-committed design system's artifacts — the fixture under `fixtures/jhd-v7b/`.
-That test is the reason a refactor here is safe.
+`test/parity.test.mjs` asserts the outputs byte-identical against a real
+committed design system's artifacts — the fixture under `fixtures/jhd-v7b/`,
+generated with every 0.2.0 class pinned off. That test is the reason a refactor
+here is safe. `fixtures/jhd-v7c/` is a second real export of the same system,
+re-exported after three variable descriptions were filled in, and is what the
+description convention is tested against.
 
 ## Licence
 
