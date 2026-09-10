@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jhd/handoff-css/schema/config.schema.json",
+  "title": "handoff-css config",
+  "description": "Every house policy handoff-css applies. Nothing in src/ carries a default for these: a consumer states them here, or the generator refuses to run.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "paths", "exclude", "color", "layout", "modes", "themes", "tailwind", "report", "header"],
+  "properties": {
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "versions"],
+      "properties": {
+        "name": { "type": "string", "description": "The export's own `schema` field. Any other value is a hard failure." },
+        "versions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "Every `schemaVersion` this consumer has read and vendored. A superseded schema usually still parses, so it is rejected rather than accepted silently."
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input", "out", "theme", "report", "handAuthored", "exclusions"],
+      "properties": {
+        "input": { "type": "string", "description": "The vendored handoff export." },
+        "out": { "type": "string", "description": "The token stylesheet." },
+        "theme": { "type": "string", "description": "The Tailwind `@theme` bridge." },
+        "report": { "type": "string", "description": "The reconciliation report." },
+        "handAuthored": { "type": "string", "description": "The consumer's own stylesheet, which wins the cascade (P2)." },
+        "exclusions": { "type": "string", "description": "EXCLUDED + PRIVATE name lists, for a downstream conformance checker." }
+      }
+    },
+    "exclude": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paths"],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "`\"<collection>/<variable>\"` prefixes never emitted, regardless of hidden state, and never revived by reachability (P7)."
+        }
+      }
+    },
+    "color": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format"],
+      "properties": {
+        "format": {
+          "enum": ["rgb-slash-percent", "hex8"],
+          "description": "How an 8-digit hex renders: `#rrggbb` at full alpha else `rgb(r g b / pct)`, or the export's hex verbatim."
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collection", "variantAttribute", "baseMode"],
+      "properties": {
+        "collection": { "type": "string", "description": "The collection whose modes are responsive breakpoints, not themes (P3)." },
+        "variantAttribute": { "type": "string", "description": "The attribute selecting a non-default layout variant." },
+        "baseMode": {
+          "enum": ["smallest-default-variant", "collection-default"],
+          "description": "Which mode seeds the unconditional base. `collection-default` is the superseded, non-mobile-first rule (P6)."
+        }
+      }
+    },
+    "modes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collectionModeAttribute"],
+      "properties": {
+        "collectionModeAttribute": {
+          "type": "string",
+          "description": "Template for a multi-mode collection with no width or theme semantics. `{collection}` is the slugified collection name."
+        }
+      }
+    },
+    "themes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collection", "total"],
+      "properties": {
+        "collection": { "type": "string", "description": "Fallback gate: the collection whose modes are themes if the export publishes no `isTheme` flag (P9.1)." },
+        "total": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Theme mode names that replace their siblings entirely, so a nested sibling class cannot re-point tokens under them (P10)."
+        }
+      }
+    },
+    "tailwind": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespaces", "held", "rootFontSizePx"],
+      "properties": {
+        "namespaces": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ns"],
+            "properties": {
+              "ns": { "type": "string", "description": "The Tailwind theme namespace, e.g. `color`, `radius`, `ease`." },
+              "collection": { "type": ["string", "null"], "description": "The export collection that populates it; null means reset-only." },
+              "group": { "type": ["string", "null"], "description": "The token-name segment the namespace claims and therefore cuts off the leaf (P8.1)." },
+              "from": { "enum": ["breakpoints"], "description": "Populate from `breakpoints.entries` instead of a collection (P8.4)." },
+              "note": { "type": "string", "description": "Emitted as a comment above the namespace, and shown in the report." }
+            }
+          }
+        },
+        "held": {
+          "type": "array",
+          "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } },
+          "description": "`[namespace, why]` pairs deliberately NOT reset, each with its blocker stated (P8.3)."
+        },
+        "rootFontSizePx": {
+          "type": ["number", "null"],
+          "description": "px -> rem divisor for breakpoints. null reads the export's own `units.policy.rootFontSizePx`."
+        }
+      }
+    },
+    "viewport": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "heightUnit": { "type": "string" },
+        "widthUnit": { "type": "string" },
+        "descriptionFallback": { "type": "boolean" },
+        "groups": { "type": "array", "items": { "type": "string" } }
+      },
+      "description": "The viewport rule. Declared from 0.1.0, consumed from 0.2.0."
+    },
+    "aliases": {
+      "type": "object",
+      "description": "`\"<pattern>\": \"<target pattern>\"` alias block. Declared from 0.1.0, consumed from 0.2.0."
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "policyRef", "parity", "colourCollections", "notes"],
+      "properties": {
+        "title": { "type": "string" },
+        "policyRef": { "type": "string", "description": "Where the consumer's human-readable policy write-up lives." },
+        "parity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title", "namePrefix"],
+          "properties": {
+            "title": { "type": "string" },
+            "namePrefix": { "type": "string", "description": "The scale §1 spot-checks against the hand-authored file." }
+          }
+        },
+        "colourCollections": { "type": "array", "items": { "type": "string" } },
+        "notes": {
+          "type": "object",
+          "description": "House narrative, interpolated into the report with `{{name}}` placeholders. Every key is optional; an absent one leaves its paragraph empty.",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "header": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["regenerateCommand"],
+      "properties": {
+        "regenerateCommand": { "type": "string", "description": "Printed into every generated file, so a reader knows how to reproduce it." }
+      }
+    }
+  }
+}

@@ -1,0 +1,384 @@
+# Policies
+
+Everything the export publishes is read from the export. The decisions below are
+**not** published by the export, so they are stated here rather than left as
+magic. Each names the config key that parameterises it, where there is one; the
+open questions are repeated in the generated report.
+
+The rule this package holds to: **never re-introduce a heuristic the export has
+taken responsibility for.** Successive schema versions have moved three
+generator guesses into published fields — the per-mode `build` cell (P4), the
+`breakpoints.entries` array (P3), and the resolved `COMPOSE_COLOR` expression
+(P9) — and each time the generator's job got smaller, not cleverer.
+
+---
+
+## P1 — Names
+
+`codeSyntax.WEB.value`, verbatim. Never re-derived from the Figma path. A
+variable without one is a hard failure: the export's own `naming.policy`
+guarantees one for every variable, so its absence means the export is malformed.
+
+`src/schema.mjs`
+
+## P2 — Hand-authored wins (global scope only)
+
+A custom property already declared **globally** in the consumer's own stylesheet
+(`paths.handAuthored`) is not emitted. The rationale is cascade-mechanical, not
+stylistic: a consumer that declares its scales inside `@theme inline` has
+Tailwind emit them into `@layer theme`, and an unlayered `:root` from a generated
+file would beat the theme layer — so emitting a colliding name would silently
+invert authorship, and for colour would detach `.dark` from the token the utility
+resolves. Standing down is the only ordering-independent way to keep
+"hand-authored wins" true. Every skipped name is reported as MATCH or
+VALUE-DRIFT.
+
+**Scope.** "Globally" means a top-level `:root` / `html`, or a `@theme` block. A
+declaration inside `.dark`, `@media`, `@supports` or `@utility` only applies when
+its condition holds, so it cannot supersede the token everywhere; treating it as
+a suppressor would leave the token undefined outside that condition. Those names
+are reported in the report's §8 instead.
+
+A **MATCH** row means the hand-authored declaration and the export agree — i.e.
+a duplicate that could simply be deleted so the generated one wins. Consumers who
+have done that tidy can pin MATCH at zero in their own test, and a new row then
+tells them a duplicate crept back.
+
+`src/hand-authored.mjs`
+
+## P3 — Modes
+
+The export publishes `breakpoints.entries`, one row per mode: `widthPx`,
+`layoutVariant`, `isTheme`. So:
+
+- single-mode collection → `:root`
+- a mode the export flags `isTheme` — default → `:root`, otherwise `.<mode name>`
+- `layout.collection`'s modes → `@media (min-width: <widthPx>)`, mobile-first in
+  ascending width order. The second axis is a **selector, not a width**:
+  `layoutVariant === "default"` lands on `:root`, any other variant on
+  `[<layout.variantAttribute>="<variant>"]` inside the same media block.
+- any other multi-mode collection → default mode on `:root`, every other mode on
+  `[<modes.collectionModeAttribute>="<mode name>"]` (the export publishes no
+  width or theme semantics for these).
+
+If `breakpoints.entries` does not resolve a width for **every** mode of the
+layout collection, the generator falls back to the data-attribute placeholder
+rather than guessing breakpoints.
+
+`layout.collection`, `layout.variantAttribute`, `modes.collectionModeAttribute`,
+`themes.collection` · `src/modes.mjs`
+
+## P4 — Units
+
+Driven **entirely** by the per-mode `build` cell the export publishes
+(`units.policy` v4). The generator applies no scope heuristics of its own.
+
+- `build.status === "resolved"` → emit `build.css` verbatim. A `build.raw` that
+  disagrees with the mode's own `raw` is a hard failure, never a silent pick of
+  one side. Where `unitHint.sourceUnit` is px and `build.unit` is not, the source
+  px value goes in a trailing comment. So `divide-by-100` → `--opacity-500: 0.5`,
+  `identity` + px → `--blur-100: 12px`, `divide-by-root-font-size` →
+  `3rem /* 48px */`.
+- `build.status === "unresolved"` (in practice `divide-by-associated-font-size`,
+  which needs a font size the export does not carry for a standalone variable) →
+  emit the raw source value with an `UNCONVERTED:` comment and list it in the
+  report's §6. **The divisor is never invented.**
+
+Non-FLOAT types are rendered by type, since unit does not apply: TIMING →
+seconds (`0.375s`); EASING → `cubic-bezier(…)`, LINEAR → `linear`; COLOR → per
+`color.format`; STRING → quoted.
+
+`color.format` · `src/resolve.mjs`
+
+## P5 — Aliases
+
+`var(--<next hop's WEB name>)` from `alias.chain[0]`, so the semantic →
+primitive relationship survives into CSS. `terminalValue` goes in a trailing
+comment. If the next hop is not in the export (a remote library variable), the
+terminal value is emitted instead and the token is listed under UNRESOLVED
+ALIASES in the report.
+
+`src/resolve.mjs`
+
+## P6 — Which mode seeds the base
+
+`layout.baseMode: "smallest-default-variant"` — the unconditional base seeds
+from the **smallest-width `default`-variant mode**, not the collection's
+`defaultModeId`. Wider modes arrive only via their own ascending
+`@media (min-width)` block.
+
+The superseded alternative (`"collection-default"`) is kept as an option because
+it is what a naive reading of the export gives you, and it is a real bug when the
+default mode is not the narrowest: every token below the default mode's width
+silently falls back to the default's value, inverting mobile-first. Viewports
+narrower than the smallest published sample resolve to that sample's value —
+there is no published design intent below it.
+
+`layout.baseMode` · `src/modes.mjs`
+
+## P7 — Private / hidden / excluded
+
+Figma-only scaffolding must never become a public design-system token. But
+hidden-in-Figma does **not** mean absent-from-CSS, and conflating the two ships
+broken CSS.
+
+In Figma, "don't publish" means "don't offer this in the picker" — a consumption
+rule for designers, not a statement that the value is unused. Primitives stay
+alive as the alias targets behind semantic tokens. CSS custom properties have no
+such distinction: a name is either declared or it is not, and
+`--background-default-primary: var(--palette-500)` with no `--palette-500`
+declaration is **invalid at computed-value time** — the semantic token resolves
+to nothing and the element renders unstyled. So the emit set is the alias
+closure, not the published set:
+
+```
+emit = published ∪ { reachable by alias from an emitted variable }
+```
+
+Three classes, reported separately:
+
+- **PRIVATE** — hidden, but reachable by alias from an emitted variable (walk
+  `alias.chain[0]` transitively across every effective mode; light and dark
+  routinely alias different primitives). **Emitted**, under the same name,
+  because the aliases have to resolve — fenced in a marked block so the file
+  states the intent the publish flag was carrying: these exist to be aliased, not
+  used directly. Never a public row, never MISSING or EXTRA downstream.
+- **HIDDEN** — hidden **and** unreachable. Nothing refers to it, so dropping it
+  breaks nothing. Never emitted. This is the export's own signal and the durable
+  fix: once Figma marks a variable hidden, it lands here with no config change.
+- **EXCLUDED** — the variable's `"<collection>/<name>"` path starts with an entry
+  in `exclude.paths`. A **policy** list, applied wholesale on path identity
+  regardless of hidden state, and **never revived by reachability** — if product
+  code must not consume it, an alias to it is a design-file bug worth surfacing,
+  not papering over.
+
+All three are excluded from the reconciliation rows, so MATCH / VALUE-DRIFT /
+NAME-ONLY-IN-EXPORT never reflect them. Only PRIVATE is emitted.
+
+`exclude.paths` · `src/exclude.mjs`
+
+## P8 — Tailwind namespaces
+
+A second output (`paths.theme`) holding **one** `@theme` block, so Tailwind's
+generated utilities speak the design system's vocabulary
+(`bg-background-default-primary`, `rounded-300`, `lg:` = the Figma device width)
+and Tailwind's own default scale is gone. `paths.out` stays Figma-fidelity-only
+and never gains a Tailwind bridge; the bridge is generated rather than
+hand-authored, so it cannot drift from the tokens.
+
+### P8.1 Suffix rule
+
+The key is `--<namespace>-<leaf>`. The leaf is the token's WEB name minus its
+leading `--`, minus its leading group segment **when** that group is the
+namespace or a documented alias of it (`tailwind.namespaces[].group`):
+
+```
+--radius-300                  -> --radius-300        (not --radius-radius-300)
+--radius-action-radius-elipse -> --radius-action-radius-elipse
+--easing-power2-out           -> --ease-power2-out   (easing -> ease)
+--letter-spacing-100          -> --tracking-100      (letter-spacing -> tracking)
+--background-default-primary  -> --color-background-default-primary
+```
+
+Groups are never re-derived from Figma paths: the leaf is cut off the WEB name P1
+already published, so P8 inherits P1's naming policy instead of running a second,
+divergent one.
+
+### P8.2 Value
+
+Always `var(--<token WEB name>)`, never the resolved literal, and the block is
+`@theme inline`. Both halves were established by measurement:
+
+- `@theme inline` substitutes the value **text** into the utility and does not
+  emit the key as a custom property, so the utility ends up
+  `background-color: var(--background-default-primary)` and resolves the token
+  **at the element**, picking up `.dark` and any scoped override on the way down.
+- A plain `@theme` was tried first and is **wrong**. It emits
+  `--color-background-default-primary: var(--background-default-primary)` into
+  `:root`, which resolves there and then inherits the `:root` answer downward, so
+  a subtree that re-declares the token no longer reaches the utility. A
+  breakpoint probe caught this as a real shipped regression: a media control
+  under a locally inverted scope went white → black at every width.
+
+**Exception — same-name.** When the computed key equals the token's WEB name
+(`--radius-300`, `--blur-100`), `var()` is a self-reference and must not be
+emitted. Under `inline` Tailwind does not drop such a key; it re-declares it
+inside the utility rule, producing
+`.rounded-300 { --radius-300: var(--radius-300); border-radius: var(--radius-300) }`
+— a cycle, so the custom property is invalid at computed-value time and the
+utility silently computes to `0`. Measured in Chromium: the cyclic case yields
+`border-radius: 0px` where the plain one yields 3px. No error, no warning.
+
+Those keys therefore emit the token's resolved **default-mode literal**, with the
+token named in a trailing comment. Safe because a same-name namespace is
+single-mode (so the literal cannot go stale against a `.dark` or `@media`
+override), and both halves come from the same export in the same pass. Colour is
+never same-name (`--color-` prefix), so the namespace that actually needs
+element-level resolution always gets it.
+
+### P8.3 Resets
+
+Each populated namespace opens with `--<namespace>-*: initial`, so Tailwind's
+defaults stop compiling. `tailwind.held` names the namespaces deliberately left
+un-reset, each with its blocker, and each is listed in the report's §9 so a hold
+is a visible decision rather than an omission. Two kinds of hold are worth
+distinguishing:
+
+- **Nothing to reset.** Tailwind derives numeric spacing from a single
+  `--spacing` multiplier (`p-4` = `calc(var(--spacing) * 4)`), not from per-key
+  entries, so there is no namespace to populate and `--spacing-*: initial` would
+  remove nothing. `z-<number>` is likewise a bare-value utility with no theme
+  namespace behind it.
+- **A real blocker.** A namespace whose hand-authored scale the export cannot
+  regenerate (a type ramp with per-step letter-spacing modifiers, say) must not
+  be reset, or the reset strips a scale nothing replaces.
+
+### P8.4 Breakpoints
+
+`--<namespace>-<family>` from `breakpoints.entries`, `default` layoutVariant only,
+px converted to rem at the export's own `units.policy.rootFontSizePx`
+(`tailwind.rootFontSizePx` overrides it; `null` means read the export and hard-fail
+if absent, rather than assuming 16). Non-default variant rows are **layout
+variants, not breakpoints** — they share their family's width and are selected by
+the variant attribute (P3), so emitting them here would invent duplicate widths.
+A Tailwind default breakpoint with no Figma device width behind it simply
+disappears with the reset.
+
+### P8.5 Hand-authored
+
+**P2 does not apply to this file.** A namespace reset is only true if the whole
+namespace is emitted in one place, so P8 always emits the full namespace, and the
+report's §9 classifies every hand-authored `@theme` entry as
+GENERATED-EQUIVALENT / VALUE-DRIFT / HAND-ONLY instead.
+
+### P8.6 Motion is bridged under Tailwind's own namespace names
+
+The duration/delay utilities are not bare-value-only: Tailwind v4 reads
+`--transition-duration-*` and `--transition-delay-*`, and a namespace entry
+**wins** over the bare-millisecond fallback. Measured against tailwindcss 4.3.3:
+with `--transition-duration-300: 0.375s` present, `duration-300` emits
+`transition-duration: 0.375s`; without it, the bare path emits `300ms`. So the
+bridge maps the motion collection into both namespaces keyed by the **Figma**
+suffix.
+
+What the resets do and do not do, measured: Tailwind ships no
+`--transition-duration-*` / `--transition-delay-*` theme entries at all
+(`theme.css` has only `--default-transition-duration`), so those `: initial`
+lines remove nothing — they are whole-namespace consistency and a fence against a
+future Tailwind default. The bare-ms fallback also **survives** for suffixes
+Figma does not publish (`delay-150` still compiles to `150ms`); only a lint can
+close that. The win is that every suffix Figma **does** publish now resolves to
+the Figma value instead of a coincidental millisecond.
+
+The house token names remain the token layer; the `--transition-*` keys are the
+bridge, and the two never collide, so P8.2's same-name literal rule does not
+fire. A `motion-`-prefixed candidate (`duration-motion-300`) emits nothing — the
+namespace suffix is the bare Figma leaf.
+
+`tailwind.namespaces`, `tailwind.held`, `tailwind.rootFontSizePx` ·
+`src/emit-theme.mjs`
+
+## P9 — COMPOSE_COLOR
+
+A COLOR variable's mode `raw` can be a `VARIABLE_EXPRESSION`
+(`expressionFunction: COMPOSE_COLOR`): exactly two `VARIABLE_ALIAS` arguments,
+arg 1 a colour, arg 2 an opacity FLOAT. This is Figma's replacement for a
+hand-authored alpha ramp.
+
+The export resolves the expression itself. Every COMPOSE_COLOR mode carries a
+`build` cell exactly like a FLOAT's: `build.status: "resolved"`, `build.css`
+(relative colour syntax, `rgb(from var(--<colour>) r g b / var(--<opacity>))`,
+both arguments still live `var()` references so theme-mode overrides on either
+half keep flowing through), `build.literal` (an 8-digit hex fallback),
+`build.conversionStrategy: "compose-color"`.
+
+Under P4's contract the generator emits `build.css` as-is and **does not** derive
+a `color-mix()` of its own. The compose pass is retained only as a validating
+pass-through: it still walks `expressionArguments` to resolve both operands' WEB
+names (needed for P9.2 reachability and for the terminal-value comment further
+down an alias chain, P5), and it still hard-fails on any expression shape it does
+not recognise or on `build.status !== "resolved"`. An unresolved compose cell is
+exactly the shape the old generator handled by computing its own mix; the export
+now states plainly that this is its job, so an unresolved cell is a hard failure
+rather than a silent fallback.
+
+Noted for the record, not overridden: `rgb(from …)` reaches Baseline later
+(Chrome 119 / Safari 16.4 / Firefox 128) than `color-mix()` (Chrome 111 / Safari
+16.2 / Firefox 113). The export states the value and P4 says emit it verbatim.
+
+A bare-number second argument (instead of a `VARIABLE_ALIAS`) is kept as a
+defensive branch — one earlier export in this schema family carried the shape,
+and nothing proves Figma cannot reintroduce it.
+
+### P9.1 Theme modes, driven by the export's own flag
+
+`breakpoints.entries` carries `isTheme: true` / `theme: "<name>"` /
+`source: "theme-name"` for every theme mode alongside the layout rows
+(`isTheme: false`). P3's mode-selector rule is driven by that flag directly
+rather than a collection-name string check, so a third theme mode lands on its
+own class through the same mechanism as the second, with no new code path. No
+semantics beyond that are assumed for any theme.
+
+### P9.2 Reachability
+
+P7's alias closure must also walk a COMPOSE_COLOR mode's two
+`expressionArguments` (read from `mode.raw`, published alongside `build`), not
+just `mode.alias.chain[0]` — both arguments are emitted as `var()` and are
+load-bearing exactly like an alias hop. Missing this wrongly drops a hidden
+colour/opacity primitive as HIDDEN instead of keeping it PRIVATE, leaving the
+composing token's `var()` dangling.
+
+`src/resolve.mjs`, `src/exclude.mjs`
+
+## P10 — Total themes
+
+A mode named in `themes.total` **replaces its sibling themes entirely**. While
+its class is on the document root, a nested sibling theme class (a per-media or
+per-section ground mode) must not re-point tokens back to that sibling's values —
+proximity should not beat the root theme.
+
+**Mechanism.** The total mode's generated block is selected by
+`.total, .total .sibling, .total.sibling` instead of plain `.total`:
+
+- `.total .sibling` (0,2,0) outguns both the generated and any hand-authored
+  `.sibling` block (0,1,0) regardless of source order, for descendants.
+- `.total.sibling` (0,2,0) covers the case where **both** classes land on the
+  same element, where plain `.total` (0,1,0) would only tie the `.sibling` block
+  and lose on source order.
+- Plain `.total` needs no help against `:root` (0,1,0 vs 0,1,0): `:root` sorts
+  first, so the total mode wins ties by position alone.
+
+**What this cannot do.** Specificity decides which of two competing declarations
+wins; it cannot make a rule win a token that neither `.total` nor
+`.total .sibling` declares at all — that token keeps resolving through whatever
+`.sibling` rule does declare it. Every theme-bearing token must therefore be
+either generated (so P10 covers it automatically) or explicitly hand-mirrored
+under the same selector list. **A token declared only in a hand-authored sibling
+block is a leak by construction**, whatever this selector's specificity is.
+
+**Checked and rejected: deriving exclusivity from the export.**
+`breakpoints.entries` publishes `isTheme` / `theme` / `source` / `confidence` and
+no exclusivity or ordering field, so there is nothing generic to hang a rule on.
+Hence a named config list rather than an invented heuristic.
+
+**Also rejected: emitting each sibling as `.sibling:not(.total, .total *)`.** That
+would require revisiting every consumer of the sibling's specificity assumptions
+(the hand-authored and generated blocks share one selector) for a mode that has
+no reason to know the total mode exists. Putting the exclusion on the total
+mode's own selector keeps the concept contained to the mode that claims it.
+
+A consumer's `dark:`-style custom variant needs the same treatment on its own
+side (`@custom-variant dark (&:is(.dark:not(.bttf, .bttf *) *))` in the JHD
+case), so those utilities go inert under the total theme exactly as the token
+block does. That edit is in the consumer's stylesheet, not here.
+
+`themes.total` · `src/modes.mjs`
+
+---
+
+## Determinism
+
+Collections sorted by name, variables by WEB name, numbers rounded to 6 decimal
+places (Figma stores float32, so raws arrive as `0.10000000149011612`). Same
+inputs → byte-identical output. `--check` writes nothing and exits 1 if any
+committed artifact would change, which is what a consumer's CI runs.
