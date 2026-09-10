@@ -41,7 +41,15 @@ process.stdout.write(
     `  EXCLUDED                ${excludedRows.length}`,
     `  responsive classes      ${honoured} honoured (${config.responsive.honourClasses.join(", ") || "none"})`,
     `  aliases                 ${aliasRows.length}`,
-    ...warnings.map((w) => `  warning                 ${w.code}  ${w.name}`),
+    // One line per warning CODE, not per occurrence: a contradictory build
+    // cell (P13) is found per (variable, mode), so a single bad plugin export
+    // is 100 of them and the summary has to stay a summary. Every occurrence is
+    // in the report's §10, named.
+    ...[...new Set(warnings.map((w) => w.code))].sort().map((code) => {
+      const hits = warnings.filter((w) => w.code === code);
+      const names = [...new Set(hits.map((w) => w.name))];
+      return `  warning                 ${code}  ${hits.length} in ${names.length} token${names.length === 1 ? "" : "s"} (${names.slice(0, 3).join(", ")}${names.length > 3 ? ", …" : ""})`;
+    }),
     `  out                     ${opts.out}`,
     `  theme                   ${opts.theme}`,
     `  report                  ${opts.report}`,

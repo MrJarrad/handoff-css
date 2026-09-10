@@ -436,6 +436,43 @@ plausibility check here would make the export stop being the contract.
 
 ---
 
+## P13 — Cell trust
+
+Every FLOAT mode carries a `build` cell, and P4 emits its `css` verbatim — but
+only while the cell agrees with itself. A cell is **untrusted** when
+`conversionStrategy: "identity"` (the build value IS the source value) comes
+with a `rawValue` and a `convertedValue` that differ, or when `css` carries a
+unit other than the `buildUnit` the same cell published. Float32
+representation noise is not a contradiction: both comparisons round through the
+same `num()` the emitter uses, so `162.39999389648438` stored against
+`162.399994` converted is one number written twice.
+
+An untrusted cell never emits its `css`. Resolution falls, in order, to an
+explicit `responsive.viewport.fraction`, then the description convention (P11),
+then the raw source value in the cell's own `sourceUnit` — with a
+`BUILD_CELL_CONTRADICTORY` / `BUILD_CELL_UNIT_MISMATCH` warning naming the
+variable, the mode and the raw/converted pair. A cell with no `rawValue` to
+fall back on is a **hard failure**: the export states no value for that mode,
+and inventing one is the bug this policy exists to prevent. The 2026-09-10
+schema-8 export publishes 100 such cells — `device/container-max-width` is
+`rawValue: 2156`, `sourceUnit: "px"`, `convertedValue: 100`, `css: "100vw"`, so
+trusting it makes a fixed 2156px cap full-bleed site-wide.
+
+For the same reason a responsive **class** is not a value. `viewport-width` /
+`viewport-height` say "a fraction of the screen" and the class name says nothing
+about which fraction, so a class arriving from `responsiveBehavior[].strategy`
+or a bare `responsive.strategy` is a **hint**: it is reported
+(`VIEWPORT_CLASS_WITHOUT_FRACTION`) and changes nothing on its own. Only a
+`responsive.viewport.fraction` or a description states a fraction.
+
+The report's §10 lists every untrusted cell with its raw/converted pair. The
+count is a property of the export, not of your config: when the plugin stops
+publishing contradictory cells it goes to zero.
+
+`src/resolve.mjs` (`cellTrust`, `untrustedCells`)
+
+---
+
 ## P12 — Alias block
 
 `aliases` maps a name pattern to a target pattern, each ending in exactly one

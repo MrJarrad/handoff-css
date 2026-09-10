@@ -158,6 +158,19 @@ stays px and is reported as `VIEWPORT_UNFLAGGED`, and a wrong description
 yields a wrong token on purpose (the export is the contract; the fix is in
 Figma). Full rules: [P11](docs/POLICIES.md).
 
+### Cell trust
+
+The export's `build` cell states the value (P4) — but only while it agrees with
+itself. An `identity` conversion whose `rawValue` and `convertedValue` differ,
+or a `css` unit that is not the cell's own `buildUnit`, is **untrusted**: its
+`css` is never emitted. The value falls to a stated fraction if there is one,
+otherwise to the raw source value in the cell's own `sourceUnit`, always with a
+`BUILD_CELL_CONTRADICTORY` / `BUILD_CELL_UNIT_MISMATCH` warning and a §10 row
+carrying the raw/converted pair; a cell with no `rawValue` to fall back on is a
+hard failure. Float32 noise is not a contradiction. For the same reason a
+responsive class with no fraction behind it is only a hint and changes nothing
+(`VIEWPORT_CLASS_WITHOUT_FRACTION`). Full rules: [P13](docs/POLICIES.md).
+
 ### Aliases
 
 ```js
