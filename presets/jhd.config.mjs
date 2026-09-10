@@ -101,15 +101,42 @@ export default {
     rootFontSizePx: null,
   },
 
-  // Consumed from 0.2.0 (the viewport rule and the alias block); declared here
-  // so the house answer is recorded in one place rather than two.
+  // P11 — which responsive classes may change what is emitted.
+  //
+  // HELD, each with its blocker (same convention as `tailwind.held` above):
+  //   `fluid-clamp`  50 rules in the 2026-09-10 export already carry a ready
+  //                  `clamp()` — honouring it would move ~50 `grid/col-span/*`
+  //                  and `grid/col-start/*` tokens from stepped px to fluid
+  //                  clamps in one release. A real design decision (fluid grid
+  //                  columns), not a token-pipeline one: operator's call,
+  //                  and its own lane.
+  //   `fixed`        9 rules. Honouring it collapses a token that is equal at
+  //                  every breakpoint from ten declarations to one — correct,
+  //                  and invisible in computed values, but it is a diff across
+  //                  `grid/columns`, `grid/col-start/col-start-1` and
+  //                  `space/spacer-0` with no behaviour to show for it.
+  //   `mode-stepped` / `sample-only` ARE the per-mode default path; listing
+  //                  them would change nothing either way.
+  responsive: {
+    honourClasses: ["viewport-height", "viewport-width"],
+  },
+
+  // P11 — the viewport rule. `device/*` is the group the house declares
+  // viewport-relative; a member with no `responsive` field and no
+  // "N% of screen height|width" description stays px and is reported.
   viewport: {
     heightUnit: "dvh",
     widthUnit: "vw",
     descriptionFallback: true,
     groups: ["device/"],
   },
-  aliases: {},
+
+  // P12 — the two house alias hops that were hand-authored in
+  // `DS/src/styles.css` (~782-799), now expanded from the emitted leaves.
+  aliases: {
+    "--screen-height-*": "--device-screen-height-*",
+    "--height-screen-*": "--screen-height-*",
+  },
 
   report: {
     title: "ds-from-handoff — reconciliation report",

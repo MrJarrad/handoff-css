@@ -29,6 +29,7 @@ test("every key the plan locked is present in the preset", () => {
     "modes.collectionModeAttribute",
     "themes.collection", "themes.total",
     "tailwind.namespaces", "tailwind.held", "tailwind.rootFontSizePx",
+    "responsive.honourClasses",
     "viewport.heightUnit", "viewport.widthUnit", "viewport.descriptionFallback",
     "viewport.groups",
     "aliases",
@@ -76,6 +77,21 @@ test("a wrong type is named with what was expected", () => {
   const bad = clone();
   bad.exclude.paths = "layout/grid/aspect/";
   assert.match(validateConfig(bad).join("\n"), /config\.exclude\.paths: expected array, got string/);
+});
+
+test("a responsive class the package does not implement is refused", () => {
+  const bad = clone();
+  bad.responsive.honourClasses = ["viewport-height", "fluid-grid"];
+  assert.match(
+    validateConfig(bad).join("\n"),
+    /config\.responsive\.honourClasses\[1\]: "fluid-grid" is not one of/,
+  );
+});
+
+test("an alias pattern that is not a string is refused", () => {
+  const bad = clone();
+  bad.aliases = { "--screen-height-*": 12 };
+  assert.match(validateConfig(bad).join("\n"), /config\.aliases\.--screen-height-\*: expected string, got number/);
 });
 
 test("generate() refuses an invalid config rather than emitting from defaults", () => {

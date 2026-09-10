@@ -5,7 +5,7 @@
   "description": "Every house policy handoff-css applies. Nothing in src/ carries a default for these: a consumer states them here, or the generator refuses to run.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "paths", "exclude", "color", "layout", "modes", "themes", "tailwind", "report", "header"],
+  "required": ["schema", "paths", "exclude", "color", "layout", "modes", "themes", "tailwind", "responsive", "viewport", "aliases", "report", "header"],
   "properties": {
     "schema": {
       "type": "object",
@@ -125,20 +125,41 @@
         }
       }
     },
+    "responsive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["honourClasses"],
+      "properties": {
+        "honourClasses": {
+          "type": "array",
+          "items": {
+            "enum": ["viewport-width", "viewport-height", "fluid-clamp", "mode-stepped", "fixed", "sample-only"]
+          },
+          "description": "Which responsive classes may change what is emitted (P11). `mode-stepped` and `sample-only` ARE the per-mode default path, so listing them changes nothing; the other four collapse a variable's per-mode samples. An empty list pins pre-0.2.0 output exactly."
+        }
+      },
+      "description": "P11 — responsive classes."
+    },
     "viewport": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["heightUnit", "widthUnit", "descriptionFallback", "groups"],
       "properties": {
-        "heightUnit": { "type": "string" },
-        "widthUnit": { "type": "string" },
-        "descriptionFallback": { "type": "boolean" },
-        "groups": { "type": "array", "items": { "type": "string" } }
+        "heightUnit": { "type": "string", "description": "The unit a `viewport-height` fraction is emitted in, e.g. `dvh`." },
+        "widthUnit": { "type": "string", "description": "The unit a `viewport-width` fraction is emitted in, e.g. `vw`." },
+        "descriptionFallback": { "type": "boolean", "description": "Read the `\"N% of screen height|width\"` description convention as a viewport signal (P11)." },
+        "groups": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Variable-name prefixes the consumer declares viewport-relative. A member with neither a `responsive` field nor a matching description stays px and is reported as `VIEWPORT_UNFLAGGED`."
+        }
       },
-      "description": "The viewport rule. Declared from 0.1.0, consumed from 0.2.0."
+      "description": "P11 — how a viewport fraction becomes CSS."
     },
     "aliases": {
       "type": "object",
-      "description": "`\"<pattern>\": \"<target pattern>\"` alias block. Declared from 0.1.0, consumed from 0.2.0."
+      "additionalProperties": { "type": "string" },
+      "description": "P12 — `\"<name pattern>\": \"<target pattern>\"`, each ending in exactly one `*`, expanded over the emitted token leaves into a `:root` alias block. A collision with a generated or hand-authored name is a hard failure."
     },
     "report": {
       "type": "object",

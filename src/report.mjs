@@ -14,7 +14,8 @@ const fillIn = (text, vars) =>
   String(text ?? "").replace(/\{\{(\w+)\}\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
 
 export function report(doc, rows, handNames, handScoped, themeRows, handDeclared, cfg,
-                       privateRows = [], hiddenRows = [], excludedRows = []) {
+                       privateRows = [], hiddenRows = [], excludedRows = [],
+                       responsiveRows = [], aliasRows = [], warnings = []) {
   const handFile = cfg.paths.handAuthored.split("/").pop();
   const by = (s) => rows.filter((r) => r.status === s);
   const drift = by("VALUE-DRIFT");
@@ -238,6 +239,58 @@ ${["| Key | Value | Figma |", "| --- | --- | --- |",
 
 ${note("breakpointNote")}`;
 })()}
+
+## 10. Responsive classes (P11) and aliases (P12)
+
+How each variable became CSS. **Class** is the export's own responsive class —
+\`viewport-width\` / \`viewport-height\` (a fraction of the screen), \`fluid-clamp\`
+(one \`clamp()\` across the range), \`mode-stepped\` (per-breakpoint samples),
+\`fixed\` (equal at every mode), \`sample-only\` (one published sample). **Source**
+is where the class came from: a \`responsive\` **field** on the variable, the
+\`"N% of screen height|width"\` **description** convention, the export's own
+\`responsiveBehavior\` (**export**), or none of the three (**default**).
+**Effect** is what this run emitted — only a class named in
+\`responsive.honourClasses\` changes it; every other class takes the per-mode
+path, so parity can be pinned.
+
+Honoured this run: ${cfg.responsive.honourClasses.length ? cfg.responsive.honourClasses.map((c) => `\`${c}\``).join(", ") : "none — every class takes the per-mode path"}.
+
+${(() => {
+  const classified = responsiveRows.filter((r) => r.cls).sort((a, b) => cmp(a.name, b.name));
+  const tally = {};
+  for (const r of classified) tally[`${r.cls} (${r.source})`] = (tally[`${r.cls} (${r.source})`] ?? 0) + 1;
+  const summary = Object.entries(tally).sort((a, b) => cmp(a[0], b[0]))
+    .map(([k, n]) => `${k}: ${n}`).join(" · ");
+  const table = classified.filter((r) => r.honoured || r.source !== "export");
+  return `${classified.length} of ${responsiveRows.length} emitted variables carry a class — ${summary || "none"}.
+The ${classified.length - table.length} \`mode-stepped\`/\`sample-only\` rows the export
+classified and this run emitted per-mode are not listed individually; they are
+unchanged from the pre-P11 output.
+
+${table.length
+  ? ["| Token | Collection | Class | Source | Effect |", "| --- | --- | --- | --- | --- |",
+     ...table.map((r) => `| \`${r.name}\` | ${r.collection} | ${r.cls} | ${r.source} | ${r.effect} |`)].join("\n")
+  : "None."}`;
+})()}
+
+**Warnings (${warnings.length})** — what the generator would not guess at. A
+variable in a \`viewport.groups\` group with no stated fraction keeps its px
+samples: the fix is one description in Figma, not a heuristic here.
+
+${warnings.length
+  ? ["| Code | Token | Detail |", "| --- | --- | --- |",
+     ...[...warnings].sort((a, b) => cmp(a.code + a.name, b.code + b.name))
+       .map((w) => `| \`${w.code}\` | \`${w.name}\` | ${w.detail} |`)].join("\n")
+  : "None."}
+
+**Aliases (${aliasRows.length})** — published names that are a \`var()\` hop onto a
+generated token, expanded from \`aliases\` over the emitted leaves. The token is
+still the single place the value is stated.
+
+${aliasRows.length
+  ? ["| Alias | Target | Pattern |", "| --- | --- | --- |",
+     ...aliasRows.map((r) => `| \`${r.name}\` | \`${r.target}\` | \`${r.pattern}\` |`)].join("\n")
+  : "None."}
 
 ## Appendix A — zero-usage tokens (${zeroUsage.length})
 

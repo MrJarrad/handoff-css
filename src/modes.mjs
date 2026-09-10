@@ -75,18 +75,32 @@ export function placementsFor(collection, mode, ctx, cfg) {
   if (collection.name === cfg.layout.collection && ctx.layout.widths.size) {
     const width = ctx.layout.widths.get(mode.id);
     const variant = ctx.layout.variants.get(mode.id) ?? "default";
-    const selector =
-      variant === "default" ? ":root" : `[${cfg.layout.variantAttribute}="${variant}"]`;
+    const { selector } = variantBase(variant, cfg);
     const at = { media: `@media (min-width: ${num(width)}px)`, selector, width };
     // P6: the SMALLEST-width default-variant mode seeds the unconditional
     // base (not the collection's defaultModeId), so every layout token still
     // resolves below the smallest published sample width — mobile-first.
-    return mode.id === ctx.layout.baseModeId ? [{ media: null, selector, width: -1 }, at] : [at];
+    return mode.id === ctx.layout.baseModeId ? [variantBase(variant, cfg), at] : [at];
   }
 
   if (isDefault) return [{ media: null, selector: ":root", width: -1 }];
   return [{ media: null, selector: `[${modeAttribute(collection.name, cfg)}="${mode.name}"]`, width: -1 }];
 }
+/**
+ * The unconditional (media-free) scope of one layout variant: `:root` for the
+ * default variant, its `layout.variantAttribute` selector otherwise. It is
+ * where the base mode's declarations land (P6) and where P11 puts a single
+ * declaration that holds at every width — a viewport fraction or a `clamp()`.
+ */
+export const variantBase = (variant, cfg) => ({
+  media: null,
+  selector:
+    variant == null || variant === "default"
+      ? ":root"
+      : `[${cfg.layout.variantAttribute}="${variant}"]`,
+  width: -1,
+});
+
 /**
  * The data-attribute selector for a mode of a collection the export publishes
  * no width or theme semantics for. `modes.collectionModeAttribute` is a

@@ -2,9 +2,11 @@
 // (variable, effective mode), placed by `modes.mjs`. See docs/POLICIES.md.
 import path from "node:path";
 
+import { aliasBlock } from "./aliases.mjs";
 import { aliasedByNames, isExcluded, isHidden, privateIds } from "./exclude.mjs";
-import { layoutBreakpoints, placementsFor, renderGroups, themeModeIds } from "./modes.mjs";
+import { layoutBreakpoints, placementsFor, renderGroups, themeModeIds, variantBase } from "./modes.mjs";
 import { cmp, resolveValue } from "./resolve.mjs";
+import { classify, honours } from "./responsive.mjs";
 import { assertSchema, indexById, webName } from "./schema.mjs";
 
 const handAuthoredName = (cfg) => path.basename(cfg.paths.handAuthored);
@@ -21,6 +23,9 @@ export function emitTokens(doc, handDeclared, cfg) {
   const privateRows = []; // P7 — hidden but alias-reachable: emitted, fenced, not public
   const hiddenRows = []; // P7 — hidden AND unreachable: never emitted
   const excludedRows = []; // P7 — EXCLUDE_PATHS policy list
+  const responsiveRows = []; // P11 — one row per emitted variable: class, source, effect
+  const warnings = []; // P11 — what the generator would not guess at
+  const emitted = new Set(); // every name declared below, for the alias block
   const blocks = []; // rendered CSS blocks
 
   for (const c of collections) {
@@ -81,18 +86,66 @@ export function emitTokens(doc, handDeclared, cfg) {
         if (!isPrivate) superseded.push(name);
         continue;
       }
+      emitted.add(name);
 
+      // P11 — the responsive class decides HOW MANY declarations this variable
+      // gets and where, before any of them is placed.
+      const resp = classify(v, cfg);
+      const row = { collection: c.name, name, cls: resp.cls, source: resp.source, honoured: false, effect: "per-mode" };
+      responsiveRows.push(row);
+      if (resp.warning) {
+        warnings.push({
+          code: resp.warning,
+          name,
+          collection: c.name,
+          detail: `in a \`viewport.groups\` group with neither a \`responsive\` field nor a "N% of screen height|width" description — per-mode px samples emitted unchanged`,
+        });
+      }
+
+      const target = isPrivate ? privGroups : groups;
+      const push = (p, decl) => {
+        const key = `${p.media ?? ""}|${p.selector}`;
+        if (!target.has(key)) target.set(key, { ...p, lines: [] });
+        target.get(key).lines.push(decl);
+      };
+
+      // viewport-* — a fraction of the screen holds at every viewport, so it is
+      // ONE declaration on the base scope and the per-mode samples are dropped.
+      if (honours(cfg, resp.cls) && resp.value) {
+        row.honoured = true;
+        row.effect = `${resp.value} once on the base scope`;
+        push({ media: null, selector: ":root", width: -1 }, `${name}: ${resp.value};`);
+        continue;
+      }
+
+      // Per-mode, with one collapse: a `layoutVariant` whose rule is an
+      // honoured `fluid-clamp` or `fixed` emits once at that variant's base
+      // scope instead of once per width.
+      const collapsed = new Set();
       for (const mode of c.modes) {
         const mv = v.modes.find((m) => m.modeId === mode.id);
         if (!mv || mv.effective === false) continue;
         const r = mv.modeId === defaultMode.modeId ? defaultResolved : resolveValue(v, mv, byId, cfg);
         const decl = `${name}: ${r.value};${r.note ? ` /* ${r.note} */` : ""}`;
-        const target = isPrivate ? privGroups : groups;
-        for (const p of placementsFor(c, mode, ctx, cfg)) {
-          const key = `${p.media ?? ""}|${p.selector}`;
-          if (!target.has(key)) target.set(key, { ...p, lines: [] });
-          target.get(key).lines.push(decl);
+
+        // A variant this export publishes no rule for — and any collection
+        // outside `layout.collection` — takes the per-mode path untouched.
+        const variant = ctx.layout.variants.get(mode.id);
+        const rule = variant == null
+          ? null
+          : resp.override
+            ? { cls: resp.override, css: resp.rules.get(variant)?.css ?? null }
+            : resp.rules.get(variant);
+        if (rule && honours(cfg, rule.cls) && collapse(v, rule, variant, ctx, byId, cfg, warnings)) {
+          if (collapsed.has(variant)) continue;
+          collapsed.add(variant);
+          row.honoured = true;
+          row.effect = `${rule.cls} once per layout variant`;
+          push(variantBase(variant, cfg), `${name}: ${rule.cls === "fluid-clamp" ? rule.css : r.value};`);
+          continue;
         }
+
+        for (const p of placementsFor(c, mode, ctx, cfg)) push(p, decl);
       }
     }
 
@@ -125,6 +178,10 @@ export function emitTokens(doc, handDeclared, cfg) {
     blocks.push(head.join("\n"));
   }
 
+  // The consumer's own alias names, expanded over what was emitted above.
+  const aliases = aliasBlock(emitted, handDeclared, cfg);
+  if (aliases.css) blocks.push(aliases.css);
+
   const header = [
     "/* GENERATED FILE — DO NOT EDIT BY HAND.",
     "",
@@ -142,5 +199,46 @@ export function emitTokens(doc, handDeclared, cfg) {
     "",
   ].join("\n");
 
-  return { css: `${header}${blocks.join("\n\n")}\n`, rows, privateRows, hiddenRows, excludedRows };
+  return {
+    css: `${header}${blocks.join("\n\n")}\n`,
+    rows, privateRows, hiddenRows, excludedRows,
+    responsiveRows, aliasRows: aliases.rows, warnings,
+  };
+}
+
+/**
+ * Whether a `fluid-clamp` / `fixed` rule can be honoured, or must fall back to
+ * the per-mode path with a warning. Nothing is emitted from a rule the export
+ * did not finish: a `fluid-clamp` without its `css` expression, or a `fixed`
+ * whose samples do not actually agree, would otherwise ship a value the export
+ * never stated.
+ */
+function collapse(v, rule, variant, ctx, byId, cfg, warnings) {
+  const name = webName(v);
+  if (rule.cls === "fluid-clamp") {
+    if (rule.css) return true;
+    warnings.push({
+      code: "CLAMP_WITHOUT_EXPRESSION",
+      name,
+      collection: cfg.layout.collection,
+      detail: `\`fluid-clamp\` at layout variant \`${variant}\` carries no \`css\` expression — per-mode samples emitted instead`,
+    });
+    return false;
+  }
+
+  // `fixed`: prove it before collapsing ten samples into one.
+  const values = new Set();
+  for (const mv of v.modes) {
+    if (mv.effective === false) continue;
+    if ((ctx.layout.variants.get(mv.modeId) ?? null) !== variant) continue;
+    values.add(resolveValue(v, mv, byId, cfg).value);
+  }
+  if (values.size <= 1) return true;
+  warnings.push({
+    code: "FIXED_VARIES_BY_MODE",
+    name,
+    collection: cfg.layout.collection,
+    detail: `\`fixed\` at layout variant \`${variant}\`, but its modes resolve to ${values.size} different values — per-mode samples emitted instead`,
+  });
+  return false;
 }
