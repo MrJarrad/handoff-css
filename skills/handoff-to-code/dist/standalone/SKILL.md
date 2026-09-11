@@ -7,20 +7,29 @@ description: >-
   "regenerate tokens", a `*-design-system-handoff.json` or `design-handoff-*.md` path, or
   any implementation whose values come from a handoff export rather than from the canvas.
   Every node, token, copy string and annotation in the pair is built; deviations are
-  returned as a table and drift stops for a ruling. {{description-scope}}
+  returned as a table and drift stops for a ruling. Not for reading a Figma file live —
+  pixels, screenshots, variant walks and selection are a different job; not for measuring an
+  already-built page back against the design.
 ---
 
 # Handoff to Code
 
 **The handoff pair is the contract: every node, token, copy string and annotation in it is
 built — never Figma pixels, never inferred values.** A value the pair does not state is not
-yours to supply. {{contract-read}}
+yours to supply. The pair is read, not re-described: a task description that paraphrases the
+pair has replaced the contract with a summary of it, and the pair still wins.
 
 ## When it fires
 
-{{fires-table}}
+| Situation | This skill |
+| --- | --- |
+| An export pair exists and code is being written from it | **yes** |
+| No export — reading the design file live (selection, screenshots, variant matrix) | no, that is a design-file read |
+| A page is already built and needs measuring back against the design | no, that is a build audit |
 
-{{sibling-skills}}
+The pair cannot carry everything: renders, interaction and prototype detail, and
+binding proofs verified against the design tool's own API stay with a live read of the file.
+Reach for one *inside* step 4 when the pair is silent — not instead of the pair.
 
 ## Inputs — four required, one optional
 
@@ -159,7 +168,7 @@ row:
 - **hand-authored-override** — the consuming stylesheet declares the property itself and the
   generator reported rather than overwrote it.
 
-{{ruling-ref-cites}} An empty `ruling ref`
+`ruling ref` cites the entry in the ruling list that authorised a non-match. An empty `ruling ref`
 on a non-match row is an unauthorised deviation.
 
 An empty table means you built the pair exactly. That is the expected outcome, not a
@@ -259,4 +268,11 @@ Reading it in order:
 - **DON'T:** Keep the existing string because a comment above it cites an audit from a previous
   week. The audit is a record of an older export; the pair in the brief is the contract.
 
-{{tail}}
+## Where the rules behind this live
+
+Every generator behaviour this skill leans on is written up with the measurements that
+produced it: `docs/POLICIES.md` — P4 (units), P7 (private/hidden/excluded), P11 (responsive
+classes and `viewport.groups`), P12 (the alias block), P13 (cell trust). `README.md` covers
+install, config keys and the CLI. `presets/jhd.config.mjs` is a real house config with every
+key filled in and commented — read it as a worked example of the policy this skill assumes,
+not as a default; there are no defaults.

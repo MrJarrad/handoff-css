@@ -15,15 +15,19 @@
   "files": [
     "bin",
     "src",
+    "scripts",
     "presets",
     "schema",
     "docs",
     "skills",
+    "AGENTS.md",
     "README.md",
     "fixtures/jhd-v8b-2026-09-10/styles.css"
   ],
   "scripts": {
-    "test": "node --test 'test/**/*.test.mjs'"
+    "test": "node --test 'test/**/*.test.mjs'",
+    "skills": "node scripts/build-skill-adapters.mjs",
+    "skills:check": "node scripts/build-skill-adapters.mjs --check"
   },
   "keywords": [
     "figma",

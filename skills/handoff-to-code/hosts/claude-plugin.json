@@ -1,0 +1,8 @@
+{
+  "_": "The Claude plugin (JHD discipline) host: sibling skills exist by name, and the house tail is allowed — but only under `## At JHD`, and only here.",
+  "description-scope": "Not for reading a Figma file itself —\n  that's capture-figma, which owns pixels, screenshots, variant walks and live selection;\n  not for measuring a built page back against the design — that's audit-build.",
+  "contract-read": "The pair is read, not re-described; the brief that dispatched you points at\nit rather than paraphrasing it.",
+  "fires-table": "| Situation | Skill |\n| --- | --- |\n| An export pair exists and code is being written from it | **this skill** |\n| No export — reading the design file live (selection, screenshots, variant matrix, copy inventory) | `capture-figma` |\n| A page is already built and needs measuring back against the design | `audit-build` |",
+  "sibling-skills": "`capture-figma` still supplies what a pair cannot carry: renders, interaction/prototype\ndetail, and spot-verified binding proofs via REST `--raw`. Reach for it *inside* step 4\nwhen the pair is silent — not instead of it.",
+  "ruling-ref-cites": "`ruling ref` cites the lock row or ruling that authorised a non-match."
+}

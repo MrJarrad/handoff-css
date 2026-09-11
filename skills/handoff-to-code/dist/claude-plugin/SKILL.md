@@ -7,20 +7,29 @@ description: >-
   "regenerate tokens", a `*-design-system-handoff.json` or `design-handoff-*.md` path, or
   any implementation whose values come from a handoff export rather than from the canvas.
   Every node, token, copy string and annotation in the pair is built; deviations are
-  returned as a table and drift stops for a ruling. {{description-scope}}
+  returned as a table and drift stops for a ruling. Not for reading a Figma file itself —
+  that's capture-figma, which owns pixels, screenshots, variant walks and live selection;
+  not for measuring a built page back against the design — that's audit-build.
 ---
 
 # Handoff to Code
 
 **The handoff pair is the contract: every node, token, copy string and annotation in it is
 built — never Figma pixels, never inferred values.** A value the pair does not state is not
-yours to supply. {{contract-read}}
+yours to supply. The pair is read, not re-described; the brief that dispatched you points at
+it rather than paraphrasing it.
 
 ## When it fires
 
-{{fires-table}}
+| Situation | Skill |
+| --- | --- |
+| An export pair exists and code is being written from it | **this skill** |
+| No export — reading the design file live (selection, screenshots, variant matrix, copy inventory) | `capture-figma` |
+| A page is already built and needs measuring back against the design | `audit-build` |
 
-{{sibling-skills}}
+`capture-figma` still supplies what a pair cannot carry: renders, interaction/prototype
+detail, and spot-verified binding proofs via REST `--raw`. Reach for it *inside* step 4
+when the pair is silent — not instead of it.
 
 ## Inputs — four required, one optional
 
@@ -159,7 +168,7 @@ row:
 - **hand-authored-override** — the consuming stylesheet declares the property itself and the
   generator reported rather than overwrote it.
 
-{{ruling-ref-cites}} An empty `ruling ref`
+`ruling ref` cites the lock row or ruling that authorised a non-match. An empty `ruling ref`
 on a non-match row is an unauthorised deviation.
 
 An empty table means you built the pair exactly. That is the expected outcome, not a
@@ -259,4 +268,10 @@ Reading it in order:
 - **DON'T:** Keep the existing string because a comment above it cites an audit from a previous
   week. The audit is a record of an older export; the pair in the brief is the contract.
 
-{{tail}}
+## At JHD
+
+The house consumer is `jhd-design-system`, which vendors the export, keeps its policy in
+`handoff.config.mjs`, and exposes `tokens` / `tokens:check` scripts; downstream products get
+the generated CSS through the published package and never re-derive a token. House rulings on
+top of a pair arrive as the brief's lock table, and a drift row waits for the operator rather
+than being resolved in the branch. Everything above this section is house-independent.
