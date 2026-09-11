@@ -10,7 +10,18 @@ nothing checked a consumer's built CSS back against the export. Each is now a fa
 
 ### Added
 
-- **Export validation (P14).** `schema/design-system-handoff.v8.schema.json` (draft 2020-12)
+- **Schema 9 support.** `fixtures/jhd-v9-2026-09-11/` vendors the operator's newest export
+  (schema 9, generated 2026-09-11T06:35:12.600Z, same design-system state as v8b) and nav
+  brief 6 (schema v6, companion moved to v9). Schema 9 is the same JSON shape as 8 — verified
+  field by field before deciding — so `schema/design-system-handoff.schema.json`'s
+  `schemaVersion` enum is `[8, 9]` rather than a second schema file; `VALIDATED_SCHEMA_VERSIONS`
+  and the JHD preset's `schema.versions` both gain `"9"`. A schema version newer than every
+  known one (e.g. a future 10) now fails at `/schemaVersion` instead of silently "skipping" —
+  closes the gap where "unrecognized" could read as "passed." `test/parity-v9.test.mjs` pins
+  the schema-9 device ramp byte-identical to v8b's; `test/responsive-census-v9.test.mjs` locks
+  the export's own polish (every `viewport-*` rule under `device/`, every `viewportFraction` a
+  whole percent) as a failing test against regression.
+- **Export validation (P14).** `schema/design-system-handoff.schema.json` (draft 2020-12)
   states the shape the generator depends on — `codeSyntax.WEB` and `responsiveBehavior.rules[]`
   are closed, the viewport/clamp rules must carry the field they promise. `generate()` asserts
   it before emitting (schema 7 skips, legacy). `validateExport` / `assertValidExport` are

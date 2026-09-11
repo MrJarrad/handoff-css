@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 
 import { generate } from "../src/index.mjs";
 import { validateExport, assertValidExport, exportSchema, VALIDATED_SCHEMA_VERSIONS } from "../src/validate-export.mjs";
-import { consumerCss, doc as docV7b, docV8b, preset } from "./fixture.mjs";
+import { consumerCss, doc as docV7b, docV8b, docV9, preset } from "./fixture.mjs";
 
 /** Every error pointer, so a mutation can be asserted at its JSON pointer. */
 const paths = (doc) => validateExport(doc).errors.map((e) => e.path);
@@ -20,6 +20,23 @@ test("the real v8b export validates", () => {
   assert.deepEqual(res.errors, []);
   assert.equal(res.ok, true);
   assert.equal(res.skipped, false);
+});
+
+test("the real v9 export validates with zero errors", () => {
+  const res = validateExport(docV9());
+  assert.deepEqual(res.errors, []);
+  assert.equal(res.ok, true);
+  assert.equal(res.skipped, false);
+});
+
+test("a v9 export mutated to schemaVersion 10 fails at /schemaVersion", () => {
+  const doc = docV9();
+  doc.schemaVersion = 10;
+  const res = validateExport(doc);
+  assert.equal(res.skipped, false);
+  assert.equal(res.ok, false);
+  const hit = res.errors.find((e) => e.path === "/schemaVersion");
+  assert.ok(hit, `expected an error at /schemaVersion, got ${res.errors.map((e) => e.path).join(", ")}`);
 });
 
 test("a schema-7 export is skipped, not validated — and says so", () => {

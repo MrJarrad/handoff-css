@@ -146,3 +146,21 @@ test("a missing required section is MISSING_SECTION at line 1", () => {
   assert.equal(hit.line, 1);
   assert.match(hit.message, /### Content Outline/);
 });
+
+// The nav brief's next revision — schema v6, companion moved to
+// design-system-handoff 9. Its header still names `units v4` against the
+// companion's v5, the same open defect as brief 5's fixture.
+const brief6Path = new URL(
+  "../fixtures/jhd-v9-2026-09-11/design-handoff-block-navigation.md",
+  import.meta.url,
+);
+const brief6 = () => readFileSync(brief6Path, "utf8");
+
+test("brief 6 (companion v9) passes with exactly one warning: POLICY_VERSION_MISMATCH", () => {
+  const { ok, findings } = validateHandoffMarkdown(brief6());
+  assert.equal(ok, true);
+  assert.equal(findings.length, 1, findings.map((f) => `${f.line} ${f.code}`).join("; "));
+  const [w] = findings;
+  assert.equal(w.code, "POLICY_VERSION_MISMATCH");
+  assert.match(w.message, /`units` policy is v4 .* and v5 in the companion block/);
+});

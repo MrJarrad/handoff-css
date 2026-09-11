@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/jarradhd/handoff-css/schema/design-system-handoff.v8.schema.json",
+  "$id": "https://github.com/jarradhd/handoff-css/schema/design-system-handoff.schema.json",
   "title": "design-system-handoff, schema 8-9",
   "description": "The companion export the generator reads. This document states the SHAPE the generator depends on — not every field the plugin emits. The top level is open (a plugin may add fields; a consumer that fails on a new field would make every export a breaking change), while the two structures whose keys the generator reads by name — codeSyntax.WEB and responsiveBehavior.rules[] — are closed, so a renamed or mistyped key is an error rather than a silent default.",
   "type": "object",

@@ -232,8 +232,8 @@ difference.
 handoff-css validate export.json design-handoff-block-navigation.md
 ```
 
-A `.json` file is checked against `schema/design-system-handoff.v8.schema.json` (schema 7
-is skipped: legacy). A `.md` file is checked against the line grammar in
+A `.json` file is checked against `schema/design-system-handoff.schema.json` (schema 8
+and 9; schema 7 is skipped: legacy). A `.md` file is checked against the line grammar in
 `schema/design-handoff.v6.grammar.md` — identity lines, the companion block, Build
 standards 1–5, token rows, node rows, the responsive grid tables. One line per file, the
 findings under it, exit 1 on any **error**. A warning never fails the run: it is a decision

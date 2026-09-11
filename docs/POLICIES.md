@@ -529,26 +529,39 @@ exactly the drift a generated alias block exists to catch.
 
 ## P14 — Export validation
 
-A document that names `schemaVersion: 8` is checked against
-`schema/design-system-handoff.v8.schema.json` before a line of CSS exists, and
+A document that names `schemaVersion: 8` or `9` is checked against
+`schema/design-system-handoff.schema.json` before a line of CSS exists, and
 against nothing else — the top level is open, because a plugin that adds a field
 must not break every consumer, while the two structures the generator reads by
 name are closed: `codeSyntax.WEB` (`value`, `source`) and
 `responsiveBehavior.rules[]`. A typo'd key in either is an error rather than a
 silently-defaulted value.
 
+Schema 9 (2026-09-11) is the **same JSON shape** as schema 8 — compared field
+by field (top-level keys, `units.policy` shape, `responsiveBehavior` rule
+keys) across a real export at each version before deciding this. What changed
+is semantic, stated in the export's own `changes.schema[9]`: viewport classes
+are now gated by designer signal (a reference-variable group or a
+screen-percentage description) rather than by group membership alone, and
+`viewportFraction` values are snapped to the nearest whole percent. One schema
+file with `schemaVersion: { "enum": [8, 9] }` is the honest fit; a second `v9`
+schema file would duplicate a structure that did not change.
+
 Three shape rules carry meaning:
 
 - `codeSyntax.WEB.value` matches `^--[a-z0-9-]+$`. It is the name a build binds,
   so its form is part of the contract.
 - A `viewport-width` / `viewport-height` rule must carry a numeric
-  `viewportFraction`. Schema 8 states it; a rule without it is a hint, and a
+  `viewportFraction`. Schema 8+ states it; a rule without it is a hint, and a
   hint arriving as a rule is an export defect.
 - A `fluid-clamp` rule must carry `css`. The generator emits the export's own
   `clamp()` and never composes one.
 
 A schema-7 export SKIPS validation — it predates both rules — and the result
-says `skipped: true` rather than `ok` with no checks run. Dropped in 0.4.0.
+says `skipped: true` rather than `ok` with no checks run. Dropped in 0.4.0. A
+schema version NEWER than every version this module validates (e.g. a future
+10) is not skipped: it runs through the schema and fails at `/schemaVersion` —
+"unrecognized" must never read as "passed."
 
 The markdown half has no JSON Schema, so its contract is a line grammar:
 `schema/design-handoff.v6.grammar.md`, implemented by `src/validate-handoff-md.mjs`.
