@@ -12,6 +12,7 @@ import {
   aliasGraph, bindingsFromHandoff, conform, exportNames, FINDINGS, renderMarkdown, resolveName,
   samplePixels, tokenizeCss,
 } from "../src/conform.mjs";
+import { configSchema } from "../src/config.mjs";
 import { parseHandoffMarkdown } from "../src/validate-handoff-md.mjs";
 
 const DIR = new URL("../fixtures/jhd-v8b-2026-09-10/", import.meta.url).pathname;
@@ -141,6 +142,60 @@ test("the real v8b styles.css smoke: one red, and it is the font the package ask
   assert.equal(summary.byCode.GRID_ARITHMETIC, 0, "the house stylesheet does no column maths");
 });
 
+test("the same smoke with `--font-suisse` allowed is 0 red — `allowNames`", () => {
+  // `--font-suisse` is the one name in the house stylesheet that no export can
+  // ever declare: the package tells consumers to supply their own font face.
+  // An allowlist is how a consumer says that out loud once, instead of
+  // carrying a permanent red it has learned to ignore.
+  const { findings, summary } = conform({
+    doc: doc(),
+    handoff: handoff(),
+    tokensCss: tokensCss(),
+    files: [{ path: "styles.css", text: readFileSync(path.join(DIR, "styles.css"), "utf8") }],
+    allowNames: ["--font-suisse"],
+  });
+  assert.equal(summary.red, 0, findings.filter((f) => f.severity === "red").map((f) => `${f.line} ${f.code} ${f.name}`).join("\n"));
+  assert.deepEqual(findings.filter((f) => f.name === "--font-suisse"), []);
+});
+
+test("an allowed name that is declared locally is still LOCAL_ONLY, not silence", () => {
+  // The allowlist answers ONE question — "this name comes from outside the
+  // export" — and is not a mute button for every finding that mentions it.
+  const { findings } = conform({
+    doc: doc(), handoff: handoff(), tokensCss: tokensCss(),
+    files: [fixture("local-only.css")],
+    allowNames: [...new Set(check("local-only.css").findings.map((f) => f.name))],
+  });
+  assert.deepEqual(findings.map((f) => f.code), check("local-only.css").findings.map((f) => f.code));
+});
+
+test("`--allow-name` is repeatable on the CLI and takes a `--`-prefixed value", async () => {
+  const sink = () => {
+    const chunks = [];
+    return { write: (s) => chunks.push(s), get text() { return chunks.join(""); } };
+  };
+  const args = (...extra) => [
+    "conform",
+    "--export", path.join(DIR, "export.json"),
+    "--handoff", path.join(DIR, "design-handoff-block-navigation.md"),
+    "--tokens", path.join(DIR, "expected/tokens.generated.css"),
+    "--css", path.join(DIR, "styles.css"),
+    ...extra,
+  ];
+
+  assert.equal(await dispatch(args("--json"), { stdout: sink(), stderr: sink() }), 1);
+
+  const stdout = sink();
+  assert.equal(
+    await dispatch(args("--allow-name", "--font-suisse", "--allow-name", "--font-nothing", "--json"),
+      { stdout, stderr: sink() }),
+    0,
+  );
+  const parsed = JSON.parse(stdout.text);
+  assert.equal(parsed.summary.red, 0);
+  assert.deepEqual(parsed.findings.filter((f) => f.name === "--font-suisse"), []);
+});
+
 test("tokenizeCss ignores comments, so prose about px and col-unit is not a finding", () => {
   const { pxLiterals, usages } = tokenizeCss("/* 812px, --nav-col-unit */\n.a { height: var(--device-width); }\n");
   assert.deepEqual(pxLiterals, []);
@@ -180,4 +235,33 @@ test("`handoff-css conform` exits 1 on red, 0 on clean, and --json is machine-re
   const stderr = sink();
   assert.equal(await dispatch(["conform"], { stdout: sink(), stderr }), 1);
   assert.match(stderr.text, /--export <json> --handoff <md>/);
+});
+
+test("`conform.allowNames` in the config is the same statement as the flag", async () => {
+  const sink = () => {
+    const chunks = [];
+    return { write: (s) => chunks.push(s), get text() { return chunks.join(""); } };
+  };
+  const configPath = path.join(CONFORM, "allow-font.config.mjs");
+  const stdout = sink();
+  const code = await dispatch([
+    "conform",
+    "--export", path.join(DIR, "export.json"),
+    "--handoff", path.join(DIR, "design-handoff-block-navigation.md"),
+    "--tokens", path.join(DIR, "expected/tokens.generated.css"),
+    "--css", path.join(DIR, "styles.css"),
+    "--config", configPath,
+    "--json",
+  ], { stdout, stderr: sink() });
+  assert.equal(code, 0);
+  assert.equal(JSON.parse(stdout.text).summary.red, 0);
+});
+
+test("the config's `conform` block is a valid config block", () => {
+  // `schema/config.schema.json` is the single statement of what a config may
+  // contain, and `additionalProperties: false` at the root means a key the
+  // schema does not know is a hard failure — so `conform` has to be IN it.
+  const { properties } = configSchema();
+  assert.deepEqual(Object.keys(properties.conform.properties), ["allowNames"]);
+  assert.equal(properties.conform.properties.allowNames.type, "array");
 });

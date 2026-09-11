@@ -13,7 +13,7 @@ import assert from "node:assert/strict";
 
 import { generate } from "../src/index.mjs";
 import { classify, honours, percentFromFraction, VIEWPORT_FRACTION_TOLERANCE } from "../src/responsive.mjs";
-import { config, consumerCss, doc as exportDoc, docV7c, docV8b, preset } from "./fixture.mjs";
+import { config, consumerCss, doc as exportDoc, docV7c, docV8b, docV9b, preset } from "./fixture.mjs";
 
 const emit = (doc, cfg = preset) => generate(doc, cfg, { handAuthoredCss: consumerCss() });
 
@@ -276,8 +276,11 @@ test("a viewportFraction on responsiveBehavior is honoured, once, on jhd-v8b", (
     assert.deepEqual(declarations(tokensCss, name), [`${name}: ${value};`], name);
     assert.deepEqual(insideMedia(tokensCss, name), [], name);
   }
+  // 0.3.1 — v8b is the FIRST export to state `fixed` on this token's rule, so
+  // it collapses here too: eleven identical samples became one declaration,
+  // and its `VIEWPORT_UNFLAGGED` went quiet because the export answered.
   assert.deepEqual(declarations(tokensCss, "--device-container-max-width"),
-    Array.from({ length: 11 }, () => "--device-container-max-width: 2156px;"));
+    ["--device-container-max-width: 2156px;"]);
   assert.equal(untrustedRows.length, 0, "§10 untrusted cells must be 0 on this export");
 });
 
@@ -520,4 +523,61 @@ test("the description path is untouched by rounding — a stated percent is emit
   assert.equal(c.source, "description");
   assert.equal(c.value, "20.5dvh");
   assert.equal(c.warning, null);
+});
+
+// --- P11's third silencing source: a rule-level `fixed` (0.3.1) ------------
+//
+// `device/container-max-width` is the token schema 9 still could not classify:
+// it sits in the declared `device/` group, so the generator asked for a
+// fraction and got silence (`VIEWPORT_UNFLAGGED`). The v9b export answers the
+// question instead of filling in a fraction it does not have — every
+// `responsiveBehavior` rule states `strategy: "fixed"` — which is the memo's
+// (`2026-09-10-handoff-viewport-tokens-brief`, addendum 1) "`fixed` -> one
+// value", and is a THIRD way the warning goes quiet.
+
+test("every rule stating `fixed` classifies the variable fixed, not unflagged", () => {
+  const v = docV9b().collections.find((c) => c.name === "layout").variables
+    .find((x) => x.name === "device/container-max-width");
+  const resp = classify(v, preset);
+  assert.equal(resp.cls, "fixed");
+  assert.equal(resp.source, "rule");
+  assert.equal(resp.warning, null);
+});
+
+test("a rule-level `fixed` emits ONE declaration, on the base scope, at the export's own css", () => {
+  const out = emit(docV9b());
+  const name = "--device-container-max-width";
+  // `2156px` is the export's own build cell for every one of the ten layout
+  // modes (`build.css`), not a number recomputed here.
+  assert.deepEqual(declarations(out.tokensCss, name), [`${name}: 2156px;`]);
+  assert.deepEqual(insideMedia(out.tokensCss, name), []);
+  assert.deepEqual(out.warnings.filter((w) => w.name === name), []);
+  assert.match(out.report, /\| `--device-container-max-width` \| layout \| fixed \| rule \|/);
+});
+
+test("a rule-level `fixed` whose modes disagree still raises FIXED_VARIES_BY_MODE", () => {
+  // The same v9b export with ONE mode's build cell moved off 2156px: the
+  // export's claim is now false, so nothing is collapsed and the samples stand.
+  const doc = docV9b();
+  const v = doc.collections.find((c) => c.name === "layout").variables
+    .find((x) => x.name === "device/container-max-width");
+  const mv = v.modes.find((m) => m.modeName === "md");
+  mv.raw = 1200;
+  mv.build = { ...mv.build, raw: 1200, value: 1200, css: "1200px" };
+  mv.unitHint = { ...mv.unitHint, rawValue: 1200, convertedValue: 1200 };
+
+  const out = emit(doc);
+  const name = "--device-container-max-width";
+  assert.ok(declarations(out.tokensCss, name).length > 1, "the per-mode samples are emitted instead");
+  assert.deepEqual(out.warnings.filter((w) => w.name === name).map((w) => w.code),
+    ["FIXED_VARIES_BY_MODE"]);
+});
+
+test("a declared viewport-group variable with NO rules is still VIEWPORT_UNFLAGGED", () => {
+  // The silencing source is the export STATING `fixed`, not the absence of a
+  // fraction: v7b publishes no `responsiveBehavior` at all for this token.
+  const v = exportDoc().collections.find((c) => c.name === "layout").variables
+    .find((x) => x.name === "device/container-max-width");
+  assert.deepEqual(v.responsiveBehavior?.rules ?? [], []);
+  assert.equal(classify(v, preset).warning, "VIEWPORT_UNFLAGGED");
 });

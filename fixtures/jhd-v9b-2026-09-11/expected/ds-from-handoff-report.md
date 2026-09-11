@@ -4,9 +4,9 @@ GENERATED FILE — regenerate with `pnpm run tokens`.
 
 | | |
 | --- | --- |
-| Export | `jhd-spec-designsystem-design-system-handoff` |
+| Export | `jhd-spec-designsystem-design-system-handoff-v3` |
 | Schema | design-system-handoff v9 |
-| Exported at | 2026-09-11T06:35:12.600Z |
+| Exported at | 2026-09-11T07:31:20.236Z |
 | designSystemStateHash | `bb6a002560860ecfb6376514a66ca4173a673c1237033c97b627520356bc7224` |
 | Tokens in export | 475 |
 | MATCH (hand-authored, same value) | 0 |

@@ -515,13 +515,13 @@ path, so parity can be pinned.
 
 Honoured this run: `viewport-height`, `viewport-width`.
 
-82 of 486 emitted variables carry a class — fixed (export): 7 · fluid-clamp (export): 7 · mode-stepped (export): 47 · viewport-height (description): 8 · viewport-height (export): 5 · viewport-width (description): 1 · viewport-width (export): 7.
+82 of 486 emitted variables carry a class — fixed (export): 6 · fixed (rule): 1 · fluid-clamp (export): 7 · mode-stepped (export): 47 · viewport-height (description): 8 · viewport-height (export): 5 · viewport-width (description): 1 · viewport-width (export): 7.
 The other 47 are `mode-stepped` or `sample-only`, which IS the
 per-mode path, so they are not listed individually: their output is unchanged.
 
 | Token | Collection | Class | Source | Effect |
 | --- | --- | --- | --- | --- |
-| `--device-container-max-width` | layout | fixed | export | per-mode |
+| `--device-container-max-width` | layout | fixed | rule | 2156px once on the base scope |
 | `--device-screen-height-100` | layout | viewport-height | description | 20dvh once on the base scope |
 | `--device-screen-height-200` | layout | viewport-height | description | 30dvh once on the base scope |
 | `--device-screen-height-300` | layout | viewport-height | description | 40dvh once on the base scope |
@@ -568,7 +568,7 @@ plugin export takes the count to zero.
 
 None.
 
-**Warnings (51)** — what the generator would not guess at. A
+**Warnings (50)** — what the generator would not guess at. A
 variable in a `viewport.groups` group with no stated fraction keeps its px
 samples: the fix is one description in Figma, not a heuristic here.
 
@@ -624,7 +624,6 @@ samples: the fix is one description in Figma, not a heuristic here.
 | `VIEWPORT_OUTSIDE_GROUPS` | `--text-title-font-size-100` | states a viewport fraction but sits outside every `viewport.groups` prefix (`device/`) — treated as a hint, per-mode samples emitted unchanged. Correct the class in Figma, or declare the group. |
 | `VIEWPORT_OUTSIDE_GROUPS` | `--text-title-letter-spacing-300` | states a viewport fraction but sits outside every `viewport.groups` prefix (`device/`) — treated as a hint, per-mode samples emitted unchanged. Correct the class in Figma, or declare the group. |
 | `VIEWPORT_OUTSIDE_GROUPS` | `--text-title-letter-spacing-400` | states a viewport fraction but sits outside every `viewport.groups` prefix (`device/`) — treated as a hint, per-mode samples emitted unchanged. Correct the class in Figma, or declare the group. |
-| `VIEWPORT_UNFLAGGED` | `--device-container-max-width` | in a `viewport.groups` group with neither a `responsive` field nor a "N% of screen height|width" description — per-mode px samples emitted unchanged |
 
 **Aliases (16)** — published names that are a `var()` hop onto a
 generated token, expanded from `aliases` over the emitted leaves. The token is
