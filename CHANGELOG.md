@@ -2,6 +2,30 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.3.3 — 2026-09-11
+
+The plugin's export v4 adds a leading YAML front-matter block and turns the ragged
+table-note cell into a proper `Notes` column.
+
+### Added
+
+- **`src/front-matter.mjs`: a minimal hand-rolled YAML front-matter reader.** Flat keys, one
+  level of nested mapping, quoted strings, ints, and simple sequences of flat mappings — no
+  YAML dependency. `parseHandoffMarkdown` reads a leading `---`/`---` block and exposes it as
+  `parsed.frontMatter` (`null` when absent — every pre-export-v4 brief).
+- **`FRONT_MATTER_MISMATCH` (error).** When an identity field is stated in both the front
+  matter and the bold lines and they disagree, the field, the front-matter value and the
+  bold-line value are all named. A field in only one source is not a mismatch.
+- **The `Notes` header column.** A table whose last header cell is literally `Notes` accepts
+  empty / `† <note>` / `† row-wrap: <free text>` cells there, never against the value-column
+  vocabulary; `row.note` is populated the same way the legacy ragged trailing cell was. The
+  legacy ragged form is unchanged and still accepted on tables without a `Notes` header.
+- **`validation.findings` (schema 9+, optional).** `validateExport` surfaces each finding as
+  a `PLUGIN_FINDING` warning. `figma.fileKey` accepts `string | null`.
+- **`fixtures/jhd-v9c-2026-09-11/`** — export v4 (schema 9, state `bb6a0025…7224`) + brief v3,
+  vendoring both halves of the plugin's 2026-09-11T09:47:02.715Z pair. Zero warnings; the
+  generated artifacts differ from `jhd-v9b`'s only in the header (Source/Exported timestamps).
+
 ## 0.3.2 — 2026-09-11
 
 The plugin's next export gave `⚠` one meaning (a raw value that should be bound) and moved

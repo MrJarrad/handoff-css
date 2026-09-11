@@ -668,6 +668,31 @@ that is a named gap rather than a silent one. Exit 1 on any red.
 
 ---
 
+## P17 — Front matter and the `Notes` column (0.3.3)
+
+The plugin's export v4 prepends a `---`-fenced YAML front-matter block to the layer brief and
+turns its responsive tables' ragged trailing note cell into a proper fifth `Notes` header
+column. Both are additive to the v6 grammar, not a version bump.
+
+**Front matter.** Read by a MINIMAL hand-rolled parser (`src/front-matter.mjs`) — flat keys,
+one level of nested mapping, quoted strings, ints; deliberately no YAML dependency, because the
+shape needed is narrow. Exposed as `parsed.frontMatter` (`null` when absent). Identity fields it
+duplicates from the bold lines (`schemaVersion`, `contract`/lane, the fingerprint state, the
+companion block) are cross-checked: a disagreement is `FRONT_MATTER_MISMATCH` (error), naming
+the field and both values. A field present in only one source is not a mismatch — the front
+matter is additive, not a second required source.
+
+**The `Notes` column.** A table whose last header cell is literally `Notes` routes that column
+through its own cell check (empty / `† <note>` / `† row-wrap: <free text>`, `⚠` also accepted)
+instead of the closed value-column vocabulary — `row.note` is populated the same way the legacy
+ragged trailing cell was, and `row.cells` no longer includes it. Tables without a `Notes` header
+keep taking the legacy ragged form.
+
+`design-handoff.v6.grammar.md` §"Front matter"/§"The `Notes` column" · `src/front-matter.mjs`,
+`src/validate-handoff-md.mjs` · fixture `fixtures/jhd-v9c-2026-09-11/`
+
+---
+
 ## Determinism
 
 Collections sorted by name, variables by WEB name, numbers rounded to 6 decimal

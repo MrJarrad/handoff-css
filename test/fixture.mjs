@@ -175,3 +175,20 @@ export const V9B = path.join(path.dirname(FIXTURE), "jhd-v9b-2026-09-11");
  * `expectedV9` is. Only the export moved. */
 export const expectedV9b = (file) =>
   readFileSync(path.join(V9B, "expected", file), "utf8");
+
+/**
+ * A SEVENTH real export, `fixtures/jhd-v9c-2026-09-11/export.json` — schema 9,
+ * generated 2026-09-11T09:47:02.715Z, same design-system state as `docV9b()`
+ * (`bb6a0025…7224`), the plugin's export v4. This is the fixture for P17: the
+ * companion `design-handoff-block-navigation.md` now opens with a `---` YAML
+ * front-matter block and its responsive tables carry a fifth `Notes` header
+ * column (`† token-swap` / `† variant-only` / `† row-wrap: …`), replacing the
+ * ragged trailing-cell form `jhd-v9b` used. `validation.findings` is present
+ * (empty) for the first time.
+ */
+export const docV9c = () =>
+  JSON.parse(
+    readFileSync(path.join(path.dirname(FIXTURE), "jhd-v9c-2026-09-11", "export.json"), "utf8"),
+  );
+
+export const V9C = path.join(path.dirname(FIXTURE), "jhd-v9c-2026-09-11");
