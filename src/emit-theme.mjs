@@ -109,7 +109,7 @@ export function themeCss(doc, rows, cfg) {
     `   ${cfg.report.policyRef}; the name-by-name status of every hand-authored`,
     `   \`@theme\` entry is in ${cfg.paths.report} §9.`,
     "",
-    `   Source:   ${doc.artifactFilename ?? doc.documentName ?? "design-system handoff export"}`,
+    `   Source:   ${doc.documentName ?? doc.artifact ?? "design-system handoff export"}`,
     `   Schema:   ${doc.schema} v${doc.schemaVersion}`,
     `   Exported: ${doc.generatedAt}`,
     `   State:    ${doc.fingerprint.designSystemStateHash}`,
