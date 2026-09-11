@@ -385,7 +385,7 @@ not the number of modes — decides how many declarations it gets.
 | --- | --- |
 | `viewport-width` / `viewport-height` | ONE declaration on the base scope, the fraction in `viewport.widthUnit` / `viewport.heightUnit` (`vw` / `dvh`). The per-mode px samples are dropped and listed in the report. |
 | `fluid-clamp` | The export's own `clamp()` expression, once per layout variant. Never recomputed here — the export publishes `preferred.slopeRemPerPx`, `interceptRem` and the finished `css`. |
-| `fixed` | One declaration per layout variant, instead of one per width. |
+| `fixed` | One declaration per layout variant, instead of one per width — or, when EVERY published rule states `fixed` and the variable is in a declared `viewport.groups` prefix, one declaration on the base scope for the whole variable. |
 | `mode-stepped` | Per-mode, in ascending `@media (min-width)` blocks — the default path (P3, P6). |
 | `sample-only` | Per-mode, from the one published sample. |
 
@@ -404,7 +404,11 @@ not the number of modes — decides how many declarations it gets.
    with `viewport.descriptionFallback`.
 3. The export's own `responsiveBehavior.rules[].strategy`, which is published
    **per `layoutVariant`** — `col-span-1` is `mode-stepped` at the default
-   variant and `fluid-clamp` at `flush`, and each is honoured on its own.
+   variant and `fluid-clamp` at `flush`, and each is honoured on its own. One
+   reading is variable-wide rather than per-variant: **every** published rule
+   stating `fixed`, on a variable inside a declared `viewport.groups` prefix,
+   is the export saying this is one value at every breakpoint — see the third
+   silencing source below.
 4. Nothing: the per-mode default path.
 
 The description beats `responsiveBehavior` deliberately. Every
@@ -438,10 +442,25 @@ declaration is the only statement in the system that knows it. An empty
 honoured, and nothing is reported either way — which is the right default for a
 consumer with no group convention.
 
-**Nothing is guessed.** A `viewport.groups` member with neither a field nor a
-matching description keeps its px samples and is reported as
-`VIEWPORT_UNFLAGGED` — the fix is one description in Figma, not a heuristic
-here. Likewise a `fluid-clamp` with no `css` expression
+**Nothing is guessed.** A `viewport.groups` member with none of the **three**
+signals keeps its px samples and is reported as `VIEWPORT_UNFLAGGED` — the fix
+is one edit in Figma, not a heuristic here. The three that silence it, all of
+them statements rather than absences:
+
+1. a `responsive` field stating the fraction;
+2. a `N% of screen height|width` description stating the fraction;
+3. **`fixed` on every `responsiveBehavior` rule** (0.3.1) — the export
+   answering the question the warning asks. `VIEWPORT_UNFLAGGED` means "the
+   consumer declared this group a fraction of the screen; which fraction is
+   this one?", and an all-`fixed` rule set answers *none — it is one value at
+   every breakpoint*. Honoured generically, per the memo
+   `2026-09-10-handoff-viewport-tokens-brief` addendum 1 ("`fixed` -> one
+   value"), and proved before it is collapsed: the modes' own resolved values
+   must agree, or the samples stand and `FIXED_VARIES_BY_MODE` says so. Gated
+   on the same `viewport.groups` whitelist as the warning it replaces, so the
+   per-variant `fixed` path outside every declared group is untouched.
+
+Likewise a `fluid-clamp` with no `css` expression
 (`CLAMP_WITHOUT_EXPRESSION`) and a `fixed` whose modes do not actually agree
 (`FIXED_VARIES_BY_MODE`) fall back to the samples and say so.
 

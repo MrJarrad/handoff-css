@@ -137,7 +137,7 @@ export function emitTokens(doc, handDeclared, cfg) {
           code: resp.warning,
           name,
           collection: c.name,
-          detail: `in a \`viewport.groups\` group with neither a \`responsive\` field nor a "N% of screen height|width" description — per-mode px samples emitted unchanged`,
+          detail: `in a \`viewport.groups\` group with none of the three signals — a \`responsive\` field, a "N% of screen height|width" description, or \`fixed\` on every \`responsiveBehavior\` rule — per-mode px samples emitted unchanged`,
         });
       }
 
@@ -155,6 +155,32 @@ export function emitTokens(doc, handDeclared, cfg) {
         row.effect = `${resp.value} once on the base scope`;
         push({ media: null, selector: ":root", width: -1 }, `${name}: ${resp.value};`);
         continue;
+      }
+
+      // P11's third silencing source — `fixed` stated on EVERY rule, so the
+      // variable is one value across every layout variant AND every width, not
+      // one per variant. Proved before it is collapsed: the export's claim is
+      // checked against the modes' own resolved values, and a claim that turns
+      // out to be false falls through to the per-mode path with
+      // `FIXED_VARIES_BY_MODE`, exactly as the per-variant collapse does.
+      if (resp.allFixed) {
+        const values = new Set(
+          v.modes.filter((mv) => mv.effective !== false)
+            .map((mv) => resolveValue(v, mv, byId, cfg).value),
+        );
+        if (values.size <= 1) {
+          const value = [...values][0] ?? defaultResolved.value;
+          row.honoured = true;
+          row.effect = `${value} once on the base scope`;
+          push({ media: null, selector: ":root", width: -1 }, `${name}: ${value};`);
+          continue;
+        }
+        warnings.push({
+          code: "FIXED_VARIES_BY_MODE",
+          name,
+          collection: c.name,
+          detail: `every \`responsiveBehavior\` rule states \`fixed\`, but its modes resolve to ${values.size} different values — per-mode samples emitted instead`,
+        });
       }
 
       // Per-mode, with one collapse: a `layoutVariant` whose rule is an

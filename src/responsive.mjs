@@ -184,11 +184,28 @@ function ruleFraction(rules) {
 }
 
 /**
+ * The other answer the same rules can give (0.3.1). `ruleFraction` above asks
+ * "does the export state a fraction of the screen?"; this asks "does the
+ * export state there is NO fraction, because the value is the same at every
+ * breakpoint?" — every published rule saying `fixed`, which is the memo's
+ * (`2026-09-10-handoff-viewport-tokens-brief`, addendum 1) "`fixed` -> one
+ * value".
+ *
+ * EVERY rule, not the default one: a variable that is `fixed` at the default
+ * variant and `fluid-clamp` at `flush` is not one value, and the per-variant
+ * path in `emit-tokens.mjs` already handles that correctly. A variable with no
+ * rules at all states nothing and is not this.
+ */
+const allRulesFixed = (rules) =>
+  rules.size > 0 && [...rules.values()].every((r) => r.cls === "fixed");
+
+/**
  * Classify one variable.
  *
  * Precedence: an explicit `responsive.viewport.fraction` field, then the
  * description convention, then the export's own `responsiveBehavior[].viewportFraction`
  * (P13, Workstream C's next ask — the 2026-09-10 plugin now emits this), then
+ * an all-`fixed` rule set on a declared viewport-group member (0.3.1), then
  * a bare `responsiveBehavior` strategy with no fraction at all (a hint, never
  * a value — see `emit-tokens.mjs`), then the per-mode default.
  *
@@ -260,6 +277,21 @@ export function classify(v, cfg) {
       override: null,
       warning: pct.rounded ? null : "VIEWPORT_FRACTION_UNROUNDED",
     };
+  }
+
+  // P11's THIRD silencing source — a rule-level `fixed` on a variable the
+  // consumer declared viewport-relative. `VIEWPORT_UNFLAGGED` asks "this group
+  // is a fraction of the screen; which fraction is this one?", and an export
+  // whose every rule states `fixed` has ANSWERED it: none, it is one value at
+  // every breakpoint. That is a statement, not silence, so it is honoured and
+  // not warned about. `emit-tokens.mjs` still proves the modes agree before
+  // collapsing them, and raises `FIXED_VARIES_BY_MODE` when they do not.
+  //
+  // Gated on `declared`, the same whitelist the warning is gated on: outside
+  // every declared group the per-variant `fixed` path is unchanged, because
+  // there was no warning to silence there in the first place.
+  if (declared && allRulesFixed(rules)) {
+    return { cls: "fixed", source: "rule", value: null, allFixed: true, rules, override: null, warning: null };
   }
 
   const fromExport = rules.get("default") ?? [...rules.values()][0] ?? null;
