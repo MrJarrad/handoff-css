@@ -14,12 +14,15 @@ import addFormats from "ajv-formats";
 const require = createRequire(import.meta.url);
 
 /** The published schema document, also reachable as `handoff-css/schema/export`. */
-export const exportSchema = require("../schema/design-system-handoff.v8.schema.json");
+export const exportSchema = require("../schema/design-system-handoff.schema.json");
 
 /** The schema versions this module knows how to validate. A v7 export is
  * legacy: it parses, it generates, and it is NOT validated (schema 7 predates
- * `responsiveBehavior` and the WEB-name contract). Dropped in 0.4.0. */
-export const VALIDATED_SCHEMA_VERSIONS = [8];
+ * `responsiveBehavior` and the WEB-name contract). Dropped in 0.4.0. Schema 9
+ * is the same shape as 8 — designer-signal viewport gating and whole-percent
+ * fraction snapping are semantic changes the export makes, not structural
+ * ones this schema needs to distinguish. */
+export const VALIDATED_SCHEMA_VERSIONS = [8, 9];
 
 let compiled = null;
 const validator = () => {
@@ -36,14 +39,18 @@ const validator = () => {
  *
  * @param {object} doc
  * @returns {{ ok: boolean, skipped: boolean, errors: {path: string, message: string, keyword: string}[] }}
- *   `skipped` is true for a schema version outside `VALIDATED_SCHEMA_VERSIONS`
- *   — an unvalidated document is never reported as a valid one.
+ *   `skipped` is true only for a schema version OLDER than every version this
+ *   module validates (legacy, e.g. 7) — an unvalidated document is never
+ *   reported as a valid one. A version NEWER than the newest one known (e.g.
+ *   a future 10) is not skipped: it is run through the schema, whose
+ *   `schemaVersion` enum fails it at `/schemaVersion` — "unrecognized" must
+ *   never read as "passed."
  */
 export function validateExport(doc) {
   if (doc == null || typeof doc !== "object") {
     return { ok: false, skipped: false, errors: [{ path: "", message: "export is not an object", keyword: "type" }] };
   }
-  if (!VALIDATED_SCHEMA_VERSIONS.includes(doc.schemaVersion)) {
+  if (typeof doc.schemaVersion === "number" && doc.schemaVersion < Math.min(...VALIDATED_SCHEMA_VERSIONS)) {
     return { ok: true, skipped: true, errors: [] };
   }
   const validate = validator();
@@ -70,5 +77,5 @@ export function assertValidExport(doc) {
   if (ok) return;
   const shown = errors.slice(0, 5).map((e) => `  ${e.path} ${e.message}`);
   const more = errors.length > shown.length ? `\n  … and ${errors.length - shown.length} more` : "";
-  throw new Error(`export does not match schema design-system-handoff 8:\n${shown.join("\n")}${more}`);
+  throw new Error(`export does not match schema design-system-handoff ${doc.schemaVersion}:\n${shown.join("\n")}${more}`);
 }

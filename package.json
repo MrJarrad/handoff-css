@@ -11,7 +11,7 @@
     ".": "./src/index.mjs",
     "./presets/jhd": "./presets/jhd.config.mjs",
     "./schema": "./schema/config.schema.json",
-    "./schema/export": "./schema/design-system-handoff.v8.schema.json"
+    "./schema/export": "./schema/design-system-handoff.schema.json"
   },
   "files": [
     "bin",

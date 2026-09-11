@@ -28,14 +28,17 @@ test("a schema-7 export is skipped, not validated — and says so", () => {
   const res = validateExport(v7);
   assert.equal(res.ok, true);
   assert.equal(res.skipped, true);
-  assert.deepEqual(VALIDATED_SCHEMA_VERSIONS, [8]);
+  assert.deepEqual(VALIDATED_SCHEMA_VERSIONS, [8, 9]);
 });
 
-test("an unknown future schema version is skipped by this validator, not failed", () => {
+test("an unknown future schema version fails at /schemaVersion, not skipped", () => {
   const doc = docV8b();
-  doc.schemaVersion = 9;
+  doc.schemaVersion = 10;
   const res = validateExport(doc);
-  assert.equal(res.skipped, true);
+  assert.equal(res.skipped, false);
+  assert.equal(res.ok, false);
+  const hit = res.errors.find((e) => e.path === "/schemaVersion");
+  assert.ok(hit, `expected an error at /schemaVersion, got ${res.errors.map((e) => e.path).join(", ")}`);
 });
 
 test("a deleted codeSyntax.WEB value fails at the variable's pointer", () => {
@@ -154,6 +157,6 @@ test("assertValidExport names at most five pointers and counts the rest", () => 
 });
 
 test("the schema document is published as part of the package", () => {
-  assert.equal(exportSchema.properties.schemaVersion.const, 8);
+  assert.deepEqual(exportSchema.properties.schemaVersion.enum, [8, 9]);
   assert.equal(exportSchema.$schema, "https://json-schema.org/draft/2020-12/schema");
 });
