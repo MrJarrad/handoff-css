@@ -135,3 +135,9 @@ test("a missing --config path is an error the CLI reports, not a stack trace", a
   assert.equal(await dispatch(["--config"], { stdout: sink(), stderr }), 1);
   assert.match(stderr.text, /--config needs a path/);
 });
+
+test("--help's conform line names --config and --allow-name (P16's reviewer amber)", async () => {
+  const stdout = sink();
+  assert.equal(await dispatch(["--help"], { stdout, stderr: sink() }), 0);
+  assert.match(stdout.text, /conform.*\n.*--config <mjs>.*--allow-name <name>/);
+});
