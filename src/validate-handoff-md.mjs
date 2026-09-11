@@ -8,6 +8,12 @@
 //                            tables, copy). Lock 3's conformance check reads
 //                            the bindings from here rather than re-parsing.
 //   `validateHandoffMarkdown` — the grammar check over that parse.
+//
+// P17 — the 2026-09-11 plugin export prepends a `---` YAML front-matter block
+// ahead of the bold identity lines. `parseFrontMatter` (src/front-matter.mjs)
+// reads it; this module cross-checks it against the bold lines it already
+// parses and prefers it when both exist and agree.
+import { parseFrontMatter } from "./front-matter.mjs";
 
 /** Section headers the grammar requires, in the order they must appear. */
 export const REQUIRED_SECTIONS = [
@@ -53,6 +59,10 @@ const CELL = [
 // `⚠` to mean only "flag this value" (raw/placeholder). Both sigils are
 // accepted here: `⚠ <note>` is the pre-v2 form, `† <note>` is the current one.
 const RAGGED_NOTE = /^[†⚠] [\w-]+$/;
+// The 2026-09-11 plugin's proper `Notes` column: same two sigils, but the
+// note text is free prose (`† row-wrap: 2 rows (row 1: …, row 2: …)`), not
+// the single-word form the legacy ragged cell used.
+const NOTES_CELL = /^[†⚠] .+$/;
 
 const policyVersions = (text) => {
   const out = {};
@@ -82,7 +92,8 @@ const policyVersions = (text) => {
  * }}
  */
 export function parseHandoffMarkdown(text) {
-  const lines = text.split("\n");
+  const { frontMatter, body, offset } = parseFrontMatter(text);
+  const lines = body.split("\n");
   const out = {
     schemaVersion: null,
     artifact: null,
@@ -98,6 +109,7 @@ export function parseHandoffMarkdown(text) {
     changes: [],
     sections: new Set(),
     lines,
+    frontMatter,
   };
 
   let inBuildStandards = false;
@@ -107,7 +119,7 @@ export function parseHandoffMarkdown(text) {
 
   lines.forEach((raw, i) => {
     const line = raw.replace(/\s+$/, "");
-    const at = i + 1;
+    const at = i + 1 + offset;
 
     for (const s of REQUIRED_SECTIONS) if (line.startsWith(s)) out.sections.add(s);
 
@@ -208,13 +220,23 @@ export function parseHandoffMarkdown(text) {
       const cells = body.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
       if (cells.every((c) => /^-{3,}$/.test(c))) return; // the separator row
       if (table == null) {
-        table = { header: cells, rows: [], line: at };
+        table = { header: cells, rows: [], line: at, hasNotesColumn: cells[cells.length - 1] === "Notes" };
         out.tables.push(table);
       } else {
         // `note` normalises the sigil away — one shape, `† token-swap` or
-        // `⚠ token-swap` both read as `{ note: "token-swap" }`.
-        const note = ragged != null ? ragged.replace(/^[†⚠]\s*/, "") : null;
-        table.rows.push({ cells, ragged, note, line: at });
+        // `⚠ token-swap` both read as `{ note: "token-swap" }`. A ragged
+        // trailing cell is the legacy form; a proper `Notes` column (last
+        // header cell literally `Notes`) is the 2026-09-11 plugin's form —
+        // both populate the same `note`.
+        let note = ragged != null ? ragged.replace(/^[†⚠]\s*/, "") : null;
+        let dataCells = cells;
+        let notesRaw = null;
+        if (table.hasNotesColumn && cells.length === table.header.length) {
+          notesRaw = cells[cells.length - 1];
+          dataCells = cells.slice(0, -1);
+          if (notesRaw !== "") note = notesRaw.replace(/^[†⚠]\s*/, "");
+        }
+        table.rows.push({ cells: dataCells, ragged, note, notesRaw, line: at });
       }
       return;
     }
@@ -224,7 +246,42 @@ export function parseHandoffMarkdown(text) {
     if (footnote) out.notes.push({ marker: footnote[1], text: footnote[2], line: at });
   });
 
+  out.frontMatterMismatches = frontMatterMismatches(out);
   return out;
+}
+
+/**
+ * Cross-check the front-matter block against the bold identity lines it
+ * duplicates. Each mismatch names the field and the line of the bold line
+ * that disagrees (the front matter itself has no per-field line number).
+ * Identity fields present in ONLY one of the two are not a mismatch — the
+ * front matter is additive, not a second required source.
+ */
+function frontMatterMismatches(parsed) {
+  const fm = parsed.frontMatter;
+  if (fm == null) return [];
+  const mismatches = [];
+  const check = (field, fmValue, boldValue, line) => {
+    if (fmValue == null || boldValue == null) return;
+    if (fmValue !== boldValue) mismatches.push({ field, frontMatter: fmValue, bold: boldValue, line });
+  };
+
+  check("schemaVersion", fm.schemaVersion, parsed.artifact?.schemaVersion, parsed.artifact?.line ?? 1);
+  check("contract", fm.contract, parsed.artifact?.compatibility, parsed.artifact?.line ?? 1);
+  check("lane", fm.lane, parsed.artifact?.lane, parsed.artifact?.line ?? 1);
+  check("contentHash", fm.contentHash, parsed.contentHash?.value, parsed.contentHash?.line ?? 1);
+  check("fingerprint.designSystemStateHash", fm.fingerprint?.designSystemStateHash,
+    parsed.fingerprint?.state, parsed.fingerprint?.line ?? 1);
+  check("companion.artifactFilename", fm.companion?.artifactFilename,
+    parsed.companion?.base, parsed.companion?.line ?? 1);
+  check("companion.schemaVersion", fm.companion?.schemaVersion,
+    parsed.companion?.schemaVersion, parsed.companion?.line ?? 1);
+  check("companion.contentHash", fm.companion?.contentHash,
+    parsed.companion?.contentHash, parsed.companion?.line ?? 1);
+  check("companion.designSystemStateHash", fm.companion?.designSystemStateHash,
+    parsed.companion?.state, parsed.companion?.line ?? 1);
+
+  return mismatches;
 }
 
 /**
@@ -241,6 +298,11 @@ export function validateHandoffMarkdown(text) {
 
   for (const section of REQUIRED_SECTIONS) {
     if (!parsed.sections.has(section)) add("MISSING_SECTION", "error", 1, `required section missing: ${section}`);
+  }
+
+  for (const m of parsed.frontMatterMismatches) {
+    add("FRONT_MATTER_MISMATCH", "error", m.line,
+      `front matter \`${m.field}\` is \`${m.frontMatter}\`, the bold line (line ${m.line}) states \`${m.bold}\``);
   }
 
   if (parsed.artifact == null) {
@@ -316,14 +378,19 @@ export function validateHandoffMarkdown(text) {
   }
 
   for (const table of parsed.tables) {
+    const dataWidth = table.hasNotesColumn ? table.header.length - 1 : table.header.length;
     for (const row of table.rows) {
-      if (row.cells.length !== table.header.length) {
+      if (row.cells.length !== dataWidth) {
         add("TABLE_RAGGED", "error", row.line,
-          `row has ${row.cells.length} cells, the header (line ${table.line}) has ${table.header.length}`);
+          `row has ${row.cells.length} cells, the header (line ${table.line}) has ${dataWidth}`);
       }
       if (row.ragged != null && !RAGGED_NOTE.test(row.ragged)) {
         add("TABLE_RAGGED", "error", row.line,
           `trailing cell \`${row.ragged}\` is not a \`⚠ <note>\` marker (nor \`† <note>\`)`);
+      }
+      if (row.notesRaw != null && row.notesRaw !== "" && !NOTES_CELL.test(row.notesRaw)) {
+        add("TABLE_CELL_UNKNOWN", "error", row.line,
+          `Notes cell \`${row.notesRaw}\` is not empty nor a \`† <note>\` marker`);
       }
       for (const cell of row.cells.slice(1)) {
         if (cell === "" || CELL.some((re) => re.test(cell))) continue;

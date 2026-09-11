@@ -149,6 +149,62 @@ pipe, carrying a note marker (`† token-swap`, `† variant-only`, or the pre-2
 `row.note` field (the sigil stripped); a ragged row whose extra cell is neither is
 `TABLE_RAGGED` (error), and a row with fewer cells than the header is `TABLE_RAGGED` too.
 
+### The `Notes` column (export v4, 2026-09-11)
+
+The plugin's export v4 replaced the ragged trailing cell with a proper fifth header column
+named literally `Notes`:
+
+```
+| Child | lg+ | md | sm | Notes |
+| --- | --- | --- | --- | --- |
+| colGap | $grid/gap-sm | $grid/gap-sm | $grid/gap | † token-swap |
+| sm |  |  |  | † row-wrap: 2 rows (row 1: title + action, row 2: description) |
+```
+
+A table whose last header cell is exactly `Notes` sets `table.hasNotesColumn`. Its `Notes`
+cells accept: empty, `† <note>`, or `† row-wrap: <free text>` (also `⚠` for either, same
+normalisation as the legacy ragged form) — never validated against the closed value-column
+vocabulary, and never `TABLE_CELL_UNKNOWN`. The cell populates the same `row.note` field the
+legacy ragged form did; `row.cells` excludes the Notes cell, so the value-column count and
+vocabulary checks run only over the value columns. A non-empty Notes cell that is neither
+form is `TABLE_CELL_UNKNOWN` (error). The legacy ragged form is still accepted on tables
+without a `Notes` header.
+
+## Front matter (export v4, 2026-09-11)
+
+The brief may open with a leading `---`-fenced YAML block, read by a minimal hand-rolled
+parser (`src/front-matter.mjs`) — flat keys, one level of nested mapping, quoted strings,
+ints; no YAML dependency:
+
+```yaml
+---
+schema: design-handoff
+schemaVersion: 6
+contract: layer-brief/1
+lane: selection/design
+exportVersion: 3
+figma:
+  fileKey: "unavailable"
+  pageCount: 17
+policies:
+  units: 5
+fingerprint:
+  designSystemStateHash: "…"
+companion:
+  artifactFilename: "…"
+  schemaVersion: 9
+  contentHash: "…"
+  designSystemStateHash: "…"
+---
+```
+
+Parsed into `parsed.frontMatter` (or `null` when absent — every pre-export-v4 brief). Fields
+also stated by the bold identity lines (`schemaVersion`, `contract`/lane via the Artifact line,
+`fingerprint.designSystemStateHash`, the `companion.*` block) are cross-checked against them:
+when both exist and disagree, `FRONT_MATTER_MISMATCH` (error) names the field, the front-matter
+value, and the bold line's value. A field present in only one of the two sources is not a
+mismatch — the front matter is additive.
+
 ## Exit codes
 
 `handoff-css validate` prints one line per file and exits 1 if any file raised an **error**.

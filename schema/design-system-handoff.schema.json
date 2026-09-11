@@ -50,6 +50,30 @@
       "type": "array",
       "minItems": 1,
       "items": { "$ref": "#/$defs/collection" }
+    },
+    "figma": {
+      "type": "object",
+      "properties": {
+        "fileKey": { "type": ["string", "null"] },
+        "pageCount": { "type": "number" }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["code"],
+            "properties": {
+              "code": { "type": "string" },
+              "variable": { "type": "string" },
+              "detail": { "type": "string" }
+            }
+          }
+        }
+      }
     }
   },
   "$defs": {

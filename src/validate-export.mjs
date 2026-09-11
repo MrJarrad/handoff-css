@@ -38,23 +38,30 @@ const validator = () => {
  * Validate a parsed export document.
  *
  * @param {object} doc
- * @returns {{ ok: boolean, skipped: boolean, errors: {path: string, message: string, keyword: string}[] }}
+ * @returns {{ ok: boolean, skipped: boolean, errors: {path: string, message: string, keyword: string}[],
+ *             warnings: {code: string, variable?: string, detail?: string}[] }}
  *   `skipped` is true only for a schema version OLDER than every version this
  *   module validates (legacy, e.g. 7) — an unvalidated document is never
  *   reported as a valid one. A version NEWER than the newest one known (e.g.
  *   a future 10) is not skipped: it is run through the schema, whose
  *   `schemaVersion` enum fails it at `/schemaVersion` — "unrecognized" must
  *   never read as "passed."
+ *
+ *   `warnings` surfaces the plugin's OWN `validation.findings` (schema 9+) as
+ *   `PLUGIN_FINDING` — the export self-reporting something the generator did
+ *   not itself detect. An empty array (the common case) means the plugin
+ *   found nothing to say.
  */
 export function validateExport(doc) {
   if (doc == null || typeof doc !== "object") {
-    return { ok: false, skipped: false, errors: [{ path: "", message: "export is not an object", keyword: "type" }] };
+    return { ok: false, skipped: false, errors: [{ path: "", message: "export is not an object", keyword: "type" }], warnings: [] };
   }
   if (typeof doc.schemaVersion === "number" && doc.schemaVersion < Math.min(...VALIDATED_SCHEMA_VERSIONS)) {
-    return { ok: true, skipped: true, errors: [] };
+    return { ok: true, skipped: true, errors: [], warnings: [] };
   }
   const validate = validator();
   const ok = validate(doc);
+  const findings = Array.isArray(doc.validation?.findings) ? doc.validation.findings : [];
   return {
     ok,
     skipped: false,
@@ -67,6 +74,7 @@ export function validateExport(doc) {
           message: e.message ?? "invalid",
           keyword: e.keyword,
         })),
+    warnings: findings.map((f) => ({ code: "PLUGIN_FINDING", variable: f.variable, detail: f.detail ?? f.code })),
   };
 }
 

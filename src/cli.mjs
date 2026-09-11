@@ -89,14 +89,17 @@ function validateJson(file, text) {
   } catch (err) {
     return { file, kind: "export", ok: false, findings: [{ code: "UNPARSEABLE", severity: "error", line: 0, path: "/", message: err.message }] };
   }
-  const { ok, skipped, errors } = validateExport(doc);
+  const { ok, skipped, errors, warnings } = validateExport(doc);
   return {
     file,
     kind: "export",
     ok,
     skipped,
     schemaVersion: doc.schemaVersion ?? null,
-    findings: errors.map((e) => ({ code: "SCHEMA", severity: "error", line: 0, path: e.path, message: `${e.message} (${e.keyword})` })),
+    findings: [
+      ...errors.map((e) => ({ code: "SCHEMA", severity: "error", line: 0, path: e.path, message: `${e.message} (${e.keyword})` })),
+      ...warnings.map((w) => ({ code: w.code, severity: "warning", line: 0, path: w.variable ? `/${w.variable}` : "/", message: w.detail ?? "" })),
+    ],
   };
 }
 
