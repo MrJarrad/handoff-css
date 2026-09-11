@@ -245,7 +245,8 @@ waiting on a human. `--json` prints the same result machine-readably.
 handoff-css conform --export export.json \
                     --handoff design-handoff-block-navigation.md \
                     --tokens src/tokens.generated.css \
-                    --css src/app/globals.css
+                    --css src/app/globals.css \
+                    --allow-name --font-suisse
 ```
 
 | Finding | Severity | What it means |
@@ -259,6 +260,21 @@ handoff-css conform --export export.json \
 
 Exit 1 on any red. **CSS only in 0.3.0** — a binding that lives in markup (a utility class,
 a styled component, an inline style) is invisible to this check, and that is a named gap.
+
+**Allowing a name.** Some `var()` names legitimately come from outside the export — a font
+face this package asks you to supply, for instance. `--allow-name <name>` (repeatable) and
+the config's `conform.allowNames: []` are the same statement, and both are additive:
+
+```js
+// handoff.config.mjs
+export default {
+  // …
+  conform: { allowNames: ["--font-suisse"] },
+};
+```
+
+An allowed name never raises `UNKNOWN_NAME`. It is not a mute button: a name your own
+stylesheet declares is still `LOCAL_ONLY`.
 
 ## Pair it with the skill
 

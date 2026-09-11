@@ -645,10 +645,23 @@ breakpoint families only — the export writes a sample's `widthPx` as the mode'
 own numeric name on non-viewport mode sets, so a checker that trusted every
 `widthPx` would call `padding: 200px` a device sample.
 
+**The allowlist (0.3.1).** Some names legitimately come from outside the
+export: this package asks consumers to supply their own font face, so
+`--font-suisse` is a `var()` no export will ever declare, and a permanent red
+a consumer has learned to ignore is worse than no check. `--allow-name <name>`
+(repeatable) and the config's `conform.allowNames` are the same statement, and
+both are additive — an allowed name never raises `UNKNOWN_NAME`.
+
+It answers exactly one question — "this name comes from outside the export" —
+and is not a mute button. A name the consumer's own stylesheet declares is
+still `LOCAL_ONLY`, because that is a different claim about a different
+mistake, and an allowlist entry that silenced it would hide the drift it exists
+to find.
+
 Scope: CSS only in 0.3.0. A binding that lives in markup is invisible here, and
 that is a named gap rather than a silent one. Exit 1 on any red.
 
-`conform` · `src/conform.mjs`
+`conform`, `conform.allowNames` · `src/conform.mjs`, `src/conform-cli.mjs`
 
 ---
 

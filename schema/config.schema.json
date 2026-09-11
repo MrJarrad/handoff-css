@@ -161,6 +161,18 @@
       "additionalProperties": { "type": "string" },
       "description": "P12 — `\"<name pattern>\": \"<target pattern>\"`, each ending in exactly one `*`, expanded over the emitted token leaves into a `:root` alias block. A collision with a generated or hand-authored name is a hard failure."
     },
+    "conform": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowNames": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "P16 — custom-property names the consumer legitimately declares outside the export (`--font-suisse`: this package asks consumers to supply their own font face). An allowed name never raises `UNKNOWN_NAME`. It is not a mute button: a name declared in the consumer's own stylesheet is still `LOCAL_ONLY`."
+        }
+      },
+      "description": "P16 — the conformance check's policy. Optional: a config that omits it allows nothing, which is the pre-0.3.1 behaviour."
+    },
     "report": {
       "type": "object",
       "additionalProperties": false,

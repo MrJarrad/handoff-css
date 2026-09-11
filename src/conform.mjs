@@ -199,9 +199,16 @@ export function samplePixels(doc) {
  * @param {object}   input.handoff    `parseHandoffMarkdown(...)` output
  * @param {string}   input.tokensCss  the generated tokens stylesheet
  * @param {{path: string, text: string}[]} input.files the consumer's own CSS
+ * @param {string[]} [input.allowNames] custom-property names that legitimately
+ *   come from outside the export (`--font-suisse`: this package tells consumers
+ *   to supply their own font face). An allowed name never raises
+ *   `UNKNOWN_NAME`. It answers exactly that one question and is not a mute
+ *   button: a name declared in the consumer's own stylesheet is still
+ *   `LOCAL_ONLY`, because that is a different claim about a different mistake.
  * @returns {{ findings: {code, severity, file, line, name?, message}[], summary: object }}
  */
-export function conform({ doc, handoff, tokensCss, files }) {
+export function conform({ doc, handoff, tokensCss, files, allowNames = [] }) {
+  const allowed = new Set(allowNames);
   const findings = [];
   const add = (code, file, line, message, name, severity = FINDINGS[code]) =>
     findings.push({ code, severity, file, line, name, message });
@@ -238,7 +245,7 @@ export function conform({ doc, handoff, tokensCss, files }) {
       if (local.has(name)) {
         add("LOCAL_ONLY", file, line,
           `\`${name}\` is declared in this stylesheet and is not an export name — a local value, not a token`, name);
-      } else {
+      } else if (!allowed.has(name)) {
         add("UNKNOWN_NAME", file, line,
           `\`${name}\` is in neither the export nor the generated tokens (and nothing declares it here)`, name);
       }
