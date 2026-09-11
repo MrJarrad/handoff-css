@@ -1,0 +1,5 @@
+/* The alias hop: `--screen-height-full` is not an export name, it is the
+   generated alias block's legacy hop onto `--device-screen-height-full`.
+   Resolvable, so NOT unknown — the report says which token was consumed. */
+.hero { min-height: var(--screen-height-full); }
+.hero--stacked { height: var(--height-screen-full); }

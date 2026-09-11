@@ -1,0 +1,15 @@
+/* Clean: every binding is a name the export states, every mechanism is the one
+   the handoff names. This file is the shape a conforming consumer has. */
+.nav-footer {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--grid-gap-sm);
+  width: var(--device-width);
+  height: var(--device-screen-height-full);
+}
+.nav-footer__section {
+  grid-column: span 3;
+}
+@media (min-width: 768px) {
+  .nav-footer__section { grid-column: span 6; }
+}

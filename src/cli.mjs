@@ -11,13 +11,14 @@ import { run } from "./index.mjs";
 import { validateExport } from "./validate-export.mjs";
 import { validateHandoffMarkdown } from "./validate-handoff-md.mjs";
 
-export const SUBCOMMANDS = ["validate"];
+export const SUBCOMMANDS = ["validate", "conform"];
 
 const USAGE = `handoff-css — Design Handoff export → CSS custom properties
 
   handoff-css [--config <mjs>] [--input <json>] [--out <css>] [--theme <css>]
               [--report <md>] [--exclusions <json>] [--check]
   handoff-css validate <file…> [--json]
+  handoff-css conform --export <json> --handoff <md> --tokens <css> --css <file…> [--json]
 `;
 
 /**
@@ -27,6 +28,10 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
 export async function dispatch(argv, { cwd = process.cwd(), stdout = process.stdout, stderr = process.stderr } = {}) {
   const [first, ...rest] = argv;
   if (first === "validate") return validateCommand(rest, { cwd, stdout, stderr });
+  if (first === "conform") {
+    const { conformCommand } = await import("./conform-cli.mjs");
+    return conformCommand(rest, { cwd, stdout, stderr });
+  }
   if (first === "--help" || first === "-h") {
     stdout.write(USAGE);
     return 0;
