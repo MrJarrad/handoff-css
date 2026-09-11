@@ -1,6 +1,6 @@
 {
   "name": "handoff-css",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Turn a Figma Design Handoff export into production-ready CSS custom properties, a Tailwind v4 @theme bridge and a reconciliation report.",
   "license": "MIT",
   "type": "module",
@@ -10,20 +10,25 @@
   "exports": {
     ".": "./src/index.mjs",
     "./presets/jhd": "./presets/jhd.config.mjs",
-    "./schema": "./schema/config.schema.json"
+    "./schema": "./schema/config.schema.json",
+    "./schema/export": "./schema/design-system-handoff.schema.json"
   },
   "files": [
     "bin",
     "src",
+    "scripts",
     "presets",
     "schema",
     "docs",
     "skills",
+    "AGENTS.md",
     "README.md",
     "fixtures/jhd-v8b-2026-09-10/styles.css"
   ],
   "scripts": {
-    "test": "node --test 'test/**/*.test.mjs'"
+    "test": "node --test 'test/**/*.test.mjs'",
+    "skills": "node scripts/build-skill-adapters.mjs",
+    "skills:check": "node scripts/build-skill-adapters.mjs --check"
   },
   "keywords": [
     "figma",
@@ -34,5 +39,9 @@
   ],
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
   }
 }

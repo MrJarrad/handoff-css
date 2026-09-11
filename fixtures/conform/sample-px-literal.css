@@ -1,0 +1,9 @@
+/* 812px is the sm device's own height — the sample `100dvh` was measured on.
+   24px is a token's px sample: amber, because a spacing decision that happens
+   to match is not a device measurement. A breakpoint in an @media prelude is
+   exempt: it is the one px a stylesheet cannot state as a custom property. */
+.hero { height: 812px; }
+.card { padding: 24px; }
+@media (min-width: 768px) {
+  .hero { height: var(--device-screen-height-full); }
+}

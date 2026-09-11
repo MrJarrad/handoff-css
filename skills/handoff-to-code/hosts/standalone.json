@@ -1,0 +1,9 @@
+{
+  "_": "Host values for the six host-varying hunks. The fifth input (the ruling list) is NOT a hunk: its wording converged on this package's form in every host, including the 'Anything else in that list is a paraphrase of the pair, and the pair wins.' sentence.",
+  "description-scope": "Not for reading a Figma file live —\n  pixels, screenshots, variant walks and selection are a different job; not for measuring an\n  already-built page back against the design.",
+  "contract-read": "The pair is read, not re-described: a task description that paraphrases the\npair has replaced the contract with a summary of it, and the pair still wins.",
+  "fires-table": "| Situation | This skill |\n| --- | --- |\n| An export pair exists and code is being written from it | **yes** |\n| No export — reading the design file live (selection, screenshots, variant matrix) | no, that is a design-file read |\n| A page is already built and needs measuring back against the design | no, that is a build audit |",
+  "sibling-skills": "The pair cannot carry everything: renders, interaction and prototype detail, and\nbinding proofs verified against the design tool's own API stay with a live read of the file.\nReach for one *inside* step 4 when the pair is silent — not instead of the pair.",
+  "ruling-ref-cites": "`ruling ref` cites the entry in the ruling list that authorised a non-match.",
+  "tail": "## Where the rules behind this live\n\nEvery generator behaviour this skill leans on is written up with the measurements that\nproduced it: `docs/POLICIES.md` — P4 (units), P7 (private/hidden/excluded), P11 (responsive\nclasses and `viewport.groups`), P12 (the alias block), P13 (cell trust). `README.md` covers\ninstall, config keys and the CLI. `presets/jhd.config.mjs` is a real house config with every\nkey filled in and commented — read it as a worked example of the policy this skill assumes,\nnot as a default; there are no defaults."
+}

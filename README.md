@@ -216,10 +216,49 @@ handoff-css [--config <mjs>]        default: ./handoff.config.mjs
             [--input <json>] [--out <css>] [--theme <css>]
             [--report <md>] [--exclusions <json>]
             [--check]
+
+handoff-css validate <file…> [--json]
+
+handoff-css conform --export <json> --handoff <md> --tokens <css>
+                    --css <file…> [--json]
 ```
 
 Flags override `paths.*`. `--check` writes nothing and exits 1 on any
 difference.
+
+### `validate` — is the pair itself well-formed?
+
+```sh
+handoff-css validate export.json design-handoff-block-navigation.md
+```
+
+A `.json` file is checked against `schema/design-system-handoff.schema.json` (schema 8
+and 9; schema 7 is skipped: legacy). A `.md` file is checked against the line grammar in
+`schema/design-handoff.v6.grammar.md` — identity lines, the companion block, Build
+standards 1–5, token rows, node rows, the responsive grid tables. One line per file, the
+findings under it, exit 1 on any **error**. A warning never fails the run: it is a decision
+waiting on a human. `--json` prints the same result machine-readably.
+
+### `conform` — does the built CSS honour the pair?
+
+```sh
+handoff-css conform --export export.json \
+                    --handoff design-handoff-block-navigation.md \
+                    --tokens src/tokens.generated.css \
+                    --css src/app/globals.css
+```
+
+| Finding | Severity | What it means |
+| --- | --- | --- |
+| `UNKNOWN_NAME` | red | a `var(--x)` in neither the export nor the generated tokens (alias hops resolve first) |
+| `LOCAL_ONLY` | amber | the stylesheet declares the name itself — a local value, not a token |
+| `UNMAPPED_BINDING` | amber | the handoff states a binding the generated tokens never declare |
+| `SAMPLE_PX_LITERAL` | red / amber | red for a device/viewport sample (`812px`), amber for any other token px; an `@media` breakpoint is exempt |
+| `GRID_ARITHMETIC` | red | column maths where the handoff states `col-span N/M` — Build standard 5 names a grid container |
+| `PLACEHOLDER_COPY` | amber | a `⚠ placeholder` string shipped as content |
+
+Exit 1 on any red. **CSS only in 0.3.0** — a binding that lives in markup (a utility class,
+a styled component, an inline style) is invisible to this check, and that is a named gap.
 
 ## Pair it with the skill
 
@@ -241,6 +280,17 @@ Point your agent at it:
 skills/handoff-to-code/SKILL.md      # or copy it into .claude/skills/ / your agent's skills dir
 ```
 
+## Library use, 0.3.0 additions
+
+```js
+import { generate, validateExport, assertValidExport, exportSchema } from "handoff-css";
+import { parseHandoffMarkdown, validateHandoffMarkdown } from "handoff-css/src/validate-handoff-md.mjs";
+import { conform, tokenizeCss, aliasGraph, resolveName } from "handoff-css/src/conform.mjs";
+import schema from "handoff-css/schema/export" with { type: "json" };
+```
+
+Every one of them is pure: text or parsed documents in, findings out.
+
 ## Guarantees
 
 - **Deterministic.** Collections sorted by name, variables by name, floats
@@ -252,6 +302,14 @@ skills/handoff-to-code/SKILL.md      # or copy it into .claude/skills/ / your ag
   that does not match its own `raw`), the run stops rather than picking a side.
 - **Your stylesheet wins.** A custom property you declare globally is reported,
   not overwritten (P2).
+- **The export is checked before it is trusted** (P14). A schema-8 export that
+  does not match the published schema stops the run at a JSON pointer, rather
+  than producing three-quarters of a stylesheet.
+- **A derived fraction rounds to the value a designer typed** (P15), and says
+  so out loud when it cannot.
+- **One skill, every host** (Lock 2). `skills/handoff-to-code/SKILL.md` is the
+  only copy; the adapters under `skills/handoff-to-code/dist/` are built from it
+  and asserted against a rebuild, so two hosts cannot drift apart.
 
 ## Development
 

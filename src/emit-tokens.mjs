@@ -6,7 +6,7 @@ import { aliasBlock } from "./aliases.mjs";
 import { aliasedByNames, isExcluded, isHidden, privateIds } from "./exclude.mjs";
 import { layoutBreakpoints, placementsFor, renderGroups, themeModeIds, variantBase } from "./modes.mjs";
 import { cmp, num, resolveValue, untrustedCells } from "./resolve.mjs";
-import { classify, honours, isViewportClass } from "./responsive.mjs";
+import { classify, honours, isViewportClass, VIEWPORT_FRACTION_TOLERANCE } from "./responsive.mjs";
 import { assertSchema, indexById, webName } from "./schema.mjs";
 
 const handAuthoredName = (cfg) => path.basename(cfg.paths.handAuthored);
@@ -114,6 +114,16 @@ export function emitTokens(doc, handDeclared, cfg) {
           name,
           collection: c.name,
           detail: `responsiveBehavior's viewportFraction (${num(rule * 100)}%) disagrees with the description's stated fraction (${num(description * 100)}%) by more than 0.5 — the description wins, ${resp.value} emitted`,
+        });
+      } else if (resp.warning === "VIEWPORT_FRACTION_UNROUNDED") {
+        // P15 — a derived fraction no whole percent is within tolerance of.
+        // Emitted at three decimals, and named here so the number can be
+        // corrected at the input rather than trusted as a design value.
+        warnings.push({
+          code: resp.warning,
+          name,
+          collection: c.name,
+          detail: `derived viewport fraction ${resp.fraction} is not within ${VIEWPORT_FRACTION_TOLERANCE} of a whole percent — kept at three decimals (${resp.value}); check the value in the design file`,
         });
       } else if (resp.warning === "VIEWPORT_OUTSIDE_GROUPS") {
         warnings.push({

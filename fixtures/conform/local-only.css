@@ -1,0 +1,4 @@
+/* Declared here, so it resolves — but it is this stylesheet's own value, not a
+   token the export states. Amber: a local value is a decision, not drift. */
+:root { --hero-lead: 1.15; }
+.hero { line-height: var(--hero-lead); }

@@ -24,8 +24,10 @@ import { readHandAuthored } from "./hand-authored.mjs";
 import { report } from "./report.mjs";
 import { cmp, fail } from "./resolve.mjs";
 import { indexById } from "./schema.mjs";
+import { assertValidExport } from "./validate-export.mjs";
 
 export { validateConfig, configSchema } from "./config.mjs";
+export { validateExport, assertValidExport, exportSchema, VALIDATED_SCHEMA_VERSIONS } from "./validate-export.mjs";
 
 /**
  * The public entry: pure, no filesystem.
@@ -37,6 +39,11 @@ export { validateConfig, configSchema } from "./config.mjs";
  */
 export function generate(doc, config, { handAuthoredCss = "" } = {}) {
   const cfg = assertConfig(config);
+  // P14 — the export is checked against the published schema BEFORE a line of
+  // CSS exists. A schema-7 export skips the check (legacy, see
+  // `validate-export.mjs`); anything the config declares but the schema does
+  // not know stops here rather than half-generating.
+  assertValidExport(doc);
   const { declared: handDeclared, scoped: handScoped } = readHandAuthored(handAuthoredCss);
   const { css, rows, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings,
           untrustedRows } = emitTokens(doc, handDeclared, cfg);

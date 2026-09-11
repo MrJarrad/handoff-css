@@ -1,0 +1,7 @@
+/* Build standard 5: the handoff states col-span N/12, so the mechanism is a
+   grid container. Dividing the viewport by 12 measures the same and is a
+   defect — the portfolio nav's own 2026-09-10 pattern. */
+:root {
+  --nav-col-unit: calc((100vw - 2 * var(--grid-margin-default) + var(--grid-gap)) / 12);
+}
+.nav__title { width: calc(var(--nav-col-unit) * 6 - var(--grid-gap)); }

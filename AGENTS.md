@@ -1,28 +1,23 @@
----
-name: handoff-to-code
-description: >-
-  Build code from a Design Handoff export pair — the design-handoff markdown and its
-  design-system-handoff JSON companion — treating the pair as the contract. Trigger on
-  "consume the handoff", "build from the handoff", "handoff pair", "the export says",
-  "regenerate tokens", a `*-design-system-handoff.json` or `design-handoff-*.md` path, or
-  any implementation whose values come from a handoff export rather than from the canvas.
-  Every node, token, copy string and annotation in the pair is built; deviations are
-  returned as a table and drift stops for a ruling. {{description-scope}}
----
-
-# Handoff to Code
+## Handoff to Code
 
 **The handoff pair is the contract: every node, token, copy string and annotation in it is
 built — never Figma pixels, never inferred values.** A value the pair does not state is not
-yours to supply. {{contract-read}}
+yours to supply. The pair is read, not re-described: a task description that paraphrases the
+pair has replaced the contract with a summary of it, and the pair still wins.
 
-## When it fires
+### When it fires
 
-{{fires-table}}
+| Situation | This skill |
+| --- | --- |
+| An export pair exists and code is being written from it | **yes** |
+| No export — reading the design file live (selection, screenshots, variant matrix) | no, that is a design-file read |
+| A page is already built and needs measuring back against the design | no, that is a build audit |
 
-{{sibling-skills}}
+The pair cannot carry everything: renders, interaction and prototype detail, and
+binding proofs verified against the design tool's own API stay with a live read of the file.
+Reach for one *inside* step 4 when the pair is silent — not instead of the pair.
 
-## Inputs — four required, one optional
+### Inputs — four required, one optional
 
 | Input | What it is |
 | --- | --- |
@@ -36,9 +31,9 @@ The fifth, optional input is the **ruling list** for the task: decisions **on to
 pair, carrying only what the file cannot — blend modes, behaviour, links, copy overrides.
 Anything else in that list is a paraphrase of the pair, and the pair wins.
 
-## Steps
+### Steps
 
-### 1. Prove the pair and the vendored export are the same system
+#### 1. Prove the pair and the vendored export are the same system
 
 Read the identity fields before anything else:
 
@@ -68,7 +63,7 @@ is a decision waiting on a human: read it, carry it into your deviation table, a
 
 **Done when** all three hashes reconcile and the schema version is one the config declares.
 
-### 2. Regenerate, then read every warning
+#### 2. Regenerate, then read every warning
 
 Run the generator in check mode — `handoff-css --config handoff.config.mjs --check`, which
 writes nothing and exits 1 if any committed artifact would change. A red check before you
@@ -94,7 +89,7 @@ generated and naming the warning in your deviation table — is correct.
 **Done when** every warning code in the report is either irrelevant to the nodes you are
 building or carries a deviation row.
 
-### 3. Map every binding to `codeSyntax.WEB` — an unmapped binding is a defect
+#### 3. Map every binding to `codeSyntax.WEB` — an unmapped binding is a defect
 
 Walk the markdown's node tree and collect every `$variable` on every node you are building —
 sizes, gaps, padding, fills, stroke widths, text styles. For each one, find the variable in
@@ -117,7 +112,7 @@ Three rules make this the whole of the mapping:
 **Done when** every `$variable` on every built node has a `codeSyntax.WEB` name, or a
 deviation row saying why it has none.
 
-### 4. Implement against tokens only, with the Build standards as the mechanism rules
+#### 4. Implement against tokens only, with the Build standards as the mechanism rules
 
 The markdown's **Build standards** are not style advice — they are the mechanism each value
 must be produced by. A right number produced by the wrong mechanism is a defect.
@@ -137,7 +132,7 @@ design happened to sample them.
 **Done when** every node in scope is built, and each of the five standards has been applied
 or has a deviation row.
 
-### 5. Copy is a lane, not a detail
+#### 5. Copy is a lane, not a detail
 
 The markdown's **Content Outline** is the copy inventory, per component and per device
 variant, and the node lines carry each string verbatim. Build the strings as written.
@@ -150,7 +145,7 @@ variant, and the node lines carry each string verbatim. Build the strings as wri
   section states what moved since the last export — read it, then build the current strings.
 - **A copy section with zero findings still exists and says so.** Silence is not a report.
 
-### 6. Check the built CSS back against the pair
+#### 6. Check the built CSS back against the pair
 
 Before the deviation table, run the check in the other direction:
 
@@ -168,7 +163,7 @@ to check by hand.
 
 **Done when** the run is red-free, or every red has a deviation row and a ruling.
 
-### 7. Return a deviation table, and stop for a ruling on drift
+#### 7. Return a deviation table, and stop for a ruling on drift
 
 One row per node whose built value did not come straight from the pair, plus one row per lock
 row:
@@ -186,13 +181,13 @@ row:
 - **hand-authored-override** — the consuming stylesheet declares the property itself and the
   generator reported rather than overwrote it.
 
-{{ruling-ref-cites}} An empty `ruling ref`
+`ruling ref` cites the entry in the ruling list that authorised a non-match. An empty `ruling ref`
 on a non-match row is an unauthorised deviation.
 
 An empty table means you built the pair exactly. That is the expected outcome, not a
 suspicious one.
 
-## Export shape — what the companion and a live capture carry
+### Export shape — what the companion and a live capture carry
 
 An export carries more than a flat token list, and the implementation reads all of it:
 
@@ -218,7 +213,7 @@ An export carries more than a flat token list, and the implementation reads all 
   design-tool variables carry no viewport semantics and a description is the only place a
   designer can state the fraction today.
 
-## Worked example — a navigation footer
+### Worked example — a navigation footer
 
 From a real pair (`design-handoff` v6 + `design-system-handoff` schema 8).
 
@@ -261,7 +256,7 @@ Reading it in order:
 5. The `device` property is the variant axis, so `md+` and `sm` are one component with one
    prop — not two components.
 
-## DO / DON'T — this week's failures
+### DO / DON'T — this week's failures
 
 **Column maths instead of the grid**
 
@@ -286,4 +281,11 @@ Reading it in order:
 - **DON'T:** Keep the existing string because a comment above it cites an audit from a previous
   week. The audit is a record of an older export; the pair in the brief is the contract.
 
-{{tail}}
+### Where the rules behind this live
+
+Every generator behaviour this skill leans on is written up with the measurements that
+produced it: `docs/POLICIES.md` — P4 (units), P7 (private/hidden/excluded), P11 (responsive
+classes and `viewport.groups`), P12 (the alias block), P13 (cell trust). `README.md` covers
+install, config keys and the CLI. `presets/jhd.config.mjs` is a real house config with every
+key filled in and commented — read it as a worked example of the policy this skill assumes,
+not as a default; there are no defaults.

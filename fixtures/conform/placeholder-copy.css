@@ -1,0 +1,3 @@
+/* "Title" is flagged `⚠ placeholder` on the handoff's own text nodes: the
+   design has not stated this copy, so shipping it is a defect, not a default. */
+.nav__title::before { content: "Title"; }

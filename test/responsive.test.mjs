@@ -12,7 +12,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { generate } from "../src/index.mjs";
-import { classify, honours } from "../src/responsive.mjs";
+import { classify, honours, percentFromFraction, VIEWPORT_FRACTION_TOLERANCE } from "../src/responsive.mjs";
 import { config, consumerCss, doc as exportDoc, docV7c, docV8b, preset } from "./fixture.mjs";
 
 const emit = (doc, cfg = preset) => generate(doc, cfg, { handAuthoredCss: consumerCss() });
@@ -425,9 +425,15 @@ test("the gate is the group, not the source: a description outside the groups is
 
 test("a consumer that declares no groups is not gated — every stated fraction is honoured", () => {
   const cfg = { ...preset, viewport: { ...preset.viewport, groups: [] } };
-  const { tokensCss } = generate(docV8b(), cfg, { handAuthoredCss: consumerCss() });
+  const { tokensCss, warnings } = generate(docV8b(), cfg, { handAuthoredCss: consumerCss() });
+  // P15 — the export's 1.7241% is a DERIVED fraction no whole percent is within
+  // tolerance of (the memo's own example: a title font size that is `16` in
+  // Figma). It is emitted at three decimals and flagged, never rounded to 2%.
   assert.deepEqual(declarations(tokensCss, "--text-title-font-size-100"),
-    ["--text-title-font-size-100: 1.7241dvh;"]);
+    ["--text-title-font-size-100: 1.724dvh;"]);
+  const flagged = warnings.filter((w) => w.code === "VIEWPORT_FRACTION_UNROUNDED");
+  assert.ok(flagged.some((w) => w.name === "--text-title-font-size-100"),
+    "the unrounded fraction must be named in validation");
 });
 
 test("§10 reports each gated variable, so a mis-stated fraction in Figma is visible", () => {
@@ -436,4 +442,82 @@ test("§10 reports each gated variable, so a mis-stated fraction in Figma is vis
   assert.ok(gated.length >= 4, `expected the gated rules to be reported, got ${gated.length}`);
   assert.ok(gated.some((w) => w.name === "--text-title-font-size-100"));
   assert.match(report, /VIEWPORT_OUTSIDE_GROUPS/);
+});
+
+// --- P15, the rounding ruling ---------------------------------------------
+// Memo `2026-09-10-handoff-viewport-tokens-brief`, Addendum 2 (2026-09-11):
+// the export never states a value that was not input into Figma, so a DERIVED
+// fraction rounds back to the whole percent the designer typed — and says so
+// when it cannot.
+
+test("percentFromFraction rounds a derived fraction back to the designer's whole percent", () => {
+  // The ruling's own numbers: 244/812, 568/812, 731/812.
+  assert.deepEqual(percentFromFraction(244 / 812), { value: "30", rounded: true });
+  assert.deepEqual(percentFromFraction(568 / 812), { value: "70", rounded: true });
+  assert.deepEqual(percentFromFraction(731 / 812), { value: "90", rounded: true });
+  assert.equal(VIEWPORT_FRACTION_TOLERANCE, 0.005);
+});
+
+test("percentFromFraction keeps three decimals when no whole percent is within tolerance", () => {
+  assert.deepEqual(percentFromFraction(0.3125), { value: "31.25", rounded: false });
+  assert.deepEqual(percentFromFraction(0.017241), { value: "1.724", rounded: false });
+});
+
+test("a derived fraction from the export's own rule rounds, with no warning", () => {
+  const doc = docV8b();
+  const v = doc.collections.find((c) => c.name === "layout").variables
+    .find((x) => x.name === "device/screen-height/100");
+  v.description = "";
+  for (const r of v.responsiveBehavior.rules) {
+    if (r.strategy === "viewport-height") r.viewportFraction = 244 / 812;
+  }
+  const c = classify(v, preset);
+  assert.equal(c.source, "rule");
+  assert.equal(c.value, "30dvh");
+  assert.equal(c.warning, null);
+});
+
+test("a rule fraction no whole percent is close to keeps three decimals and warns", () => {
+  const doc = docV8b();
+  const v = doc.collections.find((c) => c.name === "layout").variables
+    .find((x) => x.name === "device/screen-height/100");
+  v.description = "";
+  for (const r of v.responsiveBehavior.rules) {
+    if (r.strategy === "viewport-height") r.viewportFraction = 0.3125;
+  }
+  const c = classify(v, preset);
+  assert.equal(c.value, "31.25dvh");
+  assert.equal(c.warning, "VIEWPORT_FRACTION_UNROUNDED");
+
+  const { tokensCss, warnings } = emit(doc);
+  assert.deepEqual(declarations(tokensCss, "--device-screen-height-100"),
+    ["--device-screen-height-100: 31.25dvh;"]);
+  const w = warnings.find((x) => x.code === "VIEWPORT_FRACTION_UNROUNDED");
+  assert.equal(w.name, "--device-screen-height-100");
+  assert.match(w.detail, /0\.3125/);
+});
+
+test("an explicit `responsive` field fraction rounds the same way, and warns the same way", () => {
+  const doc = docV8b();
+  const v = doc.collections.find((c) => c.name === "layout").variables
+    .find((x) => x.name === "device/screen-height/100");
+  v.responsive = { kind: "viewport", viewport: { axis: "height", fraction: 244 / 812 } };
+  assert.equal(classify(v, preset).value, "30dvh");
+  assert.equal(classify(v, preset).warning, null);
+
+  v.responsive = { kind: "viewport", viewport: { axis: "height", fraction: 0.3125 } };
+  const c = classify(v, preset);
+  assert.equal(c.value, "31.25dvh");
+  assert.equal(c.warning, "VIEWPORT_FRACTION_UNROUNDED");
+});
+
+test("the description path is untouched by rounding — a stated percent is emitted verbatim", () => {
+  const doc = docV8b();
+  const v = doc.collections.find((c) => c.name === "layout").variables
+    .find((x) => x.name === "device/screen-height/100");
+  v.description = "20.5% of screen height";
+  const c = classify(v, preset);
+  assert.equal(c.source, "description");
+  assert.equal(c.value, "20.5dvh");
+  assert.equal(c.warning, null);
 });
