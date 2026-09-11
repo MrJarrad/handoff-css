@@ -9,6 +9,7 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+import { dispatch } from "../src/cli.mjs";
 import { run } from "../src/index.mjs";
 import { handAuthoredCss, preset, read } from "./fixture.mjs";
 
@@ -67,4 +68,70 @@ test("--check flags a committed artifact that would change, and writes nothing",
   } finally {
     process.exitCode = before;
   }
+});
+
+// --- 0.3.0: `dispatch` and the `validate` subcommand ------------------------
+// The fence: a first argument that is not a subcommand falls through to the
+// generator path unchanged, so `--config`/`--check` behave exactly as before.
+
+/** A writable that collects, so a command's own output is assertable. */
+const sink = () => {
+  const chunks = [];
+  return { write: (s) => chunks.push(s), get text() { return chunks.join(""); } };
+};
+const FIXTURES = new URL("../fixtures/jhd-v8b-2026-09-10/", import.meta.url).pathname;
+
+test("dispatch routes `validate` and prints ✓ per file, with the one real warning", async () => {
+  const stdout = sink();
+  const code = await dispatch(
+    ["validate", path.join(FIXTURES, "export.json"), path.join(FIXTURES, "design-handoff-block-navigation.md")],
+    { stdout, stderr: sink() },
+  );
+  assert.equal(code, 0);
+  const lines = stdout.text.split("\n").filter(Boolean);
+  assert.equal(lines.filter((l) => l.startsWith("✓")).length, 2, stdout.text);
+  assert.equal(lines.filter((l) => l.startsWith("✗")).length, 0);
+  assert.equal(stdout.text.match(/POLICY_VERSION_MISMATCH/g).length, 1);
+  assert.match(stdout.text, /line 27/);
+});
+
+test("`validate --json` is machine-readable and `validate` exits 1 on an error", async () => {
+  const cwd = mkdtempSync(path.join(tmpdir(), "handoff-css-val-"));
+  const bad = path.join(cwd, "export.json");
+  const doc = JSON.parse(readFileSync(path.join(FIXTURES, "export.json"), "utf8"));
+  doc.contentHash = "nope";
+  writeFileSync(bad, JSON.stringify(doc));
+
+  const stdout = sink();
+  const code = await dispatch(["validate", bad, "--json"], { stdout, stderr: sink() });
+  assert.equal(code, 1);
+  const parsed = JSON.parse(stdout.text);
+  assert.equal(parsed.results[0].ok, false);
+  assert.equal(parsed.results[0].findings[0].path, "/contentHash");
+});
+
+test("`validate` with no files is a usage error, not a silent pass", async () => {
+  const stderr = sink();
+  assert.equal(await dispatch(["validate"], { stdout: sink(), stderr }), 1);
+  assert.match(stderr.text, /name at least one/);
+});
+
+test("a first argument that is not a subcommand still runs the generator", async () => {
+  const cwd = consumer();
+  writeFileSync(path.join(cwd, "handoff.config.mjs"),
+    `export default ${JSON.stringify(preset, null, 2)};\n`);
+  const stdout = sink();
+  const code = await dispatch(["--config", "handoff.config.mjs"], { cwd, stdout, stderr: sink() });
+  assert.equal(code, 0);
+  assert.match(stdout.text, /^handoff-css \(write\)/);
+  assert.ok(readFileSync(path.join(cwd, preset.paths.out), "utf8").length > 0);
+
+  // …and `--check` over that fresh output stays green, through dispatch too.
+  assert.equal(await dispatch(["--config", "handoff.config.mjs", "--check"], { cwd, stdout: sink(), stderr: sink() }), 0);
+});
+
+test("a missing --config path is an error the CLI reports, not a stack trace", async () => {
+  const stderr = sink();
+  assert.equal(await dispatch(["--config"], { stdout: sink(), stderr }), 1);
+  assert.match(stderr.text, /--config needs a path/);
 });
