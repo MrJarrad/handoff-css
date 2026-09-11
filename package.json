@@ -19,7 +19,8 @@
     "schema",
     "docs",
     "skills",
-    "README.md"
+    "README.md",
+    "fixtures/jhd-v8b-2026-09-10/styles.css"
   ],
   "scripts": {
     "test": "node --test 'test/**/*.test.mjs'"
