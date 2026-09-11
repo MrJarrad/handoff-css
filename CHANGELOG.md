@@ -2,6 +2,47 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.3.1 — 2026-09-11
+
+The house export's last standing warning, and the checker's last standing red — both were
+the tool refusing to take an answer it had been given.
+
+### Added
+
+- **P11's third silencing source: a rule-level `fixed`.** A variable inside a declared
+  `viewport.groups` prefix whose every `responsiveBehavior` rule states `strategy: "fixed"`
+  now classifies as `fixed` and emits ONE declaration on the base scope, with no
+  `VIEWPORT_UNFLAGGED`. The warning asks "this group is a fraction of the screen; which
+  fraction is this one?", and an all-`fixed` rule set answers *none — it is one value at
+  every breakpoint*. That is a statement, not silence. Memo
+  `2026-09-10-handoff-viewport-tokens-brief` addendum 1: "`fixed` -> one value".
+  Proved before it collapses — the modes' own resolved values must agree, or the per-mode
+  samples stand and `FIXED_VARIES_BY_MODE` says so — and gated on the same `viewport.groups`
+  whitelist as the warning it replaces, so the per-variant `fixed` path outside every
+  declared group is untouched.
+- **`fixtures/jhd-v9b-2026-09-11/`** — the operator's 2026-09-11T07:31Z re-export (schema 9,
+  same design-system state `bb6a0025…7224`, content hash `3dd36033…2aa4`), vendored whole:
+  the JSON, its companion `design-system-handoff.md`, and the block-navigation layer brief
+  from the same state at the same minute. `device/container-max-width` is now described
+  "Fixed maximum container width (2156px across all breakpoints)" and carries the `fixed`
+  rule. `test/parity-v9b.test.mjs` pins its artifacts byte-for-byte and asserts the run
+  raises **zero** warnings.
+- **A conformance allowlist (P16).** `--allow-name <name>` (repeatable) and the config's
+  `conform.allowNames: []` — the same additive statement — for names that legitimately come
+  from outside the export, such as the font face this package asks consumers to supply. An
+  allowed name never raises `UNKNOWN_NAME`. It is not a mute button: a name the consumer's
+  own stylesheet declares is still `LOCAL_ONLY`. `handoff-css conform` also takes
+  `--config <mjs>`.
+
+### Changed
+
+- `--device-container-max-width` collapses from eleven identical `2156px` declarations to
+  one on the base scope in the **v8b** and **v9** parity fixtures too — both exports state
+  the `fixed` rule. v9's warning count goes 1 → 0 and v8b's 51 → 50; the vanished warning is
+  `VIEWPORT_UNFLAGGED` on that same token, which is the whole point of the change. Nothing
+  else in either artifact moves.
+- `VIEWPORT_UNFLAGGED`'s detail now names all three signals it looked for, not two.
+
 ## 0.3.0 — 2026-09-11
 
 Three joints in the plugin ↔ package ↔ skill pairing were soft: the package trusted any JSON
