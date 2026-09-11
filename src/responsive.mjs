@@ -54,6 +54,38 @@ export const honours = (cfg, cls) =>
  */
 const DESCRIPTION = /^(\d+(?:\.\d+)?)% of screen (height|width)$/;
 
+/**
+ * P15 — the rounding ruling (memo `2026-09-10-handoff-viewport-tokens-brief`,
+ * Addendum 2, 2026-09-11): "the export never states a value that was not input
+ * into Figma". A DERIVED fraction (value ÷ screen reference) is the one
+ * exception, so the consumer rounds it back to the whole percent the designer
+ * typed — 244/812 = 0.300493 → `30dvh`, 568/812 → `70dvh`, 731/812 → `90dvh`.
+ *
+ * The tolerance is RELATIVE to the percent, not absolute on the fraction: every
+ * fraction is within 0.005 of SOME whole percent (0.005 is half the gap between
+ * two of them), so an absolute reading can never fail and the ruling's "if no
+ * whole percent is within 0.005, keep three decimals and flag the variable"
+ * would be unreachable. Relative is the only reading under which every number
+ * the ruling states lands where it says: 0.300493 rounds (0.16% off 30%),
+ * 0.3125 does not (0.8% off 31%).
+ */
+export const VIEWPORT_FRACTION_TOLERANCE = 0.005;
+
+/**
+ * fraction -> the percent to emit. `rounded: false` means no whole percent was
+ * within tolerance, so three decimals are kept and the caller raises
+ * `VIEWPORT_FRACTION_UNROUNDED` — the generator states the export's own number
+ * and says out loud that it did not come from a round input.
+ */
+export function percentFromFraction(fraction) {
+  const percent = fraction * 100;
+  const whole = Math.round(percent);
+  if (whole >= 1 && Math.abs(percent - whole) <= VIEWPORT_FRACTION_TOLERANCE * percent) {
+    return { value: String(whole), rounded: true };
+  }
+  return { value: num(Math.round(percent * 1000) / 1000), rounded: false };
+}
+
 const axisClass = (axis) => (axis === "height" ? "viewport-height" : "viewport-width");
 const axisUnit = (axis, cfg) => (axis === "height" ? cfg.viewport.heightUnit : cfg.viewport.widthUnit);
 
@@ -84,7 +116,14 @@ function fromField(v, cfg) {
     if (typeof fraction !== "number" || !Number.isFinite(fraction)) {
       fail(`${webName(v)}: responsive.viewport.fraction is ${JSON.stringify(fraction)}, expected a number`);
     }
-    return { cls: axisClass(axis), source: "field", value: `${num(fraction * 100)}${axisUnit(axis, cfg)}` };
+    const pct = percentFromFraction(fraction);
+    return {
+      cls: axisClass(axis),
+      source: "field",
+      value: `${pct.value}${axisUnit(axis, cfg)}`,
+      fraction,
+      rounded: pct.rounded,
+    };
   }
 
   if (stated === "viewport-height" || stated === "viewport-width") {
@@ -191,9 +230,13 @@ export function classify(v, cfg) {
     // operator's deliberate override and is never second-guessed against it.
     let warning = null;
     let fractionDisagree = null;
+    // A DERIVED fraction that no whole percent is close to (P15). The
+    // description path cannot reach here: a description states the percent, it
+    // does not derive it.
+    if (viewport.source === "field" && viewport.rounded === false) warning = "VIEWPORT_FRACTION_UNROUNDED";
     if (viewport.source === "description") {
       const rf = ruleFraction(rules);
-      if (rf != null && rf.cls === viewport.cls && Math.abs(rf.fraction - viewport.fraction) > 0.005) {
+      if (rf != null && rf.cls === viewport.cls && Math.abs(rf.fraction - viewport.fraction) > VIEWPORT_FRACTION_TOLERANCE) {
         warning = "VIEWPORT_FRACTION_DISAGREES";
         fractionDisagree = { rule: rf.fraction, description: viewport.fraction };
       }
@@ -207,13 +250,15 @@ export function classify(v, cfg) {
   const rf = allowed ? ruleFraction(rules) : null;
   if (rf != null) {
     const axis = rf.cls === "viewport-height" ? "height" : "width";
+    const pct = percentFromFraction(rf.fraction);
     return {
       cls: rf.cls,
       source: "rule",
-      value: `${num(rf.fraction * 100)}${axisUnit(axis, cfg)}`,
+      value: `${pct.value}${axisUnit(axis, cfg)}`,
+      fraction: rf.fraction,
       rules,
       override: null,
-      warning: null,
+      warning: pct.rounded ? null : "VIEWPORT_FRACTION_UNROUNDED",
     };
   }
 
