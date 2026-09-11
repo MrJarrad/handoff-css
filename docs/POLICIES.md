@@ -587,7 +587,10 @@ The markdown half has no JSON Schema, so its contract is a line grammar:
 Its two cross-file checks are `COMPANION_STATE_MISMATCH` (error — the two halves
 describe different design-system states, which is the stale-pair defect) and
 `POLICY_VERSION_MISMATCH` (warning — a policy version stated twice, disagreeing;
-the real 2026-09-10 nav brief carries exactly one, `units` v4 vs v5).
+the real 2026-09-10 nav brief carries exactly one, `units` v4 vs v5). The plugin's
+2026-09-11 export moved table/footnote/layout notes to a single-meaning `†` sigil,
+freeing `⚠` to mean only "raw value that should be bound"; the grammar accepts both
+the current `†` and the pre-2026-09-11 `⚠` note form (0.3.2).
 
 `validateExport`, `assertValidExport` · `src/validate-export.mjs`,
 `src/validate-handoff-md.mjs`

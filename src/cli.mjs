@@ -18,7 +18,8 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
   handoff-css [--config <mjs>] [--input <json>] [--out <css>] [--theme <css>]
               [--report <md>] [--exclusions <json>] [--check]
   handoff-css validate <file…> [--json]
-  handoff-css conform --export <json> --handoff <md> --tokens <css> --css <file…> [--json]
+  handoff-css conform --export <json> --handoff <md> --tokens <css> --css <file…>
+              [--config <mjs>] [--allow-name <name>…] [--json]
 `;
 
 /**

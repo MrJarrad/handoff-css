@@ -35,6 +35,11 @@ const NODE_LINK = /\[→\]\(([^)]*)\)/;
 const COPY = / — "([^"]*)"/;
 const BUILD_STANDARD = /^(\d)\. \*\*(.+?)\*\* — /;
 const POLICY_PAIR = /\b(fingerprint|naming|units|mode|responsive) v(\d+)\b/g;
+const CHANGELOG_ROW = /^- \*\*(.+?)\*\* #(\S+) — (.+)$/;
+// A standalone footnote line: a leading sigil (either generation's) followed
+// by prose — table footnotes (`† **sm** wraps…`) and nothing else. Node rows
+// and table rows start with `-`/`|` and never reach this branch.
+const FOOTNOTE = /^\s*([†⚠])\s+(.+)$/;
 
 /** The closed cell vocabulary of a responsive grid table (grammar §tables). */
 const CELL = [
@@ -44,7 +49,10 @@ const CELL = [
   /^(?:hug|fill)$/,
   /^\d+(?:\.\d+)?(?:px|rem|%)?$/,
 ];
-const RAGGED_NOTE = /^⚠ [\w-]+$/;
+// The plugin's 2026-09-11 export moved the table-note sigil to `†`, freeing
+// `⚠` to mean only "flag this value" (raw/placeholder). Both sigils are
+// accepted here: `⚠ <note>` is the pre-v2 form, `† <note>` is the current one.
+const RAGGED_NOTE = /^[†⚠] [\w-]+$/;
 
 const policyVersions = (text) => {
   const out = {};
@@ -67,7 +75,9 @@ const policyVersions = (text) => {
  *   declaredTokenCount: {count: number, line: number}|null,
  *   nodes: {name: string, type: string, id: string|null, link: string|null, depth: number,
  *           copy: string|null, placeholder: boolean, annotation: boolean, line: number}[],
- *   tables: {header: string[], rows: {cells: string[], ragged: string|null, line: number}[], line: number}[],
+ *   tables: {header: string[], rows: {cells: string[], ragged: string|null, note: string|null, line: number}[], line: number}[],
+ *   notes: {marker: "†"|"⚠", text: string, line: number}[],
+ *   changes: {node: string, id: string, kind: string, line: number}[],
  *   sections: Set<string>, lines: string[],
  * }}
  */
@@ -84,12 +94,15 @@ export function parseHandoffMarkdown(text) {
     declaredTokenCount: null,
     nodes: [],
     tables: [],
+    notes: [],
+    changes: [],
     sections: new Set(),
     lines,
   };
 
   let inBuildStandards = false;
   let inTokens = false;
+  let inChangelog = false;
   let table = null;
 
   lines.forEach((raw, i) => {
@@ -125,6 +138,13 @@ export function parseHandoffMarkdown(text) {
     if (compPolicies && out.companion != null && Object.keys(out.companion.policies).length === 0) {
       out.companion.policies = policyVersions(compPolicies[1]);
       out.companion.policiesLine = at;
+    }
+
+    if (line.startsWith("**Changelog**")) { inChangelog = true; return; }
+    if (inChangelog) {
+      const change = CHANGELOG_ROW.exec(line);
+      if (change) { out.changes.push({ node: change[1], id: change[2], kind: change[3], line: at }); return; }
+      if (line.startsWith("###") || line.startsWith("**") || line.trim() === "") inChangelog = false;
     }
 
     if (line.startsWith("**Build standards:**")) { inBuildStandards = true; out.buildStandardsLine = at; return; }
@@ -191,11 +211,17 @@ export function parseHandoffMarkdown(text) {
         table = { header: cells, rows: [], line: at };
         out.tables.push(table);
       } else {
-        table.rows.push({ cells, ragged, line: at });
+        // `note` normalises the sigil away — one shape, `† token-swap` or
+        // `⚠ token-swap` both read as `{ note: "token-swap" }`.
+        const note = ragged != null ? ragged.replace(/^[†⚠]\s*/, "") : null;
+        table.rows.push({ cells, ragged, note, line: at });
       }
       return;
     }
     if (table != null && line.trim() === "") table = null;
+
+    const footnote = FOOTNOTE.exec(line);
+    if (footnote) out.notes.push({ marker: footnote[1], text: footnote[2], line: at });
   });
 
   return out;
@@ -297,7 +323,7 @@ export function validateHandoffMarkdown(text) {
       }
       if (row.ragged != null && !RAGGED_NOTE.test(row.ragged)) {
         add("TABLE_RAGGED", "error", row.line,
-          `trailing cell \`${row.ragged}\` is not a \`⚠ <note>\` marker`);
+          `trailing cell \`${row.ragged}\` is not a \`⚠ <note>\` marker (nor \`† <note>\`)`);
       }
       for (const cell of row.cells.slice(1)) {
         if (cell === "" || CELL.some((re) => re.test(cell))) continue;

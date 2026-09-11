@@ -164,3 +164,60 @@ test("brief 6 (companion v9) passes with exactly one warning: POLICY_VERSION_MIS
   assert.equal(w.code, "POLICY_VERSION_MISMATCH");
   assert.match(w.message, /`units` policy is v4 .* and v5 in the companion block/);
 });
+
+// 0.3.2 — the plugin's single-meaning sigils. v1 is the pre-2026-09-11 nav
+// brief (legacy `⚠ <note>` tables), v2 is the same brief re-exported with the
+// new `†` table/footnote sigil and a changed Navigation node.
+const v9bDir = new URL("../fixtures/jhd-v9b-2026-09-11/", import.meta.url);
+const v9bV1 = () => readFileSync(new URL("design-handoff-block-navigation.md", v9bDir), "utf8");
+const v9bV2 = () => readFileSync(new URL("design-handoff-block-navigation-v2.md", v9bDir), "utf8");
+
+test("v1 (jhd-v9b, legacy `⚠` notes) still validates with zero errors and zero warnings", () => {
+  const { ok, findings } = validateHandoffMarkdown(v9bV1());
+  assert.equal(ok, true);
+  assert.deepEqual(findings, []);
+});
+
+test("v2 (jhd-v9b, the `†` sigil) validates with zero errors and zero warnings", () => {
+  const { ok, findings } = validateHandoffMarkdown(v9bV2());
+  assert.equal(ok, true, findings.map((f) => `${f.line} ${f.code} ${f.message}`).join("\n"));
+  assert.deepEqual(findings, []);
+});
+
+test("v2's NavigationHeader table carries token-swap on colGap, variant-only on rowGap", () => {
+  const { parsed } = validateHandoffMarkdown(v9bV2());
+  const [table] = parsed.tables;
+  const row = (name) => table.rows.find((r) => r.cells[0] === name);
+  assert.equal(row("colGap").note, "token-swap");
+  assert.equal(row("rowGap").note, "variant-only");
+  // The raw `ragged` cell still carries the `†` sigil the export wrote.
+  assert.equal(row("colGap").ragged, "† token-swap");
+});
+
+test("v2's placeholders are still found under the unchanged `⚠ placeholder` marker", () => {
+  const { parsed } = validateHandoffMarkdown(v9bV2());
+  assert.ok(parsed.nodes.some((n) => n.copy === "Title" && n.placeholder));
+  assert.ok(parsed.nodes.filter((n) => n.placeholder).length > 0);
+});
+
+test("v2's changelog entry parses to {node, id, kind}", () => {
+  const { parsed } = validateHandoffMarkdown(v9bV2());
+  assert.deepEqual(
+    parsed.changes.map(({ node, id, kind }) => ({ node, id, kind })),
+    [{ node: "Navigation", id: "4227:16272", kind: "content changed" }],
+  );
+});
+
+test("v1's changelog ('No changes detected.') parses to an empty changes array", () => {
+  const { parsed } = validateHandoffMarkdown(v9bV1());
+  assert.deepEqual(parsed.changes, []);
+});
+
+test("a table trailing note still rejects a marker that is neither `†` nor `⚠`", () => {
+  const { text, line } = edit(v9bV2(),
+    "| colGap | $grid/gap-sm | $grid/gap-sm | $grid/gap | † token-swap",
+    "| colGap | $grid/gap-sm | $grid/gap-sm | $grid/gap | see below");
+  const [hit] = only(validateHandoffMarkdown(text).findings, "TABLE_RAGGED");
+  assert.equal(hit.line, line);
+  assert.match(hit.message, /is not a `⚠ <note>` marker/);
+});

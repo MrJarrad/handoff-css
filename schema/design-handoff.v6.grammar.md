@@ -92,6 +92,35 @@ design has not stated the copy. The validator **parses** placeholders and never 
 they are the design file's state, and it is the *consumer* that must not ship one
 (`PLACEHOLDER_COPY`, `handoff-css conform`).
 
+The 2026-09-11 export gave `⚠` a single meaning — a raw value that should be bound — and moved
+table/footnote/layout notes to `†`. Both forms of the raw marker mean the same thing:
+`⚠raw <value>` (the export's prose name for it) and the bare `⚠<value>` it actually emits inline
+(`radius(⚠2)`, `fill(⚠#eeeeee)`) both read as unbound raw. Neither is structurally parsed today —
+they are prose the validator passes through, same as before — this section states the
+normalisation so a future check has one meaning to enforce, not two sigils to special-case.
+
+## Changelog
+
+```
+**Changelog** _(since <ISO-8601>):_
+- **<Node>** #<id> — <kind>
+```
+
+or `- No changes detected.` Rows parse into `parsed.changes: {node, id, kind, line}[]`. Not
+validated — there is no wrong shape for "nothing changed" — but parsed, because `id` is the
+stable citation a consumer diffs a re-export against.
+
+## Footnotes and row-wrap notes
+
+A standalone line whose only content is a sigil and prose — a table footnote
+(`† **sm** wraps to 2 rows…`) or a layout-block aside (`† row-wrap (…)` inside a node row's
+bracketed `[Grid, …]` list) — is a **note**, never a binding. Table footnotes parse into
+`parsed.notes: {marker, text, line}[]`; `marker` is whichever sigil the line used (`†` the
+2026-09-11 form, `⚠` the legacy one) and carries no different meaning. A row-wrap note that
+sits inside a node row's bracket list is not separately parsed — it is inside prose the
+validator already passes through untouched — but it is unambiguously a note, not a binding,
+under either sigil.
+
 ## Responsive grid tables
 
 ```
@@ -99,7 +128,7 @@ they are the design file's state, and it is the *consumer* that must not ship on
 | --- | --- | --- | --- |
 | size (w×h) | $device/width×hug | … | … |
 | title | col-span 3/12 | col-span 3/12 | col-span 6/12 |
-| colGap | $grid/gap-sm | $grid/gap-sm | $grid/gap | ⚠ token-swap
+| colGap | $grid/gap-sm | $grid/gap-sm | $grid/gap | † token-swap
 ```
 
 Cells in the value columns use one closed vocabulary:
@@ -115,9 +144,10 @@ Cells in the value columns use one closed vocabulary:
 Anything else is `TABLE_CELL_UNKNOWN` (error) at that line.
 
 The last row of a variant column may be **ragged** — one extra trailing cell with no closing
-pipe, carrying a `⚠ <note>` marker (`⚠ token-swap`, `⚠ variant-only`). That is the export's
-own form and is accepted; a ragged row whose extra cell is not a `⚠` note is `TABLE_RAGGED`
-(error), and a row with fewer cells than the header is `TABLE_RAGGED` too.
+pipe, carrying a note marker (`† token-swap`, `† variant-only`, or the pre-2026-09-11
+`⚠ token-swap` / `⚠ variant-only` form). Both sigils are accepted and normalise to the same
+`row.note` field (the sigil stripped); a ragged row whose extra cell is neither is
+`TABLE_RAGGED` (error), and a row with fewer cells than the header is `TABLE_RAGGED` too.
 
 ## Exit codes
 

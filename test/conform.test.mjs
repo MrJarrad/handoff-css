@@ -26,6 +26,38 @@ const fixture = (name) => ({ path: name, text: readFileSync(path.join(CONFORM, n
 const check = (...names) =>
   conform({ doc: doc(), handoff: handoff(), tokensCss: tokensCss(), files: names.map(fixture) });
 
+// 0.3.2 — `conform` reads bindings identically off the plugin's new
+// single-meaning-sigil export (v2) as off the legacy one (v1). Both live
+// under jhd-v9b, sharing one export.json/tokens.generated.css pair.
+const V9B = new URL("../fixtures/jhd-v9b-2026-09-11/", import.meta.url).pathname;
+const v9bDoc = () => JSON.parse(readFileSync(path.join(V9B, "export.json"), "utf8"));
+const v9bTokensCss = () => readFileSync(path.join(V9B, "expected/tokens.generated.css"), "utf8");
+const v9bHandoff = (v) =>
+  parseHandoffMarkdown(readFileSync(path.join(V9B, `design-handoff-block-navigation${v}.md`), "utf8"));
+const v9bCheck = (v, ...names) => conform({
+  doc: v9bDoc(), handoff: v9bHandoff(v), tokensCss: v9bTokensCss(), files: names.map(fixture),
+});
+
+test("conform reads bindings from the v2 (`†`-sigil) brief identically to v1", () => {
+  const v1 = v9bCheck("", "alias-hop.css", "clean.css", "unknown-name.css");
+  const v2 = v9bCheck("-v2", "alias-hop.css", "clean.css", "unknown-name.css");
+  assert.deepEqual(v2.findings.map((f) => f.code), v1.findings.map((f) => f.code));
+  assert.deepEqual(v1.findings.map((f) => f.code), ["UNKNOWN_NAME"]);
+});
+
+test("UNMAPPED_BINDING fires the same way whether the export stopped declaring a v1 or v2 binding", () => {
+  const forVersion = (v) => {
+    const parsed = v9bHandoff(v);
+    const target = parsed.tokens.find((t) => t.token === "device/screen-height/full");
+    target.web = "--device-screen-height-forever";
+    return conform({ doc: v9bDoc(), handoff: parsed, tokensCss: v9bTokensCss(), files: [fixture("clean.css")] });
+  };
+  const v1 = forVersion("");
+  const v2 = forVersion("-v2");
+  assert.deepEqual(v2.findings.map((f) => f.code), v1.findings.map((f) => f.code));
+  assert.deepEqual(v1.findings.map((f) => f.code), ["UNMAPPED_BINDING"]);
+});
+
 test("a clean stylesheet has no findings at all", () => {
   const { findings, summary } = check("clean.css");
   assert.deepEqual(findings, [], findings.map((f) => `${f.line} ${f.code}`).join("; "));

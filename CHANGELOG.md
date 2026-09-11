@@ -2,6 +2,25 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.3.2 — 2026-09-11
+
+The plugin's next export gave `⚠` one meaning (a raw value that should be bound) and moved
+table/footnote/layout notes to `†`. The grammar reads both.
+
+### Changed
+
+- **`design-handoff.v6.grammar.md` + `validate-handoff-md.mjs`: single-meaning sigils.**
+  A table's trailing note cell and a footnote line accept `† <note>` (the 2026-09-11 form)
+  and the legacy `⚠ <note>` — both normalise to one `row.note` / `parsed.notes[].text` shape,
+  sigil stripped. `⚠raw <value>` and the inline `⚠<value>` both mean unbound raw; `⚠ placeholder`
+  is unchanged. Added `parsed.changes` for the `**Changelog**` block's `- **Node** #id — kind`
+  rows. Vendored the plugin's 2026-09-11 v2 export as
+  `fixtures/jhd-v9b-2026-09-11/design-handoff-block-navigation-v2.md`; it and the v1 sibling
+  both validate with zero errors and zero warnings, and `conform` reads bindings from either
+  identically.
+- **`src/cli.mjs` `USAGE`: `conform` now names `--config` and `--allow-name`** — the
+  reviewer's 2026-09-11 amber on P16 landing without them.
+
 ## 0.3.1 — 2026-09-11
 
 The house export's last standing warning, and the checker's last standing red — both were

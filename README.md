@@ -237,7 +237,8 @@ and 9; schema 7 is skipped: legacy). A `.md` file is checked against the line gr
 `schema/design-handoff.v6.grammar.md` — identity lines, the companion block, Build
 standards 1–5, token rows, node rows, the responsive grid tables. One line per file, the
 findings under it, exit 1 on any **error**. A warning never fails the run: it is a decision
-waiting on a human. `--json` prints the same result machine-readably.
+waiting on a human. `--json` prints the same result machine-readably. Table/footnote notes
+accept either the plugin's current `†` sigil or the pre-2026-09-11 `⚠` (0.3.2).
 
 ### `conform` — does the built CSS honour the pair?
 
