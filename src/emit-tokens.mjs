@@ -273,7 +273,7 @@ export function emitTokens(doc, handDeclared, cfg) {
   const header = [
     "/* GENERATED FILE — DO NOT EDIT BY HAND.",
     "",
-    `   Source:   ${doc.artifactFilename ?? doc.documentName ?? "design-system handoff export"}`,
+    `   Source:   ${doc.documentName ?? doc.artifact ?? "design-system handoff export"}`,
     `   Schema:   ${doc.schema} v${doc.schemaVersion}`,
     `   Exported: ${doc.generatedAt}`,
     `   State:    ${doc.fingerprint.designSystemStateHash}`,

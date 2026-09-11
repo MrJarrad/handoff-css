@@ -2,6 +2,19 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.3.4 — 2026-09-11
+
+Generated headers no longer print the export's filename.
+
+### Fixed
+
+- **Header `Source:` line now prints `doc.documentName`, never `doc.artifactFilename`.**
+  Downloads keep a suffix so exports never overwrite each other on disk, but that suffix was
+  leaking into `tokens.generated.css`, `theme.generated.css`, and the reconciliation report's
+  `Export` row — a suffixed download moved generated output even though nothing about the
+  design system changed. Fallback is `doc.artifact`, then a fixed string. Fixes
+  `src/emit-tokens.mjs`, `src/emit-theme.mjs`, `src/report.mjs`; see P18 in `docs/POLICIES.md`.
+
 ## 0.3.3 — 2026-09-11
 
 The plugin's export v4 adds a leading YAML front-matter block and turns the ragged

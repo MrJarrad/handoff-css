@@ -4,7 +4,7 @@ GENERATED FILE — regenerate with `node scripts/ds-from-handoff.mjs`.
 
 | | |
 | --- | --- |
-| Export | `jhd-spec-designsystem-design-system-handoff` |
+| Export | `JHD-Spec-DesignSystem` |
 | Schema | design-system-handoff v7 |
 | Exported at | 2026-09-09T10:00:41.115Z |
 | designSystemStateHash | `bb6a002560860ecfb6376514a66ca4173a673c1237033c97b627520356bc7224` |

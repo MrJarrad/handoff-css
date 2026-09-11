@@ -58,7 +58,7 @@ GENERATED FILE — regenerate with \`${cfg.header.regenerateCommand}\`.
 
 | | |
 | --- | --- |
-| Export | \`${doc.artifactFilename ?? doc.documentName}\` |
+| Export | \`${doc.documentName ?? doc.artifact}\` |
 | Schema | ${doc.schema} v${doc.schemaVersion} |
 | Exported at | ${doc.generatedAt} |
 | designSystemStateHash | \`${doc.fingerprint.designSystemStateHash}\` |

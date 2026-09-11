@@ -693,6 +693,21 @@ keep taking the legacy ragged form.
 
 ---
 
+## P18 — Header `Source:` names the document, not the download (0.3.4)
+
+The generated header's `Source:` line (tokens/theme headers, the report's `Export` row) prints
+`doc.documentName`, falling back to `doc.artifact` and then a fixed string when neither is
+present — never `doc.artifactFilename`. A downloaded export gets a suffix so repeated
+downloads never overwrite each other (`…-handoff-v6.json`, `…-handoff (1).json`); that suffix
+lives in the filename the browser wrote, not in the export's own payload, so it must never
+reach generated output. Two exports of the same design-system state that differ only in
+`artifactFilename` produce byte-identical `tokensCss`, `themeCss`, `report`, and
+`exclusionsJson`.
+
+`src/emit-tokens.mjs`, `src/emit-theme.mjs`, `src/report.mjs` · `test/header-filename-independence.test.mjs`
+
+---
+
 ## Determinism
 
 Collections sorted by name, variables by WEB name, numbers rounded to 6 decimal
