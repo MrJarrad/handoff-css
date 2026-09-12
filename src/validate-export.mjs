@@ -16,10 +16,13 @@ const require = createRequire(import.meta.url);
 /** The published schema document, also reachable as `handoff-css/schema/export`. */
 export const exportSchema = require("../schema/design-system-handoff.schema.json");
 
-/** Schema 12's own document — the base above plus the structures schema 12
- * introduced (style classes, type ramp v2, `fontWeightNumeric`,
- * `cssCustomPropertySheets`). Reachable as `handoff-css/schema/export/v12`. */
-export const exportSchemaV12 = require("../schema/design-system-handoff.v12.schema.json");
+/** The schema 12-and-up document — the base above plus the structures schema
+ * 12 introduced and 13 keeps (style classes, type ramp v2, `fontWeightNumeric`,
+ * `cssCustomPropertySheets`). Schema 13 changed the CONTENT of those classes
+ * (effect and grid classes bind their variables, grid selectors carry a
+ * `grid-` prefix), not their shape, so it validates against the same document.
+ * Reachable as `handoff-css/schema/export/v12plus`. */
+export const exportSchemaV12Plus = require("../schema/design-system-handoff.v12plus.schema.json");
 
 /** The schema versions this module knows how to validate. A v7 export is
  * legacy: it parses, it generates, and it is NOT validated (schema 7 predates
@@ -27,13 +30,13 @@ export const exportSchemaV12 = require("../schema/design-system-handoff.v12.sche
  * is the same shape as 8 — designer-signal viewport gating and whole-percent
  * fraction snapping are semantic changes the export makes, not structural
  * ones this schema needs to distinguish. */
-export const VALIDATED_SCHEMA_VERSIONS = [8, 9, 10, 11, 12];
+export const VALIDATED_SCHEMA_VERSIONS = [8, 9, 10, 11, 12, 13];
 
 /** Which schema document validates a given `schemaVersion` (0.5.0). 8-11 share
  * the base shape; 12 adds required structures the base must NOT demand of an
  * older export, so it gets its own document rather than a widened base. */
 export const schemaFor = (schemaVersion) =>
-  Number(schemaVersion) >= 12 ? exportSchemaV12 : exportSchema;
+  Number(schemaVersion) >= 12 ? exportSchemaV12Plus : exportSchema;
 
 const compiled = new Map(); // $id -> compiled validator
 const validator = (schema) => {

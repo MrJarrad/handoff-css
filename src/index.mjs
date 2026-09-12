@@ -18,10 +18,12 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 
 import { assertConfig } from "./config.mjs";
+import { emitStyles } from "./emit-styles.mjs";
 import { emitTokens } from "./emit-tokens.mjs";
 import { themeCss, themeEntries } from "./emit-theme.mjs";
 import { readHandAuthored } from "./hand-authored.mjs";
 import { report } from "./report.mjs";
+import { sheetFindings } from "./sheets.mjs";
 import { cmp, fail } from "./resolve.mjs";
 import { indexById } from "./schema.mjs";
 import { assertValidExport } from "./validate-export.mjs";
@@ -52,17 +54,25 @@ export function generate(doc, config, { handAuthoredCss = "" } = {}) {
   // `validate-export.mjs`); anything the config declares but the schema does
   // not know stops here rather than half-generating.
   assertValidExport(doc);
-  const { declared: handDeclared, scoped: handScoped } = readHandAuthored(handAuthoredCss);
+  const { declared: handDeclared, scoped: handScoped, classes: handClasses,
+          utilities: handUtilities } = readHandAuthored(handAuthoredCss);
   const { css, rows, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings,
-          untrustedRows } = emitTokens(doc, handDeclared, cfg);
+          untrustedRows, fontWeightRows } = emitTokens(doc, handDeclared, cfg);
 
   const byId = indexById(doc);
+  // P21 — the style classes, and the findings the classes themselves raise.
+  // An export older than schema 12 carries no `cssClass`, so `styles.css` is
+  // null and nothing about an 8-11 consumer's output changes.
+  const styles = emitStyles(doc, byId, handClasses, handUtilities, cfg);
+  warnings.push(...styles.warnings);
+  // Schema 12's own `:root` sheets, cross-checked and never emitted.
+  const sheetRows = sheetFindings(doc, byId, cfg);
   const themeRows = themeEntries(doc, byId, cfg);
   const theme = themeCss(doc, themeRows, cfg);
 
   const md = report(doc, rows, new Set(handDeclared.keys()), handScoped, themeRows, handDeclared,
                     cfg, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings,
-                    untrustedRows);
+                    untrustedRows, styles.rows, fontWeightRows, sheetRows);
 
   // Single source of truth for a downstream conformance checker (P7): it must
   // not keep its own copy of the exclude list or re-derive either list.
@@ -93,6 +103,10 @@ export function generate(doc, config, { handAuthoredCss = "" } = {}) {
 
   return {
     tokensCss: css,
+    stylesCss: styles.css,
+    styleRows: styles.rows,
+    fontWeightRows,
+    sheetRows,
     themeCss: theme,
     report: md,
     exclusionsJson,
@@ -161,6 +175,9 @@ export function run(argv = [], { cwd = process.cwd(), config } = {}) {
   };
 
   write(opts.out, out.tokensCss);
+  // P21 — only when the export published classes. Writing an empty stylesheet
+  // for a schema 8-11 export would add a file the export never justified.
+  if (opts.styles && out.stylesCss != null) write(opts.styles, out.stylesCss);
   write(opts.theme, out.themeCss);
   write(opts.report, out.report);
   write(opts.exclusions, out.exclusionsJson);

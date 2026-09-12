@@ -17,7 +17,8 @@ const fillIn = (text, vars) =>
 export function report(doc, rows, handNames, handScoped, themeRows, handDeclared, cfg,
                        privateRows = [], hiddenRows = [], excludedRows = [],
                        responsiveRows = [], aliasRows = [], warnings = [],
-                       untrustedRows = []) {
+                       untrustedRows = [], styleRows = [], fontWeightRows = [],
+                       sheetRows = []) {
   const handFile = cfg.paths.handAuthored.split("/").pop();
   const by = (s) => rows.filter((r) => r.status === s);
   const drift = by("VALUE-DRIFT");
@@ -318,7 +319,7 @@ ${aliasRows.length
      ...aliasRows.map((r) => `| \`${r.name}\` | \`${r.target}\` | \`${r.pattern}\` |`)].join("\n")
   : "None."}
 
-## Appendix A — zero-usage tokens (${zeroUsage.length})
+${stylesSection(styleRows, fontWeightRows, sheetRows, cfg, handFile)}## Appendix A — zero-usage tokens (${zeroUsage.length})
 
 ${note("zeroUsage")}
 
@@ -345,5 +346,82 @@ ${["| Type | Styles | Groups |", "| --- | --- | --- |", styleSummary].join("\n")
 ## Open questions for the operator
 
 ${note("openQuestions")}
+`;
+}
+
+/**
+ * P21/P22 — the styles lane. Rendered ONLY when the export publishes style
+ * classes (schema 12+); an 8-11 export has nothing to say here and its report
+ * is byte-identical to what it was before 0.5.0.
+ */
+function stylesSection(styleRows, fontWeightRows, sheetRows, cfg, handFile) {
+  if (!styleRows.some((r) => r.selector)) return "";
+  const by = (s) => styleRows.filter((r) => r.status === s);
+  const generated = by("GENERATED");
+  const shadowed = styleRows.filter((r) => r.shadowed);
+  const noDecl = by("NO-DECLARATIONS");
+
+  return `## 11. Styles (P21) and font weights (P22)
+
+One class per Figma style, from the export's own \`cssClass\` — **selector and
+declarations verbatim, in the export's order**. Nothing here is recomputed from
+a style name or from \`properties\`: a style the export gives no declarations
+for is listed and not emitted. Hand-authored wins per class exactly as it does
+per token (P2): a selector \`${handFile}\` declares at top level is reported
+MATCH / VALUE-DRIFT and left to the consumer.
+
+| | |
+| --- | --- |
+| Styles in export | ${styleRows.length} |
+| GENERATED (written to \`${cfg.paths.styles ?? "the styles stylesheet"}\`) | ${generated.length} |
+| MATCH (hand-authored, same declarations) | ${by("MATCH").length} |
+| VALUE-DRIFT (hand-authored, different declarations) | ${by("VALUE-DRIFT").length} |
+| NO-DECLARATIONS (no \`cssClass.declarations\` — not a class) | ${noDecl.length} |
+| Shadowed by a hand-authored \`@utility\` of the same name | ${shadowed.length} |
+
+${["| Style | Type | Selector | Status | Declarations | Also `@utility` |",
+   "| --- | --- | --- | --- | --- | --- |",
+   ...styleRows.map((r) => `| \`${r.style}\` | ${r.type} | ${r.selector ? `\`${r.selector}\`` : "—"} | ${r.status} | ${r.declarations.length ? r.declarations.map((d) => `\`${d}\``).join("<br>") : "—"} | ${r.shadowed ? "yes" : "—"} |`)].join("\n")}
+
+**\`@utility\` shadows (${shadowed.length})** — Tailwind compiles \`@utility foo\` to
+\`.foo\`, so a hand-authored utility of the same name and a generated class are
+the SAME selector from two files. It is not an unconditional declaration of the
+selector (P2 takes the same reading of \`@utility\` for custom properties), so it
+does not suppress generation — the consumer deletes the utility when it adopts
+the class. Listed so the swap is a checklist, not a surprise.
+
+**Font weights (P22, ${fontWeightRows.length})** — a STRING variable holding a Figma
+font-style name is a \`font-weight\`, and \`font-weight: "Medium"\` is not a value
+CSS accepts. Schema 12 states the number on the variable itself
+(\`fontWeightNumeric\`), so the token carries the export's own \`css\` verbatim.
+The style name and confidence are the export's; nothing here maps a name to a
+number.
+
+${fontWeightRows.length
+  ? ["| Token | Collection | Value | Figma style name | Confidence | Emitted |", "| --- | --- | --- | --- | --- | --- |",
+     ...fontWeightRows.map((r) => `| \`${r.name}\` | ${r.collection} | \`${r.value}\` | ${r.sourceStyleName ? `\`${r.sourceStyleName}\`` : "—"} | ${r.confidence} | ${r.emitted ? "yes" : `no — hand-authored in ${handFile} (P2)`} |`)].join("\n")
+  : "None."}
+
+**\`cssCustomPropertySheets\` cross-check (${sheetRows.length} differences)** — schema 12
+publishes its own \`:root\` / theme blocks. They are **never emitted**: the
+consumer's policies (colour format, ratio form, motion unit, cell trust,
+hand-authored-wins) decide what a token reads as, and shipping the plugin's
+sheet alongside would put two disagreeing stylesheets in one repo. They are
+compared instead — same variable, same mode, this run's value against the
+export's. A row below is one of the two disagreeing, and neither is silently
+resolved: a house policy difference belongs here as the record of a deliberate
+choice, and anything else is an export defect to fix in the plugin.
+
+Per collection: ${(() => {
+  const tally = {};
+  for (const r of sheetRows) tally[r.collection] = (tally[r.collection] ?? 0) + 1;
+  return Object.entries(tally).sort((a, b) => cmp(a[0], b[0])).map(([k, n]) => `${k}: ${n}`).join(" · ") || "none";
+})()}.
+
+${sheetRows.length
+  ? ["| Token | Collection | Mode | Sheet says | Generated |", "| --- | --- | --- | --- | --- |",
+     ...sheetRows.map((r) => `| \`${r.name}\` | ${r.collection} | ${r.mode} | \`${r.sheet}\` | \`${r.generated}\` |`)].join("\n")
+  : "None — every sheet value equals the generated one."}
+
 `;
 }

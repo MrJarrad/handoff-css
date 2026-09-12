@@ -305,6 +305,13 @@ export function resolveValue(v, mode, byId, cfg, collection = null) {
       }
       return plain(color(raw, cfg));
     case "STRING":
+      // P22 — a STRING variable Figma holds a FONT STYLE NAME in ("Medium") is
+      // a font weight, and `font-weight: "Medium"` is not a value CSS accepts.
+      // Schema 12 states the number itself on the variable, so the value is
+      // the export's own `css` verbatim — nothing here maps a style name to a
+      // number, which is precisely the guess that would go wrong on the first
+      // family whose "Medium" is not 500.
+      if (v.fontWeightNumeric?.css != null) return plain(String(v.fontWeightNumeric.css));
       // P20 — a STRING variable the consumer declared a ratio holder is the
       // design system's aspect-ratio primitive, and `aspect-ratio: "3:2"` is
       // not a value CSS accepts. Every other STRING is quoted, as before.

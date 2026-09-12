@@ -27,6 +27,8 @@ export function emitTokens(doc, handDeclared, cfg) {
   // independently of what is emitted, so the count is a property of the EXPORT
   // (a fixed plugin export takes it to zero) rather than of this run's config.
   const untrustedRows = untrustedCells(doc);
+  // P22 — every STRING variable schema 12 states a numeric font weight for.
+  const fontWeightRows = [];
   const warnings = []; // P11/P13 — what the generator would not guess at
   const emitted = new Set(); // every name declared below, for the alias block
   const blocks = []; // rendered CSS blocks
@@ -93,6 +95,20 @@ export function emitTokens(doc, handDeclared, cfg) {
         aliasTarget: defaultResolved.aliasTarget,
         unconverted: defaultResolved.unconverted ?? null,
       });
+
+      // P22 — the weight tokens, named with the style name and the confidence
+      // the export attached to the mapping, so a "medium" the plugin guessed
+      // at is visible rather than folded into the ramp.
+      if (v.fontWeightNumeric) {
+        fontWeightRows.push({
+          collection: c.name,
+          name,
+          value: defaultResolved.value,
+          sourceStyleName: v.fontWeightNumeric.sourceStyleName ?? null,
+          confidence: v.fontWeightNumeric.confidence ?? "none",
+          emitted: hand == null,
+        });
+      }
 
       if (hand != null) {
         // P2 — already declared globally by hand, so it resolves either way.
@@ -320,7 +336,7 @@ export function emitTokens(doc, handDeclared, cfg) {
   return {
     css: `${header}${blocks.join("\n\n")}\n`,
     rows, privateRows, hiddenRows, excludedRows,
-    responsiveRows, aliasRows: aliases.rows, warnings, untrustedRows,
+    responsiveRows, aliasRows: aliases.rows, warnings, untrustedRows, fontWeightRows,
   };
 }
 

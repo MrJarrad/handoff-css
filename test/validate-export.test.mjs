@@ -29,12 +29,12 @@ test("the real v9 export validates with zero errors", () => {
   assert.equal(res.skipped, false);
 });
 
-// 0.5.0 — repointed from 10 to 13. Schemas 10 and 11 are accepted now (the
-// plugin shipped them and they are the 8-11 shape); 13 is the first version
-// this package has not read, so it is the one that must not pass.
-test("a v9 export mutated to schemaVersion 13 fails at /schemaVersion", () => {
+// 0.5.0 — repointed from 10 to 14. Schemas 10-13 are accepted now (the plugin
+// shipped them, and 12/13 are the fixture this release is built against); 14
+// is the first version this package has not read, so it must not pass.
+test("a v9 export mutated to schemaVersion 14 fails at /schemaVersion", () => {
   const doc = docV9();
-  doc.schemaVersion = 13;
+  doc.schemaVersion = 14;
   const res = validateExport(doc);
   assert.equal(res.skipped, false);
   assert.equal(res.ok, false);
@@ -48,12 +48,12 @@ test("a schema-7 export is skipped, not validated — and says so", () => {
   const res = validateExport(v7);
   assert.equal(res.ok, true);
   assert.equal(res.skipped, true);
-  assert.deepEqual(VALIDATED_SCHEMA_VERSIONS, [8, 9, 10, 11, 12]);
+  assert.deepEqual(VALIDATED_SCHEMA_VERSIONS, [8, 9, 10, 11, 12, 13]);
 });
 
 test("an unknown future schema version fails at /schemaVersion, not skipped", () => {
   const doc = docV8b();
-  doc.schemaVersion = 13;
+  doc.schemaVersion = 14;
   const res = validateExport(doc);
   assert.equal(res.skipped, false);
   assert.equal(res.ok, false);
@@ -73,7 +73,7 @@ test("an export claiming schemaVersion 12 without schema 12's structures fails a
   // The v9 export already carries `styles`, but with type ramp v1 and no
   // `cssCustomPropertySheets` — exactly the two things schema 12 adds.
   assert.deepEqual([...new Set(res.errors.map((e) => e.message))].sort(), [
-    "must be equal to constant",
+    "must be equal to one of the allowed values",
     "must have required property 'cssCustomPropertySheets'",
   ]);
   assert.ok(res.errors.some((e) => e.path === "/styles/TEXT/0/typeRamp/policyVersion"));
@@ -195,6 +195,6 @@ test("assertValidExport names at most five pointers and counts the rest", () => 
 });
 
 test("the schema document is published as part of the package", () => {
-  assert.deepEqual(exportSchema.properties.schemaVersion.enum, [8, 9, 10, 11, 12]);
+  assert.deepEqual(exportSchema.properties.schemaVersion.enum, [8, 9, 10, 11, 12, 13]);
   assert.equal(exportSchema.$schema, "https://json-schema.org/draft/2020-12/schema");
 });
