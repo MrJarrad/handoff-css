@@ -346,14 +346,16 @@ test("§10 states each variable's class, where the class came from, and the effe
   const { report } = emit(exportDoc());
   const section = report.slice(report.indexOf("## 10. Responsive classes"),
                               report.indexOf("## Appendix A —"));
-  assert.match(section, /Honoured this run: `viewport-height`, `viewport-width`\./);
+  assert.match(section,
+    /Honoured this run: `viewport-height`, `viewport-width`, `fluid-clamp`, `fixed`\./);
   assert.match(section,
     /\| `--device-screen-height-100` \| layout \| viewport-height \| description \| 20dvh once on the base scope \|/);
   assert.match(section, /\| `VIEWPORT_UNFLAGGED` \| `--device-width` \|/);
-  // A class the preset HOLDS is still listed, with `per-mode` as its effect —
-  // the report is where a consumer sees what adopting it would change.
-  assert.match(section, /\| `--grid-columns` \| layout \| fixed \| export \| per-mode \|/);
-  assert.match(section, /\| `--grid-col-start-2` \| layout \| fluid-clamp \| export \| per-mode \|/);
+  // 0.4.2 — the house preset honours `fluid-clamp` and `fixed`: the plugin's
+  // own rule is followed exactly, per layout variant, not held.
+  assert.match(section, /\| `--grid-columns` \| layout \| fixed \| export \| fixed once per layout variant \|/);
+  assert.match(section,
+    /\| `--grid-col-start-2` \| layout \| fluid-clamp \| export \| fluid-clamp once per layout variant \|/);
 });
 
 // --- P11, the group gate ----------------------------------------------------

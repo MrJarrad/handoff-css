@@ -2,6 +2,46 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.4.2 — 2026-09-12
+
+Operator ruling ("Responsive strategy"): *"let's follow what the plugin suggests."* The
+generator now emits each variable's responsive value exactly as the plugin's
+`responsiveBehavior` rule states, per layout variant.
+
+### Changed
+
+- **P11 un-holds `fluid-clamp` and `fixed`.** `presets/jhd.config.mjs`'s `responsive.honourClasses`
+  now lists all four classes that can change output (`viewport-height`, `viewport-width`,
+  `fluid-clamp`, `fixed`) instead of the viewport pair alone. Every `responsiveBehavior.rules[]`
+  entry is honoured exactly as published, per `layoutVariant` — `fluid-clamp` emits the export's
+  own `css: clamp(...)` verbatim, never recomputed; `fixed` collapses to one declaration per
+  variant, or once on the base scope when every rule states `fixed`. `mode-stepped` stays
+  per-breakpoint. A variable whose rule is genuinely `fluid-clamp`/`fixed` at one layout variant
+  and `mode-stepped` at another (e.g. `--grid-col-start-2`: `fluid-clamp` at `default`/`flush`,
+  `fixed` at `sidebar-main`/`sidebar-main-flush`) honours each variant independently.
+- **§10 states an honoured variable's per-variant effect, not the last variant processed.**
+  Previously a variable classed differently across layout variants had its single `Effect` cell
+  silently overwritten by whichever variant the emitter reached last, understating what other
+  variants actually did. `Effect` now names every distinct outcome and the variants that share it
+  (`default/flush: fluid-clamp once per layout variant; sidebar-main/sidebar-main-flush: fixed
+  once per layout variant`) — a report-only fix; the emitted CSS was already correct per variant.
+- **`FIXED_VARIES_BY_MODE` / `CLAMP_WITHOUT_EXPRESSION` warn once per layout variant, not once per
+  width sample.** An honoured `fixed` rule whose modes disagree is proved false before every
+  width sample in that variant, not just the first; the warning is now deduplicated per variant
+  (`src/emit-tokens.mjs`'s `uncollapsible` set), matching the existing per-variant dedupe for
+  `VIEWPORT_CLASS_WITHOUT_FRACTION`. The variable-wide all-`fixed` collapse (0.3.1) also no longer
+  double-warns when its own per-variant fallback re-checks the same disagreement.
+- **§10 reports a strategy-count summary row** (`Strategy counts: fixed: 7 · fluid-clamp: 14 ·
+  mode-stepped: 52 · viewport-height: 8 · viewport-width: 1`), collapsed over `source` — one
+  number per `responsiveBehavior` strategy regardless of how the generator learned of it,
+  alongside the existing per-(class, source) tally.
+- **`fixtures/jhd-v11-2026-09-12/expected/*` regenerated** under the new preset default
+  (`test/fixture.mjs`'s `consumerConfig042`). Every other fixture's `tokens.generated.css`,
+  `theme.generated.css` and `exclusions.json` stay byte-identical under their own pinned configs
+  (`consumerConfig`/`consumerConfig040` now pin `responsive.honourClasses` explicitly to the
+  pre-0.4.2 viewport-only default, rather than inheriting it from the mutable preset); their
+  `ds-from-handoff-report.md` gained only the new strategy-count summary line.
+
 ## 0.4.1 — 2026-09-12
 
 The layer-brief markdown gets a JSON companion of its own (schema `design-handoff` v10),

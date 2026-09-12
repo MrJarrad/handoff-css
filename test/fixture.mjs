@@ -154,19 +154,42 @@ export const expectedV8b = (file) =>
  * correct in a preset other consumers copy, and the v8b `expected/*` files are
  * that repo's committed artifacts, so reproducing them needs the real pair.
  */
+// P11 — pinned explicitly on every pre-0.4.2 consumer config below, rather
+// than inherited from the mutable `preset`: 0.4.2 un-holds `fluid-clamp` and
+// `fixed` in the house preset, and these configs back fixtures generated
+// under the pre-0.4.2 preset (viewport classes only). Pinning keeps them
+// byte-stable regardless of what the preset does next.
+const PRE_0_4_2_RESPONSIVE = { responsive: { honourClasses: ["viewport-height", "viewport-width"] } };
+
 export const consumerConfig = {
   ...preset,
   report: { ...preset.report, policyRef: "docs/handoff-css.md" },
   header: { ...preset.header, regenerateCommand: "pnpm run tokens" },
   ...PRE_0_4_0,
+  ...PRE_0_4_2_RESPONSIVE,
 };
 
 /**
  * The same consumer pair with the 0.4.0 policies ON — the config
- * `jhd-design-system` ships from 0.4.0 onward. Used by the `jhd-v9d` fixture,
- * whose `expected/*` this package generated.
+ * `jhd-design-system` ships from 0.4.0 onward. Used by the `jhd-v9d`/`jhd-v10`
+ * fixtures, whose `expected/*` this package generated. P11 stays pinned to
+ * the pre-0.4.2 preset (see `PRE_0_4_2_RESPONSIVE`) — `consumerConfig042`
+ * below is the 0.4.2 config, used only by the v11 fixture.
  */
 export const consumerConfig040 = {
+  ...preset,
+  report: { ...preset.report, policyRef: "docs/handoff-css.md" },
+  header: { ...preset.header, regenerateCommand: "pnpm run tokens" },
+  ...PRE_0_4_2_RESPONSIVE,
+};
+
+/**
+ * The consumer pair with 0.4.2's responsive policy ON — the house preset's
+ * `responsive.honourClasses` un-held (`fluid-clamp` and `fixed` honoured, per
+ * `layoutVariant`, exactly as `responsiveBehavior.rules[]` states). Used only
+ * by the v11 fixture, the first generated under it.
+ */
+export const consumerConfig042 = {
   ...preset,
   report: { ...preset.report, policyRef: "docs/handoff-css.md" },
   header: { ...preset.header, regenerateCommand: "pnpm run tokens" },

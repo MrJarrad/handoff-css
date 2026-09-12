@@ -263,11 +263,19 @@ ${(() => {
   for (const r of classified) tally[`${r.cls} (${r.source})`] = (tally[`${r.cls} (${r.source})`] ?? 0) + 1;
   const summary = Object.entries(tally).sort((a, b) => cmp(a[0], b[0]))
     .map(([k, n]) => `${k}: ${n}`).join(" · ");
+  // Strategy counts — per `responsiveBehavior.rules[].strategy`, collapsed
+  // over `source` (unlike the tally above): one number per strategy, however
+  // the generator learned of it.
+  const strategyTally = {};
+  for (const r of classified) strategyTally[r.cls] = (strategyTally[r.cls] ?? 0) + 1;
+  const strategySummary = Object.entries(strategyTally).sort((a, b) => cmp(a[0], b[0]))
+    .map(([k, n]) => `${k}: ${n}`).join(" · ");
   // Listed individually: every variable whose class WOULD change its output if
   // honoured. The rest are `mode-stepped`/`sample-only` — the per-mode path
   // either way — and there are too many to be worth a row each.
   const table = classified.filter((r) => changesOutput(r.cls));
   return `${classified.length} of ${responsiveRows.length} emitted variables carry a class — ${summary || "none"}.
+Strategy counts: ${strategySummary || "none"}.
 The other ${classified.length - table.length} are \`mode-stepped\` or \`sample-only\`, which IS the
 per-mode path, so they are not listed individually: their output is unchanged.
 

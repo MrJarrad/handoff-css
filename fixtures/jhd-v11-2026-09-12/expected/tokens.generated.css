@@ -723,11 +723,11 @@
   --grid-col-span-7: 11.296875rem; /* 180.75px */
   --grid-col-span-8: 13.125rem; /* 210px */
   --grid-col-span-9: 14.953125rem; /* 239.25px */
-  --grid-col-start-1: 0rem; /* 0px */
+  --grid-col-start-1: 0rem;
   --grid-col-start-10: 16.4375rem; /* 263px */
   --grid-col-start-11: 18.3125rem; /* 293px */
   --grid-col-start-12: 20.125rem; /* 322px */
-  --grid-col-start-2: 1.828125rem; /* 29.25px */
+  --grid-col-start-2: clamp(1.828125rem, 0.5127vw + -0.0945rem, 9.75rem);
   --grid-col-start-3: 3.6875rem; /* 59px */
   --grid-col-start-4: 5.5rem; /* 88px */
   --grid-col-start-5: 7.3125rem; /* 117px */
@@ -744,33 +744,177 @@
   --grid-padding-default: var(--dimension-800); /* 1.5rem */
   --grid-padding-offset: var(--dimension-600); /* 1rem */
   --grid-padding-sm: var(--dimension-600); /* 1rem */
-  --space-spacer-0: var(--dimension-0); /* 0rem */
+  --space-spacer-0: var(--dimension-0);
   --space-spacer-100: var(--dimension-500); /* 0.75rem */
   --space-spacer-200: var(--dimension-600); /* 1rem */
   --space-spacer-300: var(--dimension-800); /* 1.5rem */
   --space-spacer-400: var(--dimension-1000); /* 2rem */
   --space-spacer-500: var(--dimension-1200); /* 3rem */
   --space-spacer-600: var(--dimension-1500); /* 4.5rem */
-  --text-body-font-size-100: var(--size-100); /* 0.75rem */
-  --text-body-font-size-200: var(--size-200); /* 0.875rem */
-  --text-body-font-size-300: var(--size-350); /* 1.125rem */
+  --text-body-font-size-100: clamp(0.75rem, 0.0081vw + 0.719625rem, 0.875rem);
+  --text-body-font-size-200: clamp(0.875rem, 0.0081vw + 0.844625rem, 1rem);
+  --text-body-font-size-300: clamp(1.125rem, 0.0081vw + 1.094625rem, 1.25rem);
   --text-body-font-size-400: var(--size-500); /* 1.5rem */
   --text-body-letter-spacing-100: var(--letter-spacing-100); /* 0 */
   --text-body-letter-spacing-200: var(--letter-spacing-200); /* 0 */
   --text-body-letter-spacing-300: var(--letter-spacing-350); /* -0.25 */
   --text-body-letter-spacing-400: var(--letter-spacing-500); /* -0.25 */
-  --text-body-paragraph-spacing-100: 0.6875rem; /* 11px */
-  --text-body-paragraph-spacing-200: 0.8125rem; /* 13px */
-  --text-body-paragraph-spacing-300: 1.0625rem; /* 17px */
+  --text-body-paragraph-spacing-100: clamp(0.6875rem, 0.0081vw + 0.657125rem, 0.8125rem);
+  --text-body-paragraph-spacing-200: clamp(0.8125rem, 0.0081vw + 0.782125rem, 0.9375rem);
+  --text-body-paragraph-spacing-300: clamp(1.0625rem, 0.0081vw + 1.032125rem, 1.1875rem);
   --text-body-paragraph-spacing-400: 1.4375rem; /* 23px */
-  --text-title-font-size-100: var(--size-200); /* 0.875rem */
-  --text-title-font-size-200: var(--size-350); /* 1.125rem */
+  --text-title-font-size-100: clamp(0.875rem, 0.0081vw + 0.844625rem, 1rem);
+  --text-title-font-size-200: clamp(1.125rem, 0.0081vw + 1.094625rem, 1.25rem);
   --text-title-font-size-300: var(--size-600); /* 1.75rem */
   --text-title-font-size-400: var(--size-1000); /* 3.5rem */
   --text-title-letter-spacing-100: var(--letter-spacing-200); /* 0 */
   --text-title-letter-spacing-200: var(--letter-spacing-350); /* -0.25 */
   --text-title-letter-spacing-300: var(--letter-spacing-600); /* -0.5 */
   --text-title-letter-spacing-400: var(--letter-spacing-1000); /* -1.75 */
+}
+[data-jhd-layout-variant="flush"] {
+  --grid-col-span-1: clamp(1.953125rem, 0.5208vw + 0.000125rem, 10rem);
+  --grid-col-span-10: clamp(19.53125rem, 5.2083vw + 0.000125rem, 100rem);
+  --grid-col-span-11: clamp(21.484375rem, 5.7292vw + -0.000125rem, 110rem);
+  --grid-col-span-12: clamp(23.4375rem, 6.25vw + 0rem, 120rem);
+  --grid-col-span-2: clamp(3.90625rem, 1.0417vw + -0.000125rem, 20rem);
+  --grid-col-span-3: clamp(5.859375rem, 1.5625vw + 0rem, 30rem);
+  --grid-col-span-4: clamp(7.8125rem, 2.0833vw + 0.000125rem, 40rem);
+  --grid-col-span-5: clamp(9.765625rem, 2.6042vw + -0.000125rem, 50rem);
+  --grid-col-span-6: clamp(11.71875rem, 3.125vw + 0rem, 60rem);
+  --grid-col-span-7: clamp(13.671875rem, 3.6458vw + 0.000125rem, 70rem);
+  --grid-col-span-8: clamp(15.625rem, 4.1667vw + -0.000125rem, 80rem);
+  --grid-col-span-9: clamp(17.578125rem, 4.6875vw + 0rem, 90rem);
+  --grid-col-start-12: clamp(21.484375rem, 5.7292vw + -0.000125rem, 110rem);
+  --grid-col-start-2: clamp(1.953125rem, 0.5208vw + 0.000125rem, 10rem);
+  --grid-col-start-3: clamp(3.90625rem, 1.0417vw + -0.000125rem, 20rem);
+  --grid-col-start-4: clamp(5.859375rem, 1.5625vw + 0rem, 30rem);
+  --grid-col-start-5: clamp(7.8125rem, 2.0833vw + 0.000125rem, 40rem);
+  --grid-col-start-6: clamp(9.765625rem, 2.6042vw + -0.000125rem, 50rem);
+  --grid-col-start-7: clamp(11.71875rem, 3.125vw + 0rem, 60rem);
+  --grid-margin-default: var(--dimension-0);
+  --grid-margin-offset: var(--dimension-0);
+  --grid-margin-sm: var(--dimension-0);
+  --text-body-font-size-100: clamp(0.75rem, 0.0081vw + 0.719625rem, 0.875rem);
+  --text-body-font-size-200: clamp(0.875rem, 0.0081vw + 0.844625rem, 1rem);
+  --text-body-font-size-300: clamp(1.125rem, 0.0081vw + 1.094625rem, 1.25rem);
+  --text-body-paragraph-spacing-100: clamp(0.6875rem, 0.0081vw + 0.657125rem, 0.8125rem);
+  --text-body-paragraph-spacing-200: clamp(0.8125rem, 0.0081vw + 0.782125rem, 0.9375rem);
+  --text-body-paragraph-spacing-300: clamp(1.0625rem, 0.0081vw + 1.032125rem, 1.1875rem);
+  --text-title-font-size-100: clamp(0.875rem, 0.0081vw + 0.844625rem, 1rem);
+  --text-title-font-size-200: clamp(1.125rem, 0.0081vw + 1.094625rem, 1.25rem);
+}
+[data-jhd-layout-variant="sidebar-main"] {
+  --grid-col-span-1: 1.8125rem;
+  --grid-col-span-10: 45.125rem;
+  --grid-col-span-11: 49.9375rem;
+  --grid-col-span-12: 54.75rem;
+  --grid-col-span-2: 6.625rem;
+  --grid-col-span-3: 11.4375rem;
+  --grid-col-span-4: 16.25rem;
+  --grid-col-span-5: 21.0625rem;
+  --grid-col-span-6: 25.875rem;
+  --grid-col-span-7: 30.6875rem;
+  --grid-col-span-8: 35.5rem;
+  --grid-col-span-9: 40.3125rem;
+  --grid-col-start-10: 43.3125rem;
+  --grid-col-start-11: 48.125rem;
+  --grid-col-start-12: 52.9375rem;
+  --grid-col-start-2: 4.8125rem;
+  --grid-col-start-3: 9.625rem;
+  --grid-col-start-4: 14.4375rem;
+  --grid-col-start-5: 19.25rem;
+  --grid-col-start-6: 24.0625rem;
+  --grid-col-start-7: 28.875rem;
+  --grid-col-start-8: 33.6875rem;
+  --grid-col-start-9: 38.5rem;
+  --grid-gap-md: var(--dimension-1300);
+  --grid-gap-sm: var(--dimension-800);
+  --grid-margin-default: var(--dimension-1200);
+  --grid-margin-offset: var(--dimension-1050);
+  --grid-margin-sm: var(--dimension-1000);
+  --grid-padding-default: var(--dimension-1200);
+  --grid-padding-offset: var(--dimension-1050);
+  --grid-padding-sm: var(--dimension-1000);
+  --space-spacer-100: var(--dimension-800);
+  --space-spacer-200: var(--dimension-1000);
+  --space-spacer-300: var(--dimension-1200);
+  --space-spacer-400: var(--dimension-1400);
+  --space-spacer-500: var(--dimension-1700);
+  --space-spacer-600: var(--dimension-1900);
+  --text-body-font-size-100: var(--size-200);
+  --text-body-font-size-200: var(--size-300);
+  --text-body-font-size-300: var(--size-400);
+  --text-body-font-size-400: var(--size-600);
+  --text-body-letter-spacing-200: var(--letter-spacing-300);
+  --text-body-letter-spacing-400: var(--letter-spacing-600);
+  --text-body-paragraph-spacing-100: 0.8125rem;
+  --text-body-paragraph-spacing-200: 0.9375rem;
+  --text-body-paragraph-spacing-300: 1.1875rem;
+  --text-body-paragraph-spacing-400: 1.6875rem;
+  --text-title-font-size-100: var(--size-300);
+  --text-title-font-size-200: var(--size-400);
+  --text-title-font-size-300: var(--size-800);
+  --text-title-font-size-400: var(--size-1200);
+  --text-title-letter-spacing-100: var(--letter-spacing-300);
+  --text-title-letter-spacing-300: var(--letter-spacing-800);
+  --text-title-letter-spacing-400: var(--letter-spacing-1200);
+}
+[data-jhd-layout-variant="sidebar-main-flush"] {
+  --grid-col-span-1: 4.5625rem;
+  --grid-col-span-10: 45.625rem;
+  --grid-col-span-11: 50.1875rem;
+  --grid-col-span-12: 54.75rem;
+  --grid-col-span-2: 9.125rem;
+  --grid-col-span-3: 13.6875rem;
+  --grid-col-span-4: 18.25rem;
+  --grid-col-span-5: 22.8125rem;
+  --grid-col-span-6: 27.375rem;
+  --grid-col-span-7: 31.9375rem;
+  --grid-col-span-8: 36.5rem;
+  --grid-col-span-9: 41.0625rem;
+  --grid-col-start-10: 41.0625rem;
+  --grid-col-start-11: 45.625rem;
+  --grid-col-start-12: 50.1875rem;
+  --grid-col-start-2: 4.5625rem;
+  --grid-col-start-3: 9.125rem;
+  --grid-col-start-4: 13.6875rem;
+  --grid-col-start-5: 18.25rem;
+  --grid-col-start-6: 22.8125rem;
+  --grid-col-start-7: 27.375rem;
+  --grid-col-start-8: 31.9375rem;
+  --grid-col-start-9: 36.5rem;
+  --grid-gap-md: var(--dimension-1300);
+  --grid-gap-sm: var(--dimension-800);
+  --grid-margin-default: var(--dimension-0);
+  --grid-margin-offset: var(--dimension-0);
+  --grid-margin-sm: var(--dimension-0);
+  --grid-padding-default: var(--dimension-1200);
+  --grid-padding-offset: var(--dimension-1050);
+  --grid-padding-sm: var(--dimension-1000);
+  --space-spacer-100: var(--dimension-800);
+  --space-spacer-200: var(--dimension-1000);
+  --space-spacer-300: var(--dimension-1200);
+  --space-spacer-400: var(--dimension-1400);
+  --space-spacer-500: var(--dimension-1700);
+  --space-spacer-600: var(--dimension-1900);
+  --text-body-font-size-100: var(--size-200);
+  --text-body-font-size-200: var(--size-300);
+  --text-body-font-size-300: var(--size-400);
+  --text-body-font-size-400: var(--size-600);
+  --text-body-letter-spacing-200: var(--letter-spacing-300);
+  --text-body-letter-spacing-400: var(--letter-spacing-600);
+  --text-body-paragraph-spacing-100: 0.8125rem;
+  --text-body-paragraph-spacing-200: 0.9375rem;
+  --text-body-paragraph-spacing-300: 1.1875rem;
+  --text-body-paragraph-spacing-400: 1.6875rem;
+  --text-title-font-size-100: var(--size-300);
+  --text-title-font-size-200: var(--size-400);
+  --text-title-font-size-300: var(--size-800);
+  --text-title-font-size-400: var(--size-1200);
+  --text-title-letter-spacing-100: var(--letter-spacing-300);
+  --text-title-letter-spacing-300: var(--letter-spacing-800);
+  --text-title-letter-spacing-400: var(--letter-spacing-1200);
 }
 @media (min-width: 375px) {
   :root {
@@ -786,11 +930,9 @@
     --grid-col-span-7: 11.296875rem; /* 180.75px */
     --grid-col-span-8: 13.125rem; /* 210px */
     --grid-col-span-9: 14.953125rem; /* 239.25px */
-    --grid-col-start-1: 0rem; /* 0px */
     --grid-col-start-10: 16.4375rem; /* 263px */
     --grid-col-start-11: 18.3125rem; /* 293px */
     --grid-col-start-12: 20.125rem; /* 322px */
-    --grid-col-start-2: 1.828125rem; /* 29.25px */
     --grid-col-start-3: 3.6875rem; /* 59px */
     --grid-col-start-4: 5.5rem; /* 88px */
     --grid-col-start-5: 7.3125rem; /* 117px */
@@ -798,7 +940,6 @@
     --grid-col-start-7: 11rem; /* 176px */
     --grid-col-start-8: 12.8125rem; /* 205px */
     --grid-col-start-9: 14.625rem; /* 234px */
-    --grid-columns: 12;
     --grid-gap-md: var(--dimension-1000); /* 2rem */
     --grid-gap-sm: var(--dimension-600); /* 1rem */
     --grid-margin-default: var(--dimension-800); /* 1.5rem */
@@ -807,27 +948,18 @@
     --grid-padding-default: var(--dimension-800); /* 1.5rem */
     --grid-padding-offset: var(--dimension-600); /* 1rem */
     --grid-padding-sm: var(--dimension-600); /* 1rem */
-    --space-spacer-0: var(--dimension-0); /* 0rem */
     --space-spacer-100: var(--dimension-500); /* 0.75rem */
     --space-spacer-200: var(--dimension-600); /* 1rem */
     --space-spacer-300: var(--dimension-800); /* 1.5rem */
     --space-spacer-400: var(--dimension-1000); /* 2rem */
     --space-spacer-500: var(--dimension-1200); /* 3rem */
     --space-spacer-600: var(--dimension-1500); /* 4.5rem */
-    --text-body-font-size-100: var(--size-100); /* 0.75rem */
-    --text-body-font-size-200: var(--size-200); /* 0.875rem */
-    --text-body-font-size-300: var(--size-350); /* 1.125rem */
     --text-body-font-size-400: var(--size-500); /* 1.5rem */
     --text-body-letter-spacing-100: var(--letter-spacing-100); /* 0 */
     --text-body-letter-spacing-200: var(--letter-spacing-200); /* 0 */
     --text-body-letter-spacing-300: var(--letter-spacing-350); /* -0.25 */
     --text-body-letter-spacing-400: var(--letter-spacing-500); /* -0.25 */
-    --text-body-paragraph-spacing-100: 0.6875rem; /* 11px */
-    --text-body-paragraph-spacing-200: 0.8125rem; /* 13px */
-    --text-body-paragraph-spacing-300: 1.0625rem; /* 17px */
     --text-body-paragraph-spacing-400: 1.4375rem; /* 23px */
-    --text-title-font-size-100: var(--size-200); /* 0.875rem */
-    --text-title-font-size-200: var(--size-350); /* 1.125rem */
     --text-title-font-size-300: var(--size-600); /* 1.75rem */
     --text-title-font-size-400: var(--size-1000); /* 3.5rem */
     --text-title-letter-spacing-100: var(--letter-spacing-200); /* 0 */
@@ -838,36 +970,14 @@
 }
 @media (min-width: 375px) {
   [data-jhd-layout-variant="flush"] {
-    --grid-col-span-1: 1.953125rem; /* 31.25px */
-    --grid-col-span-10: 19.53125rem; /* 312.5px */
-    --grid-col-span-11: 21.484375rem; /* 343.75px */
-    --grid-col-span-12: 23.4375rem; /* 375px */
-    --grid-col-span-2: 3.90625rem; /* 62.5px */
-    --grid-col-span-3: 5.859375rem; /* 93.75px */
-    --grid-col-span-4: 7.8125rem; /* 125px */
-    --grid-col-span-5: 9.765625rem; /* 156.25px */
-    --grid-col-span-6: 11.71875rem; /* 187.5px */
-    --grid-col-span-7: 13.671875rem; /* 218.75px */
-    --grid-col-span-8: 15.625rem; /* 250px */
-    --grid-col-span-9: 17.578125rem; /* 281.25px */
     --grid-col-start-1: 0rem; /* 0px */
     --grid-col-start-10: 15.625rem; /* 250px */
     --grid-col-start-11: 17.578125rem; /* 281.25px */
-    --grid-col-start-12: 21.484375rem; /* 343.75px */
-    --grid-col-start-2: 1.953125rem; /* 31.25px */
-    --grid-col-start-3: 3.90625rem; /* 62.5px */
-    --grid-col-start-4: 5.859375rem; /* 93.75px */
-    --grid-col-start-5: 7.8125rem; /* 125px */
-    --grid-col-start-6: 9.765625rem; /* 156.25px */
-    --grid-col-start-7: 11.71875rem; /* 187.5px */
     --grid-col-start-8: 11.71875rem; /* 187.5px */
     --grid-col-start-9: 13.671875rem; /* 218.75px */
     --grid-columns: 12;
     --grid-gap-md: var(--dimension-1000); /* 2rem */
     --grid-gap-sm: var(--dimension-600); /* 1rem */
-    --grid-margin-default: var(--dimension-0); /* 0rem */
-    --grid-margin-offset: var(--dimension-0); /* 0rem */
-    --grid-margin-sm: var(--dimension-0); /* 0rem */
     --grid-padding-default: var(--dimension-800); /* 1.5rem */
     --grid-padding-offset: var(--dimension-600); /* 1rem */
     --grid-padding-sm: var(--dimension-600); /* 1rem */
@@ -878,20 +988,12 @@
     --space-spacer-400: var(--dimension-1000); /* 2rem */
     --space-spacer-500: var(--dimension-1200); /* 3rem */
     --space-spacer-600: var(--dimension-1500); /* 4.5rem */
-    --text-body-font-size-100: var(--size-100); /* 0.75rem */
-    --text-body-font-size-200: var(--size-200); /* 0.875rem */
-    --text-body-font-size-300: var(--size-350); /* 1.125rem */
     --text-body-font-size-400: var(--size-500); /* 1.5rem */
     --text-body-letter-spacing-100: var(--letter-spacing-100); /* 0 */
     --text-body-letter-spacing-200: var(--letter-spacing-200); /* 0 */
     --text-body-letter-spacing-300: var(--letter-spacing-350); /* -0.25 */
     --text-body-letter-spacing-400: var(--letter-spacing-500); /* -0.25 */
-    --text-body-paragraph-spacing-100: 0.6875rem; /* 11px */
-    --text-body-paragraph-spacing-200: 0.8125rem; /* 13px */
-    --text-body-paragraph-spacing-300: 1.0625rem; /* 17px */
     --text-body-paragraph-spacing-400: 1.4375rem; /* 23px */
-    --text-title-font-size-100: var(--size-200); /* 0.875rem */
-    --text-title-font-size-200: var(--size-350); /* 1.125rem */
     --text-title-font-size-300: var(--size-600); /* 1.75rem */
     --text-title-font-size-400: var(--size-1000); /* 3.5rem */
     --text-title-letter-spacing-100: var(--letter-spacing-200); /* 0 */
@@ -914,11 +1016,9 @@
     --grid-col-span-7: 24.831875rem; /* 397.309998px */
     --grid-col-span-8: 28.665001rem; /* 458.640015px */
     --grid-col-span-9: 32.498123rem; /* 519.969971px */
-    --grid-col-start-1: 0rem; /* 0px */
     --grid-col-start-10: 34.5rem; /* 552px */
     --grid-col-start-11: 38.3125rem; /* 613px */
     --grid-col-start-12: 42.1875rem; /* 675px */
-    --grid-col-start-2: 3.8125rem; /* 61px */
     --grid-col-start-3: 7.6875rem; /* 123px */
     --grid-col-start-4: 11.5rem; /* 184px */
     --grid-col-start-5: 15.3125rem; /* 245px */
@@ -926,7 +1026,6 @@
     --grid-col-start-7: 23rem; /* 368px */
     --grid-col-start-8: 26.8125rem; /* 429px */
     --grid-col-start-9: 30.6875rem; /* 491px */
-    --grid-columns: 12;
     --grid-gap-md: var(--dimension-1100); /* 2.5rem */
     --grid-gap-sm: var(--dimension-700); /* 1.25rem */
     --grid-margin-default: var(--dimension-1000); /* 2rem */
@@ -935,27 +1034,18 @@
     --grid-padding-default: var(--dimension-1000); /* 2rem */
     --grid-padding-offset: var(--dimension-600); /* 1rem */
     --grid-padding-sm: var(--dimension-600); /* 1rem */
-    --space-spacer-0: var(--dimension-0); /* 0rem */
     --space-spacer-100: var(--dimension-600); /* 1rem */
     --space-spacer-200: var(--dimension-700); /* 1.25rem */
     --space-spacer-300: var(--dimension-1000); /* 2rem */
     --space-spacer-400: var(--dimension-1200); /* 3rem */
     --space-spacer-500: var(--dimension-1400); /* 4rem */
     --space-spacer-600: var(--dimension-1700); /* 6rem */
-    --text-body-font-size-100: var(--size-200); /* 0.875rem */
-    --text-body-font-size-200: var(--size-300); /* 1rem */
-    --text-body-font-size-300: var(--size-400); /* 1.25rem */
     --text-body-font-size-400: var(--size-600); /* 1.75rem */
     --text-body-letter-spacing-100: var(--letter-spacing-200); /* 0 */
     --text-body-letter-spacing-200: var(--letter-spacing-300); /* -0.25 */
     --text-body-letter-spacing-300: var(--letter-spacing-400); /* -0.25 */
     --text-body-letter-spacing-400: var(--letter-spacing-600); /* -0.5 */
-    --text-body-paragraph-spacing-100: 0.8125rem; /* 13px */
-    --text-body-paragraph-spacing-200: 0.9375rem; /* 15px */
-    --text-body-paragraph-spacing-300: 1.1875rem; /* 19px */
     --text-body-paragraph-spacing-400: 1.6875rem; /* 27px */
-    --text-title-font-size-100: var(--size-300); /* 1rem */
-    --text-title-font-size-200: var(--size-400); /* 1.25rem */
     --text-title-font-size-300: var(--size-800); /* 2.5rem */
     --text-title-font-size-400: var(--size-1200); /* 5rem */
     --text-title-letter-spacing-100: var(--letter-spacing-300); /* -0.25 */
@@ -966,36 +1056,14 @@
 }
 @media (min-width: 768px) {
   [data-jhd-layout-variant="flush"] {
-    --grid-col-span-1: 4rem; /* 64px */
-    --grid-col-span-10: 40rem; /* 640px */
-    --grid-col-span-11: 44rem; /* 704px */
-    --grid-col-span-12: 48rem; /* 768px */
-    --grid-col-span-2: 8rem; /* 128px */
-    --grid-col-span-3: 12rem; /* 192px */
-    --grid-col-span-4: 16rem; /* 256px */
-    --grid-col-span-5: 20rem; /* 320px */
-    --grid-col-span-6: 24rem; /* 384px */
-    --grid-col-span-7: 28rem; /* 448px */
-    --grid-col-span-8: 32rem; /* 512px */
-    --grid-col-span-9: 36rem; /* 576px */
     --grid-col-start-1: 0rem; /* 0px */
     --grid-col-start-10: 36rem; /* 576px */
     --grid-col-start-11: 40rem; /* 640px */
-    --grid-col-start-12: 44rem; /* 704px */
-    --grid-col-start-2: 4rem; /* 64px */
-    --grid-col-start-3: 8rem; /* 128px */
-    --grid-col-start-4: 12rem; /* 192px */
-    --grid-col-start-5: 16rem; /* 256px */
-    --grid-col-start-6: 20rem; /* 320px */
-    --grid-col-start-7: 24rem; /* 384px */
     --grid-col-start-8: 28rem; /* 448px */
     --grid-col-start-9: 32rem; /* 512px */
     --grid-columns: 12;
     --grid-gap-md: var(--dimension-1100); /* 2.5rem */
     --grid-gap-sm: var(--dimension-700); /* 1.25rem */
-    --grid-margin-default: var(--dimension-0); /* 0rem */
-    --grid-margin-offset: var(--dimension-0); /* 0rem */
-    --grid-margin-sm: var(--dimension-0); /* 0rem */
     --grid-padding-default: var(--dimension-1000); /* 2rem */
     --grid-padding-offset: var(--dimension-600); /* 1rem */
     --grid-padding-sm: var(--dimension-600); /* 1rem */
@@ -1006,20 +1074,12 @@
     --space-spacer-400: var(--dimension-1200); /* 3rem */
     --space-spacer-500: var(--dimension-1400); /* 4rem */
     --space-spacer-600: var(--dimension-1700); /* 6rem */
-    --text-body-font-size-100: var(--size-200); /* 0.875rem */
-    --text-body-font-size-200: var(--size-300); /* 1rem */
-    --text-body-font-size-300: var(--size-400); /* 1.25rem */
     --text-body-font-size-400: var(--size-600); /* 1.75rem */
     --text-body-letter-spacing-100: var(--letter-spacing-200); /* 0 */
     --text-body-letter-spacing-200: var(--letter-spacing-300); /* -0.25 */
     --text-body-letter-spacing-300: var(--letter-spacing-400); /* -0.25 */
     --text-body-letter-spacing-400: var(--letter-spacing-600); /* -0.5 */
-    --text-body-paragraph-spacing-100: 0.8125rem; /* 13px */
-    --text-body-paragraph-spacing-200: 0.9375rem; /* 15px */
-    --text-body-paragraph-spacing-300: 1.1875rem; /* 19px */
     --text-body-paragraph-spacing-400: 1.6875rem; /* 27px */
-    --text-title-font-size-100: var(--size-300); /* 1rem */
-    --text-title-font-size-200: var(--size-400); /* 1.25rem */
     --text-title-font-size-300: var(--size-600); /* 1.75rem */
     --text-title-font-size-400: var(--size-1200); /* 5rem */
     --text-title-letter-spacing-100: var(--letter-spacing-300); /* -0.25 */
@@ -1042,11 +1102,9 @@
     --grid-col-span-7: 41.918125rem; /* 670.690002px */
     --grid-col-span-8: 48.334999rem; /* 773.359985px */
     --grid-col-span-9: 54.751877rem; /* 876.030029px */
-    --grid-col-start-1: 0rem; /* 0px */
     --grid-col-start-10: 57.75rem; /* 924px */
     --grid-col-start-11: 64.1875rem; /* 1027px */
     --grid-col-start-12: 70.5625rem; /* 1129px */
-    --grid-col-start-2: 6.4375rem; /* 103px */
     --grid-col-start-3: 12.8125rem; /* 205px */
     --grid-col-start-4: 19.25rem; /* 308px */
     --grid-col-start-5: 25.6875rem; /* 411px */
@@ -1054,7 +1112,6 @@
     --grid-col-start-7: 38.5rem; /* 616px */
     --grid-col-start-8: 44.9375rem; /* 719px */
     --grid-col-start-9: 51.3125rem; /* 821px */
-    --grid-columns: 12;
     --grid-gap-md: var(--dimension-1300); /* 3.5rem */
     --grid-gap-sm: var(--dimension-800); /* 1.5rem */
     --grid-margin-default: var(--dimension-1200); /* 3rem */
@@ -1063,27 +1120,18 @@
     --grid-padding-default: var(--dimension-1200); /* 3rem */
     --grid-padding-offset: var(--dimension-1050); /* 2.25rem */
     --grid-padding-sm: var(--dimension-1000); /* 2rem */
-    --space-spacer-0: var(--dimension-0); /* 0rem */
     --space-spacer-100: var(--dimension-800); /* 1.5rem */
     --space-spacer-200: var(--dimension-1000); /* 2rem */
     --space-spacer-300: var(--dimension-1200); /* 3rem */
     --space-spacer-400: var(--dimension-1400); /* 4rem */
     --space-spacer-500: var(--dimension-1700); /* 6rem */
     --space-spacer-600: var(--dimension-1900); /* 10rem */
-    --text-body-font-size-100: var(--size-200); /* 0.875rem */
-    --text-body-font-size-200: var(--size-300); /* 1rem */
-    --text-body-font-size-300: var(--size-400); /* 1.25rem */
     --text-body-font-size-400: var(--size-600); /* 1.75rem */
     --text-body-letter-spacing-100: var(--letter-spacing-200); /* 0 */
     --text-body-letter-spacing-200: var(--letter-spacing-300); /* -0.25 */
     --text-body-letter-spacing-300: var(--letter-spacing-400); /* -0.25 */
     --text-body-letter-spacing-400: var(--letter-spacing-600); /* -0.5 */
-    --text-body-paragraph-spacing-100: 0.8125rem; /* 13px */
-    --text-body-paragraph-spacing-200: 0.9375rem; /* 15px */
-    --text-body-paragraph-spacing-300: 1.1875rem; /* 19px */
     --text-body-paragraph-spacing-400: 1.6875rem; /* 27px */
-    --text-title-font-size-100: var(--size-300); /* 1rem */
-    --text-title-font-size-200: var(--size-400); /* 1.25rem */
     --text-title-font-size-300: var(--size-800); /* 2.5rem */
     --text-title-font-size-400: var(--size-1200); /* 5rem */
     --text-title-letter-spacing-100: var(--letter-spacing-300); /* -0.25 */
@@ -1094,36 +1142,14 @@
 }
 @media (min-width: 1280px) {
   [data-jhd-layout-variant="flush"] {
-    --grid-col-span-1: 6.666875rem; /* 106.669998px */
-    --grid-col-span-10: 66.666878rem; /* 1066.670044px */
-    --grid-col-span-11: 73.333122rem; /* 1173.329956px */
-    --grid-col-span-12: 80rem; /* 1280px */
-    --grid-col-span-2: 13.333125rem; /* 213.330002px */
-    --grid-col-span-3: 20rem; /* 320px */
-    --grid-col-span-4: 26.666876rem; /* 426.670013px */
-    --grid-col-span-5: 33.333126rem; /* 533.330017px */
-    --grid-col-span-6: 40rem; /* 640px */
-    --grid-col-span-7: 46.666874rem; /* 746.669983px */
-    --grid-col-span-8: 53.333126rem; /* 853.330017px */
-    --grid-col-span-9: 60rem; /* 960px */
     --grid-col-start-1: 0rem; /* 0px */
     --grid-col-start-10: 60rem; /* 960px */
     --grid-col-start-11: 66.666878rem; /* 1066.670044px */
-    --grid-col-start-12: 73.333122rem; /* 1173.329956px */
-    --grid-col-start-2: 6.666875rem; /* 106.669998px */
-    --grid-col-start-3: 13.333125rem; /* 213.330002px */
-    --grid-col-start-4: 20rem; /* 320px */
-    --grid-col-start-5: 26.666876rem; /* 426.670013px */
-    --grid-col-start-6: 33.333126rem; /* 533.330017px */
-    --grid-col-start-7: 40rem; /* 640px */
     --grid-col-start-8: 46.666874rem; /* 746.669983px */
     --grid-col-start-9: 53.333126rem; /* 853.330017px */
     --grid-columns: 12;
     --grid-gap-md: var(--dimension-1300); /* 3.5rem */
     --grid-gap-sm: var(--dimension-800); /* 1.5rem */
-    --grid-margin-default: var(--dimension-0); /* 0rem */
-    --grid-margin-offset: var(--dimension-0); /* 0rem */
-    --grid-margin-sm: var(--dimension-0); /* 0rem */
     --grid-padding-default: var(--dimension-1200); /* 3rem */
     --grid-padding-offset: var(--dimension-1050); /* 2.25rem */
     --grid-padding-sm: var(--dimension-1000); /* 2rem */
@@ -1134,20 +1160,12 @@
     --space-spacer-400: var(--dimension-1400); /* 4rem */
     --space-spacer-500: var(--dimension-1700); /* 6rem */
     --space-spacer-600: var(--dimension-1900); /* 10rem */
-    --text-body-font-size-100: var(--size-200); /* 0.875rem */
-    --text-body-font-size-200: var(--size-300); /* 1rem */
-    --text-body-font-size-300: var(--size-400); /* 1.25rem */
     --text-body-font-size-400: var(--size-600); /* 1.75rem */
     --text-body-letter-spacing-100: var(--letter-spacing-200); /* 0 */
     --text-body-letter-spacing-200: var(--letter-spacing-300); /* -0.25 */
     --text-body-letter-spacing-300: var(--letter-spacing-400); /* -0.25 */
     --text-body-letter-spacing-400: var(--letter-spacing-600); /* -0.5 */
-    --text-body-paragraph-spacing-100: 0.8125rem; /* 13px */
-    --text-body-paragraph-spacing-200: 0.9375rem; /* 15px */
-    --text-body-paragraph-spacing-300: 1.1875rem; /* 19px */
     --text-body-paragraph-spacing-400: 1.6875rem; /* 27px */
-    --text-title-font-size-100: var(--size-300); /* 1rem */
-    --text-title-font-size-200: var(--size-400); /* 1.25rem */
     --text-title-font-size-300: var(--size-800); /* 2.5rem */
     --text-title-font-size-400: var(--size-1200); /* 5rem */
     --text-title-letter-spacing-100: var(--letter-spacing-300); /* -0.25 */
@@ -1158,130 +1176,22 @@
 }
 @media (min-width: 1280px) {
   [data-jhd-layout-variant="sidebar-main"] {
-    --grid-col-span-1: 1.8125rem; /* 29px */
-    --grid-col-span-10: 45.125rem; /* 722px */
-    --grid-col-span-11: 49.9375rem; /* 799px */
-    --grid-col-span-12: 54.75rem; /* 876px */
-    --grid-col-span-2: 6.625rem; /* 106px */
-    --grid-col-span-3: 11.4375rem; /* 183px */
-    --grid-col-span-4: 16.25rem; /* 260px */
-    --grid-col-span-5: 21.0625rem; /* 337px */
-    --grid-col-span-6: 25.875rem; /* 414px */
-    --grid-col-span-7: 30.6875rem; /* 491px */
-    --grid-col-span-8: 35.5rem; /* 568px */
-    --grid-col-span-9: 40.3125rem; /* 645px */
     --grid-col-start-1: 0rem; /* 0px */
-    --grid-col-start-10: 43.3125rem; /* 693px */
-    --grid-col-start-11: 48.125rem; /* 770px */
-    --grid-col-start-12: 52.9375rem; /* 847px */
-    --grid-col-start-2: 4.8125rem; /* 77px */
-    --grid-col-start-3: 9.625rem; /* 154px */
-    --grid-col-start-4: 14.4375rem; /* 231px */
-    --grid-col-start-5: 19.25rem; /* 308px */
-    --grid-col-start-6: 24.0625rem; /* 385px */
-    --grid-col-start-7: 28.875rem; /* 462px */
-    --grid-col-start-8: 33.6875rem; /* 539px */
-    --grid-col-start-9: 38.5rem; /* 616px */
     --grid-columns: 12;
-    --grid-gap-md: var(--dimension-1300); /* 3.5rem */
-    --grid-gap-sm: var(--dimension-800); /* 1.5rem */
-    --grid-margin-default: var(--dimension-1200); /* 3rem */
-    --grid-margin-offset: var(--dimension-1050); /* 2.25rem */
-    --grid-margin-sm: var(--dimension-1000); /* 2rem */
-    --grid-padding-default: var(--dimension-1200); /* 3rem */
-    --grid-padding-offset: var(--dimension-1050); /* 2.25rem */
-    --grid-padding-sm: var(--dimension-1000); /* 2rem */
     --space-spacer-0: var(--dimension-0); /* 0rem */
-    --space-spacer-100: var(--dimension-800); /* 1.5rem */
-    --space-spacer-200: var(--dimension-1000); /* 2rem */
-    --space-spacer-300: var(--dimension-1200); /* 3rem */
-    --space-spacer-400: var(--dimension-1400); /* 4rem */
-    --space-spacer-500: var(--dimension-1700); /* 6rem */
-    --space-spacer-600: var(--dimension-1900); /* 10rem */
-    --text-body-font-size-100: var(--size-200); /* 0.875rem */
-    --text-body-font-size-200: var(--size-300); /* 1rem */
-    --text-body-font-size-300: var(--size-400); /* 1.25rem */
-    --text-body-font-size-400: var(--size-600); /* 1.75rem */
     --text-body-letter-spacing-100: var(--letter-spacing-200); /* 0 */
-    --text-body-letter-spacing-200: var(--letter-spacing-300); /* -0.25 */
     --text-body-letter-spacing-300: var(--letter-spacing-400); /* -0.25 */
-    --text-body-letter-spacing-400: var(--letter-spacing-600); /* -0.5 */
-    --text-body-paragraph-spacing-100: 0.8125rem; /* 13px */
-    --text-body-paragraph-spacing-200: 0.9375rem; /* 15px */
-    --text-body-paragraph-spacing-300: 1.1875rem; /* 19px */
-    --text-body-paragraph-spacing-400: 1.6875rem; /* 27px */
-    --text-title-font-size-100: var(--size-300); /* 1rem */
-    --text-title-font-size-200: var(--size-400); /* 1.25rem */
-    --text-title-font-size-300: var(--size-800); /* 2.5rem */
-    --text-title-font-size-400: var(--size-1200); /* 5rem */
-    --text-title-letter-spacing-100: var(--letter-spacing-300); /* -0.25 */
     --text-title-letter-spacing-200: var(--letter-spacing-400); /* -0.25 */
-    --text-title-letter-spacing-300: var(--letter-spacing-800); /* -1 */
-    --text-title-letter-spacing-400: var(--letter-spacing-1200); /* -2.75 */
   }
 }
 @media (min-width: 1280px) {
   [data-jhd-layout-variant="sidebar-main-flush"] {
-    --grid-col-span-1: 4.5625rem; /* 73px */
-    --grid-col-span-10: 45.625rem; /* 730px */
-    --grid-col-span-11: 50.1875rem; /* 803px */
-    --grid-col-span-12: 54.75rem; /* 876px */
-    --grid-col-span-2: 9.125rem; /* 146px */
-    --grid-col-span-3: 13.6875rem; /* 219px */
-    --grid-col-span-4: 18.25rem; /* 292px */
-    --grid-col-span-5: 22.8125rem; /* 365px */
-    --grid-col-span-6: 27.375rem; /* 438px */
-    --grid-col-span-7: 31.9375rem; /* 511px */
-    --grid-col-span-8: 36.5rem; /* 584px */
-    --grid-col-span-9: 41.0625rem; /* 657px */
     --grid-col-start-1: 0rem; /* 0px */
-    --grid-col-start-10: 41.0625rem; /* 657px */
-    --grid-col-start-11: 45.625rem; /* 730px */
-    --grid-col-start-12: 50.1875rem; /* 803px */
-    --grid-col-start-2: 4.5625rem; /* 73px */
-    --grid-col-start-3: 9.125rem; /* 146px */
-    --grid-col-start-4: 13.6875rem; /* 219px */
-    --grid-col-start-5: 18.25rem; /* 292px */
-    --grid-col-start-6: 22.8125rem; /* 365px */
-    --grid-col-start-7: 27.375rem; /* 438px */
-    --grid-col-start-8: 31.9375rem; /* 511px */
-    --grid-col-start-9: 36.5rem; /* 584px */
     --grid-columns: 12;
-    --grid-gap-md: var(--dimension-1300); /* 3.5rem */
-    --grid-gap-sm: var(--dimension-800); /* 1.5rem */
-    --grid-margin-default: var(--dimension-0); /* 0rem */
-    --grid-margin-offset: var(--dimension-0); /* 0rem */
-    --grid-margin-sm: var(--dimension-0); /* 0rem */
-    --grid-padding-default: var(--dimension-1200); /* 3rem */
-    --grid-padding-offset: var(--dimension-1050); /* 2.25rem */
-    --grid-padding-sm: var(--dimension-1000); /* 2rem */
     --space-spacer-0: var(--dimension-0); /* 0rem */
-    --space-spacer-100: var(--dimension-800); /* 1.5rem */
-    --space-spacer-200: var(--dimension-1000); /* 2rem */
-    --space-spacer-300: var(--dimension-1200); /* 3rem */
-    --space-spacer-400: var(--dimension-1400); /* 4rem */
-    --space-spacer-500: var(--dimension-1700); /* 6rem */
-    --space-spacer-600: var(--dimension-1900); /* 10rem */
-    --text-body-font-size-100: var(--size-200); /* 0.875rem */
-    --text-body-font-size-200: var(--size-300); /* 1rem */
-    --text-body-font-size-300: var(--size-400); /* 1.25rem */
-    --text-body-font-size-400: var(--size-600); /* 1.75rem */
     --text-body-letter-spacing-100: var(--letter-spacing-200); /* 0 */
-    --text-body-letter-spacing-200: var(--letter-spacing-300); /* -0.25 */
     --text-body-letter-spacing-300: var(--letter-spacing-400); /* -0.25 */
-    --text-body-letter-spacing-400: var(--letter-spacing-600); /* -0.5 */
-    --text-body-paragraph-spacing-100: 0.8125rem; /* 13px */
-    --text-body-paragraph-spacing-200: 0.9375rem; /* 15px */
-    --text-body-paragraph-spacing-300: 1.1875rem; /* 19px */
-    --text-body-paragraph-spacing-400: 1.6875rem; /* 27px */
-    --text-title-font-size-100: var(--size-300); /* 1rem */
-    --text-title-font-size-200: var(--size-400); /* 1.25rem */
-    --text-title-font-size-300: var(--size-800); /* 2.5rem */
-    --text-title-font-size-400: var(--size-1200); /* 5rem */
-    --text-title-letter-spacing-100: var(--letter-spacing-300); /* -0.25 */
     --text-title-letter-spacing-200: var(--letter-spacing-400); /* -0.25 */
-    --text-title-letter-spacing-300: var(--letter-spacing-800); /* -1 */
-    --text-title-letter-spacing-400: var(--letter-spacing-1200); /* -2.75 */
   }
 }
 @media (min-width: 1920px) {
@@ -1298,11 +1208,9 @@
     --grid-col-span-7: 65.25rem; /* 1044px */
     --grid-col-span-8: 75rem; /* 1200px */
     --grid-col-span-9: 84.75rem; /* 1356px */
-    --grid-col-start-1: 0rem; /* 0px */
     --grid-col-start-10: 87.75rem; /* 1404px */
     --grid-col-start-11: 97.5rem; /* 1560px */
     --grid-col-start-12: 107.25rem; /* 1716px */
-    --grid-col-start-2: 9.75rem; /* 156px */
     --grid-col-start-3: 19.5rem; /* 312px */
     --grid-col-start-4: 29.25rem; /* 468px */
     --grid-col-start-5: 39rem; /* 624px */
@@ -1310,7 +1218,6 @@
     --grid-col-start-7: 58.5rem; /* 936px */
     --grid-col-start-8: 68.25rem; /* 1092px */
     --grid-col-start-9: 78rem; /* 1248px */
-    --grid-columns: 12;
     --grid-gap-md: var(--dimension-1300); /* 3.5rem */
     --grid-gap-sm: var(--dimension-800); /* 1.5rem */
     --grid-margin-default: var(--dimension-1200); /* 3rem */
@@ -1319,27 +1226,18 @@
     --grid-padding-default: var(--dimension-1200); /* 3rem */
     --grid-padding-offset: var(--dimension-1050); /* 2.25rem */
     --grid-padding-sm: var(--dimension-1000); /* 2rem */
-    --space-spacer-0: var(--dimension-0); /* 0rem */
     --space-spacer-100: var(--dimension-800); /* 1.5rem */
     --space-spacer-200: var(--dimension-1000); /* 2rem */
     --space-spacer-300: var(--dimension-1200); /* 3rem */
     --space-spacer-400: var(--dimension-1400); /* 4rem */
     --space-spacer-500: var(--dimension-1700); /* 6rem */
     --space-spacer-600: var(--dimension-1900); /* 10rem */
-    --text-body-font-size-100: var(--size-200); /* 0.875rem */
-    --text-body-font-size-200: var(--size-300); /* 1rem */
-    --text-body-font-size-300: var(--size-400); /* 1.25rem */
     --text-body-font-size-400: var(--size-600); /* 1.75rem */
     --text-body-letter-spacing-100: var(--letter-spacing-200); /* 0 */
     --text-body-letter-spacing-200: var(--letter-spacing-300); /* -0.25 */
     --text-body-letter-spacing-300: var(--letter-spacing-400); /* -0.25 */
     --text-body-letter-spacing-400: var(--letter-spacing-600); /* -0.5 */
-    --text-body-paragraph-spacing-100: 0.8125rem; /* 13px */
-    --text-body-paragraph-spacing-200: 0.9375rem; /* 15px */
-    --text-body-paragraph-spacing-300: 1.1875rem; /* 19px */
     --text-body-paragraph-spacing-400: 1.6875rem; /* 27px */
-    --text-title-font-size-100: var(--size-300); /* 1rem */
-    --text-title-font-size-200: var(--size-400); /* 1.25rem */
     --text-title-font-size-300: var(--size-800); /* 2.5rem */
     --text-title-font-size-400: var(--size-1200); /* 5rem */
     --text-title-letter-spacing-100: var(--letter-spacing-300); /* -0.25 */
@@ -1350,36 +1248,14 @@
 }
 @media (min-width: 1920px) {
   [data-jhd-layout-variant="flush"] {
-    --grid-col-span-1: 10rem; /* 160px */
-    --grid-col-span-10: 100rem; /* 1600px */
-    --grid-col-span-11: 110rem; /* 1760px */
-    --grid-col-span-12: 120rem; /* 1920px */
-    --grid-col-span-2: 20rem; /* 320px */
-    --grid-col-span-3: 30rem; /* 480px */
-    --grid-col-span-4: 40rem; /* 640px */
-    --grid-col-span-5: 50rem; /* 800px */
-    --grid-col-span-6: 60rem; /* 960px */
-    --grid-col-span-7: 70rem; /* 1120px */
-    --grid-col-span-8: 80rem; /* 1280px */
-    --grid-col-span-9: 90rem; /* 1440px */
     --grid-col-start-1: 0rem; /* 0px */
     --grid-col-start-10: 90rem; /* 1440px */
     --grid-col-start-11: 100rem; /* 1600px */
-    --grid-col-start-12: 110rem; /* 1760px */
-    --grid-col-start-2: 10rem; /* 160px */
-    --grid-col-start-3: 20rem; /* 320px */
-    --grid-col-start-4: 30rem; /* 480px */
-    --grid-col-start-5: 40rem; /* 640px */
-    --grid-col-start-6: 50rem; /* 800px */
-    --grid-col-start-7: 60rem; /* 960px */
     --grid-col-start-8: 70rem; /* 1120px */
     --grid-col-start-9: 80rem; /* 1280px */
     --grid-columns: 12;
     --grid-gap-md: var(--dimension-1300); /* 3.5rem */
     --grid-gap-sm: var(--dimension-800); /* 1.5rem */
-    --grid-margin-default: var(--dimension-0); /* 0rem */
-    --grid-margin-offset: var(--dimension-0); /* 0rem */
-    --grid-margin-sm: var(--dimension-0); /* 0rem */
     --grid-padding-default: var(--dimension-1200); /* 3rem */
     --grid-padding-offset: var(--dimension-1050); /* 2.25rem */
     --grid-padding-sm: var(--dimension-1000); /* 2rem */
@@ -1390,20 +1266,12 @@
     --space-spacer-400: var(--dimension-1400); /* 4rem */
     --space-spacer-500: var(--dimension-1700); /* 6rem */
     --space-spacer-600: var(--dimension-1900); /* 10rem */
-    --text-body-font-size-100: var(--size-200); /* 0.875rem */
-    --text-body-font-size-200: var(--size-300); /* 1rem */
-    --text-body-font-size-300: var(--size-400); /* 1.25rem */
     --text-body-font-size-400: var(--size-600); /* 1.75rem */
     --text-body-letter-spacing-100: var(--letter-spacing-200); /* 0 */
     --text-body-letter-spacing-200: var(--letter-spacing-300); /* -0.25 */
     --text-body-letter-spacing-300: var(--letter-spacing-400); /* -0.25 */
     --text-body-letter-spacing-400: var(--letter-spacing-600); /* -0.5 */
-    --text-body-paragraph-spacing-100: 0.8125rem; /* 13px */
-    --text-body-paragraph-spacing-200: 0.9375rem; /* 15px */
-    --text-body-paragraph-spacing-300: 1.1875rem; /* 19px */
     --text-body-paragraph-spacing-400: 1.6875rem; /* 27px */
-    --text-title-font-size-100: var(--size-300); /* 1rem */
-    --text-title-font-size-200: var(--size-400); /* 1.25rem */
     --text-title-font-size-300: var(--size-600); /* 1.75rem */
     --text-title-font-size-400: var(--size-1200); /* 5rem */
     --text-title-letter-spacing-100: var(--letter-spacing-300); /* -0.25 */

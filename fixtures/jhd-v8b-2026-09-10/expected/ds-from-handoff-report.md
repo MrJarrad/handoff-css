@@ -516,6 +516,7 @@ path, so parity can be pinned.
 Honoured this run: `viewport-height`, `viewport-width`.
 
 82 of 486 emitted variables carry a class — fixed (export): 6 · fixed (rule): 1 · fluid-clamp (export): 7 · mode-stepped (export): 47 · viewport-height (description): 8 · viewport-height (export): 5 · viewport-width (description): 1 · viewport-width (export): 7.
+Strategy counts: fixed: 7 · fluid-clamp: 7 · mode-stepped: 47 · viewport-height: 13 · viewport-width: 8.
 The other 47 are `mode-stepped` or `sample-only`, which IS the
 per-mode path, so they are not listed individually: their output is unchanged.
 

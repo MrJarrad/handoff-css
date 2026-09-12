@@ -59,11 +59,17 @@ test("a viewport class with no stated fraction is a hint, and changes nothing", 
   // `flush` variant with no description and no `responsive` field.
   assert.ok(w.some((x) => x.name === "--grid-col-span-1"));
 
-  // Held to the same output as a run with no class honoured at all.
+  // Held to the same output as a run with no class honoured at all. Isolated
+  // to the viewport classes: 0.4.2 honours `fluid-clamp`/`fixed` too, and
+  // `--text-title-letter-spacing-100` is a genuinely honoured `fixed` rule
+  // there — a real behavioural difference, not the hint this test is about.
+  const viewportOnly = generate(docV8(),
+    { ...preset, responsive: { honourClasses: ["viewport-height", "viewport-width"] } },
+    { handAuthoredCss: consumerCss() });
   const pinned = generate(docV8(), { ...preset, responsive: { honourClasses: [] } },
                           { handAuthoredCss: consumerCss() });
   for (const name of ["--grid-col-span-1", "--text-title-letter-spacing-100"]) {
-    assert.deepEqual(values(out.tokensCss, name), values(pinned.tokensCss, name));
+    assert.deepEqual(values(viewportOnly.tokensCss, name), values(pinned.tokensCss, name));
   }
 });
 
