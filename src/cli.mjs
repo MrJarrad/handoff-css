@@ -10,6 +10,7 @@ import { pathToFileURL } from "node:url";
 import { run } from "./index.mjs";
 import { validateExport } from "./validate-export.mjs";
 import { validateHandoffMarkdown } from "./validate-handoff-md.mjs";
+import { validateBriefJson, validateBriefPair } from "./brief.mjs";
 
 export const SUBCOMMANDS = ["validate", "conform"];
 
@@ -49,17 +50,40 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
     return 1;
   }
 
-  const results = [];
+  const read = [];
   for (const file of files) {
     const abs = path.isAbsolute(file) ? file : path.join(cwd, file);
-    let text;
     try {
-      text = readFileSync(abs, "utf8");
+      read.push({ file, abs, text: readFileSync(abs, "utf8") });
     } catch (err) {
-      results.push({ file, kind: "unreadable", ok: false, findings: [{ code: "UNREADABLE", severity: "error", line: 0, message: err.message }] });
-      continue;
+      read.push({ file, abs, text: null, error: err });
     }
-    results.push(abs.endsWith(".md") ? validateMd(file, text) : validateJson(file, text));
+  }
+
+  // P17/0.4.1 — a `.json` naming schema `design-handoff` (not
+  // `design-system-handoff`) is the brief's OWN JSON companion, not a tokens
+  // export. Given alongside its `.md`, the pair is the machine contract and
+  // validates together (schema + identity reconciliation); the markdown's
+  // full line grammar is not re-run for a paired brief.
+  const briefJson = read.find((r) => r.abs.endsWith(".json") && r.text != null && safeParse(r.text)?.schema === "design-handoff");
+  const briefMd = read.find((r) => r.abs.endsWith(".md"));
+
+  const results = [];
+  if (briefJson && briefMd && briefMd.text != null) {
+    results.push(validateJson(briefJson.file, briefJson.text, { brief: true }));
+    results.push(validateBriefMd(briefMd.file, briefMd.text, safeParse(briefJson.text)));
+    for (const r of read) {
+      if (r === briefJson || r === briefMd) continue;
+      results.push(r.text == null
+        ? { file: r.file, kind: "unreadable", ok: false, findings: [{ code: "UNREADABLE", severity: "error", line: 0, message: r.error.message }] }
+        : r.abs.endsWith(".md") ? validateMd(r.file, r.text) : validateJson(r.file, r.text));
+    }
+  } else {
+    for (const r of read) {
+      results.push(r.text == null
+        ? { file: r.file, kind: "unreadable", ok: false, findings: [{ code: "UNREADABLE", severity: "error", line: 0, message: r.error.message }] }
+        : r.abs.endsWith(".md") ? validateMd(r.file, r.text) : validateJson(r.file, r.text));
+    }
   }
 
   if (asJson) {
@@ -82,12 +106,30 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
   return results.every((r) => r.ok) ? 0 : 1;
 }
 
-function validateJson(file, text) {
+function safeParse(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+function validateJson(file, text, { brief = false } = {}) {
   let doc;
   try {
     doc = JSON.parse(text);
   } catch (err) {
-    return { file, kind: "export", ok: false, findings: [{ code: "UNPARSEABLE", severity: "error", line: 0, path: "/", message: err.message }] };
+    return { file, kind: brief ? "brief" : "export", ok: false, findings: [{ code: "UNPARSEABLE", severity: "error", line: 0, path: "/", message: err.message }] };
+  }
+  if (brief || doc?.schema === "design-handoff") {
+    const { ok, errors } = validateBriefJson(doc);
+    return {
+      file,
+      kind: "brief",
+      ok,
+      schemaVersion: doc.schemaVersion ?? null,
+      findings: errors.map((e) => ({ code: "SCHEMA", severity: "error", line: 0, path: e.path, message: `${e.message} (${e.keyword})` })),
+    };
   }
   const { ok, skipped, errors, warnings } = validateExport(doc);
   return {
@@ -106,6 +148,23 @@ function validateJson(file, text) {
 function validateMd(file, text) {
   const { ok, findings, parsed } = validateHandoffMarkdown(text);
   return { file, kind: "handoff", ok, schemaVersion: parsed.schemaVersion, findings };
+}
+
+/**
+ * P17/0.4.1 — the light structural pass a markdown brief gets once its JSON
+ * companion is given alongside it: front matter, legend, and identity
+ * reconciled against the JSON. Not the full v6/v9 line grammar — that stays
+ * with `validateMd` for a lone `.md`.
+ */
+function validateBriefMd(file, text, briefDoc) {
+  const { ok, findings } = validateBriefPair(briefDoc, text);
+  return {
+    file,
+    kind: "handoff (paired, light)",
+    ok,
+    schemaVersion: briefDoc?.schemaVersion ?? null,
+    findings: findings.map((f) => ({ ...f, line: 0 })),
+  };
 }
 
 /** The pre-0.3.0 path, unchanged: load the config, run, print the summary. */
