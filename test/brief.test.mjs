@@ -39,3 +39,26 @@ test("a markdown with no front matter is MD_FRONT_MATTER_MISSING", () => {
   assert.equal(ok, false);
   assert.ok(findings.some((f) => f.code === "MD_FRONT_MATTER_MISSING"));
 });
+
+// Reviewer round 2: the schema must constrain the shape, not just its presence.
+test("a `selectedNodes` that is a string, not an array, fails schema validation", () => {
+  const { ok } = validateBriefJson({ ...doc(), selectedNodes: "not-an-array" });
+  assert.equal(ok, false);
+});
+
+test("a `selectedNodes` item that is a number, not {id, name}, fails schema validation", () => {
+  const { ok } = validateBriefJson({ ...doc(), selectedNodes: [42] });
+  assert.equal(ok, false);
+});
+
+test("a `selectedNodes` item with an unknown key fails schema validation", () => {
+  const { ok } = validateBriefJson({ ...doc(), selectedNodes: [{ id: "x", name: "y", bogus: true }] });
+  assert.equal(ok, false);
+});
+
+test("a `layerTree` node with an unknown key fails schema validation", () => {
+  const mutated = doc();
+  mutated.layerTree = [{ ...mutated.layerTree[0], bogus: true }];
+  const { ok } = validateBriefJson(mutated);
+  assert.equal(ok, false);
+});
