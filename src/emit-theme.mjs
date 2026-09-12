@@ -77,7 +77,7 @@ export function themeEntries(doc, byId, cfg) {
       let note = null;
       if (key === name) {
         const dm = v.modes.find((m) => m.modeId === c.defaultModeId) ?? v.modes[0];
-        value = resolveValue(v, dm, byId, cfg).value;
+        value = resolveValue(v, dm, byId, cfg, c).value;
         note = `literal, not var(${name}): same-name cycle (P8.2)`;
       }
       rows.push({ ns: spec.ns, key, value, note, source: `${c.name}/${name}` });

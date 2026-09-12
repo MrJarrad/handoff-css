@@ -96,7 +96,7 @@ import config from "./handoff.config.mjs";
 const out = generate(JSON.parse(exportJson), config, { handAuthoredCss });
 // out.tokensCss, out.themeCss, out.report, out.exclusionsJson
 // out.rows, out.themeRows, out.privateRows, out.hiddenRows, out.excludedRows
-// out.aliasRows, out.aspectRows, out.warnings
+// out.aliasRows, out.warnings
 ```
 
 `generate` is pure — no filesystem, no `process`. The rows are the report's data
@@ -115,7 +115,9 @@ before it is rendered, so you can build your own checks on them.
 | `exclude.paths` | `"<collection>/<variable>"` prefixes that are never emitted — authoring scratch, Figma-only hacks. Applied on path identity, never revived by an alias. |
 | `color.format` | `rgb-slash-percent` (`#rrggbb` at full alpha, else `rgb(r g b / pct)`) or `hex8`. |
 | `motion.timingUnit` | `ms` or `s`. Figma stores a TIMING variable in seconds; `ms` republishes it in milliseconds, so a step named for its milliseconds reads in the unit its name states (P19). |
-| `aspect.group` / `.prefix` / `.descriptionPattern` | Figma has no aspect-ratio primitive, so a ratio is encoded as a group of per-column-span heights that all carry it in their descriptions. The heights stay excluded; the ratio is published once per leaf group as `--aspect-<group>`. A group whose members disagree publishes nothing and raises `ASPECT_RATIO_MIXED` (P20). |
+| `motion.delayAliasOf` | The delay and duration group prefixes. A delay step holding a duration step's value as its own literal instead of aliasing it raises `DELAY_NOT_ALIASED`. Reported, never rewritten (P19). |
+| `aspect.ratioPaths` | `"<collection>/<variable>"` prefixes whose STRING variables hold a ratio (`core/aspect/`). `"3:2"` renders as the CSS value `3 / 2`; every STRING outside them stays quoted (P20). |
+| `aspect.descriptionGroup` / `.descriptionPattern` | Optional cross-check: the excluded per-column-span height groups that describe the same ratios. A description contradicting the authored variable raises `ASPECT_DESCRIPTION_DISAGREES` and changes no value (P20). |
 | `layout.collection` | The collection whose modes are responsive breakpoints rather than themes. |
 | `layout.variantAttribute` | The attribute that selects a non-default layout variant. |
 | `layout.baseMode` | `smallest-default-variant` (mobile-first) or `collection-default`. |

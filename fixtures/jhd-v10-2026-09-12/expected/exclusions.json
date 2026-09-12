@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-11T18:08:21.155Z",
-  "designSystemStateHash": "9cc28d2d9faa349e5984e0430ef0e311ad32ff25bbc68f6a84b04dccc6fd96eb",
+  "generatedAt": "2026-09-12T07:11:41.254Z",
+  "designSystemStateHash": "26351f7a09758f626996439752be73090a54f3ec5e5fa371edd44b716e07defc",
   "policy": "P7 — see docs/handoff-css.md. `names` = EXCLUDED (never emitted); `private` = hidden but alias-reachable (emitted, not public).",
   "excludePaths": [
     "layout/grid/aspect/",
@@ -36,6 +36,7 @@
     "--grid-aspect-tall-col-span-1",
     "--grid-aspect-tall-col-span-10",
     "--grid-aspect-tall-col-span-11",
+    "--grid-aspect-tall-col-span-12",
     "--grid-aspect-tall-col-span-2",
     "--grid-aspect-tall-col-span-3",
     "--grid-aspect-tall-col-span-4",
@@ -44,7 +45,6 @@
     "--grid-aspect-tall-col-span-7",
     "--grid-aspect-tall-col-span-8",
     "--grid-aspect-tall-col-span-9",
-    "--grid-aspect-tall-cols-span-12",
     "--grid-aspect-tall-full-width",
     "--utility-space-lg",
     "--utility-space-md",

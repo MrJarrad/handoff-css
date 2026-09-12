@@ -60,32 +60,43 @@
     "motion": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["timingUnit"],
-      "description": "P19 — MOTION. An EASING variable renders from the export's own curve (`cubic-bezier(…)`, `linear` for a LINEAR curve) and needs no house policy; the timing unit is the one decision.",
+      "required": ["timingUnit", "delayAliasOf"],
+      "description": "P19 — MOTION. An EASING variable renders from the export's own curve (`cubic-bezier(…)`, `linear` for a LINEAR curve) and needs no house policy.",
       "properties": {
         "timingUnit": {
           "enum": ["ms", "s"],
           "description": "The unit a TIMING variable (`motion/duration/*`, `motion/delay/*`) publishes. Figma stores seconds. `ms` republishes them as milliseconds, so a step the operator named for its milliseconds reads in the unit its name states (ruling 2026-09-12 row 2); `s` is the pre-0.4.0 form."
+        },
+        "delayAliasOf": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["delay", "duration"],
+          "description": "Ruling 2026-09-12 row 4 makes every delay step an ALIAS of the duration step of the same value, so the two can never drift. Naming the two groups lets the generator REPORT a delay Figma authored as its own literal copy (`DELAY_NOT_ALIASED`). It never rewrites one: pairing them here would look identical today and silently overwrite the first delay that legitimately differs. `null` switches the check off.",
+          "properties": {
+            "delay": { "type": "string", "description": "`\"<collection>/<variable>\"` prefix of the delay ramp." },
+            "duration": { "type": "string", "description": "`\"<collection>/<variable>\"` prefix of the duration ramp it aliases." }
+          }
         }
       }
     },
     "aspect": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["group", "prefix", "descriptionPattern"],
-      "description": "P20 — ASPECT RATIOS. Figma has no aspect-ratio primitive, so the design system encodes each ratio as a column-span height group whose variables all carry the ratio in their description. The ratio is the design decision; the heights are the workaround.",
+      "required": ["ratioPaths", "descriptionGroup", "descriptionPattern"],
+      "description": "P20 — ASPECT RATIOS. Figma has no aspect-ratio TYPE, so a design system authors each ratio as a STRING variable holding `a:b`. This states which variables those are, so they render as the CSS ratio `a / b` instead of a quoted string.",
       "properties": {
-        "group": {
-          "type": ["string", "null"],
-          "description": "The `\"<collection>/<variable>\"` prefix whose LEAF GROUPS each state one ratio in their members' descriptions (`layout/grid/aspect/`). `null` derives nothing. This prefix is normally also in `exclude.paths`: the per-col-span heights under it are the Figma hack and stay out of the CSS, while the ratio they encode is published once per leaf group."
+        "ratioPaths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "`\"<collection>/<variable>\"` prefixes whose STRING variables hold a ratio (`core/aspect/`). Their values render as `a / b`; a value that is neither `a:b` nor `a/b` is a hard failure, never emitted as a quoted string. Empty derives nothing and leaves every STRING quoted."
         },
-        "prefix": {
+        "descriptionGroup": {
           "type": ["string", "null"],
-          "description": "The custom-property prefix the derived token takes, joined to the leaf group's own name (`--aspect-` + `landscape`). A derived token has no variable of its own, so P1's `codeSyntax.WEB` cannot name it and the prefix is stated here."
+          "description": "OPTIONAL cross-check only, never a source of values. The `\"<collection>/<variable>\"` prefix of the per-column-span HEIGHT groups that encode the same ratios in their descriptions (`layout/grid/aspect/`) — normally also in `exclude.paths`. A leaf group whose descriptions contradict the authored `ratioPaths` variable of the same name raises `ASPECT_DESCRIPTION_DISAGREES`. `null` skips the check."
         },
         "descriptionPattern": {
           "type": ["string", "null"],
-          "description": "A JavaScript regular-expression source matched against each member's `description`, whose first two capture groups are the ratio's antecedent and consequent. A leaf group whose members do not all state the SAME ratio raises `ASPECT_RATIO_MIXED` and publishes nothing — never a silent pick."
+          "description": "A JavaScript regular-expression source matched against those descriptions, whose first two capture groups are the ratio's antecedent and consequent."
         }
       }
     },

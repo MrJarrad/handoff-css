@@ -64,12 +64,13 @@ export { preset };
  * export that carries it — exactly as the 0.2.0 deltas are asserted against
  * the preset rather than folded into these files.
  *
- * P19 `timingUnit: "s"` — Figma's own unit, which is what 0.3.4 emitted.
- * P20 `group: null`     — derive no aspect ratios.
+ * P19 `timingUnit: "s"`  — Figma's own unit, which is what 0.3.4 emitted.
+ *     `delayAliasOf: null` — no delay/duration cross-check.
+ * P20 `ratioPaths: []`     — no STRING variable is treated as a ratio.
  */
 export const PRE_0_4_0 = {
-  motion: { timingUnit: "s" },
-  aspect: { group: null, prefix: null, descriptionPattern: null },
+  motion: { timingUnit: "s", delayAliasOf: null },
+  aspect: { ratioPaths: [], descriptionGroup: null, descriptionPattern: null },
 };
 
 export const config = {
@@ -228,34 +229,72 @@ export const docV9c = () =>
 export const V9C = path.join(path.dirname(FIXTURE), "jhd-v9c-2026-09-11");
 
 /**
- * An EIGHTH real export, `fixtures/jhd-v9d-2026-09-11/export.json` — schema 9,
- * generated 2026-09-11T18:08:21.155Z, the plugin's export v10, design-system
- * state `9cc28d2d…96eb`. This is the 0.4.0 fixture: `motion` is typed
- * (`EASING` / `TIMING`) and every `grid/aspect/*` leaf variable carries a
- * "Ratio – a/b, a:b" description.
+ * The consumer's stylesheet as it ships AFTER adopting 0.4.0 — every
+ * hand-authored declaration the new policies supersede, deleted.
  *
- * It is an INTERIM capture and carries two known defects the operator is
- * fixing in Figma, both kept here deliberately because the generator's
- * behaviour on them is what P19 and P20 are for:
+ * A global hand-authored declaration suppresses the generated token (P2), so
+ * adoption is a deletion on the consumer's side, exactly as adopting P12 meant
+ * deleting the eighteen `--screen-height-*` lines (see `consumerCss` above).
+ * Six lines go:
  *
- *   `grid/aspect/tall/full-width` says "Ratio – 3/4, 3:4" while the other 12
- *   members of its group say 2/3 — the MIXED case, which publishes nothing and
- *   raises `ASPECT_RATIO_MIXED` rather than picking a side (P20).
+ *   `--aspect-{landscape,square,portrait,tall}` — ruling row 5, *"no
+ *   hand-authored copies"*. `core/aspect/*` now authors all four, and the
+ *   generated values are byte-equal (report §3 MATCH), so nothing computes
+ *   differently.
  *
- *   `motion/duration/*` and `motion/delay/*` are still named by INDEX
- *   (`duration/300` = 375ms) rather than by their milliseconds, and the delay
- *   steps are not yet Figma aliases of the duration steps. P1 reads the name
- *   verbatim either way, so the rename lands with the next export and changes
- *   no code.
+ *   `--duration-1600: 1.6s` — styles.css ~928 calls it *"not yet a Figma
+ *   step"*. It is one now, and P19 publishes it as `1600ms`, so the stale copy
+ *   is the only thing keeping the file on seconds. `--duration-250` STAYS:
+ *   there is still no `duration/250` in Figma, and the generator can only emit
+ *   what the export publishes.
+ *
+ *   `--easing-linear: cubic-bezier(0, 0, 1, 1)` — styles.css ~960 kept it by
+ *   hand because the export published the keyword `linear`, *"equivalent but
+ *   not byte-equal"*, and would not settle that VALUE-DRIFT row. Export v11
+ *   authors the explicit 0,0,1,1 bezier, so the row is a MATCH now — P2's own
+ *   definition of a duplicate that can simply be deleted.
+ *
+ * Filtered rather than vendored as a second styles.css, because
+ * `jhd-design-system` has not landed the deletion yet, and a fixture
+ * stylesheet no repo ships would prove nothing. `jhd-v8b/styles.css` stays the
+ * pinned, shipped one.
  */
-export const docV9d = () =>
+export const consumerCss040 = () =>
+  consumerCss().split("\n")
+    .filter((l) => !/^\s*--(?:aspect-[a-z]+|duration-1600|easing-linear):/.test(l))
+    .join("\n");
+
+/**
+ * An EIGHTH real export, `fixtures/jhd-v10-2026-09-12/export.json` — schema 9,
+ * generated 2026-09-12T07:11:41.254Z, the plugin's export v11, design-system
+ * state `26351f7a…defc`. This is THE 0.4.0 fixture: the design system as the
+ * operator's 2026-09-12 rulings authored it.
+ *
+ *   motion — easings renamed to their curve families (`quad-out`, `cubic-out`,
+ *   `quart-out`, `expo-out`, `ease-out`, `circ-in-out`, `linear`); durations a
+ *   0–2000 ms ramp in 100 ms steps plus 375 and 750; delays 0–1000 in 100 ms
+ *   steps plus 50, 375 and 750. Every step is NAMED for its milliseconds.
+ *
+ *   aspect — `core/aspect/{landscape, portrait, square, tall}` are STRING
+ *   variables holding "3:2" / "4:5" / "1:1" / "2:3", with their own
+ *   `--aspect-<name>` WEB names. The `layout/grid/aspect/*` heights stay
+ *   excluded and their descriptions now agree with them.
+ *
+ * One contract statement is NOT met by this export and is left visible rather
+ * than papered over: ruling row 4 makes every delay step a Figma ALIAS of the
+ * matching duration step, and not one of the fourteen is (664 aliases exist
+ * elsewhere in the export, so the shape is available). Eleven of them hold a
+ * duration step's value as their own literal, which is what `DELAY_NOT_ALIASED`
+ * reports — see `test/motion-v10.test.mjs`.
+ */
+export const docV10 = () =>
   JSON.parse(
-    readFileSync(path.join(path.dirname(FIXTURE), "jhd-v9d-2026-09-11", "export.json"), "utf8"),
+    readFileSync(path.join(path.dirname(FIXTURE), "jhd-v10-2026-09-12", "export.json"), "utf8"),
   );
 
-export const V9D = path.join(path.dirname(FIXTURE), "jhd-v9d-2026-09-11");
+export const V10 = path.join(path.dirname(FIXTURE), "jhd-v10-2026-09-12");
 
-/** `expected/*` for the v9d fixture — generated by this package's own CLI
- * against `docV9d()` + `consumerConfig040` + v8b's `consumerCss()`. */
-export const expectedV9d = (file) =>
-  readFileSync(path.join(V9D, "expected", file), "utf8");
+/** `expected/*` for the v10 fixture — generated by this package's own CLI
+ * against `docV10()` + `consumerConfig040` + v8b's `consumerCss()`. */
+export const expectedV10 = (file) =>
+  readFileSync(path.join(V10, "expected", file), "utf8");

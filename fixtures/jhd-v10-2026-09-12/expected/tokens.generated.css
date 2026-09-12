@@ -2,8 +2,8 @@
 
    Source:   JHD-Spec-DesignSystem
    Schema:   design-system-handoff v9
-   Exported: 2026-09-11T18:08:21.155Z
-   State:    9cc28d2d9faa349e5984e0430ef0e311ad32ff25bbc68f6a84b04dccc6fd96eb
+   Exported: 2026-09-12T07:11:41.254Z
+   State:    26351f7a09758f626996439752be73090a54f3ec5e5fa371edd44b716e07defc
 
    Regenerate with:  pnpm run tokens
    Policies (names, cascade, modes, units, aliases) are documented at the
@@ -572,7 +572,7 @@
 }
 
 /* --- core -------------------------------------------------------- */
-/* 12 tokens in this collection are declared by hand in styles.css and
+/* 16 tokens in this collection are declared by hand in styles.css and
    are therefore not emitted here (see policy P2 in docs/handoff-css.md).
    Full name-by-name status is in design/generated/ds-from-handoff-report.md. */
 :root {
@@ -1410,30 +1410,52 @@
 }
 
 /* --- motion ------------------------------------------------------ */
-/* 1 token in this collection are declared by hand in styles.css and
+/* 2 tokens in this collection are declared by hand in styles.css and
    are therefore not emitted here (see policy P2 in docs/handoff-css.md).
    Full name-by-name status is in design/generated/ds-from-handoff-report.md. */
 :root {
   --delay-0: 0ms;
   --delay-100: 100ms;
-  --delay-200: 375ms;
-  --delay-300: 500ms;
-  --delay-400: 750ms;
+  --delay-1000: 1000ms;
+  --delay-200: 200ms;
+  --delay-300: 300ms;
+  --delay-375: 375ms;
+  --delay-400: 400ms;
+  --delay-50: 50ms;
+  --delay-500: 500ms;
+  --delay-600: 600ms;
+  --delay-700: 700ms;
+  --delay-750: 750ms;
+  --delay-800: 800ms;
+  --delay-900: 900ms;
   --duration-0: 0ms;
   --duration-100: 100ms;
-  --duration-1000: 1200ms;
+  --duration-1000: 1000ms;
+  --duration-1100: 1100ms;
+  --duration-1200: 1200ms;
+  --duration-1300: 1300ms;
+  --duration-1400: 1400ms;
+  --duration-1500: 1500ms;
+  --duration-1700: 1700ms;
+  --duration-1800: 1800ms;
+  --duration-1900: 1900ms;
   --duration-200: 200ms;
-  --duration-300: 375ms;
+  --duration-2000: 2000ms;
+  --duration-300: 300ms;
+  --duration-375: 375ms;
   --duration-400: 400ms;
   --duration-500: 500ms;
   --duration-600: 600ms;
-  --duration-700: 750ms;
-  --duration-800: 900ms;
-  --duration-900: 1000ms;
+  --duration-700: 700ms;
+  --duration-750: 750ms;
+  --duration-800: 800ms;
+  --duration-900: 900ms;
   --easing-circ-in-out: cubic-bezier(0.85, 0, 0.15, 1);
-  --easing-ease-expo-out: cubic-bezier(0, 0, 0.2, 1);
-  --easing-expo-out: cubic-bezier(0.2, 1, 0.22, 1);
-  --easing-power2-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --easing-cubic-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --easing-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --easing-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-quad-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --easing-quart-out: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* --- text-primitives --------------------------------------------- */

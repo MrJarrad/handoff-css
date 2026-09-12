@@ -53,8 +53,8 @@ export function generate(doc, config, { handAuthoredCss = "" } = {}) {
   // not know stops here rather than half-generating.
   assertValidExport(doc);
   const { declared: handDeclared, scoped: handScoped } = readHandAuthored(handAuthoredCss);
-  const { css, rows, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, aspectRows,
-          warnings, untrustedRows } = emitTokens(doc, handDeclared, cfg);
+  const { css, rows, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings,
+          untrustedRows } = emitTokens(doc, handDeclared, cfg);
 
   const byId = indexById(doc);
   const themeRows = themeEntries(doc, byId, cfg);
@@ -62,7 +62,7 @@ export function generate(doc, config, { handAuthoredCss = "" } = {}) {
 
   const md = report(doc, rows, new Set(handDeclared.keys()), handScoped, themeRows, handDeclared,
                     cfg, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings,
-                    untrustedRows, aspectRows);
+                    untrustedRows);
 
   // Single source of truth for a downstream conformance checker (P7): it must
   // not keep its own copy of the exclude list or re-derive either list.
@@ -103,8 +103,6 @@ export function generate(doc, config, { handAuthoredCss = "" } = {}) {
     excludedRows,
     responsiveRows,
     aliasRows,
-    // P20 — one row per leaf group under `aspect.group` that stated a ratio.
-    aspectRows,
     // P13 — every self-contradicting build cell found in the export, whether or
     // not this run emitted the variable it belongs to.
     untrustedRows,

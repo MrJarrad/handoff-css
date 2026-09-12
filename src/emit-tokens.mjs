@@ -3,7 +3,8 @@
 import path from "node:path";
 
 import { aliasBlock } from "./aliases.mjs";
-import { assertNoAspectCollision, aspectTokens } from "./aspect.mjs";
+import { aspectDescriptionFindings } from "./aspect.mjs";
+import { delayAliasFindings } from "./motion.mjs";
 import { aliasedByNames, isExcluded, isHidden, privateIds } from "./exclude.mjs";
 import { layoutBreakpoints, placementsFor, renderGroups, themeModeIds, variantBase } from "./modes.mjs";
 import { cmp, num, resolveValue, untrustedCells } from "./resolve.mjs";
@@ -69,7 +70,7 @@ export function emitTokens(doc, handDeclared, cfg) {
 
       const hand = handDeclared.get(name);
       const defaultMode = v.modes.find((m) => m.modeId === c.defaultModeId) ?? v.modes[0];
-      const defaultResolved = resolveValue(v, defaultMode, byId, cfg);
+      const defaultResolved = resolveValue(v, defaultMode, byId, cfg, c);
 
       if (isPrivate) {
         privateRows.push({
@@ -167,7 +168,7 @@ export function emitTokens(doc, handDeclared, cfg) {
       if (resp.allFixed) {
         const values = new Set(
           v.modes.filter((mv) => mv.effective !== false)
-            .map((mv) => resolveValue(v, mv, byId, cfg).value),
+            .map((mv) => resolveValue(v, mv, byId, cfg, c).value),
         );
         if (values.size <= 1) {
           const value = [...values][0] ?? defaultResolved.value;
@@ -192,7 +193,7 @@ export function emitTokens(doc, handDeclared, cfg) {
       for (const mode of c.modes) {
         const mv = v.modes.find((m) => m.modeId === mode.id);
         if (!mv || mv.effective === false) continue;
-        const r = mv.modeId === defaultMode.modeId ? defaultResolved : resolveValue(v, mv, byId, cfg);
+        const r = mv.modeId === defaultMode.modeId ? defaultResolved : resolveValue(v, mv, byId, cfg, c);
         const decl = `${name}: ${r.value};${r.note ? ` /* ${r.note} */` : ""}`;
 
         // A variant this export publishes no rule for — and any collection
@@ -225,7 +226,7 @@ export function emitTokens(doc, handDeclared, cfg) {
           continue;
         }
 
-        if (rule && honours(cfg, rule.cls) && collapse(v, rule, variant, ctx, byId, cfg, warnings)) {
+        if (rule && honours(cfg, rule.cls) && collapse(v, rule, variant, ctx, byId, cfg, warnings, c)) {
           if (collapsed.has(variant)) continue;
           collapsed.add(variant);
           row.honoured = true;
@@ -267,14 +268,11 @@ export function emitTokens(doc, handDeclared, cfg) {
     blocks.push(head.join("\n"));
   }
 
-  // P20 — the aspect ratios the excluded `grid/aspect/*` heights encode, lifted
-  // out of their descriptions. Placed after the collection blocks and before
-  // the alias block, so an alias may hop onto one.
-  const aspect = aspectTokens(doc, handDeclared, cfg);
-  assertNoAspectCollision(aspect.rows, emitted);
-  warnings.push(...aspect.warnings);
-  for (const r of aspect.rows) if (r.hand == null) emitted.add(r.name);
-  if (aspect.css) blocks.push(aspect.css);
+  // P19/P20 — two lanes that report on the DESIGN FILE without changing a byte
+  // of what is emitted: a delay step Figma authored as its own copy of a
+  // duration's value, and a `grid/aspect/*` description that contradicts the
+  // authored `core/aspect/*` variable. Both are one-line Figma fixes.
+  warnings.push(...delayAliasFindings(doc, cfg), ...aspectDescriptionFindings(doc, cfg));
 
   // The consumer's own alias names, expanded over what was emitted above.
   const aliases = aliasBlock(emitted, handDeclared, cfg);
@@ -300,7 +298,7 @@ export function emitTokens(doc, handDeclared, cfg) {
   return {
     css: `${header}${blocks.join("\n\n")}\n`,
     rows, privateRows, hiddenRows, excludedRows,
-    responsiveRows, aliasRows: aliases.rows, aspectRows: aspect.rows, warnings, untrustedRows,
+    responsiveRows, aliasRows: aliases.rows, warnings, untrustedRows,
   };
 }
 
@@ -311,7 +309,7 @@ export function emitTokens(doc, handDeclared, cfg) {
  * whose samples do not actually agree, would otherwise ship a value the export
  * never stated.
  */
-function collapse(v, rule, variant, ctx, byId, cfg, warnings) {
+function collapse(v, rule, variant, ctx, byId, cfg, warnings, collection) {
   const name = webName(v);
   if (rule.cls === "fluid-clamp") {
     if (rule.css) return true;
@@ -329,7 +327,7 @@ function collapse(v, rule, variant, ctx, byId, cfg, warnings) {
   for (const mv of v.modes) {
     if (mv.effective === false) continue;
     if ((ctx.layout.variants.get(mv.modeId) ?? null) !== variant) continue;
-    values.add(resolveValue(v, mv, byId, cfg).value);
+    values.add(resolveValue(v, mv, byId, cfg, collection).value);
   }
   if (values.size <= 1) return true;
   warnings.push({

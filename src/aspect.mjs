@@ -1,154 +1,108 @@
-// Policy P20 — ASPECT RATIOS. Figma has no aspect-ratio primitive. A design
-// system that needs one therefore encodes it the only way the tool allows: a
-// group of per-column-span HEIGHT variables, each carrying the ratio it was
-// computed from in its own description ("Ratio – 3/2, 3:2").
+// Policy P20 — ASPECT RATIOS. Figma has no aspect-ratio *type*, but it does
+// have STRING variables, and as of export v11 the design system authors the
+// four ratios as `core/aspect/{landscape, portrait, square, tall}` holding
+// `"3:2"`, `"4:5"`, `"1:1"`, `"2:3"`.
 //
-// Those heights are the workaround and never become tokens — they are in
-// `exclude.paths` (P7) and stay there. The ratio is the design decision, and
-// this module is the one place it is lifted out: one `--aspect-<leaf group>`
-// per leaf group, stating the ratio the group's members agree on.
+// So there is nothing to derive. These are ordinary published variables that
+// flow through the normal emit path under their own `codeSyntax.WEB` names
+// (P1); this module owns one thing — rendering `a:b` as the CSS ratio
+// `a / b`, because `aspect-ratio: "3:2"` is not a value CSS accepts.
 //
-// Reading an EXCLUDED group is deliberate, not a leak. P7 governs what is
-// EMITTED; the excluded variables are still the only place the ratio is
-// written down, so refusing to read them would mean hand-authoring the four
-// ratios a second time — exactly the duplicate this package exists to remove.
+// The per-column-span HEIGHT variables under `layout/grid/aspect/` remain the
+// Figma workaround they always were: EXCLUDED (P7), never tokens. They still
+// carry the ratio in their descriptions, so this module cross-checks them
+// against the authored variable and reports a disagreement. That is a
+// validation note about the design file, not an input to what is emitted —
+// superseding 0.4.0's pre-release derivation path, where those descriptions
+// WERE the source and a disagreement meant nothing could be published.
 //
 // See docs/POLICIES.md P20.
 import { cmp, fail } from "./resolve.mjs";
 import { webName } from "./schema.mjs";
 
-/**
- * One entry per leaf group under `aspect.group`, in group-name order, with
- * every member's stated ratio — parsed, or `null` where the description does
- * not state one. Separated from the emit step so the disagreement check reads
- * as what it is: a property of the group, decided before anything is written.
- *
- * @returns {Array<{ group: string, path: string,
- *                   members: Array<{ name: string, ratio: string|null, description: string }> }>}
- */
-export function aspectGroups(doc, cfg) {
-  const { group, descriptionPattern } = cfg.aspect ?? {};
-  if (group == null) return [];
-  const re = descriptionPattern == null ? null : new RegExp(descriptionPattern);
+/** `3:2` or `3/2`, with optional spaces. Decimals allowed — `1.85:1` is a real ratio. */
+const RATIO = /^\s*(\d+(?:\.\d+)?)\s*[:/]\s*(\d+(?:\.\d+)?)\s*$/;
 
-  const byGroup = new Map();
+/** Whether this variable is one the consumer declared to hold a ratio. */
+export const isRatioVariable = (collection, v, cfg) =>
+  (cfg.aspect?.ratioPaths ?? []).some((prefix) => `${collection.name}/${v.name}`.startsWith(prefix));
+
+/**
+ * P20 — the CSS ratio a declared ratio variable's STRING value states.
+ *
+ * A value the pattern does not recognise is a HARD FAILURE, not a passthrough:
+ * the consumer has declared this path to hold a ratio, so a value that is not
+ * one is the design file and the config disagreeing, and emitting
+ * `aspect-ratio: "banana"` would push that discovery into a browser.
+ */
+export function ratioValue(v, raw) {
+  const m = RATIO.exec(String(raw));
+  if (!m) {
+    fail(`${webName(v)}: \`aspect.ratioPaths\` declares this a ratio, but its value ${JSON.stringify(raw)} is not \`a:b\` or \`a/b\` (P20)`);
+  }
+  return `${m[1]} / ${m[2]}`;
+}
+
+/**
+ * P20's validation note. `layout/grid/aspect/<leaf>/*` are the per-column-span
+ * heights, each describing the ratio it was computed from ("Ratio – 3/2,
+ * 3:2"). They are excluded from the CSS, but a description that disagrees with
+ * the authored `core/aspect/<leaf>` variable means one of the two is wrong and
+ * a designer is reading a stale number off the wrong one.
+ *
+ * Nothing here changes what is emitted. The authored variable is the value,
+ * always — these descriptions stopped being a source the moment the design
+ * system authored the ratios properly.
+ *
+ * @returns {Array<{code, name, collection, detail}>}
+ */
+export function aspectDescriptionFindings(doc, cfg) {
+  const { descriptionGroup, descriptionPattern, ratioPaths = [] } = cfg.aspect ?? {};
+  if (descriptionGroup == null || descriptionPattern == null) return [];
+  const re = new RegExp(descriptionPattern);
+
+  // The authored ratio per leaf name, from whichever declared path holds it.
+  const authored = new Map();
+  for (const c of doc.collections) {
+    for (const v of c.variables) {
+      if (!isRatioVariable(c, v, cfg)) continue;
+      const prefix = ratioPaths.find((p) => `${c.name}/${v.name}`.startsWith(p));
+      authored.set(`${c.name}/${v.name}`.slice(prefix.length),
+        { name: webName(v), ratio: ratioValue(v, v.modes[0]?.raw) });
+    }
+  }
+
+  // Distinct stated ratios per leaf group, each with one variable that states it.
+  const stated = new Map();
   for (const c of doc.collections) {
     for (const v of c.variables) {
       const path = `${c.name}/${v.name}`;
-      if (!path.startsWith(group)) continue;
-      // A variable sitting DIRECTLY in the aspect group has no leaf group to
-      // name a token after. Skipped here and reported by `aspectTokens`.
-      const rest = path.slice(group.length);
+      if (!path.startsWith(descriptionGroup)) continue;
+      const rest = path.slice(descriptionGroup.length);
       const slash = rest.indexOf("/");
-      const leaf = slash === -1 ? null : rest.slice(0, slash);
-      const description = v.description ?? "";
-      const m = re && leaf != null ? re.exec(description) : null;
-      const key = leaf ?? "";
-      if (!byGroup.has(key)) byGroup.set(key, []);
-      byGroup.get(key).push({
-        name: webName(v),
-        ratio: m ? `${m[1]} / ${m[2]}` : null,
-        description,
-      });
+      if (slash === -1) continue; // no leaf group to compare against
+      const leaf = rest.slice(0, slash);
+      const m = re.exec(v.description ?? "");
+      const ratio = m ? `${m[1]} / ${m[2]}` : null;
+      if (!stated.has(leaf)) stated.set(leaf, new Map());
+      if (!stated.get(leaf).has(ratio)) stated.get(leaf).set(ratio, webName(v));
     }
   }
 
-  return [...byGroup.entries()]
-    .sort(([a], [b]) => cmp(a, b))
-    .map(([leaf, members]) => ({
-      group: leaf,
-      path: `${group}${leaf}`,
-      members: members.sort((a, b) => cmp(a.name, b.name)),
-    }));
-}
-
-/**
- * The derived tokens and everything the report needs to say about them.
- *
- * A leaf group whose members do not all state the SAME ratio publishes
- * NOTHING and raises `ASPECT_RATIO_MIXED`. Picking the majority, the first, or
- * the default mode's would be the generator deciding a design question from a
- * typo — and a wrong aspect ratio is invisible until a card is the wrong shape
- * in production. The finding names each distinct value and one variable that
- * states it, so the fix is one description in Figma.
- *
- * @param handDeclared P2 — the consumer's own GLOBAL declarations
- * @returns {{ css: string, rows: Array<{name, ratio, group, members, status, hand}>,
- *             warnings: Array<{code, name, collection, detail}> }}
- */
-export function aspectTokens(doc, handDeclared, cfg) {
-  const { group, prefix } = cfg.aspect ?? {};
-  if (group == null || prefix == null) return { css: "", rows: [], warnings: [] };
-
-  const rows = [];
-  const warnings = [];
-  const warn = (code, name, detail) => warnings.push({ code, name, collection: group, detail });
-
-  for (const g of aspectGroups(doc, cfg)) {
-    if (g.group === "") {
-      warn("ASPECT_UNGROUPED", g.path,
-        `${g.members.length} variable(s) sit directly in \`${group}\` with no leaf group to name a ratio after (${g.members.map((m) => `\`${m.name}\``).join(", ")}) — nothing derived`);
-      continue;
-    }
-
-    const distinct = new Map(); // ratio (or null) -> first member stating it
-    for (const m of g.members) if (!distinct.has(m.ratio)) distinct.set(m.ratio, m);
-
-    if (distinct.size > 1) {
-      const detail = [...distinct.entries()]
-        .sort(([a], [b]) => cmp(String(a), String(b)))
-        .map(([ratio, m]) => `${ratio == null ? "no stated ratio" : `\`${ratio}\``} (\`${m.name}\`: ${JSON.stringify(m.description)})`)
-        .join("; ");
-      warn("ASPECT_RATIO_MIXED", `${prefix}${g.group}`,
-        `the ${g.members.length} variables in \`${g.path}\` state ${distinct.size} different ratios — ${detail}. Nothing is published for this group: one of these descriptions is wrong, and the generator will not pick which.`);
-      continue;
-    }
-
-    const ratio = [...distinct.keys()][0];
-    if (ratio == null) {
-      warn("ASPECT_RATIO_MISSING", `${prefix}${g.group}`,
-        `no variable in \`${g.path}\` states a ratio its \`aspect.descriptionPattern\` recognises (${g.members.length} checked, e.g. \`${g.members[0].name}\`: ${JSON.stringify(g.members[0].description)}) — nothing derived`);
-      continue;
-    }
-
-    const name = `${prefix}${g.group}`;
-    const hand = handDeclared.get(name);
-    rows.push({
-      name,
-      ratio,
-      group: g.path,
-      members: g.members.length,
-      hand: hand ?? null,
-      // P2 — a global hand-authored declaration wins the cascade, so the
-      // derived token stands down exactly as an export-backed one does.
-      status: hand == null ? "DERIVED" : hand === ratio ? "MATCH" : "VALUE-DRIFT",
+  const findings = [];
+  for (const [leaf, ratios] of [...stated].sort(([a], [b]) => cmp(a, b))) {
+    const auth = authored.get(leaf);
+    // A described group with no authored variable is not a contradiction —
+    // `descriptionGroup` may legitimately hold groups the ratio set does not.
+    if (!auth) continue;
+    const wrong = [...ratios].filter(([ratio]) => ratio !== auth.ratio);
+    if (wrong.length === 0) continue;
+    findings.push({
+      code: "ASPECT_DESCRIPTION_DISAGREES",
+      name: auth.name,
+      collection: descriptionGroup,
+      detail: `\`${auth.name}\` is authored \`${auth.ratio}\`, but ${wrong.map(([ratio, who]) => `\`${who}\` describes ${ratio == null ? "no recognisable ratio" : `\`${ratio}\``}`).join(" and ")} in \`${descriptionGroup}${leaf}\`. The authored variable is the value; correct the description in Figma so a designer reading the height group is not reading a stale number.`,
     });
   }
-
-  const emitted = rows.filter((r) => r.hand == null);
-  if (emitted.length === 0) return { css: "", rows, warnings };
-
-  const css = [
-    `/* --- aspect ratios ${"-".repeat(45)} */`,
-    `/* Derived from the leaf groups under \`${group}\`, each of whose variables states`,
-    "   the same ratio in its description (policy P20 in",
-    `   ${cfg.report.policyRef}). Figma has no aspect-ratio primitive: those variables are`,
-    "   per-column-span HEIGHTS — the workaround — and are excluded from this file under",
-    "   P7. The ratio they encode is the design decision, and this is where it is stated. */",
-    ":root {",
-    ...emitted.map((r) => `  ${r.name}: ${r.ratio};`),
-    "}",
-  ].join("\n");
-
-  return { css, rows, warnings };
-}
-
-/** A derived name that collides with an export-backed token is never resolved by ordering. */
-export function assertNoAspectCollision(rows, emitted) {
-  for (const r of rows) {
-    if (emitted.has(r.name)) {
-      fail(`aspect token \`${r.name}\` (derived from \`${r.group}\`, policy P20) collides with a generated token of the same name`);
-    }
-  }
-  return rows;
+  return findings.sort((a, b) => cmp(a.name, b.name));
 }

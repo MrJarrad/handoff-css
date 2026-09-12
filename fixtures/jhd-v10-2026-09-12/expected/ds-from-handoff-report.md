@@ -6,12 +6,12 @@ GENERATED FILE — regenerate with `pnpm run tokens`.
 | --- | --- |
 | Export | `JHD-Spec-DesignSystem` |
 | Schema | design-system-handoff v9 |
-| Exported at | 2026-09-11T18:08:21.155Z |
-| designSystemStateHash | `9cc28d2d9faa349e5984e0430ef0e311ad32ff25bbc68f6a84b04dccc6fd96eb` |
-| Tokens in export | 475 |
-| MATCH (hand-authored, same value) | 0 |
+| Exported at | 2026-09-12T07:11:41.254Z |
+| designSystemStateHash | `26351f7a09758f626996439752be73090a54f3ec5e5fa371edd44b716e07defc` |
+| Tokens in export | 502 |
+| MATCH (hand-authored, same value) | 5 |
 | VALUE-DRIFT (hand-authored, different value) | 15 |
-| NAME-ONLY-IN-EXPORT (newly generated) | 460 |
+| NAME-ONLY-IN-EXPORT (newly generated) | 482 |
 | NAME-ONLY-IN-HAND (in styles.css, not in export) | see §4 |
 | PRIVATE (hidden, but an alias target of a published token — emitted) | 26 |
 | HIDDEN (hidden and unreachable — not emitted) | 18 |
@@ -131,6 +131,7 @@ on path identity, regardless of hidden state, and never revived by reachability.
 | `--grid-aspect-tall-col-span-1` | layout | EXCLUDE_PATHS (layout) |
 | `--grid-aspect-tall-col-span-10` | layout | EXCLUDE_PATHS (layout) |
 | `--grid-aspect-tall-col-span-11` | layout | EXCLUDE_PATHS (layout) |
+| `--grid-aspect-tall-col-span-12` | layout | EXCLUDE_PATHS (layout) |
 | `--grid-aspect-tall-col-span-2` | layout | EXCLUDE_PATHS (layout) |
 | `--grid-aspect-tall-col-span-3` | layout | EXCLUDE_PATHS (layout) |
 | `--grid-aspect-tall-col-span-4` | layout | EXCLUDE_PATHS (layout) |
@@ -139,7 +140,6 @@ on path identity, regardless of hidden state, and never revived by reachability.
 | `--grid-aspect-tall-col-span-7` | layout | EXCLUDE_PATHS (layout) |
 | `--grid-aspect-tall-col-span-8` | layout | EXCLUDE_PATHS (layout) |
 | `--grid-aspect-tall-col-span-9` | layout | EXCLUDE_PATHS (layout) |
-| `--grid-aspect-tall-cols-span-12` | layout | EXCLUDE_PATHS (layout) |
 | `--grid-aspect-tall-full-width` | layout | EXCLUDE_PATHS (layout) |
 | `--utility-space-lg` | .utility | EXCLUDE_PATHS (.utility) |
 | `--utility-space-md` | .utility | EXCLUDE_PATHS (.utility) |
@@ -195,14 +195,20 @@ on path identity, regardless of hidden state, and never revived by reachability.
 | `--border-700` | core | `4px` | `0.25rem` |
 | `--border-800` | core | `4.5px` | `0.28125rem` |
 | `--border-900` | core | `5px` | `0.3125rem` |
-| `--easing-linear` | motion | `linear` | `cubic-bezier(0, 0, 1, 1)` |
+| `--duration-1600` | motion | `1600ms` | `1.6s` |
 | `--grid-gap` | layout | `var(--dimension-1200)` | `clamp(1.5rem, calc(2.0356vw + 1.0231rem), 2rem)` |
 | `--grid-gap-lg` | layout | `var(--dimension-1700)` | `clamp(4rem, calc(2.0356vw + 3.523rem), 4.5rem)` |
 | `--radius-full` | core | `62.4375rem` | `999px` |
 
-## 3. MATCH (0)
+## 3. MATCH (5)
 
-None.
+| Token | Collection | Value |
+| --- | --- | --- |
+| `--aspect-landscape` | core | `3 / 2` |
+| `--aspect-portrait` | core | `4 / 5` |
+| `--aspect-square` | core | `1 / 1` |
+| `--aspect-tall` | core | `2 / 3` |
+| `--easing-linear` | motion | `cubic-bezier(0, 0, 1, 1)` |
 
 ## 4. NAME-ONLY-IN-HAND
 
@@ -212,15 +218,11 @@ sizes, z-index, elevation, Tailwind `@theme` namespace aliases) with no Figma
 variable behind them, plus the colour tokens styles.css names without the
 export's `color-` prefix. Listed for the tidy follow-up, not changed here.
 
-153 names.
+148 names.
 
 - `--action-radius-elipse`
 - `--action-radius-round`
 - `--action-radius-sharp`
-- `--aspect-landscape`
-- `--aspect-portrait`
-- `--aspect-square`
-- `--aspect-tall`
 - `--body-action-style1-100-size`
 - `--body-action-style1-100-tracking`
 - `--body-action-style1-200-size`
@@ -271,7 +273,6 @@ export's `color-` prefix. Listed for the tidy follow-up, not changed here.
 - `--container-lg`
 - `--container-max`
 - `--content-brand`
-- `--duration-1600`
 - `--duration-250`
 - `--easing-expo-out-card`
 - `--easing-quad-out-gill`
@@ -462,7 +463,7 @@ keeps it (it overrides the generated entry, being later in the cascade) and the
 disagreement needs its own ruling. **HAND-ONLY** — a key P8 does not emit at all,
 because the export has no variable behind it.
 
-174 generated `@theme` keys across 8 namespaces.
+197 generated `@theme` keys across 8 namespaces.
 7 hand-authored `@theme` entries fall inside those namespaces — GENERATED-EQUIVALENT: 0 · VALUE-DRIFT: 1 · HAND-ONLY: 6.
 
 | Key | Namespace | P8 emits | styles.css | Status |
@@ -515,7 +516,7 @@ path, so parity can be pinned.
 
 Honoured this run: `viewport-height`, `viewport-width`.
 
-82 of 486 emitted variables carry a class — fixed (export): 6 · fixed (rule): 1 · fluid-clamp (export): 14 · mode-stepped (export): 52 · viewport-height (description): 8 · viewport-width (description): 1.
+82 of 508 emitted variables carry a class — fixed (export): 6 · fixed (rule): 1 · fluid-clamp (export): 14 · mode-stepped (export): 52 · viewport-height (description): 8 · viewport-width (description): 1.
 The other 52 are `mode-stepped` or `sample-only`, which IS the
 per-mode path, so they are not listed individually: their output is unchanged.
 
@@ -563,24 +564,25 @@ plugin export takes the count to zero.
 
 None.
 
-**Warnings (1)** — what the generator would not guess at. A
+**Warnings (13)** — what the generator would not guess at. A
 variable in a `viewport.groups` group with no stated fraction keeps its px
 samples: the fix is one description in Figma, not a heuristic here.
 
 | Code | Token | Detail |
 | --- | --- | --- |
-| `ASPECT_RATIO_MIXED` | `--aspect-tall` | the 13 variables in `layout/grid/aspect/tall` state 2 different ratios — `2 / 3` (`--grid-aspect-tall-col-span-1`: "Ratio – 2/3, 2:3"); `3 / 4` (`--grid-aspect-tall-full-width`: "Ratio – 3/4, 3:4"). Nothing is published for this group: one of these descriptions is wrong, and the generator will not pick which. |
-
-**Aspect ratios (2)** (P20) — Figma has no aspect-ratio
-primitive, so each ratio is encoded as a group of per-column-span HEIGHT
-variables that all state it in their descriptions. The heights stay excluded
-(P7); the ratio is published once per leaf group. A group whose members
-disagree publishes nothing and appears in the warnings above instead.
-
-| Token | Ratio | Derived from | Members | Status |
-| --- | --- | --- | --- | --- |
-| `--aspect-landscape` | `3 / 2` | `layout/grid/aspect/landscape` | 13 | MATCH |
-| `--aspect-portrait` | `4 / 5` | `layout/grid/aspect/portrait` | 13 | MATCH |
+| `DELAY_NOT_ALIASED` | `--delay-0` | holds the same value as `--duration-0` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-0` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-100` | holds the same value as `--duration-100` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-100` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-1000` | holds the same value as `--duration-1000` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-1000` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-200` | holds the same value as `--duration-200` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-200` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-300` | holds the same value as `--duration-300` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-300` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-375` | holds the same value as `--duration-375` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-375` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-400` | holds the same value as `--duration-400` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-400` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-500` | holds the same value as `--duration-500` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-500` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-600` | holds the same value as `--duration-600` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-600` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-700` | holds the same value as `--duration-700` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-700` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-750` | holds the same value as `--duration-750` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-750` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-800` | holds the same value as `--duration-800` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-800` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-900` | holds the same value as `--duration-900` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-900` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
 
 **Aliases (16)** — published names that are a `var()` hop onto a
 generated token, expanded from `aliases` over the emitted leaves. The token is
@@ -605,36 +607,63 @@ still the single place the value is stated.
 | `--height-screen-700` | `--screen-height-700` | `--height-screen-*` |
 | `--height-screen-full` | `--screen-height-full` | `--height-screen-*` |
 
-## Appendix A — zero-usage tokens (55)
+## Appendix A — zero-usage tokens (82)
 
 Generated anyway, per the operator ruling of 2026-09-05 (all collections,
 superseding the 2026-07-26 used-only rule).
 
+- `--aspect-landscape` (core)
+- `--aspect-portrait` (core)
+- `--aspect-square` (core)
+- `--aspect-tall` (core)
 - `--blur-0` (effect)
 - `--delay-0` (motion)
 - `--delay-100` (motion)
+- `--delay-1000` (motion)
 - `--delay-200` (motion)
 - `--delay-300` (motion)
+- `--delay-375` (motion)
 - `--delay-400` (motion)
+- `--delay-50` (motion)
+- `--delay-500` (motion)
+- `--delay-600` (motion)
+- `--delay-700` (motion)
+- `--delay-750` (motion)
+- `--delay-800` (motion)
+- `--delay-900` (motion)
 - `--device-screen-height-600` (layout)
 - `--dimension-1050` (core)
 - `--dimension-1150` (core)
 - `--duration-0` (motion)
 - `--duration-100` (motion)
 - `--duration-1000` (motion)
+- `--duration-1100` (motion)
+- `--duration-1200` (motion)
+- `--duration-1300` (motion)
+- `--duration-1400` (motion)
+- `--duration-1500` (motion)
+- `--duration-1600` (motion)
+- `--duration-1700` (motion)
+- `--duration-1800` (motion)
+- `--duration-1900` (motion)
 - `--duration-200` (motion)
+- `--duration-2000` (motion)
 - `--duration-300` (motion)
+- `--duration-375` (motion)
 - `--duration-400` (motion)
 - `--duration-500` (motion)
 - `--duration-600` (motion)
 - `--duration-700` (motion)
+- `--duration-750` (motion)
 - `--duration-800` (motion)
 - `--duration-900` (motion)
 - `--easing-circ-in-out` (motion)
-- `--easing-ease-expo-out` (motion)
+- `--easing-cubic-out` (motion)
+- `--easing-ease-out` (motion)
 - `--easing-expo-out` (motion)
 - `--easing-linear` (motion)
-- `--easing-power2-out` (motion)
+- `--easing-quad-out` (motion)
+- `--easing-quart-out` (motion)
 - `--grid-columns` (layout)
 - `--grid-gap-md` (layout)
 - `--icon-radius-100` (icon)

@@ -17,27 +17,8 @@ const fillIn = (text, vars) =>
 export function report(doc, rows, handNames, handScoped, themeRows, handDeclared, cfg,
                        privateRows = [], hiddenRows = [], excludedRows = [],
                        responsiveRows = [], aliasRows = [], warnings = [],
-                       untrustedRows = [], aspectRows = []) {
+                       untrustedRows = []) {
   const handFile = cfg.paths.handAuthored.split("/").pop();
-  // P20 — omitted entirely for a consumer with no `aspect.group`: a section
-  // that can only ever say "None." is noise in every report that consumer runs.
-  const aspectSection = cfg.aspect?.group == null ? "" : [
-    `**Aspect ratios (${aspectRows.length})** (P20) — Figma has no aspect-ratio`,
-    "primitive, so each ratio is encoded as a group of per-column-span HEIGHT",
-    "variables that all state it in their descriptions. The heights stay excluded",
-    "(P7); the ratio is published once per leaf group. A group whose members",
-    "disagree publishes nothing and appears in the warnings above instead.",
-    "",
-    aspectRows.length
-      ? ["| Token | Ratio | Derived from | Members | Status |", "| --- | --- | --- | --- | --- |",
-         ...[...aspectRows].sort((a, b) => cmp(a.name, b.name))
-           .map((r) => `| \`${r.name}\` | \`${r.ratio}\` | \`${r.group}\` | ${r.members} | ${r.status} |`)].join("\n")
-      : "None.",
-    "",
-    "",
-  ].join("\n");
-
-
   const by = (s) => rows.filter((r) => r.status === s);
   const drift = by("VALUE-DRIFT");
   const match = by("MATCH");
@@ -320,7 +301,7 @@ ${warnings.length
        .map((w) => `| \`${w.code}\` | \`${w.name}\` | ${w.detail} |`)].join("\n")
   : "None."}
 
-${aspectSection}**Aliases (${aliasRows.length})** — published names that are a \`var()\` hop onto a
+**Aliases (${aliasRows.length})** — published names that are a \`var()\` hop onto a
 generated token, expanded from \`aliases\` over the emitted leaves. The token is
 still the single place the value is stated.
 

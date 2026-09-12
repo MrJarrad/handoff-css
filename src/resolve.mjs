@@ -1,6 +1,7 @@
 // Value rendering (policies P4, P5, P9) plus the two determinism primitives
 // every other module needs: `num` (float32 noise rounded off) and `cmp`.
 // See docs/POLICIES.md.
+import { isRatioVariable, ratioValue } from "./aspect.mjs";
 import { webName } from "./schema.mjs";
 
 export const fail = (msg) => {
@@ -265,7 +266,7 @@ function composeColorNote(v, raw, byId) {
  * @returns {{ value: string, note: string|null, aliasTarget: string|null,
  *             unresolvedAlias: boolean, terminal: string|null }}
  */
-export function resolveValue(v, mode, byId, cfg) {
+export function resolveValue(v, mode, byId, cfg, collection = null) {
   if (mode.alias) {
     const hop = mode.alias.chain?.[0];
     const terminal = mode.alias.terminalValue ?? null;
@@ -304,6 +305,10 @@ export function resolveValue(v, mode, byId, cfg) {
       }
       return plain(color(raw, cfg));
     case "STRING":
+      // P20 — a STRING variable the consumer declared a ratio holder is the
+      // design system's aspect-ratio primitive, and `aspect-ratio: "3:2"` is
+      // not a value CSS accepts. Every other STRING is quoted, as before.
+      if (collection && isRatioVariable(collection, v, cfg)) return plain(ratioValue(v, raw));
       return plain(JSON.stringify(String(raw)));
     case "TIMING":
       return plain(timing(raw, cfg));
