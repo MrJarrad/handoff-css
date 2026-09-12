@@ -708,6 +708,102 @@ reach generated output. Two exports of the same design-system state that differ 
 
 ---
 
+## P19 — Motion (0.4.0)
+
+`config.motion` · `src/resolve.mjs` (`timing`, `easing`) · `test/motion-v9d.test.mjs`
+
+Figma types motion, so the generator does not have to guess at it.
+
+**EASING.** The export publishes the curve itself. A `LINEAR` curve emits the CSS
+keyword `linear`; anything else emits `cubic-bezier(x1, y1, x2, y2)` from
+`easingFunctionCubicBezier`, rounded once by `num()`. There is no config key: the
+export states the value and CSS has exactly one syntax for it.
+
+Naming is P1's job, not this policy's. Operator ruling 2026-09-12 row 1 retires the
+role-flavoured names (`quad-out-gill`, `expo-out-card`) in favour of curve families
+(`quad-out`, `cubic-out`, `quart-out`, `expo-out`, `ease-out`, `circ-in-out`,
+`linear`) — a rename **in Figma**, which arrives through `codeSyntax.WEB` and
+changes no code here. A role name, if one is ever wanted, is a semantic alias layer
+(P12), never a second declaration of a curve.
+
+**TIMING.** Figma stores a TIMING variable in SECONDS. `motion.timingUnit` states
+which unit the house publishes:
+
+| `timingUnit` | `duration/300` (0.375 stored) |
+| --- | --- |
+| `"ms"` | `--duration-300: 375ms` |
+| `"s"` | `--duration-300: 0.375s` |
+
+Milliseconds are the house choice because operator ruling 2026-09-12 row 2 names each
+step for its milliseconds — a full primitive ramp, 0–600 by 50, 600–1200 by 100,
+1200–2000 by 200, with 375 and 750 kept as in-between steps (row 3). A token named
+`--duration-375` whose value read `0.375s` would be lying about itself in the one
+place a reader looks.
+
+Float32 noise is rounded off **in seconds, before the scale**. `0.10000000149011612 ×
+1000` is `100.00000149011612`, and `num()`'s six decimal places would faithfully
+preserve that as `100.000001ms`.
+
+**Delays alias durations — in Figma.** Ruling row 4 makes `motion/delay/*` its own
+short ramp (0, 50, 100, 150, 200, 250, 300, 375, 500, 750) whose every step is a Figma
+alias of the matching `motion/duration` step, so the two can never drift. That arrives
+as an ordinary alias hop and is emitted by P5 as `--delay-375: var(--duration-375)`,
+with the terminal-value comment rendered in the same unit. **Nothing in the generator
+pairs a delay with a duration by name.** A name-matching heuristic would read as
+identical output today and would silently overwrite the first delay step that
+legitimately differs — the class of guess this package exists to remove. Stagger is
+`index × step` in the consumer's code, not a token.
+
+---
+
+## P20 — Aspect ratios (0.4.0)
+
+`config.aspect` · `src/aspect.mjs` · `test/aspect-v9d.test.mjs`
+
+**Figma has no aspect-ratio primitive.** A design system that needs one encodes it the
+only way the tool allows: a group of per-column-span HEIGHT variables, each carrying
+the ratio it was computed from in its own description. Operator ruling 2026-09-12 row
+6: *"figma has no concept of aspect ratios, I tend to just use the col-span as the
+height for 1:1 as the result is the same"*.
+
+So the group has two halves, and they go different ways:
+
+- the **heights** are the workaround. They stay in `exclude.paths` (P7) and never
+  become tokens — ruling 2026-09-06, *"they are just figma hacks"*.
+- the **ratio** is the design decision. It is lifted out once per leaf group as
+  `aspect.prefix` + the leaf group's own name: `--aspect-landscape: 3 / 2`.
+
+Reading an EXCLUDED group is deliberate and is stated at the exclusion itself. P7
+governs what is **emitted**; the excluded variables are still the only place the ratio
+is written down, and refusing to read them would mean hand-authoring the four ratios a
+second time — ruling row 5 is explicit that there are to be *"no hand-authored
+copies"*. Adopting this policy therefore means DELETING the consumer's own
+`--aspect-*` block, exactly as adopting P12 meant deleting its `--screen-height-*`
+one; until that lands, P2 suppresses the derived token and the report says MATCH.
+
+A derived token has no variable of its own, so P1 cannot name it — `aspect.prefix` is
+where the name comes from, and it is the one place in this package a token name is not
+read from `codeSyntax.WEB`.
+
+**A leaf group whose members disagree publishes nothing.**
+`aspect.descriptionPattern`'s first two capture groups are the ratio's antecedent and
+consequent; if the group's members do not all state the same one, the generator raises
+`ASPECT_RATIO_MIXED` naming each distinct ratio and a variable that states it, and
+emits no token for that group. Picking the majority, the first, or the default mode's
+would be the generator settling a design question from a typo, and a wrong aspect
+ratio is invisible until a card is the wrong shape in production. Two quieter findings
+sit beside it: `ASPECT_RATIO_MISSING` (no member states a ratio the pattern
+recognises) and `ASPECT_UNGROUPED` (a variable sitting directly in the group, with no
+leaf group to name a token after).
+
+**Not bridged to Tailwind.** Tailwind v4 owns an `--aspect-*` namespace, but P8 maps a
+namespace to a collection + group, and these names come from an excluded group's
+descriptions rather than from a group the bridge could name. Resetting it would also
+take `aspect-video` / `aspect-square` with it. The derived names compose as arbitrary
+values — `aspect-(--aspect-landscape)` — with no reset needed.
+
+---
+
 ## Determinism
 
 Collections sorted by name, variables by WEB name, numbers rounded to 6 decimal

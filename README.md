@@ -96,7 +96,7 @@ import config from "./handoff.config.mjs";
 const out = generate(JSON.parse(exportJson), config, { handAuthoredCss });
 // out.tokensCss, out.themeCss, out.report, out.exclusionsJson
 // out.rows, out.themeRows, out.privateRows, out.hiddenRows, out.excludedRows
-// out.warnings
+// out.aliasRows, out.aspectRows, out.warnings
 ```
 
 `generate` is pure — no filesystem, no `process`. The rows are the report's data
@@ -114,6 +114,8 @@ before it is rendered, so you can build your own checks on them.
 | `paths.*` | Export in, four artifacts out, plus your own stylesheet. |
 | `exclude.paths` | `"<collection>/<variable>"` prefixes that are never emitted — authoring scratch, Figma-only hacks. Applied on path identity, never revived by an alias. |
 | `color.format` | `rgb-slash-percent` (`#rrggbb` at full alpha, else `rgb(r g b / pct)`) or `hex8`. |
+| `motion.timingUnit` | `ms` or `s`. Figma stores a TIMING variable in seconds; `ms` republishes it in milliseconds, so a step named for its milliseconds reads in the unit its name states (P19). |
+| `aspect.group` / `.prefix` / `.descriptionPattern` | Figma has no aspect-ratio primitive, so a ratio is encoded as a group of per-column-span heights that all carry it in their descriptions. The heights stay excluded; the ratio is published once per leaf group as `--aspect-<group>`. A group whose members disagree publishes nothing and raises `ASPECT_RATIO_MIXED` (P20). |
 | `layout.collection` | The collection whose modes are responsive breakpoints rather than themes. |
 | `layout.variantAttribute` | The attribute that selects a non-default layout variant. |
 | `layout.baseMode` | `smallest-default-variant` (mobile-first) or `collection-default`. |
@@ -297,12 +299,19 @@ Point your agent at it:
 skills/handoff-to-code/SKILL.md      # or copy it into .claude/skills/ / your agent's skills dir
 ```
 
-## Library use, 0.3.0 additions
+## Library use, the validation and conformance entries
+
+The package publishes `.` (plus `./presets/jhd`, `./schema`, `./schema/export`) and
+nothing else, so everything importable comes from the one entry:
 
 ```js
-import { generate, validateExport, assertValidExport, exportSchema } from "handoff-css";
-import { parseHandoffMarkdown, validateHandoffMarkdown } from "handoff-css/src/validate-handoff-md.mjs";
-import { conform, tokenizeCss, aliasGraph, resolveName } from "handoff-css/src/conform.mjs";
+import {
+  generate, run,
+  validateExport, assertValidExport, exportSchema, VALIDATED_SCHEMA_VERSIONS,
+  parseHandoffMarkdown, validateHandoffMarkdown,
+  conform, FINDINGS, renderConformMarkdown, renderConformJson,
+  validateConfig, configSchema,
+} from "handoff-css";
 import schema from "handoff-css/schema/export" with { type: "json" };
 ```
 

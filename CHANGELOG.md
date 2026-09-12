@@ -2,6 +2,59 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.4.0 — 2026-09-12
+
+Motion and aspect ratios become generator output instead of hand-authored copies.
+Operator rulings 2026-09-12 (`2026-09-12-motion-token-naming`, rows 1–8).
+
+### Added
+
+- **P19 — MOTION (`config.motion`).** A TIMING variable publishes in the unit
+  `motion.timingUnit` names. Figma stores seconds; the house preset publishes
+  **milliseconds**, because the operator's ramp names each step for its milliseconds and
+  `--duration-375: 0.375s` would lie about itself in the one place a reader looks. Float32
+  noise is rounded off in seconds BEFORE the scale, or `0.1s` reads as `100.000001ms`.
+  Easing needs no policy and gains no key: `LINEAR` emits the keyword `linear`, every other
+  curve emits `cubic-bezier(…)` from the export's own control points.
+  Delay steps alias duration steps **in Figma** (ruling row 4) and arrive as ordinary alias
+  hops — `--delay-375: var(--duration-375)`, with the terminal comment in milliseconds too.
+  Nothing in the generator pairs the two by name: that heuristic looks identical today and
+  silently overwrites the first delay step that legitimately differs.
+- **P20 — ASPECT RATIOS (`config.aspect`).** Figma has no aspect-ratio primitive, so the
+  design system encodes each one as a group of per-column-span HEIGHT variables that all
+  carry the ratio in their descriptions. The heights stay EXCLUDED (P7) and the ratio is
+  lifted out once per leaf group: `--aspect-landscape: 3 / 2`. Reading an excluded group is
+  deliberate, and said so at the exclusion. A leaf group whose members state DIFFERENT
+  ratios publishes nothing and raises `ASPECT_RATIO_MIXED`, naming each ratio and a variable
+  that states it — a wrong aspect ratio is invisible until a card is the wrong shape in
+  production, so the generator will not settle it from a typo. `ASPECT_RATIO_MISSING` and
+  `ASPECT_UNGROUPED` cover the quieter shapes. New `out.aspectRows` and a report section.
+- **`conform` and the handoff-markdown parser are exported from the package entry.** The
+  `exports` map publishes `.` only, so P16's checker was reachable from the CLI and from
+  this repo's own tests and from nowhere else; `jhd-design-system` calls it from its suite.
+  Exported as `conform`, `FINDINGS`, `renderConformMarkdown`, `renderConformJson`,
+  `parseHandoffMarkdown`, `validateHandoffMarkdown`. The README's old deep-import examples
+  (`handoff-css/src/conform.mjs`) never resolved and are corrected.
+- **`fixtures/jhd-v9d-2026-09-11/`** — the plugin's export v10 (schema 9, state
+  `9cc28d2d…96eb`), the first export that types motion and describes every `grid/aspect/*`
+  leaf. Two defects are kept deliberately, because the generator's behaviour on them is what
+  P19 and P20 are for: `grid/aspect/tall/full-width` says 3/4 while its twelve siblings say
+  2/3, and the motion steps are still named by index rather than by milliseconds (P1 reads
+  `codeSyntax.WEB` verbatim, so that rename lands with the next export and changes no code).
+
+### Changed
+
+- `config.motion` and `config.aspect` are **required**. There are no defaults in this
+  package by design — a silently defaulted house policy is how a token pipeline starts
+  emitting values nobody chose. A consumer on the shipped preset inherits both.
+
+### Unchanged
+
+- The `jhd-v7b`, `jhd-v8b`, `jhd-v9`, `jhd-v9b` and `jhd-v9c` fixtures are byte-identical.
+  Their `expected/*` are committed artifacts of exports that predate these rulings, so
+  `test/fixture.mjs` states the policy they were produced under (`PRE_0_4_0`) rather than
+  restating those exports as something they never said.
+
 ## 0.3.4 — 2026-09-11
 
 Generated headers no longer print the export's filename.
