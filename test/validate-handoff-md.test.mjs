@@ -222,19 +222,19 @@ test("a table trailing note still rejects a marker that is neither `†` nor `�
   assert.match(hit.message, /is not a `⚠ <note>` marker/);
 });
 
-// 0.4.1 — the real 08:20 brief, now schema v10 (export v14, 2026-09-12): the
+// 0.4.3 — the real 09:51 brief, schema v11 (export v15, 2026-09-12): the
 // plugin also emits a JSON companion for the brief itself (see `src/brief.mjs`),
-// but the markdown's own line grammar is unchanged — the v9 shapes below
-// (`col(S/N of M)`/`row(S/N)` grid-table cells, the `→ CSS` token row form)
-// still exercise this module directly, and this fixture still validates
-// against the same grammar with zero findings.
+// and its grid-table cells now carry explicit alignment (`justifySelf:X
+// alignSelf:Y`, a fixed pair after `col()`/`row()`); the rest of the v9 line
+// grammar (`col(S/N of M)`/`row(S/N)` cells, the `→ CSS` token row form) is
+// unchanged, and this fixture still validates with zero findings.
 const v11Path = new URL(
   "../fixtures/jhd-v11-2026-09-12/design-handoff-block-navigation.md",
   import.meta.url,
 );
 const v11 = () => readFileSync(v11Path, "utf8");
 
-test("the real schema-v10 brief validates with zero errors under the v9 line grammar", () => {
+test("the real schema-v11 brief validates with zero errors under the v9 line grammar", () => {
   const { ok, findings } = validateHandoffMarkdown(v11());
   assert.equal(ok, true, findings.map((f) => `${f.line} ${f.code} ${f.message}`).join("; "));
 });

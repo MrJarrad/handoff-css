@@ -74,8 +74,11 @@ const CELL = [
   // schema v9 (export v11, 2026-09-12): `col(S/N of M)` = grid-column: S / span N
   // on an M-column grid; `row(S/N)` = grid-row: S / span N. A cell may carry
   // both, `col()` first, space-separated.
-  /^col\(\d+\/\d+ of \d+\)(?: row\(\d+\/\d+\))?$/,
-  /^row\(\d+\/\d+\)$/,
+  // 0.4.3 — schema v11 (export v15, 2026-09-12): explicit alignment. A
+  // `col()`/`row()` cell may carry a trailing `justifySelf:X alignSelf:Y`
+  // pair, printed by the plugin in that fixed order, space-separated.
+  /^col\(\d+\/\d+ of \d+\)(?: row\(\d+\/\d+\))?(?: justifySelf:\S+ alignSelf:\S+)?$/,
+  /^row\(\d+\/\d+\)(?: justifySelf:\S+ alignSelf:\S+)?$/,
   // The full Design Handoff plugin (per the operator's Figma-agent overview,
   // 2026-09-12) also samples `aspect(…)` and the self-alignment hints as
   // grid-table cell values on some pages, not only as node-row prose.

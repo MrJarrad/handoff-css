@@ -2,6 +2,36 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.4.3 — 2026-09-12
+
+Design Handoff schema v11 (export v15+): explicit alignment. `gridPlacement` now carries
+`justifySelf`/`alignSelf` on every grid child (`auto` when default), and every layout container
+carries CSS-resolved `alignItems`/`justifyContent` beside Figma's own `align`/`justify`.
+
+### Added
+
+- **`schema/design-handoff.v11.schema.json`.** Types `alignSelf`/`justifySelf` as a closed enum
+  of CSS values plus `auto`, and `alignItems`/`justifyContent` as a closed enum of CSS content
+  values; `additionalProperties: false` throughout, including `gridPlacement` and `layout`. v10
+  stays accepted — `src/brief.mjs` now dispatches the schema to validate a brief JSON against by
+  its own `schemaVersion` (10 or 11), never a flag.
+- **`fixtures/jhd-v11-2026-09-12/design-handoff-block-navigation.{json,md}`** replaced with the
+  real 09:51 export (schema 11, export v15) — the 08:20 pair (schema 10, export v14) it
+  superseded is gone from the tree.
+- A mutation test proving an unknown alignment value (e.g. `gridPlacement.justifySelf`) fails
+  schema validation, plus a parity test that a v10 brief (alignment fields stripped) still
+  validates against schema v10.
+- `src/validate-handoff-md.mjs`'s grid-table cell vocabulary now accepts the trailing
+  `justifySelf:X alignSelf:Y` pair schema v11 prints after `col()`/`row()` cells.
+
+### Changed
+
+- `skills/handoff-to-code/SKILL.md`: alignment is written from the container's
+  `alignItems`/`justifyContent` and the child's `alignSelf`/`justifySelf` as stated, never
+  inferred. Adapters rebuilt (`npm run skills`).
+- `package.json` `exports["./schema/brief/v11"]` publishes the new schema alongside the existing
+  `./schema/brief` (v10).
+
 ## 0.4.2 — 2026-09-12
 
 Operator ruling ("Responsive strategy"): *"let's follow what the plugin suggests."* The

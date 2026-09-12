@@ -1,11 +1,11 @@
 {
   "schema": "design-handoff",
-  "schemaVersion": 10,
+  "schemaVersion": 11,
   "contract": "layer-brief/1",
   "lane": "selection/design",
-  "generatedAt": "2026-09-12T08:20:35.723Z",
-  "exportVersion": 14,
-  "contentHash": "a43ac59970e13958b5ef434ff51beed94005979f3cd37b461b2745827b168870",
+  "generatedAt": "2026-09-12T09:51:13.609Z",
+  "exportVersion": 15,
+  "contentHash": "4546d3678fa648219a91f20bd044c569365e40f958c5cf5b1397c2a6cc648ca2",
   "documentName": "JHD-Spec-DesignSystem",
   "pageName": "Block",
   "figma": {
@@ -1228,21 +1228,28 @@
   "changes": {
     "baseline": {
       "available": true,
-      "generatedAt": "2026-09-12T08:03:25.918Z",
-      "contentHash": "46459bb7e76e8a87c2c9cdb50cbb4942c4cb9d426f566cd23fe357fc2b503ba2"
+      "generatedAt": "2026-09-12T08:20:35.723Z",
+      "contentHash": "a43ac59970e13958b5ef434ff51beed94005979f3cd37b461b2745827b168870"
     },
     "frames": {
       "added": [],
       "removed": [],
       "renamed": [],
-      "contentChanged": []
+      "contentChanged": [
+        {
+          "nodeId": "4227:16272",
+          "name": "Navigation",
+          "before": "173f51e0e6f22d62578b630097c6c4045fdec5a37c39c4f71cc14cad5834bb6d",
+          "after": "e27409623cd697647865767d0cf4b12d9b23a39a59d8f3429f01048665dc27b2"
+        }
+      ]
     },
     "policyChanges": [],
     "summary": {
       "added": 0,
       "removed": 0,
       "renamed": 0,
-      "contentChanged": 0,
+      "contentChanged": 1,
       "policyChanged": 0
     }
   },
@@ -1372,11 +1379,6 @@
                 "hSizing": "FIXED",
                 "vSizing": "FIXED"
               },
-              "gridPlacement": {
-                "colStart": 0,
-                "colSpan": 1,
-                "colCount": 0
-              },
               "clip": true,
               "cornerRadius": {
                 "topLeft": 5,
@@ -1415,11 +1417,6 @@
                     "hSizing": "HUG",
                     "vSizing": "HUG"
                   },
-                  "gridPlacement": {
-                    "colStart": 0,
-                    "colSpan": 1,
-                    "colCount": 0
-                  },
                   "layout": {
                     "mode": "row",
                     "gap": {
@@ -1435,7 +1432,9 @@
                       "rightToken": null,
                       "bottomToken": null,
                       "leftToken": null
-                    }
+                    },
+                    "justifyContent": "start",
+                    "alignItems": "start"
                   },
                   "children": [
                     {
@@ -1489,11 +1488,6 @@
                         "hSizing": "HUG",
                         "vSizing": "HUG"
                       },
-                      "gridPlacement": {
-                        "colStart": 0,
-                        "colSpan": 1,
-                        "colCount": 0
-                      },
                       "layout": {
                         "mode": "row",
                         "gap": {
@@ -1513,7 +1507,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "children": [
                         {
@@ -1562,11 +1558,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -1584,7 +1575,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -1668,11 +1661,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -1690,7 +1678,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -1716,11 +1706,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -1738,7 +1723,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -1771,11 +1758,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -1799,11 +1781,6 @@
                                         "y": -14566,
                                         "width": 158,
                                         "height": 22
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -1848,11 +1825,6 @@
                                         "heightToken": "icon-dimension/height",
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "aspectRatio": {
                                         "label": "1:1",
@@ -1920,11 +1892,6 @@
                             "hSizing": "FIXED",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "aspectRatio": {
                             "label": "1:1",
                             "token": "aspect/square",
@@ -1947,7 +1914,9 @@
                               "leftToken": null
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -1997,11 +1966,6 @@
                     "hSizing": "HUG",
                     "vSizing": "HUG"
                   },
-                  "gridPlacement": {
-                    "colStart": 0,
-                    "colSpan": 1,
-                    "colCount": 0
-                  },
                   "layout": {
                     "mode": "row",
                     "gap": {
@@ -2017,7 +1981,9 @@
                       "rightToken": null,
                       "bottomToken": null,
                       "leftToken": null
-                    }
+                    },
+                    "justifyContent": "start",
+                    "alignItems": "start"
                   },
                   "children": [
                     {
@@ -2071,11 +2037,6 @@
                         "hSizing": "HUG",
                         "vSizing": "HUG"
                       },
-                      "gridPlacement": {
-                        "colStart": 0,
-                        "colSpan": 1,
-                        "colCount": 0
-                      },
                       "layout": {
                         "mode": "row",
                         "gap": {
@@ -2095,7 +2056,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "children": [
                         {
@@ -2144,11 +2107,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -2166,7 +2124,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -2258,11 +2218,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -2280,7 +2235,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -2306,11 +2263,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -2328,7 +2280,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -2361,11 +2315,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -2389,11 +2338,6 @@
                                         "y": -14472,
                                         "width": 158,
                                         "height": 22
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -2438,11 +2382,6 @@
                                         "heightToken": "icon-dimension/height",
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "aspectRatio": {
                                         "label": "1:1",
@@ -2510,11 +2449,6 @@
                             "hSizing": "FIXED",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "aspectRatio": {
                             "label": "1:1",
                             "token": "aspect/square",
@@ -2537,7 +2471,9 @@
                               "leftToken": null
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -2587,11 +2523,6 @@
                     "hSizing": "HUG",
                     "vSizing": "HUG"
                   },
-                  "gridPlacement": {
-                    "colStart": 0,
-                    "colSpan": 1,
-                    "colCount": 0
-                  },
                   "layout": {
                     "mode": "row",
                     "gap": {
@@ -2607,7 +2538,9 @@
                       "rightToken": null,
                       "bottomToken": null,
                       "leftToken": null
-                    }
+                    },
+                    "justifyContent": "start",
+                    "alignItems": "start"
                   },
                   "children": [
                     {
@@ -2661,11 +2594,6 @@
                         "hSizing": "HUG",
                         "vSizing": "HUG"
                       },
-                      "gridPlacement": {
-                        "colStart": 0,
-                        "colSpan": 1,
-                        "colCount": 0
-                      },
                       "layout": {
                         "mode": "row",
                         "gap": {
@@ -2685,7 +2613,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "children": [
                         {
@@ -2734,11 +2664,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -2756,7 +2681,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -2840,11 +2767,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -2862,7 +2784,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -2888,11 +2812,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -2910,7 +2829,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -2943,11 +2864,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -2971,11 +2887,6 @@
                                         "y": -14519,
                                         "width": 153,
                                         "height": 22
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -3020,11 +2931,6 @@
                                         "heightToken": "icon-dimension/height",
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "aspectRatio": {
                                         "label": "1:1",
@@ -3092,11 +2998,6 @@
                             "hSizing": "FIXED",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "aspectRatio": {
                             "label": "1:1",
                             "token": "aspect/square",
@@ -3119,7 +3020,9 @@
                               "leftToken": null
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -3172,11 +3075,6 @@
                                 "hSizing": "FIXED",
                                 "vSizing": "FIXED"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "aspectRatio": {
                                 "label": "1:1",
                                 "token": "aspect/square",
@@ -3200,11 +3098,6 @@
                                     "y": -14515,
                                     "width": 8,
                                     "height": 15
-                                  },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
                                   },
                                   "constraints": {
                                     "horizontal": "SCALE",
@@ -3241,11 +3134,6 @@
                                     "width": 1,
                                     "height": 8
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "constraints": {
                                     "horizontal": "SCALE",
                                     "vertical": "SCALE"
@@ -3273,11 +3161,6 @@
                                     "y": -14515,
                                     "width": 3,
                                     "height": 14
-                                  },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
                                   },
                                   "constraints": {
                                     "horizontal": "SCALE",
@@ -3323,11 +3206,6 @@
                     "hSizing": "HUG",
                     "vSizing": "HUG"
                   },
-                  "gridPlacement": {
-                    "colStart": 0,
-                    "colSpan": 1,
-                    "colCount": 0
-                  },
                   "layout": {
                     "mode": "row",
                     "gap": {
@@ -3343,7 +3221,9 @@
                       "rightToken": null,
                       "bottomToken": null,
                       "leftToken": null
-                    }
+                    },
+                    "justifyContent": "start",
+                    "alignItems": "start"
                   },
                   "children": [
                     {
@@ -3397,11 +3277,6 @@
                         "hSizing": "HUG",
                         "vSizing": "HUG"
                       },
-                      "gridPlacement": {
-                        "colStart": 0,
-                        "colSpan": 1,
-                        "colCount": 0
-                      },
                       "layout": {
                         "mode": "row",
                         "gap": {
@@ -3421,7 +3296,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "children": [
                         {
@@ -3470,11 +3347,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -3492,7 +3364,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -3584,11 +3458,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -3606,7 +3475,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -3632,11 +3503,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -3654,7 +3520,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -3687,11 +3555,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -3715,11 +3578,6 @@
                                         "y": -14425,
                                         "width": 153,
                                         "height": 22
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -3764,11 +3622,6 @@
                                         "heightToken": "icon-dimension/height",
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "aspectRatio": {
                                         "label": "1:1",
@@ -3836,11 +3689,6 @@
                             "hSizing": "FIXED",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "aspectRatio": {
                             "label": "1:1",
                             "token": "aspect/square",
@@ -3863,7 +3711,9 @@
                               "leftToken": null
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -3924,11 +3774,6 @@
                                 "hSizing": "FIXED",
                                 "vSizing": "FIXED"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "aspectRatio": {
                                 "label": "1:1",
                                 "token": "aspect/square",
@@ -3952,11 +3797,6 @@
                                     "y": -14421,
                                     "width": 8,
                                     "height": 15
-                                  },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
                                   },
                                   "constraints": {
                                     "horizontal": "SCALE",
@@ -3993,11 +3833,6 @@
                                     "width": 1,
                                     "height": 8
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "constraints": {
                                     "horizontal": "SCALE",
                                     "vertical": "SCALE"
@@ -4025,11 +3860,6 @@
                                     "y": -14421,
                                     "width": 3,
                                     "height": 14
-                                  },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
                                   },
                                   "constraints": {
                                     "horizontal": "SCALE",
@@ -4079,11 +3909,6 @@
             "hSizing": "FIXED",
             "vSizing": "HUG"
           },
-          "gridPlacement": {
-            "colStart": 0,
-            "colSpan": 1,
-            "colCount": 0
-          },
           "layout": {
             "mode": "column",
             "gap": {
@@ -4099,7 +3924,9 @@
               "rightToken": null,
               "bottomToken": null,
               "leftToken": null
-            }
+            },
+            "justifyContent": "start",
+            "alignItems": "start"
           },
           "clip": true,
           "cornerRadius": {
@@ -4144,11 +3971,6 @@
                 "hSizing": "FIXED",
                 "vSizing": "HUG"
               },
-              "gridPlacement": {
-                "colStart": 0,
-                "colSpan": 1,
-                "colCount": 0
-              },
               "layout": {
                 "mode": "column",
                 "gap": {
@@ -4164,7 +3986,9 @@
                   "rightToken": null,
                   "bottomToken": null,
                   "leftToken": null
-                }
+                },
+                "justifyContent": "start",
+                "alignItems": "start"
               },
               "modes": {
                 "layout": "lg"
@@ -4193,11 +4017,6 @@
                     "hSizing": "FILL",
                     "vSizing": "HUG"
                   },
-                  "gridPlacement": {
-                    "colStart": 0,
-                    "colSpan": 1,
-                    "colCount": 0
-                  },
                   "layout": {
                     "mode": "grid",
                     "gap": {
@@ -4213,7 +4032,9 @@
                       "rightToken": "grid/margin-offset",
                       "bottomToken": "space/spacer-200",
                       "leftToken": "grid/margin-offset"
-                    }
+                    },
+                    "justifyContent": "start",
+                    "alignItems": "start"
                   },
                   "children": [
                     {
@@ -4242,7 +4063,9 @@
                       "gridPlacement": {
                         "colStart": 1,
                         "colSpan": 3,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -4259,7 +4082,9 @@
                           "rightToken": "dimension/dimension-500",
                           "bottomToken": "dimension/dimension-350",
                           "leftToken": "dimension/dimension-500"
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "children": [
                         {
@@ -4276,11 +4101,6 @@
                             "y": -14614,
                             "width": 260,
                             "height": 22
-                          },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
                           },
                           "fills": [
                             {
@@ -4325,7 +4145,9 @@
                       "gridPlacement": {
                         "colStart": 4,
                         "colSpan": 4,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -4342,7 +4164,9 @@
                           "rightToken": "dimension/dimension-500",
                           "bottomToken": "dimension/dimension-350",
                           "leftToken": "dimension/dimension-500"
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "children": [
                         {
@@ -4359,11 +4183,6 @@
                             "y": -14614,
                             "width": 363,
                             "height": 22
-                          },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
                           },
                           "fills": [
                             {
@@ -4408,7 +4227,9 @@
                       "gridPlacement": {
                         "colStart": 9,
                         "colSpan": 4,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "column",
@@ -4426,7 +4247,9 @@
                           "bottomToken": null,
                           "leftToken": null
                         },
-                        "align": "end"
+                        "align": "end",
+                        "justifyContent": "start",
+                        "alignItems": "end"
                       },
                       "children": [
                         {
@@ -4480,11 +4303,6 @@
                             "hSizing": "HUG",
                             "vSizing": "HUG"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "row",
                             "gap": {
@@ -4505,7 +4323,9 @@
                               "bottomToken": null,
                               "leftToken": null
                             },
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "start",
+                            "alignItems": "center"
                           },
                           "semantic": "ul",
                           "children": [
@@ -4555,11 +4375,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "FIXED"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "column",
                                 "gap": {
@@ -4577,7 +4392,9 @@
                                   "leftToken": "space/button-space-h"
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "modes": {
                                 "action": "200"
@@ -4661,11 +4478,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -4683,7 +4495,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -4709,11 +4523,6 @@
                                         "hSizing": "HUG",
                                         "vSizing": "HUG"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "layout": {
                                         "mode": "row",
                                         "gap": {
@@ -4731,7 +4540,9 @@
                                           "leftToken": null
                                         },
                                         "justify": "center",
-                                        "align": "center"
+                                        "align": "center",
+                                        "justifyContent": "center",
+                                        "alignItems": "center"
                                       },
                                       "children": [
                                         {
@@ -4764,11 +4575,6 @@
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
                                           },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
-                                          },
                                           "aspectRatio": {
                                             "label": "1:1",
                                             "token": "aspect/square",
@@ -4792,11 +4598,6 @@
                                             "y": -14614,
                                             "width": 42,
                                             "height": 22
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "fills": [
                                             {
@@ -4842,11 +4643,6 @@
                                             "heightToken": "icon-dimension/height",
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "aspectRatio": {
                                             "label": "1:1",
@@ -4909,11 +4705,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "FIXED"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "column",
                                 "gap": {
@@ -4931,7 +4722,9 @@
                                   "leftToken": "space/button-space-h"
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "modes": {
                                 "action": "200"
@@ -5015,11 +4808,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -5037,7 +4825,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -5063,11 +4853,6 @@
                                         "hSizing": "HUG",
                                         "vSizing": "HUG"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "layout": {
                                         "mode": "row",
                                         "gap": {
@@ -5085,7 +4870,9 @@
                                           "leftToken": null
                                         },
                                         "justify": "center",
-                                        "align": "center"
+                                        "align": "center",
+                                        "justifyContent": "center",
+                                        "alignItems": "center"
                                       },
                                       "children": [
                                         {
@@ -5118,11 +4905,6 @@
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
                                           },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
-                                          },
                                           "aspectRatio": {
                                             "label": "1:1",
                                             "token": "aspect/square",
@@ -5146,11 +4928,6 @@
                                             "y": -14614,
                                             "width": 42,
                                             "height": 22
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "fills": [
                                             {
@@ -5196,11 +4973,6 @@
                                             "heightToken": "icon-dimension/height",
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "aspectRatio": {
                                             "label": "1:1",
@@ -5248,11 +5020,6 @@
                 "hSizing": "FIXED",
                 "vSizing": "HUG"
               },
-              "gridPlacement": {
-                "colStart": 0,
-                "colSpan": 1,
-                "colCount": 0
-              },
               "layout": {
                 "mode": "column",
                 "gap": {
@@ -5268,7 +5035,9 @@
                   "rightToken": null,
                   "bottomToken": null,
                   "leftToken": null
-                }
+                },
+                "justifyContent": "start",
+                "alignItems": "start"
               },
               "modes": {
                 "layout": "md"
@@ -5297,11 +5066,6 @@
                     "hSizing": "FILL",
                     "vSizing": "HUG"
                   },
-                  "gridPlacement": {
-                    "colStart": 0,
-                    "colSpan": 1,
-                    "colCount": 0
-                  },
                   "layout": {
                     "mode": "grid",
                     "gap": {
@@ -5317,7 +5081,9 @@
                       "rightToken": "grid/margin-offset",
                       "bottomToken": "space/spacer-200",
                       "leftToken": "grid/margin-offset"
-                    }
+                    },
+                    "justifyContent": "start",
+                    "alignItems": "start"
                   },
                   "children": [
                     {
@@ -5346,7 +5112,9 @@
                       "gridPlacement": {
                         "colStart": 1,
                         "colSpan": 3,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -5363,7 +5131,9 @@
                           "rightToken": "dimension/dimension-500",
                           "bottomToken": "dimension/dimension-350",
                           "leftToken": "dimension/dimension-500"
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "children": [
                         {
@@ -5380,11 +5150,6 @@
                             "y": -14514,
                             "width": 145,
                             "height": 22
-                          },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
                           },
                           "fills": [
                             {
@@ -5429,7 +5194,9 @@
                       "gridPlacement": {
                         "colStart": 4,
                         "colSpan": 5,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -5446,7 +5213,9 @@
                           "rightToken": "dimension/dimension-500",
                           "bottomToken": "dimension/dimension-350",
                           "leftToken": "dimension/dimension-500"
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "children": [
                         {
@@ -5463,11 +5232,6 @@
                             "y": -14514,
                             "width": 271,
                             "height": 22
-                          },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
                           },
                           "fills": [
                             {
@@ -5512,7 +5276,9 @@
                       "gridPlacement": {
                         "colStart": 9,
                         "colSpan": 4,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "column",
@@ -5530,7 +5296,9 @@
                           "bottomToken": null,
                           "leftToken": null
                         },
-                        "align": "end"
+                        "align": "end",
+                        "justifyContent": "start",
+                        "alignItems": "end"
                       },
                       "children": [
                         {
@@ -5584,11 +5352,6 @@
                             "hSizing": "HUG",
                             "vSizing": "HUG"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "row",
                             "gap": {
@@ -5609,7 +5372,9 @@
                               "bottomToken": null,
                               "leftToken": null
                             },
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "start",
+                            "alignItems": "center"
                           },
                           "semantic": "ul",
                           "children": [
@@ -5659,11 +5424,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "FIXED"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "column",
                                 "gap": {
@@ -5681,7 +5441,9 @@
                                   "leftToken": "space/button-space-h"
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "modes": {
                                 "action": "200"
@@ -5765,11 +5527,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -5787,7 +5544,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -5813,11 +5572,6 @@
                                         "hSizing": "HUG",
                                         "vSizing": "HUG"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "layout": {
                                         "mode": "row",
                                         "gap": {
@@ -5835,7 +5589,9 @@
                                           "leftToken": null
                                         },
                                         "justify": "center",
-                                        "align": "center"
+                                        "align": "center",
+                                        "justifyContent": "center",
+                                        "alignItems": "center"
                                       },
                                       "children": [
                                         {
@@ -5868,11 +5624,6 @@
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
                                           },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
-                                          },
                                           "aspectRatio": {
                                             "label": "1:1",
                                             "token": "aspect/square",
@@ -5896,11 +5647,6 @@
                                             "y": -14514,
                                             "width": 42,
                                             "height": 22
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "fills": [
                                             {
@@ -5946,11 +5692,6 @@
                                             "heightToken": "icon-dimension/height",
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "aspectRatio": {
                                             "label": "1:1",
@@ -6013,11 +5754,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "FIXED"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "column",
                                 "gap": {
@@ -6035,7 +5771,9 @@
                                   "leftToken": "space/button-space-h"
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "modes": {
                                 "action": "200"
@@ -6119,11 +5857,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -6141,7 +5874,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -6167,11 +5902,6 @@
                                         "hSizing": "HUG",
                                         "vSizing": "HUG"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "layout": {
                                         "mode": "row",
                                         "gap": {
@@ -6189,7 +5919,9 @@
                                           "leftToken": null
                                         },
                                         "justify": "center",
-                                        "align": "center"
+                                        "align": "center",
+                                        "justifyContent": "center",
+                                        "alignItems": "center"
                                       },
                                       "children": [
                                         {
@@ -6222,11 +5954,6 @@
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
                                           },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
-                                          },
                                           "aspectRatio": {
                                             "label": "1:1",
                                             "token": "aspect/square",
@@ -6250,11 +5977,6 @@
                                             "y": -14514,
                                             "width": 42,
                                             "height": 22
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "fills": [
                                             {
@@ -6300,11 +6022,6 @@
                                             "heightToken": "icon-dimension/height",
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "aspectRatio": {
                                             "label": "1:1",
@@ -6352,11 +6069,6 @@
                 "hSizing": "FIXED",
                 "vSizing": "HUG"
               },
-              "gridPlacement": {
-                "colStart": 0,
-                "colSpan": 1,
-                "colCount": 0
-              },
               "layout": {
                 "mode": "column",
                 "gap": {
@@ -6372,7 +6084,9 @@
                   "rightToken": null,
                   "bottomToken": null,
                   "leftToken": null
-                }
+                },
+                "justifyContent": "start",
+                "alignItems": "start"
               },
               "modes": {
                 "layout": "sm"
@@ -6401,11 +6115,6 @@
                     "hSizing": "FILL",
                     "vSizing": "HUG"
                   },
-                  "gridPlacement": {
-                    "colStart": 0,
-                    "colSpan": 1,
-                    "colCount": 0
-                  },
                   "layout": {
                     "mode": "grid",
                     "gap": {
@@ -6421,7 +6130,9 @@
                       "rightToken": "grid/margin-default",
                       "bottomToken": "grid/gap-lg",
                       "leftToken": "grid/margin-default"
-                    }
+                    },
+                    "justifyContent": "start",
+                    "alignItems": "start"
                   },
                   "modes": {
                     "layout": "sm"
@@ -6453,7 +6164,9 @@
                       "gridPlacement": {
                         "colStart": 1,
                         "colSpan": 6,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -6470,7 +6183,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "children": [
                         {
@@ -6487,11 +6202,6 @@
                             "y": -14427,
                             "width": 152,
                             "height": 20
-                          },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
                           },
                           "fills": [
                             {
@@ -6536,7 +6246,9 @@
                       "gridPlacement": {
                         "colStart": 7,
                         "colSpan": 6,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "column",
@@ -6555,7 +6267,9 @@
                           "leftToken": null
                         },
                         "justify": "center",
-                        "align": "end"
+                        "align": "end",
+                        "justifyContent": "center",
+                        "alignItems": "end"
                       },
                       "children": [
                         {
@@ -6581,11 +6295,6 @@
                             "hSizing": "HUG",
                             "vSizing": "HUG"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "row",
                             "gap": {
@@ -6603,7 +6312,9 @@
                               "leftToken": null
                             },
                             "justify": "end",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "end",
+                            "alignItems": "center"
                           },
                           "semantic": "ul",
                           "children": [
@@ -6663,11 +6374,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "column",
                                 "gap": {
@@ -6684,7 +6390,9 @@
                                   "bottomToken": null,
                                   "leftToken": null
                                 },
-                                "justify": "center"
+                                "justify": "center",
+                                "justifyContent": "center",
+                                "alignItems": "start"
                               },
                               "modes": {
                                 "icon": "200",
@@ -6718,11 +6426,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -6740,7 +6443,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "end",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "end",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -6773,11 +6478,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -6798,11 +6498,6 @@
                                         "y": -14427,
                                         "width": 38,
                                         "height": 20
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -6847,11 +6542,6 @@
                                         "heightToken": "icon-dimension/height",
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "aspectRatio": {
                                         "label": "1:1",
@@ -6919,11 +6609,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "column",
                                 "gap": {
@@ -6940,7 +6625,9 @@
                                   "bottomToken": null,
                                   "leftToken": null
                                 },
-                                "justify": "center"
+                                "justify": "center",
+                                "justifyContent": "center",
+                                "alignItems": "start"
                               },
                               "modes": {
                                 "icon": "200",
@@ -6974,11 +6661,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -6996,7 +6678,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "end",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "end",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -7029,11 +6713,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -7054,11 +6733,6 @@
                                         "y": -14427,
                                         "width": 38,
                                         "height": 20
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -7104,11 +6778,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -7151,7 +6820,9 @@
                         "colSpan": 12,
                         "colCount": 12,
                         "rowStart": 2,
-                        "rowSpan": 1
+                        "rowSpan": 1,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "column",
@@ -7168,7 +6839,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "children": [
                         {
@@ -7185,11 +6858,6 @@
                             "y": -14341,
                             "width": 327,
                             "height": 20
-                          },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
                           },
                           "fills": [
                             {
@@ -7237,11 +6905,6 @@
             "hSizing": "FIXED",
             "vSizing": "FIXED"
           },
-          "gridPlacement": {
-            "colStart": 0,
-            "colSpan": 1,
-            "colCount": 0
-          },
           "clip": true,
           "cornerRadius": {
             "topLeft": 5,
@@ -7284,11 +6947,6 @@
                 "hSizing": "FIXED",
                 "vSizing": "HUG"
               },
-              "gridPlacement": {
-                "colStart": 0,
-                "colSpan": 1,
-                "colCount": 0
-              },
               "layout": {
                 "mode": "column",
                 "gap": {
@@ -7305,7 +6963,9 @@
                   "bottomToken": null,
                   "leftToken": null
                 },
-                "justify": "center"
+                "justify": "center",
+                "justifyContent": "center",
+                "alignItems": "start"
               },
               "constraints": {
                 "horizontal": "SCALE",
@@ -7335,11 +6995,6 @@
                     "hSizing": "FILL",
                     "vSizing": "HUG"
                   },
-                  "gridPlacement": {
-                    "colStart": 0,
-                    "colSpan": 1,
-                    "colCount": 0
-                  },
                   "layout": {
                     "mode": "grid",
                     "gap": {
@@ -7355,7 +7010,9 @@
                       "rightToken": "grid/margin-offset",
                       "bottomToken": "space/spacer-100",
                       "leftToken": "grid/margin-offset"
-                    }
+                    },
+                    "justifyContent": "start",
+                    "alignItems": "start"
                   },
                   "children": [
                     {
@@ -7385,7 +7042,8 @@
                         "colStart": 1,
                         "colSpan": 4,
                         "colCount": 12,
-                        "justifySelf": "start"
+                        "justifySelf": "start",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "column",
@@ -7402,7 +7060,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "children": [
                         {
@@ -7456,11 +7116,6 @@
                             "hSizing": "HUG",
                             "vSizing": "HUG"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "row",
                             "gap": {
@@ -7481,7 +7136,9 @@
                               "bottomToken": null,
                               "leftToken": null
                             },
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "start",
+                            "alignItems": "center"
                           },
                           "semantic": "ul",
                           "children": [
@@ -7531,11 +7188,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "FIXED"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "column",
                                 "gap": {
@@ -7553,7 +7205,9 @@
                                   "leftToken": "space/button-space-h"
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "modes": {
                                 "action": "200"
@@ -7645,11 +7299,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -7667,7 +7316,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -7693,11 +7344,6 @@
                                         "hSizing": "HUG",
                                         "vSizing": "HUG"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "layout": {
                                         "mode": "row",
                                         "gap": {
@@ -7715,7 +7361,9 @@
                                           "leftToken": null
                                         },
                                         "justify": "center",
-                                        "align": "center"
+                                        "align": "center",
+                                        "justifyContent": "center",
+                                        "alignItems": "center"
                                       },
                                       "children": [
                                         {
@@ -7748,11 +7396,6 @@
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
                                           },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
-                                          },
                                           "aspectRatio": {
                                             "label": "1:1",
                                             "token": "aspect/square",
@@ -7776,11 +7419,6 @@
                                             "y": -14042,
                                             "width": 42,
                                             "height": 22
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "fills": [
                                             {
@@ -7826,11 +7464,6 @@
                                             "heightToken": "icon-dimension/height",
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "aspectRatio": {
                                             "label": "1:1",
@@ -7893,11 +7526,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "FIXED"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "column",
                                 "gap": {
@@ -7915,7 +7543,9 @@
                                   "leftToken": "space/button-space-h"
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "modes": {
                                 "action": "200"
@@ -8007,11 +7637,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -8029,7 +7654,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -8055,11 +7682,6 @@
                                         "hSizing": "HUG",
                                         "vSizing": "HUG"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "layout": {
                                         "mode": "row",
                                         "gap": {
@@ -8077,7 +7699,9 @@
                                           "leftToken": null
                                         },
                                         "justify": "center",
-                                        "align": "center"
+                                        "align": "center",
+                                        "justifyContent": "center",
+                                        "alignItems": "center"
                                       },
                                       "children": [
                                         {
@@ -8110,11 +7734,6 @@
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
                                           },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
-                                          },
                                           "aspectRatio": {
                                             "label": "1:1",
                                             "token": "aspect/square",
@@ -8138,11 +7757,6 @@
                                             "y": -14042,
                                             "width": 42,
                                             "height": 22
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "fills": [
                                             {
@@ -8188,11 +7802,6 @@
                                             "heightToken": "icon-dimension/height",
                                             "hSizing": "FIXED",
                                             "vSizing": "FIXED"
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "aspectRatio": {
                                             "label": "1:1",
@@ -8240,7 +7849,8 @@
                         "colStart": 9,
                         "colSpan": 4,
                         "colCount": 12,
-                        "justifySelf": "end"
+                        "justifySelf": "end",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -8259,7 +7869,9 @@
                           "leftToken": null
                         },
                         "justify": "end",
-                        "align": "center"
+                        "align": "center",
+                        "justifyContent": "end",
+                        "alignItems": "center"
                       },
                       "children": [
                         {
@@ -8303,11 +7915,6 @@
                             "hSizing": "HUG",
                             "vSizing": "HUG"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "row",
                             "gap": {
@@ -8323,7 +7930,9 @@
                               "rightToken": null,
                               "bottomToken": null,
                               "leftToken": null
-                            }
+                            },
+                            "justifyContent": "start",
+                            "alignItems": "start"
                           },
                           "semantic": "nav",
                           "children": [
@@ -8378,11 +7987,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -8402,7 +8006,9 @@
                                   "rightToken": null,
                                   "bottomToken": null,
                                   "leftToken": null
-                                }
+                                },
+                                "justifyContent": "start",
+                                "alignItems": "start"
                               },
                               "children": [
                                 {
@@ -8451,11 +8057,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "FIXED"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "column",
                                     "gap": {
@@ -8473,7 +8074,9 @@
                                       "leftToken": "space/button-space-h"
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "modes": {
                                     "action": "200"
@@ -8565,11 +8168,6 @@
                                         "hSizing": "HUG",
                                         "vSizing": "HUG"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "layout": {
                                         "mode": "row",
                                         "gap": {
@@ -8587,7 +8185,9 @@
                                           "leftToken": null
                                         },
                                         "justify": "center",
-                                        "align": "center"
+                                        "align": "center",
+                                        "justifyContent": "center",
+                                        "alignItems": "center"
                                       },
                                       "children": [
                                         {
@@ -8613,11 +8213,6 @@
                                             "hSizing": "HUG",
                                             "vSizing": "HUG"
                                           },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
-                                          },
                                           "layout": {
                                             "mode": "row",
                                             "gap": {
@@ -8635,7 +8230,9 @@
                                               "leftToken": null
                                             },
                                             "justify": "center",
-                                            "align": "center"
+                                            "align": "center",
+                                            "justifyContent": "center",
+                                            "alignItems": "center"
                                           },
                                           "children": [
                                             {
@@ -8668,11 +8265,6 @@
                                                 "hSizing": "FIXED",
                                                 "vSizing": "FIXED"
                                               },
-                                              "gridPlacement": {
-                                                "colStart": 0,
-                                                "colSpan": 1,
-                                                "colCount": 0
-                                              },
                                               "aspectRatio": {
                                                 "label": "1:1",
                                                 "token": "aspect/square",
@@ -8696,11 +8288,6 @@
                                                 "y": -14042,
                                                 "width": 153,
                                                 "height": 22
-                                              },
-                                              "gridPlacement": {
-                                                "colStart": 0,
-                                                "colSpan": 1,
-                                                "colCount": 0
                                               },
                                               "fills": [
                                                 {
@@ -8745,11 +8332,6 @@
                                                 "heightToken": "icon-dimension/height",
                                                 "hSizing": "FIXED",
                                                 "vSizing": "FIXED"
-                                              },
-                                              "gridPlacement": {
-                                                "colStart": 0,
-                                                "colSpan": 1,
-                                                "colCount": 0
                                               },
                                               "aspectRatio": {
                                                 "label": "1:1",
@@ -8817,11 +8399,6 @@
                                     "hSizing": "FIXED",
                                     "vSizing": "FIXED"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "aspectRatio": {
                                     "label": "1:1",
                                     "token": "aspect/square",
@@ -8844,7 +8421,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "modes": {
                                     "action": "200"
@@ -8905,11 +8484,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -8933,11 +8507,6 @@
                                             "y": -14038,
                                             "width": 8,
                                             "height": 15
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "constraints": {
                                             "horizontal": "SCALE",
@@ -8974,11 +8543,6 @@
                                             "width": 1,
                                             "height": 8
                                           },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
-                                          },
                                           "constraints": {
                                             "horizontal": "SCALE",
                                             "vertical": "SCALE"
@@ -9006,11 +8570,6 @@
                                             "y": -14038,
                                             "width": 3,
                                             "height": 14
-                                          },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
                                           },
                                           "constraints": {
                                             "horizontal": "SCALE",
@@ -9062,11 +8621,6 @@
                 "hSizing": "FIXED",
                 "vSizing": "HUG"
               },
-              "gridPlacement": {
-                "colStart": 0,
-                "colSpan": 1,
-                "colCount": 0
-              },
               "layout": {
                 "mode": "column",
                 "gap": {
@@ -9084,7 +8638,9 @@
                   "leftToken": null
                 },
                 "justify": "center",
-                "align": "center"
+                "align": "center",
+                "justifyContent": "center",
+                "alignItems": "center"
               },
               "modes": {
                 "layout": "sm"
@@ -9117,11 +8673,6 @@
                     "hSizing": "FILL",
                     "vSizing": "HUG"
                   },
-                  "gridPlacement": {
-                    "colStart": 0,
-                    "colSpan": 1,
-                    "colCount": 0
-                  },
                   "layout": {
                     "mode": "row",
                     "gap": {
@@ -9139,7 +8690,9 @@
                       "leftToken": "grid/margin-offset"
                     },
                     "justify": "center",
-                    "align": "center"
+                    "align": "center",
+                    "justifyContent": "center",
+                    "alignItems": "center"
                   },
                   "children": [
                     {
@@ -9193,11 +8746,6 @@
                         "hSizing": "HUG",
                         "vSizing": "HUG"
                       },
-                      "gridPlacement": {
-                        "colStart": 0,
-                        "colSpan": 1,
-                        "colCount": 0
-                      },
                       "layout": {
                         "mode": "row",
                         "gap": {
@@ -9218,7 +8766,9 @@
                           "bottomToken": null,
                           "leftToken": null
                         },
-                        "align": "center"
+                        "align": "center",
+                        "justifyContent": "start",
+                        "alignItems": "center"
                       },
                       "semantic": "ul",
                       "children": [
@@ -9268,11 +8818,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "aspectRatio": {
                             "label": "16:9",
                             "token": null,
@@ -9295,7 +8840,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "300"
@@ -9387,11 +8934,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -9409,7 +8951,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -9435,11 +8979,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -9457,7 +8996,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -9490,11 +9031,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -9518,11 +9054,6 @@
                                         "y": -13939,
                                         "width": 38,
                                         "height": 20
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -9568,11 +9099,6 @@
                                         "heightToken": "icon-dimension/height",
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "aspectRatio": {
                                         "label": "1:1",
@@ -9635,11 +9161,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "aspectRatio": {
                             "label": "16:9",
                             "token": null,
@@ -9662,7 +9183,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "300"
@@ -9754,11 +9277,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -9776,7 +9294,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -9802,11 +9322,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -9824,7 +9339,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -9857,11 +9374,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -9885,11 +9397,6 @@
                                         "y": -13939,
                                         "width": 38,
                                         "height": 20
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -9935,11 +9442,6 @@
                                         "heightToken": "icon-dimension/height",
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "aspectRatio": {
                                         "label": "1:1",
@@ -9987,11 +9489,6 @@
             "hSizing": "FIXED",
             "vSizing": "FIXED"
           },
-          "gridPlacement": {
-            "colStart": 0,
-            "colSpan": 1,
-            "colCount": 0
-          },
           "clip": true,
           "cornerRadius": {
             "topLeft": 5,
@@ -10030,11 +9527,6 @@
                 "hSizing": "FIXED",
                 "vSizing": "FIXED"
               },
-              "gridPlacement": {
-                "colStart": 0,
-                "colSpan": 1,
-                "colCount": 0
-              },
               "aspectRatio": {
                 "label": "16:9",
                 "token": null,
@@ -10056,7 +9548,9 @@
                   "bottomToken": null,
                   "leftToken": null
                 },
-                "justify": "end"
+                "justify": "end",
+                "justifyContent": "end",
+                "alignItems": "start"
               },
               "children": [
                 {
@@ -10082,11 +9576,6 @@
                     "hSizing": "FILL",
                     "vSizing": "HUG"
                   },
-                  "gridPlacement": {
-                    "colStart": 0,
-                    "colSpan": 1,
-                    "colCount": 0
-                  },
                   "layout": {
                     "mode": "grid",
                     "gap": {
@@ -10102,7 +9591,9 @@
                       "rightToken": "grid/margin-offset",
                       "bottomToken": "grid/margin-sm",
                       "leftToken": "grid/margin-offset"
-                    }
+                    },
+                    "justifyContent": "start",
+                    "alignItems": "start"
                   },
                   "semantic": "ul",
                   "children": [
@@ -10132,7 +9623,9 @@
                       "gridPlacement": {
                         "colStart": 1,
                         "colSpan": 3,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -10149,7 +9642,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "semantic": "section",
                       "children": [
@@ -10176,11 +9671,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -10198,7 +9688,9 @@
                               "leftToken": "dimension/dimension-500"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "clip": true,
                           "children": [
@@ -10216,11 +9708,6 @@
                                 "y": -13026,
                                 "width": 68,
                                 "height": 22
-                              },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
                               },
                               "fills": [
                                 {
@@ -10284,11 +9771,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -10306,7 +9788,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -10390,11 +9874,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -10412,7 +9891,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -10438,11 +9919,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -10460,7 +9936,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -10493,11 +9971,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -10521,11 +9994,6 @@
                                         "y": -13026,
                                         "width": 69,
                                         "height": 22
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -10571,11 +10039,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -10619,7 +10082,9 @@
                       "gridPlacement": {
                         "colStart": 10,
                         "colSpan": 3,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -10637,7 +10102,9 @@
                           "bottomToken": null,
                           "leftToken": null
                         },
-                        "justify": "end"
+                        "justify": "end",
+                        "justifyContent": "end",
+                        "alignItems": "start"
                       },
                       "semantic": "section",
                       "children": [
@@ -10692,11 +10159,6 @@
                             "hSizing": "FIXED",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "aspectRatio": {
                             "label": "1:1",
                             "token": "aspect/square",
@@ -10719,7 +10181,9 @@
                               "leftToken": null
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -10783,11 +10247,6 @@
                             "hSizing": "HUG",
                             "vSizing": "HUG"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "row",
                             "gap": {
@@ -10803,7 +10262,9 @@
                               "rightToken": null,
                               "bottomToken": null,
                               "leftToken": null
-                            }
+                            },
+                            "justifyContent": "start",
+                            "alignItems": "start"
                           },
                           "semantic": "nav",
                           "children": [
@@ -10858,11 +10319,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -10882,7 +10338,9 @@
                                   "rightToken": null,
                                   "bottomToken": null,
                                   "leftToken": null
-                                }
+                                },
+                                "justifyContent": "start",
+                                "alignItems": "start"
                               },
                               "children": [
                                 {
@@ -10931,11 +10389,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "FIXED"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "column",
                                     "gap": {
@@ -10953,7 +10406,9 @@
                                       "leftToken": "space/button-space-h"
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "modes": {
                                     "action": "200"
@@ -11037,11 +10492,6 @@
                                         "hSizing": "HUG",
                                         "vSizing": "HUG"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "layout": {
                                         "mode": "row",
                                         "gap": {
@@ -11059,7 +10509,9 @@
                                           "leftToken": null
                                         },
                                         "justify": "center",
-                                        "align": "center"
+                                        "align": "center",
+                                        "justifyContent": "center",
+                                        "alignItems": "center"
                                       },
                                       "children": [
                                         {
@@ -11085,11 +10537,6 @@
                                             "hSizing": "HUG",
                                             "vSizing": "HUG"
                                           },
-                                          "gridPlacement": {
-                                            "colStart": 0,
-                                            "colSpan": 1,
-                                            "colCount": 0
-                                          },
                                           "layout": {
                                             "mode": "row",
                                             "gap": {
@@ -11107,7 +10554,9 @@
                                               "leftToken": null
                                             },
                                             "justify": "center",
-                                            "align": "center"
+                                            "align": "center",
+                                            "justifyContent": "center",
+                                            "alignItems": "center"
                                           },
                                           "children": [
                                             {
@@ -11140,11 +10589,6 @@
                                                 "hSizing": "FIXED",
                                                 "vSizing": "FIXED"
                                               },
-                                              "gridPlacement": {
-                                                "colStart": 0,
-                                                "colSpan": 1,
-                                                "colCount": 0
-                                              },
                                               "aspectRatio": {
                                                 "label": "1:1",
                                                 "token": "aspect/square",
@@ -11168,11 +10612,6 @@
                                                 "y": -13026,
                                                 "width": 158,
                                                 "height": 22
-                                              },
-                                              "gridPlacement": {
-                                                "colStart": 0,
-                                                "colSpan": 1,
-                                                "colCount": 0
                                               },
                                               "fills": [
                                                 {
@@ -11217,11 +10656,6 @@
                                                 "heightToken": "icon-dimension/height",
                                                 "hSizing": "FIXED",
                                                 "vSizing": "FIXED"
-                                              },
-                                              "gridPlacement": {
-                                                "colStart": 0,
-                                                "colSpan": 1,
-                                                "colCount": 0
                                               },
                                               "aspectRatio": {
                                                 "label": "1:1",
@@ -11289,11 +10723,6 @@
                                     "hSizing": "FIXED",
                                     "vSizing": "FIXED"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "aspectRatio": {
                                     "label": "1:1",
                                     "token": "aspect/square",
@@ -11316,7 +10745,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "modes": {
                                     "action": "200"
@@ -11371,7 +10802,9 @@
                       "gridPlacement": {
                         "colStart": 4,
                         "colSpan": 2,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -11388,7 +10821,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "semantic": "section",
                       "children": [
@@ -11438,11 +10873,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -11460,7 +10890,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -11544,11 +10976,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -11566,7 +10993,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -11592,11 +11021,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -11614,7 +11038,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -11647,11 +11073,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -11675,11 +11096,6 @@
                                         "y": -13026,
                                         "width": 96,
                                         "height": 22
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -11725,11 +11141,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -11773,7 +11184,9 @@
                       "gridPlacement": {
                         "colStart": 7,
                         "colSpan": 2,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -11790,7 +11203,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "semantic": "section",
                       "children": [
@@ -11840,11 +11255,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -11862,7 +11272,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -11946,11 +11358,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -11968,7 +11375,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -11994,11 +11403,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -12016,7 +11420,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -12049,11 +11455,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -12077,11 +11478,6 @@
                                         "y": -13026,
                                         "width": 81,
                                         "height": 22
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -12127,11 +11523,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -12176,11 +11567,6 @@
                 "hSizing": "FIXED",
                 "vSizing": "FIXED"
               },
-              "gridPlacement": {
-                "colStart": 0,
-                "colSpan": 1,
-                "colCount": 0
-              },
               "layout": {
                 "mode": "column",
                 "gap": {
@@ -12197,7 +11583,9 @@
                   "bottomToken": null,
                   "leftToken": null
                 },
-                "justify": "end"
+                "justify": "end",
+                "justifyContent": "end",
+                "alignItems": "start"
               },
               "modes": {
                 "layout": "sm"
@@ -12226,11 +11614,6 @@
                     "hSizing": "FILL",
                     "vSizing": "HUG"
                   },
-                  "gridPlacement": {
-                    "colStart": 0,
-                    "colSpan": 1,
-                    "colCount": 0
-                  },
                   "layout": {
                     "mode": "grid",
                     "gap": {
@@ -12246,7 +11629,9 @@
                       "rightToken": "grid/margin-offset",
                       "bottomToken": "space/spacer-300",
                       "leftToken": "grid/margin-offset"
-                    }
+                    },
+                    "justifyContent": "start",
+                    "alignItems": "start"
                   },
                   "semantic": "ul",
                   "children": [
@@ -12276,7 +11661,9 @@
                       "gridPlacement": {
                         "colStart": 1,
                         "colSpan": 6,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -12293,7 +11680,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "semantic": "section",
                       "children": [
@@ -12343,11 +11732,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -12365,7 +11749,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -12449,11 +11835,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -12471,7 +11852,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -12497,11 +11880,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -12519,7 +11897,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -12552,11 +11932,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -12580,11 +11955,6 @@
                                         "y": -12237,
                                         "width": 87,
                                         "height": 20
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -12630,11 +12000,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -12678,7 +12043,9 @@
                       "gridPlacement": {
                         "colStart": 7,
                         "colSpan": 6,
-                        "colCount": 12
+                        "colCount": 12,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -12695,7 +12062,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "semantic": "section",
                       "children": [
@@ -12745,11 +12114,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -12767,7 +12131,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -12851,11 +12217,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -12873,7 +12234,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -12899,11 +12262,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -12921,7 +12279,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -12954,11 +12314,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -12982,11 +12337,6 @@
                                         "y": -12237,
                                         "width": 73,
                                         "height": 20
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -13031,11 +12381,6 @@
                                         "heightToken": "icon-dimension/height",
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "aspectRatio": {
                                         "label": "1:1",
@@ -13082,7 +12427,9 @@
                         "colSpan": 6,
                         "colCount": 12,
                         "rowStart": 2,
-                        "rowSpan": 1
+                        "rowSpan": 1,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -13099,7 +12446,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "semantic": "section",
                       "children": [
@@ -13126,11 +12475,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -13147,7 +12491,9 @@
                               "bottomToken": "dimension/dimension-300",
                               "leftToken": "dimension/dimension-500"
                             },
-                            "justify": "center"
+                            "justify": "center",
+                            "justifyContent": "center",
+                            "alignItems": "start"
                           },
                           "clip": true,
                           "children": [
@@ -13165,11 +12511,6 @@
                                 "y": -12189,
                                 "width": 61,
                                 "height": 20
-                              },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
                               },
                               "fills": [
                                 {
@@ -13217,7 +12558,9 @@
                         "colSpan": 6,
                         "colCount": 12,
                         "rowStart": 2,
-                        "rowSpan": 1
+                        "rowSpan": 1,
+                        "justifySelf": "auto",
+                        "alignSelf": "auto"
                       },
                       "layout": {
                         "mode": "row",
@@ -13234,7 +12577,9 @@
                           "rightToken": null,
                           "bottomToken": null,
                           "leftToken": null
-                        }
+                        },
+                        "justifyContent": "start",
+                        "alignItems": "start"
                       },
                       "semantic": "section",
                       "children": [
@@ -13284,11 +12629,6 @@
                             "hSizing": "HUG",
                             "vSizing": "FIXED"
                           },
-                          "gridPlacement": {
-                            "colStart": 0,
-                            "colSpan": 1,
-                            "colCount": 0
-                          },
                           "layout": {
                             "mode": "column",
                             "gap": {
@@ -13306,7 +12646,9 @@
                               "leftToken": "space/button-space-h"
                             },
                             "justify": "center",
-                            "align": "center"
+                            "align": "center",
+                            "justifyContent": "center",
+                            "alignItems": "center"
                           },
                           "modes": {
                             "action": "200"
@@ -13390,11 +12732,6 @@
                                 "hSizing": "HUG",
                                 "vSizing": "HUG"
                               },
-                              "gridPlacement": {
-                                "colStart": 0,
-                                "colSpan": 1,
-                                "colCount": 0
-                              },
                               "layout": {
                                 "mode": "row",
                                 "gap": {
@@ -13412,7 +12749,9 @@
                                   "leftToken": null
                                 },
                                 "justify": "center",
-                                "align": "center"
+                                "align": "center",
+                                "justifyContent": "center",
+                                "alignItems": "center"
                               },
                               "children": [
                                 {
@@ -13438,11 +12777,6 @@
                                     "hSizing": "HUG",
                                     "vSizing": "HUG"
                                   },
-                                  "gridPlacement": {
-                                    "colStart": 0,
-                                    "colSpan": 1,
-                                    "colCount": 0
-                                  },
                                   "layout": {
                                     "mode": "row",
                                     "gap": {
@@ -13460,7 +12794,9 @@
                                       "leftToken": null
                                     },
                                     "justify": "center",
-                                    "align": "center"
+                                    "align": "center",
+                                    "justifyContent": "center",
+                                    "alignItems": "center"
                                   },
                                   "children": [
                                     {
@@ -13493,11 +12829,6 @@
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
                                       },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
-                                      },
                                       "aspectRatio": {
                                         "label": "1:1",
                                         "token": "aspect/square",
@@ -13521,11 +12852,6 @@
                                         "y": -12189,
                                         "width": 62,
                                         "height": 20
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "fills": [
                                         {
@@ -13570,11 +12896,6 @@
                                         "heightToken": "icon-dimension/height",
                                         "hSizing": "FIXED",
                                         "vSizing": "FIXED"
-                                      },
-                                      "gridPlacement": {
-                                        "colStart": 0,
-                                        "colSpan": 1,
-                                        "colCount": 0
                                       },
                                       "aspectRatio": {
                                         "label": "1:1",

@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://handoff-css/schema/design-handoff.v11.schema.json",
+  "title": "Design Handoff brief — JSON companion (schema design-handoff v11)",
+  "description": "0.4.3 — schema v11 (export v15+) makes alignment explicit: every grid child's `gridPlacement` carries `justifySelf`/`alignSelf` (`auto` when default, otherwise a closed CSS enum), and every layout container carries CSS-resolved `alignItems`/`justifyContent` beside Figma's own `align`/`justify`. No `gridPlacement` object appears on a non-grid node. Validated SHAPE only, as v10 was. `additionalProperties: false` throughout: this schema is versioned, so an unknown field is a finding — bump the schema rather than let it validate silently.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "schemaVersion", "contract", "generatedAt", "exportVersion",
+    "documentName", "pageName", "contentHash", "designSystemStateHash", "companion",
+    "breakpoints", "selectedNodes"
+  ],
+  "$defs": {
+    "selfAlignment": {
+      "enum": ["auto", "start", "end", "center", "stretch", "baseline", "self-start", "self-end"]
+    },
+    "contentAlignment": {
+      "enum": ["start", "end", "center", "stretch", "baseline", "normal", "space-between", "space-around", "space-evenly", "flex-start", "flex-end"]
+    },
+    "layerNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "type", "depth", "visible"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "depth": { "type": "integer" },
+        "visible": { "type": "boolean" },
+        "link": { "type": "string" },
+        "parentId": { "type": "string" },
+        "absolute": { "type": "boolean" },
+        "absoluteBounds": {
+          "type": "object",
+          "properties": {
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "width": { "type": "number" },
+            "height": { "type": "number" }
+          }
+        },
+        "dimensions": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "number" },
+            "height": { "type": "number" },
+            "widthToken": { "type": ["string", "null"] },
+            "heightToken": { "type": ["string", "null"] },
+            "hSizing": { "type": "string" },
+            "vSizing": { "type": "string" }
+          }
+        },
+        "cornerRadius": {
+          "type": "object",
+          "properties": {
+            "topLeft": { "type": "number" },
+            "topRight": { "type": "number" },
+            "bottomLeft": { "type": "number" },
+            "bottomRight": { "type": "number" },
+            "uniform": { "type": "boolean" },
+            "tokens": { "type": "object" }
+          }
+        },
+        "fills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "color": { "type": "string" }
+            }
+          }
+        },
+        "strokes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "color": { "type": "string" },
+              "weight": { "type": "number" },
+              "align": { "type": "string" }
+            }
+          }
+        },
+        "semantic": { "type": "string" },
+        "gridPlacement": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "colStart": { "type": "number" },
+            "colSpan": { "type": "number" },
+            "colCount": { "type": "number" },
+            "rowStart": { "type": "number" },
+            "rowSpan": { "type": "number" },
+            "justifySelf": { "$ref": "#/$defs/selfAlignment" },
+            "alignSelf": { "$ref": "#/$defs/selfAlignment" }
+          }
+        },
+        "layout": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": { "type": "string" },
+            "gap": { "type": "object" },
+            "counterAxisGap": { "type": "object" },
+            "padding": { "type": "object" },
+            "justify": { "type": "string" },
+            "align": { "type": "string" },
+            "justifyContent": { "$ref": "#/$defs/contentAlignment" },
+            "alignItems": { "$ref": "#/$defs/contentAlignment" }
+          }
+        },
+        "component": {
+          "type": "object",
+          "properties": {
+            "sourceId": { "type": "string" },
+            "sourceName": { "type": "string" },
+            "sourceLink": { "type": "string" },
+            "setName": { "type": ["string", "null"] },
+            "props": { "type": "object" }
+          }
+        },
+        "modes": { "type": "object" },
+        "clip": { "type": "boolean" },
+        "interactive": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "aspectRatio": {
+          "type": "object",
+          "properties": {
+            "label": { "type": "string" },
+            "token": { "type": ["string", "null"] },
+            "locked": { "type": "boolean" }
+          }
+        },
+        "annotations": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "constraints": {
+          "type": "object",
+          "properties": {
+            "horizontal": { "type": "string" },
+            "vertical": { "type": "string" }
+          }
+        },
+        "text": {
+          "type": "object",
+          "properties": {
+            "characters": { "type": "string" },
+            "verticalAlign": { "type": "string" },
+            "textWrap": { "type": "string" }
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/layerNode" }
+        }
+      }
+    },
+    "selectedNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
+    "componentIndexEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "count"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "link": { "type": "string" },
+        "count": { "type": "integer" },
+        "perFrame": { "type": "object" }
+      }
+    },
+    "variableTokenEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "count"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "aliasId": { "type": "string" },
+        "count": { "type": "integer" }
+      }
+    },
+    "prototypeFlowEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceName", "sourceId", "trigger", "action"],
+      "properties": {
+        "sourceName": { "type": "string" },
+        "sourceId": { "type": "string" },
+        "trigger": { "type": "string" },
+        "action": { "type": "string" },
+        "destination": { "type": "string" },
+        "destinationId": { "type": "string" },
+        "transition": { "type": "string" }
+      }
+    },
+    "motionTransitionTokenEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value", "kind"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": "string" },
+        "kind": { "type": "string" }
+      }
+    }
+  },
+  "properties": {
+    "schema": { "const": "design-handoff" },
+    "schemaVersion": { "const": 11 },
+    "contract": { "type": "string" },
+    "lane": { "type": "string" },
+    "generatedAt": { "type": "string" },
+    "exportVersion": { "type": "integer" },
+    "documentName": { "type": "string" },
+    "pageName": { "type": "string" },
+    "contentHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "designSystemStateHash": { "type": "string" },
+    "fingerprintPolicyVersion": { "type": ["string", "integer"] },
+    "figma": { "type": "object" },
+    "companion": {
+      "type": "object",
+      "required": ["schema", "schemaVersion", "contentHash", "designSystemStateHash"],
+      "properties": {
+        "schema": { "const": "design-system-handoff" },
+        "schemaVersion": { "type": "integer" },
+        "artifactFilename": { "type": "string" },
+        "contentHash": { "type": "string" },
+        "designSystemStateHash": { "type": "string" },
+        "stale": { "type": "boolean" }
+      }
+    },
+    "breakpoints": { "type": "object" },
+    "selectedNodes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/selectedNode" }
+    },
+    "options": { "type": "object" },
+    "policies": { "type": "object" },
+    "changes": { "type": "object" },
+    "layerTree": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/layerNode" }
+    },
+    "componentIndex": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/componentIndexEntry" }
+    },
+    "variableTokens": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/variableTokenEntry" }
+    },
+    "prototypeFlows": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/prototypeFlowEntry" }
+    },
+    "motionEntries": { "type": "array" },
+    "zIndexScale": { "type": "array" },
+    "motionTransitionTokens": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/motionTransitionTokenEntry" }
+    }
+  }
+}
