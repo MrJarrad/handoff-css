@@ -190,6 +190,21 @@ export function emitTokens(doc, handDeclared, cfg) {
       // scope instead of once per width.
       const collapsed = new Set();
       const hinted = new Set(); // P13 — one hint warning per layout variant
+      const uncollapsible = new Set(); // one CLAMP_WITHOUT_EXPRESSION / FIXED_VARIES_BY_MODE warning per variant
+      // The `allFixed` claim above just raised its own FIXED_VARIES_BY_MODE for
+      // the whole variable — every rule states `fixed`, so every variant's own
+      // per-variant `collapse()` below would fail on the SAME disagreement and
+      // warn again. Pre-mark every rule variant uncollapsible so the per-mode
+      // fallback stays silent about a claim already reported once.
+      if (resp.allFixed) for (const variant of resp.rules.keys()) uncollapsible.add(variant);
+      // A variable's `responsiveBehavior` is published PER `layoutVariant` (P11),
+      // so two variants of the same variable can honour different strategies —
+      // `col-span-1` is `fluid-clamp` at `default`/`flush` and `fixed` at
+      // `sidebar-main`/`sidebar-main-flush` in export v11. `variantEffects`
+      // records each variant's own effect so §10 states all of them, instead of
+      // the single mutable `row.effect` overwriting itself with whichever
+      // variant the loop reaches last.
+      const variantEffects = new Map();
       for (const mode of c.modes) {
         const mv = v.modes.find((m) => m.modeId === mode.id);
         if (!mv || mv.effective === false) continue;
@@ -226,16 +241,37 @@ export function emitTokens(doc, handDeclared, cfg) {
           continue;
         }
 
-        if (rule && honours(cfg, rule.cls) && collapse(v, rule, variant, ctx, byId, cfg, warnings, c)) {
-          if (collapsed.has(variant)) continue;
-          collapsed.add(variant);
-          row.honoured = true;
-          row.effect = `${rule.cls} once per layout variant`;
-          push(variantBase(variant, cfg), `${name}: ${rule.cls === "fluid-clamp" ? rule.css : r.value};`);
-          continue;
+        if (rule && honours(cfg, rule.cls) && !uncollapsible.has(variant)) {
+          if (collapse(v, rule, variant, ctx, byId, cfg, warnings, c)) {
+            if (!collapsed.has(variant)) {
+              collapsed.add(variant);
+              row.honoured = true;
+              variantEffects.set(variant, `${rule.cls} once per layout variant`);
+              push(variantBase(variant, cfg), `${name}: ${rule.cls === "fluid-clamp" ? rule.css : r.value};`);
+            }
+            continue;
+          }
+          // Uncollapsible — `collapse` already raised its warning once; every
+          // other width sample in this variant falls to the per-mode path
+          // silently, rather than re-raising the same warning per width.
+          uncollapsible.add(variant);
         }
 
         for (const p of placementsFor(c, mode, ctx, cfg)) push(p, decl);
+      }
+
+      // §10's Effect column: one string per distinct effect, naming every
+      // variant that shares it — never the last variant processed silently
+      // standing in for the others.
+      if (variantEffects.size) {
+        const byEffect = new Map(); // effect string -> variant names, in variant order
+        for (const [variant, effect] of variantEffects) {
+          if (!byEffect.has(effect)) byEffect.set(effect, []);
+          byEffect.get(effect).push(variant);
+        }
+        row.effect = byEffect.size === 1
+          ? [...byEffect.keys()][0]
+          : [...byEffect].map(([effect, variants]) => `${variants.join("/")}: ${effect}`).join("; ");
       }
     }
 

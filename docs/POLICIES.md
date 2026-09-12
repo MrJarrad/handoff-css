@@ -389,6 +389,10 @@ not the number of modes — decides how many declarations it gets.
 | `mode-stepped` | Per-mode, in ascending `@media (min-width)` blocks — the default path (P3, P6). |
 | `sample-only` | Per-mode, from the one published sample. |
 
+For `fixed`, the emitted declaration is the resolved token reference (the alias
+chain), not the literal `css` string the export publishes — the alias binding is
+preferred over the literal because it survives upstream token renames.
+
 **Where the class comes from**, in precedence order:
 
 1. A `responsive` block on the variable —
@@ -421,7 +425,12 @@ at every viewport, so the more specific statement wins.
 allowed to change the output. `mode-stepped` and `sample-only` ARE the default
 path, so listing them changes nothing; an empty list pins pre-0.2.0 output
 exactly. This is how a consumer adopts one class at a time instead of taking
-every behavioural change in one release.
+every behavioural change in one release. The house preset (`presets/jhd.config.mjs`)
+honours all four classes that can change output as of 0.4.2 — operator ruling
+2026-09-12 ("Responsive strategy"): *"let's follow what the plugin suggests."*
+`fluid-clamp` and `fixed` are no longer held; every rule the plugin writes is
+honoured exactly as published, per `layoutVariant`, and the export's own `css`
+is used verbatim — never recomputed.
 
 **`viewport.groups` is a whitelist, not a warning filter.** It names the
 variable-name prefixes the consumer declares viewport-relative, and that

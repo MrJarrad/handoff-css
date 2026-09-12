@@ -494,9 +494,10 @@ is where the class came from: a `responsive` **field** on the variable, the
 `responsive.honourClasses` changes it; every other class takes the per-mode
 path, so parity can be pinned.
 
-Honoured this run: `viewport-height`, `viewport-width`.
+Honoured this run: `viewport-height`, `viewport-width`, `fluid-clamp`, `fixed`.
 
 82 of 516 emitted variables carry a class — fixed (export): 6 · fixed (rule): 1 · fluid-clamp (export): 14 · mode-stepped (export): 52 · viewport-height (description): 8 · viewport-width (description): 1.
+Strategy counts: fixed: 7 · fluid-clamp: 14 · mode-stepped: 52 · viewport-height: 8 · viewport-width: 1.
 The other 52 are `mode-stepped` or `sample-only`, which IS the
 per-mode path, so they are not listed individually: their output is unchanged.
 
@@ -512,25 +513,25 @@ per-mode path, so they are not listed individually: their output is unchanged.
 | `--device-screen-height-700` | layout | viewport-height | description | 90dvh once on the base scope |
 | `--device-screen-height-full` | layout | viewport-height | description | 100dvh once on the base scope |
 | `--device-width` | layout | viewport-width | description | 100vw once on the base scope |
-| `--grid-col-start-1` | layout | fixed | export | per-mode |
-| `--grid-col-start-2` | layout | fluid-clamp | export | per-mode |
-| `--grid-columns` | layout | fixed | export | per-mode |
+| `--grid-col-start-1` | layout | fixed | export | fixed once per layout variant |
+| `--grid-col-start-2` | layout | fluid-clamp | export | default/flush: fluid-clamp once per layout variant; sidebar-main/sidebar-main-flush: fixed once per layout variant |
+| `--grid-columns` | layout | fixed | export | fixed once per layout variant |
 | `--icon-radius-100` | icon | fluid-clamp | export | per-mode |
 | `--icon-radius-200` | icon | fluid-clamp | export | per-mode |
 | `--icon-radius-300` | icon | fluid-clamp | export | per-mode |
 | `--space-button-space-h` | action | fluid-clamp | export | per-mode |
 | `--space-button-space-h-offset` | action | fluid-clamp | export | per-mode |
-| `--space-spacer-0` | layout | fixed | export | per-mode |
-| `--text-body-font-size-100` | layout | fluid-clamp | export | per-mode |
-| `--text-body-font-size-200` | layout | fluid-clamp | export | per-mode |
-| `--text-body-font-size-300` | layout | fluid-clamp | export | per-mode |
+| `--space-spacer-0` | layout | fixed | export | fixed once per layout variant |
+| `--text-body-font-size-100` | layout | fluid-clamp | export | default/flush: fluid-clamp once per layout variant; sidebar-main/sidebar-main-flush: fixed once per layout variant |
+| `--text-body-font-size-200` | layout | fluid-clamp | export | default/flush: fluid-clamp once per layout variant; sidebar-main/sidebar-main-flush: fixed once per layout variant |
+| `--text-body-font-size-300` | layout | fluid-clamp | export | default/flush: fluid-clamp once per layout variant; sidebar-main/sidebar-main-flush: fixed once per layout variant |
 | `--text-body-letter-spacing-100` | layout | fixed | export | per-mode |
 | `--text-body-letter-spacing-300` | layout | fixed | export | per-mode |
-| `--text-body-paragraph-spacing-100` | layout | fluid-clamp | export | per-mode |
-| `--text-body-paragraph-spacing-200` | layout | fluid-clamp | export | per-mode |
-| `--text-body-paragraph-spacing-300` | layout | fluid-clamp | export | per-mode |
-| `--text-title-font-size-100` | layout | fluid-clamp | export | per-mode |
-| `--text-title-font-size-200` | layout | fluid-clamp | export | per-mode |
+| `--text-body-paragraph-spacing-100` | layout | fluid-clamp | export | default/flush: fluid-clamp once per layout variant; sidebar-main/sidebar-main-flush: fixed once per layout variant |
+| `--text-body-paragraph-spacing-200` | layout | fluid-clamp | export | default/flush: fluid-clamp once per layout variant; sidebar-main/sidebar-main-flush: fixed once per layout variant |
+| `--text-body-paragraph-spacing-300` | layout | fluid-clamp | export | default/flush: fluid-clamp once per layout variant; sidebar-main/sidebar-main-flush: fixed once per layout variant |
+| `--text-title-font-size-100` | layout | fluid-clamp | export | default/flush: fluid-clamp once per layout variant; sidebar-main/sidebar-main-flush: fixed once per layout variant |
+| `--text-title-font-size-200` | layout | fluid-clamp | export | default/flush: fluid-clamp once per layout variant; sidebar-main/sidebar-main-flush: fixed once per layout variant |
 | `--text-title-letter-spacing-200` | layout | fixed | export | per-mode |
 
 **Untrusted build cells (0)** (P13) — cells that contradict
@@ -544,11 +545,15 @@ plugin export takes the count to zero.
 
 None.
 
-**Warnings (0)** — what the generator would not guess at. A
+**Warnings (3)** — what the generator would not guess at. A
 variable in a `viewport.groups` group with no stated fraction keeps its px
 samples: the fix is one description in Figma, not a heuristic here.
 
-None.
+| Code | Token | Detail |
+| --- | --- | --- |
+| `FIXED_VARIES_BY_MODE` | `--text-body-letter-spacing-100` | `fixed` at layout variant `default`, but its modes resolve to 2 different values — per-mode samples emitted instead |
+| `FIXED_VARIES_BY_MODE` | `--text-body-letter-spacing-300` | `fixed` at layout variant `default`, but its modes resolve to 2 different values — per-mode samples emitted instead |
+| `FIXED_VARIES_BY_MODE` | `--text-title-letter-spacing-200` | `fixed` at layout variant `default`, but its modes resolve to 2 different values — per-mode samples emitted instead |
 
 **Aliases (16)** — published names that are a `var()` hop onto a
 generated token, expanded from `aliases` over the emitted leaves. The token is

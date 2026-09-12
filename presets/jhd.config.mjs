@@ -150,22 +150,21 @@ export default {
 
   // P11 — which responsive classes may change what is emitted.
   //
-  // HELD, each with its blocker (same convention as `tailwind.held` above):
-  //   `fluid-clamp`  50 rules in the 2026-09-10 export already carry a ready
-  //                  `clamp()` — honouring it would move ~50 `grid/col-span/*`
-  //                  and `grid/col-start/*` tokens from stepped px to fluid
-  //                  clamps in one release. A real design decision (fluid grid
-  //                  columns), not a token-pipeline one: operator's call,
-  //                  and its own lane.
-  //   `fixed`        9 rules. Honouring it collapses a token that is equal at
-  //                  every breakpoint from ten declarations to one — correct,
-  //                  and invisible in computed values, but it is a diff across
-  //                  `grid/columns`, `grid/col-start/col-start-1` and
-  //                  `space/spacer-0` with no behaviour to show for it.
+  // Operator ruling 2026-09-12 ("Responsive strategy"): *"let's follow what
+  // the plugin suggests."* Every variable's `responsiveBehavior.rules[]`
+  // states, per `layoutVariant`, a strategy the plugin chose from the
+  // breakpoint samples' fit within tolerance — `fluid-clamp` (with a ready
+  // `css: clamp(...)`), `fixed`, `mode-stepped`, or a viewport fraction. This
+  // preset un-holds `fluid-clamp` and `fixed` (0.4.2, superseding the 0.3.x
+  // HELD note below): code binds the token and never recomputes or
+  // second-guesses the plugin's own choice. Effect: the grid margins/paddings
+  // that went stepped in the W3a rebind come back fluid wherever the plugin
+  // says `fluid-clamp`.
+  //
   //   `mode-stepped` / `sample-only` ARE the per-mode default path; listing
   //                  them would change nothing either way.
   responsive: {
-    honourClasses: ["viewport-height", "viewport-width"],
+    honourClasses: ["viewport-height", "viewport-width", "fluid-clamp", "fixed"],
   },
 
   // P11 — the viewport rule. `device/*` is the group the house declares
