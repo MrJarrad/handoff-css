@@ -27,11 +27,20 @@ export default {
   //
   //   `.utility/`           durable. Operator ruling 2026-09-06: ".utility ignore
   //                         all together" — a Figma authoring scratch collection.
-  //   `layout/grid/aspect/` INTERIM, pending Figma marking these hidden. Operator
-  //                         ruling 2026-09-06: "we didn't bring in aspect ratio
-  //                         related variables like portrait, tall and landscape.
-  //                         They are just figma hacks because i can actually add
-  //                         an aspect ratio."
+  //   `layout/grid/aspect/` durable as an EXCLUSION, and deliberately READ by P20.
+  //                         Operator ruling 2026-09-06: "we didn't bring in aspect
+  //                         ratio related variables like portrait, tall and
+  //                         landscape. They are just figma hacks because i can
+  //                         actually add an aspect ratio." Ruling 2026-09-12 row 6
+  //                         adds the other half: "figma has no concept of aspect
+  //                         ratios, I tend to just use the col-span as the height".
+  //                         The per-col-span heights are the hack and never become
+  //                         tokens; the RATIO every one of them states in its
+  //                         description is the design decision, and P20 (`aspect`
+  //                         below) publishes it once per leaf group. Excluding a
+  //                         group and deriving from it is not a contradiction: P7
+  //                         governs what is emitted, and this group is the only
+  //                         place the ratio is written down.
   exclude: {
     paths: ["layout/grid/aspect/", ".utility/"],
   },
@@ -40,6 +49,39 @@ export default {
   // `rgb(r g b / <pct>)`. (`hex8` emits the export's 8-digit hex verbatim.)
   color: {
     format: "rgb-slash-percent",
+  },
+
+  // P19 — MOTION. Operator ruling 2026-09-12 row 2 ("should the name reflect
+  // the time?" -> yes, a full primitive ramp named by milliseconds): the steps
+  // are named for their milliseconds in Figma, so the value has to read in
+  // milliseconds too. Figma stores TIMING in seconds.
+  //
+  // Delays (ruling row 4, "why wouldn't we have delay values") are their own
+  // named ramp whose every step is a FIGMA ALIAS of the matching
+  // `motion/duration` step, so the value can never drift between the two. That
+  // aliasing is authored in Figma and arrives as an ordinary alias hop —
+  // `--delay-375: var(--duration-375)` — via P5/P12. Nothing here invents it:
+  // a generator-side delay/duration pairing would be a name heuristic, and the
+  // day a delay step legitimately differs it would silently overwrite it.
+  motion: {
+    timingUnit: "ms",
+  },
+
+  // P20 — ASPECT RATIOS. Operator ruling 2026-09-12 rows 5 and 6: *"all of them
+  // have a description with the ratio"*, and *"figma has no concept of aspect
+  // ratios, I tend to just use the col-span as the height"*. So the per-col-span
+  // heights under `layout/grid/aspect/` stay EXCLUDED (see `exclude.paths`
+  // above) — they are the Figma workaround, not a token — and the ratio those
+  // variables all state in their descriptions is published once per leaf group
+  // as `--aspect-<leaf group name>`. Reading an excluded group is deliberate:
+  // P7 decides what is EMITTED, and the only place the ratio is written down is
+  // inside it.
+  aspect: {
+    group: "layout/grid/aspect/",
+    prefix: "--aspect-",
+    // "Ratio – 3/2, 3:2" — the fraction is the authoritative half; the `a:b`
+    // restatement after the comma is prose.
+    descriptionPattern: "^Ratio\\s*[\u2013\u2014-]\\s*(\\d+(?:\\.\\d+)?)\\s*/\\s*(\\d+(?:\\.\\d+)?)",
   },
 
   // P3/P6 — the responsive collection: which one it is, how its non-default

@@ -3,6 +3,7 @@
 import path from "node:path";
 
 import { aliasBlock } from "./aliases.mjs";
+import { assertNoAspectCollision, aspectTokens } from "./aspect.mjs";
 import { aliasedByNames, isExcluded, isHidden, privateIds } from "./exclude.mjs";
 import { layoutBreakpoints, placementsFor, renderGroups, themeModeIds, variantBase } from "./modes.mjs";
 import { cmp, num, resolveValue, untrustedCells } from "./resolve.mjs";
@@ -266,6 +267,15 @@ export function emitTokens(doc, handDeclared, cfg) {
     blocks.push(head.join("\n"));
   }
 
+  // P20 — the aspect ratios the excluded `grid/aspect/*` heights encode, lifted
+  // out of their descriptions. Placed after the collection blocks and before
+  // the alias block, so an alias may hop onto one.
+  const aspect = aspectTokens(doc, handDeclared, cfg);
+  assertNoAspectCollision(aspect.rows, emitted);
+  warnings.push(...aspect.warnings);
+  for (const r of aspect.rows) if (r.hand == null) emitted.add(r.name);
+  if (aspect.css) blocks.push(aspect.css);
+
   // The consumer's own alias names, expanded over what was emitted above.
   const aliases = aliasBlock(emitted, handDeclared, cfg);
   if (aliases.css) blocks.push(aliases.css);
@@ -290,7 +300,7 @@ export function emitTokens(doc, handDeclared, cfg) {
   return {
     css: `${header}${blocks.join("\n\n")}\n`,
     rows, privateRows, hiddenRows, excludedRows,
-    responsiveRows, aliasRows: aliases.rows, warnings, untrustedRows,
+    responsiveRows, aliasRows: aliases.rows, aspectRows: aspect.rows, warnings, untrustedRows,
   };
 }
 

@@ -25,6 +25,8 @@ test("every key the plan locked is present in the preset", () => {
     "paths.handAuthored", "paths.exclusions",
     "exclude.paths",
     "color.format",
+    "motion.timingUnit",
+    "aspect.group", "aspect.prefix", "aspect.descriptionPattern",
     "layout.collection", "layout.variantAttribute", "layout.baseMode",
     "modes.collectionModeAttribute",
     "themes.collection", "themes.total",

@@ -5,7 +5,7 @@
   "description": "Every house policy handoff-css applies. Nothing in src/ carries a default for these: a consumer states them here, or the generator refuses to run.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "paths", "exclude", "color", "layout", "modes", "themes", "tailwind", "responsive", "viewport", "aliases", "report", "header"],
+  "required": ["schema", "paths", "exclude", "color", "motion", "aspect", "layout", "modes", "themes", "tailwind", "responsive", "viewport", "aliases", "report", "header"],
   "properties": {
     "schema": {
       "type": "object",
@@ -54,6 +54,38 @@
         "format": {
           "enum": ["rgb-slash-percent", "hex8"],
           "description": "How an 8-digit hex renders: `#rrggbb` at full alpha else `rgb(r g b / pct)`, or the export's hex verbatim."
+        }
+      }
+    },
+    "motion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timingUnit"],
+      "description": "P19 — MOTION. An EASING variable renders from the export's own curve (`cubic-bezier(…)`, `linear` for a LINEAR curve) and needs no house policy; the timing unit is the one decision.",
+      "properties": {
+        "timingUnit": {
+          "enum": ["ms", "s"],
+          "description": "The unit a TIMING variable (`motion/duration/*`, `motion/delay/*`) publishes. Figma stores seconds. `ms` republishes them as milliseconds, so a step the operator named for its milliseconds reads in the unit its name states (ruling 2026-09-12 row 2); `s` is the pre-0.4.0 form."
+        }
+      }
+    },
+    "aspect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["group", "prefix", "descriptionPattern"],
+      "description": "P20 — ASPECT RATIOS. Figma has no aspect-ratio primitive, so the design system encodes each ratio as a column-span height group whose variables all carry the ratio in their description. The ratio is the design decision; the heights are the workaround.",
+      "properties": {
+        "group": {
+          "type": ["string", "null"],
+          "description": "The `\"<collection>/<variable>\"` prefix whose LEAF GROUPS each state one ratio in their members' descriptions (`layout/grid/aspect/`). `null` derives nothing. This prefix is normally also in `exclude.paths`: the per-col-span heights under it are the Figma hack and stay out of the CSS, while the ratio they encode is published once per leaf group."
+        },
+        "prefix": {
+          "type": ["string", "null"],
+          "description": "The custom-property prefix the derived token takes, joined to the leaf group's own name (`--aspect-` + `landscape`). A derived token has no variable of its own, so P1's `codeSyntax.WEB` cannot name it and the prefix is stated here."
+        },
+        "descriptionPattern": {
+          "type": ["string", "null"],
+          "description": "A JavaScript regular-expression source matched against each member's `description`, whose first two capture groups are the ratio's antecedent and consequent. A leaf group whose members do not all state the SAME ratio raises `ASPECT_RATIO_MIXED` and publishes nothing — never a silent pick."
         }
       }
     },

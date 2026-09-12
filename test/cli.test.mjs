@@ -40,10 +40,14 @@ test("run() writes the four artifacts, and --check then passes over its own outp
     /--device-screen-height-100: 20dvh;/);
 
   // Every field the CLI summary prints must exist and be countable.
-  for (const field of ["rows", "privateRows", "hiddenRows", "excludedRows", "responsiveRows", "aliasRows", "warnings"]) {
+  for (const field of ["rows", "privateRows", "hiddenRows", "excludedRows", "responsiveRows", "aliasRows", "aspectRows", "warnings"]) {
     assert.ok(Array.isArray(out[field]), `${field} must be an array`);
   }
   assert.deepEqual(out.warnings.map((w) => [w.code, w.name]).sort(), [
+    // P20 — `grid/aspect/tall/full-width` says "Ratio – 3/4, 3:4" while the
+    // other twelve members of its group say 2/3. The generator publishes
+    // nothing for that group rather than picking a side.
+    ["ASPECT_RATIO_MIXED", "--aspect-tall"],
     ["VIEWPORT_UNFLAGGED", "--device-container-max-width"],
     ["VIEWPORT_UNFLAGGED", "--device-screen-height-full"],
     ["VIEWPORT_UNFLAGGED", "--device-width"],
