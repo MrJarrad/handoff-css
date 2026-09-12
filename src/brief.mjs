@@ -18,19 +18,36 @@ import { parseFrontMatter } from "./front-matter.mjs";
 
 const require = createRequire(import.meta.url);
 
-/** The published schema for the brief JSON, also reachable as `handoff-css/schema/brief`. */
+/** The published v10 schema for the brief JSON, also reachable as `handoff-css/schema/brief`. */
 export const briefSchema = require("../schema/design-handoff.v10.schema.json");
 
-let compiled = null;
-const validator = () => {
-  if (compiled == null) {
-    compiled = new Ajv2020({ allErrors: true, strict: false }).compile(briefSchema);
+/**
+ * 0.4.3 — schema v11 (export v15+) makes alignment explicit: `gridPlacement`
+ * carries `justifySelf`/`alignSelf`, `layout` carries CSS-resolved
+ * `alignItems`/`justifyContent`. v10 stays accepted for older exports;
+ * dispatch is by the document's own `schemaVersion`, never a flag.
+ */
+export const briefSchemaV11 = require("../schema/design-handoff.v11.schema.json");
+
+const schemasByVersion = new Map([
+  [10, briefSchema],
+  [11, briefSchemaV11],
+]);
+
+const compiledByVersion = new Map();
+const validatorFor = (schemaVersion) => {
+  const schema = schemasByVersion.get(schemaVersion) ?? briefSchema;
+  if (!compiledByVersion.has(schema)) {
+    compiledByVersion.set(schema, new Ajv2020({ allErrors: true, strict: false }).compile(schema));
   }
-  return compiled;
+  return compiledByVersion.get(schema);
 };
 
 /**
- * Validate a parsed brief JSON document against its published shape.
+ * Validate a parsed brief JSON document against its published shape. Dispatches
+ * on the document's own `schemaVersion` (10 or 11); an unrecognised version
+ * falls back to v10 so it still surfaces as a clear `schemaVersion` const
+ * mismatch rather than a thrown error.
  *
  * @param {object} doc
  * @returns {{ ok: boolean, errors: {path: string, message: string, keyword: string}[] }}
@@ -39,7 +56,7 @@ export function validateBriefJson(doc) {
   if (doc == null || typeof doc !== "object") {
     return { ok: false, errors: [{ path: "", message: "brief is not an object", keyword: "type" }] };
   }
-  const validate = validator();
+  const validate = validatorFor(doc.schemaVersion);
   const ok = validate(doc);
   return {
     ok,
