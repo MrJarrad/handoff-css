@@ -819,6 +819,106 @@ arbitrary values — `aspect-(--aspect-landscape)` — with no reset needed.
 
 ---
 
+## P21 — Style classes (0.5.0)
+
+`config.paths.styles` · `src/emit-styles.mjs` · `test/styles-v13.test.mjs`
+
+Schema 12 (and 13) publish a ready `cssClass` on every Figma style: a `selector`, a
+`declarations[]` already bound to `var(--token, fallback)`, and the `css` those two
+compose to. A TEXT style also carries type ramp v2 (`typeRamp.*.build` with
+`cssProperty`, `css`, `buildReady`) and a `fontStack` / `fontStackCss`.
+
+**The export states the class; this package copies it.** The selector is emitted
+verbatim and never derived from a style name; the declarations are emitted in the
+export's own order and never reordered, recomputed, unit-converted or composed from
+`properties`. This is P4's contract (*emit `build.css` verbatim*) applied one level up,
+and for the same reason: the moment a generator recomputes a value the export already
+resolved, it owns a second answer that can drift from the first.
+
+One file, `paths.styles`, in this order: **TEXT, then EFFECT, then GRID, then PAINT.**
+TEXT leads because those are the classes a design system swaps its hand-authored type
+utilities for. A style the export gives no `declarations` for is **not a class**: it is
+reported `NO-DECLARATIONS` and nothing is emitted. PAINT is the whole of that case
+today — a paint style is one colour, which the export already publishes as a variable.
+
+A consumer that publishes no `paths.styles`, or an export older than schema 12, gets **no
+file at all** — not an empty one.
+
+### P21.1 Hand-authored wins, per class
+
+Exactly P2, one level up. A selector the consumer declares **at top level** in its own
+stylesheet wins the cascade, so the generator stands down and the report calls it MATCH
+or VALUE-DRIFT against the export's declarations. A `.foo` nested inside `@media` is
+conditional and does not suppress anything, for the same reason a scoped custom property
+does not.
+
+`@utility foo` is the one that needs stating. Tailwind compiles it to `.foo`, so it
+**shadows** a generated class — the same selector from two files. It is still not an
+unconditional declaration of that selector (`isGlobalScope` already takes this reading of
+`@utility` for custom properties), so it does **not** suppress generation: the report
+lists every shadow so adoption is a deletion checklist rather than a surprise. Sixteen of
+the JHD design system's type utilities are shadows today; ending that duplication is why
+0.5.0 exists.
+
+### P21.2 Two findings about the export, never fixed here
+
+`STYLE_CLASS_LITERAL` — a declaration states a raw literal **outside every `var()`** for
+a property the SAME style binds to a variable (`rawStyleProperties` classifies the path
+`raw` while a sibling `boundVariables.<prop>` path is `variable-bound`). The class has
+frozen a value the design system can retheme. A literal INSIDE `var(--token, 48px)` is
+the fallback, which is what the binding is for, and is not a finding.
+
+`STYLE_CLASS_UNSCOPED` — the selector is the style's bare `leafName` with nothing in
+front of it (`.default` for the grid style `default`), so it collides with any same-named
+class in the consuming stylesheet. A scoped selector carries its group or its style type:
+`.grid-default`, `.effect-border-border-focused`, `.title-style1-100`.
+
+Neither is repaired here — a rewritten selector or an invented `var()` would break P21's
+verbatim contract, which is the only thing making the class trustworthy. Both fired on the
+schema 12 export of 2026-09-12T13:28Z (18 and 7 respectively); the plugin fixed both at
+the source, and both report **zero** on the schema 13 export of 13:43 that this release
+ships as its fixture. They stay as checks, with tests that prove they still fire.
+
+### P21.3 `cssCustomPropertySheets` are read, never emitted
+
+Schema 12 also publishes the export's own `:root` / theme blocks, one per collection x
+mode, already rendered as CSS. **They are never emitted.** This package exists because a
+consumer's policies — colour format (P4), ratio form (P20), motion unit (P19), cell trust
+(P13), hand-authored-wins (P2) — decide what a token reads as; shipping the plugin's
+sheet alongside the generated one would put two disagreeing stylesheets in one repo,
+which is the exact failure this removes.
+
+They are worth a second opinion, so every declaration is compared: same variable, same
+mode, the sheet's value against this run's. A difference is reported, never resolved.
+On the v13 export 653 differ, and the classes are instructive — an alias this generator
+keeps as a `var()` hop (P5) where the sheet flattens it to a terminal, a colour in the
+house format against the export's 8-digit hex, and 101 motion declarations the plugin
+stringified an object into (`--delay-0: [object Object]`). The first is a deliberate
+policy and the record of it; the last is an export defect with an address.
+
+---
+
+## P22 — Numeric font weights (0.5.0)
+
+`src/resolve.mjs` · `test/styles-v13.test.mjs`
+
+Figma holds a font weight as the STRING style name it is spelled with — `weight/strong`
+is `"Medium"`. `font-weight: "Medium"` is not a value CSS accepts, and mapping a style
+name to a number is precisely the guess that goes wrong on the first family whose
+"Medium" is not 500.
+
+Schema 12 states the number on the variable: `fontWeightNumeric` carries `numeric`,
+`css`, `cssProperty` and a `confidence`. A STRING variable that has one emits the
+export's own `css` verbatim — `--weight-strong: 500` — and a STRING variable without one
+stays quoted, exactly as before. The report names the Figma style name and the confidence
+the export attached, so a weight the plugin guessed at is visible rather than folded
+silently into the ramp.
+
+Same shape as P20 (a STRING that is really a typed value) and the same discipline as P4
+(the export states it, this package copies it).
+
+---
+
 ## Determinism
 
 Collections sorted by name, variables by WEB name, numbers rounded to 6 decimal
