@@ -37,45 +37,105 @@ test("a second generate() over the same inputs is byte-identical (deterministic)
 
 // --- P21 ------------------------------------------------------------------
 
-test("the done-when class is emitted exactly as the export states it", () => {
+// 0.5.1 — house policy (`config.styles.emit: "utility"`) writes every class as
+// a Tailwind v4 `@utility <name> { … }`, reachable from a consumer's own
+// `@apply` and living in the utilities layer under the normal cascade, instead
+// of the bare unlayered `.name { … }` of 0.5.0 (`emit: "class"`).
+//
+// `--family-font-sans` (`family/font-sans`, `text-primitives`) states the raw
+// value `Suisse Intl` — the SAME value every TEXT class's `font-family`
+// declaration freezes as a literal (a plugin gap; the plugin fix is tracked
+// separately). 0.5.1's one documented substitution rebinds that literal to
+// `var(--family-font-sans, "Suisse Intl")`; every other byte stays the
+// export's.
+test("the done-when class is emitted as a Tailwind v4 @utility with its font-family bound", () => {
   const s = style("TEXT", "title-style1/100");
   assert.equal(s.cssClass.selector, ".title-style1-100");
+  assert.equal(s.cssClass.declarations.at(-1), 'font-family: "Suisse Intl"');
   assert.ok(
-    out.stylesCss.includes(`.title-style1-100 {
+    out.stylesCss.includes(`@utility title-style1-100 {
   font-size: var(--text-title-font-size-100, 1rem);
   line-height: 1.1;
   letter-spacing: var(--letter-spacing-300, -0.015625em);
   font-weight: 500;
-  font-family: "Suisse Intl";
+  font-family: var(--family-font-sans, "Suisse Intl");
 }`),
     out.stylesCss.slice(0, 1200),
   );
 });
 
-test("every style with declarations is emitted, verbatim and in the export's order", () => {
+test("every style with declarations is emitted as an @utility, verbatim (font-family bound) and in the export's order", () => {
   for (const type of ["TEXT", "EFFECT", "GRID", "PAINT"]) {
     for (const s of doc.styles[type]) {
       if (!s.cssClass?.declarations?.length) continue;
-      const block = `${s.cssClass.selector} {\n${s.cssClass.declarations.map((d) => `  ${d};`).join("\n")}\n}`;
+      const decls = s.cssClass.declarations.map((d) =>
+        type === "TEXT" && d === 'font-family: "Suisse Intl"'
+          ? 'font-family: var(--family-font-sans, "Suisse Intl")'
+          : d);
+      const block = `@utility ${s.cssClass.selector.slice(1)} {\n${decls.map((d) => `  ${d};`).join("\n")}\n}`;
       assert.ok(out.stylesCss.includes(block), `missing ${s.cssClass.selector}`);
     }
   }
 });
 
-test("the emitted rule reproduces the export's own `cssClass.css`, byte for byte", () => {
+test("the emitted rule reproduces the export's own `cssClass.css` for every property but `font-family`, as an @utility", () => {
   // Two independent statements of the same class in the export. If this
-  // generator ever recomposed a declaration, these would drift.
-  for (const type of ["TEXT", "EFFECT", "GRID"]) {
+  // generator ever recomposed a declaration other than the one documented
+  // substitution, these would drift.
+  const asUtility = (s, css) => css.replace(`${s.cssClass.selector} {`, `@utility ${s.cssClass.selector.slice(1)} {`);
+  for (const type of ["EFFECT", "GRID"]) {
     for (const s of doc.styles[type]) {
-      assert.ok(out.stylesCss.includes(s.cssClass.css), `${s.cssClass.selector} does not match cssClass.css`);
+      assert.ok(out.stylesCss.includes(asUtility(s, s.cssClass.css)), `${s.cssClass.selector} does not match cssClass.css`);
     }
+  }
+  for (const s of doc.styles.TEXT) {
+    const rebound = asUtility(s, s.cssClass.css).replace(
+      'font-family: "Suisse Intl";',
+      'font-family: var(--family-font-sans, "Suisse Intl");',
+    );
+    assert.ok(out.stylesCss.includes(rebound), `${s.cssClass.selector} does not match cssClass.css modulo font-family binding`);
   }
 });
 
 test("class order is TEXT, then EFFECT, then GRID", () => {
-  const at = (sel) => out.stylesCss.indexOf(`\n${sel} {`);
-  assert.ok(at(".title-style1-100") < at(".effect-border-border-focused"));
-  assert.ok(at(".effect-border-border-focused") < at(".grid-default"));
+  const at = (name) => out.stylesCss.indexOf(`\n@utility ${name} {`);
+  assert.ok(at("title-style1-100") < at("effect-border-border-focused"));
+  assert.ok(at("effect-border-border-focused") < at("grid-default"));
+});
+
+// The done-when ask is proved with a real Tailwind v4 compile, run once by hand
+// against this package's own output rather than added as a permanent
+// devDependency + build step for one assertion (code-minimalism: a whole
+// PostCSS pipeline is a heavier rung than this repo needs to hold):
+//
+//   npx @tailwindcss/cli -i input.css -o output.css
+//     @import "tailwindcss";
+//     @import "./styles.generated.css";     (the v13 fixture's committed output)
+//     .my-heading { @apply title-style1-100; }
+//
+//   -> output.css:
+//     .my-heading {
+//       font-size: var(--text-title-font-size-100, 1rem);
+//       line-height: 1.1;
+//       letter-spacing: var(--letter-spacing-300, -0.015625em);
+//       font-weight: 500;
+//       font-family: var(--family-font-sans, "Suisse Intl");
+//     }
+//
+// `@apply` resolved the utility with no error — the failure mode reds 1–4
+// named (`Cannot apply unknown utility class title-style1-200`) does not
+// reproduce against 0.5.1's `@utility` output.
+test("`styles.emit: \"class\"` opts back into a bare, unlayered class — 0.5.0 behaviour", () => {
+  const classConfig = { ...consumerConfig042, styles: { emit: "class" } };
+  const mine = generate(docV13(), classConfig, { handAuthoredCss: consumerCssV13() });
+  assert.ok(mine.stylesCss.includes(`.title-style1-100 {
+  font-size: var(--text-title-font-size-100, 1rem);
+  line-height: 1.1;
+  letter-spacing: var(--letter-spacing-300, -0.015625em);
+  font-weight: 500;
+  font-family: var(--family-font-sans, "Suisse Intl");
+}`));
+  assert.ok(!mine.stylesCss.includes("@utility"));
 });
 
 test("every style in the export has a row, and all 74 with declarations are GENERATED", () => {
@@ -98,7 +158,7 @@ test("a consumer that declares the selector by hand wins the cascade and suppres
   const row = mine.styleRows.find((r) => r.selector === ".title-style1-100");
   assert.equal(row.status, "VALUE-DRIFT");
   assert.deepEqual(row.hand, ["font-size: 2rem"]);
-  assert.ok(!mine.stylesCss.includes("\n.title-style1-100 {"));
+  assert.ok(!mine.stylesCss.includes("\n@utility title-style1-100 {"));
 });
 
 test("a hand-authored class stating the export's own declarations is MATCH", () => {
@@ -128,8 +188,32 @@ test("a nested class rule does not count as a hand-authored declaration", () => 
 
 // --- P21, the two export findings -----------------------------------------
 
-test("the schema 13 export raises neither STYLE_CLASS finding — the plugin fixed both at the source", () => {
-  assert.deepEqual(out.warnings.filter((w) => w.code.startsWith("STYLE_CLASS_")), []);
+test("the schema 13 export raises neither structural STYLE_CLASS finding — the plugin fixed both at the source", () => {
+  assert.deepEqual(
+    out.warnings.filter((w) => w.code === "STYLE_CLASS_LITERAL" || w.code === "STYLE_CLASS_UNSCOPED"),
+    [],
+  );
+});
+
+// --- P21, font-family binding (0.5.1) --------------------------------------
+
+test("every TEXT class's font-family literal is bound, one STYLE_CLASS_FONT_BOUND finding per class", () => {
+  const hits = out.warnings.filter((w) => w.code === "STYLE_CLASS_FONT_BOUND");
+  assert.equal(hits.length, doc.styles.TEXT.length);
+  assert.ok(hits.every((w) => /bound to `--family-font-sans`/.test(w.detail)));
+  assert.deepEqual(out.warnings.filter((w) => w.code === "STYLE_CLASS_FONT_LITERAL"), []);
+});
+
+test("a font-family literal with no matching export variable raises STYLE_CLASS_FONT_LITERAL, and is left verbatim", () => {
+  const mutated = docV13();
+  const s = mutated.styles.TEXT.find((x) => x.name === "title-style1/100");
+  s.cssClass.declarations = s.cssClass.declarations.map((d) =>
+    d.startsWith("font-family:") ? 'font-family: "Nonexistent Face"' : d);
+  const mine = generate(mutated, consumerConfig042, { handAuthoredCss: consumerCssV13() });
+  const hit = mine.warnings.filter((w) => w.code === "STYLE_CLASS_FONT_LITERAL" && w.name === ".title-style1-100");
+  assert.equal(hit.length, 1);
+  assert.match(hit[0].detail, /"Nonexistent Face"/);
+  assert.ok(mine.stylesCss.includes('font-family: "Nonexistent Face";'));
 });
 
 test("STYLE_CLASS_LITERAL fires when a class freezes a value the same style binds", () => {
