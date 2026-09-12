@@ -29,6 +29,7 @@
         "input": { "type": "string", "description": "The vendored handoff export." },
         "out": { "type": "string", "description": "The token stylesheet." },
         "theme": { "type": "string", "description": "The Tailwind `@theme` bridge." },
+        "styles": { "type": "string", "description": "The style-class stylesheet (P21, schema 12+). Optional: an export that publishes no `cssClass` writes no file, and a consumer that names no path never receives one." },
         "report": { "type": "string", "description": "The reconciliation report." },
         "handAuthored": { "type": "string", "description": "The consumer's own stylesheet, which wins the cascade (P2)." },
         "exclusions": { "type": "string", "description": "EXCLUDED + PRIVATE name lists, for a downstream conformance checker." }

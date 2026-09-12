@@ -1,0 +1,1338 @@
+# Design system handoff
+
+- Document: JHD-Spec-DesignSystem
+- Figma pages: 17
+- Schema: `design-system-handoff` v13
+- Contract: `layer-brief/1`; lane: `design-system`
+- Generated: 2026-09-12T13:43:20.353Z
+- Artifact: `jhd-spec-designsystem-design-system-handoff.md` and `jhd-spec-designsystem-design-system-handoff.json`
+- Design-system state fingerprint: `eab3d422694a61d30e30e6961dd690023df3d5db3965ced39a562dcdb98498cc`
+- Artifact content hash: `9050281029b405eb38841c6e7b7a3d85b8ec6c0cca8437df1528c3604f195775`
+- Companion Design Handoff expected/last-known hash: `94dc189b541f517a2a400faeb8530ce337aaa21dab6ddb3c605e766f0b1256a2`
+
+## Overview
+
+- Collections: 10; variables: 591; styles: 74
+
+### Collections, modes, and groups
+
+**text-primitives**
+- Modes: value (`1:0`; family unresolved; width unresolved; layout none; responsive false; theme none; unresolved/none)
+- Variables: 40; types: STRING, FLOAT
+- Extension: no
+- Groups:
+- Single-mode values for value (`1:0`): `family/font-sans` = `"Suisse Intl"`; `weight/strong` = `"Medium"`; `size/050` = `10`; `size/100` = `12`; `size/200` = `14`; `size/300` = `16`; `size/350` = `18`; `size/400` = `20`; `size/500` = `24`; `size/600` = `28`; `size/700` = `32`; `size/800` = `40`; `size/900` = `48`; `size/1000` = `56`; `size/1100` = `64`; `size/1200` = `80`; `size/1300` = `88`; `size/1400` = `96`; `size/1500` = `128`; `size/1600` = `160`; `size/1700` = `256`; `letter-spacing/050` = `0`; `letter-spacing/100` = `0`; `letter-spacing/200` = `0`; `letter-spacing/300` = `-0.25`; `letter-spacing/350` = `-0.25`; `letter-spacing/400` = `-0.25`; `letter-spacing/500` = `-0.25`; `letter-spacing/600` = `-0.5`; `letter-spacing/700` = `-0.75`; `letter-spacing/800` = `-1`; `letter-spacing/900` = `-1.25`; `letter-spacing/1000` = `-1.75`; `letter-spacing/1100` = `-2.25`; `letter-spacing/1200` = `-2.75`; `letter-spacing/1300` = `-3.25`; `letter-spacing/1400` = `-3.25`; `letter-spacing/1500` = `-4.75`; `letter-spacing/1600` = `-5.75`; `letter-spacing/1700` = `-10.75`
+  - family: 1 direct / 1 total; STRING
+  - weight: 1 direct / 1 total; STRING
+  - size: 19 direct / 19 total; FLOAT
+  - letter-spacing: 19 direct / 19 total; FLOAT
+
+**core**
+- Modes: default (`8:0`; family unresolved; width unresolved; layout none; responsive false; theme none; unresolved/none)
+- Variables: 80; types: STRING, FLOAT
+- Extension: no
+- Groups:
+- Single-mode values for default (`8:0`): `aspect/landscape` = `"3:2"`; `aspect/portrait` = `"4:5"`; `aspect/square` = `"1:1"`; `aspect/tall` = `"2:3"`; `border/border-100` = `1`; `border/border-200` = `1.5`; `border/border-300-primary` = `2`; `border/border-400` = `2.5`; `border/border-500` = `3`; `border/border-600` = `3.5`; `border/border-700` = `4`; `border/border-800` = `4.5`; `border/border-900` = `5`; `border/border-1000` = `5.5`; `border/border-1100` = `6`; `border/border-1200` = `6.5`; `dimension/dimension-0` = `0`; `opacity/opacity-1000` = `100`; `opacity/opacity-0` = `0`; `opacity/opacity-10` = `1`; `opacity/opacity-20` = `2`; `opacity/opacity-30` = `3`; `opacity/opacity-40` = `4`; `opacity/opacity-50` = `5`; `opacity/opacity-60` = `6`; `opacity/opacity-70` = `7`; `opacity/opacity-80` = `8`; `opacity/opacity-90` = `9`; `opacity/opacity-100` = `10`; `opacity/opacity-150` = `15`; `opacity/opacity-200` = `20`; `opacity/opacity-250` = `25`; `opacity/opacity-300` = `30`; `opacity/opacity-400` = `40`; `opacity/opacity-500` = `50`; `opacity/opacity-600` = `60`; `opacity/opacity-700` = `70`; `opacity/opacity-800` = `80`; `opacity/opacity-900` = `90`; `opacity/opacity-950` = `95`; `dimension/dimension-100` = `1`; `dimension/dimension-200` = `2`; `dimension/dimension-300` = `4`; `dimension/dimension-350` = `5`; `dimension/dimension-400` = `8`; `dimension/dimension-500` = `12`; `dimension/dimension-600` = `16`; `dimension/dimension-700` = `20`; `dimension/dimension-800` = `24`; `dimension/dimension-900` = `28`; `dimension/dimension-1000` = `32`; `dimension/dimension-1050` = `36`; `dimension/dimension-1100` = `40`; `dimension/dimension-1150` = `44`; `dimension/dimension-1200` = `48`; `dimension/dimension-1300` = `56`; `dimension/dimension-1400` = `64`; `dimension/dimension-1500` = `72`; `dimension/dimension-1600` = `80`; `dimension/dimension-1700` = `96`; `dimension/dimension-1800` = `128`; `dimension/dimension-1900` = `160`; `dimension/dimension-2000` = `192`; `dimension/dimension-2100` = `256`; `dimension/dimension-2200` = `320`; `radius/radius-0` = `0`; `radius/radius-100` = `1`; `radius/radius-200` = `2`; `radius/radius-300` = `3`; `radius/radius-400` = `4`; `radius/radius-500` = `6`; `radius/radius-600` = `8`; `radius/radius-700` = `16`; `radius/radius-800` = `32`; `radius/radius-900` = `64`; `radius/radius-1000` = `128`; `radius/radius-full` = `999`; `radius/action-radius-sharp` = `0`; `radius/action-radius-round` = `4`; `radius/action-radius-elipse` = `999`
+  - aspect: 4 direct / 4 total; STRING
+  - border: 12 direct / 12 total; FLOAT
+  - dimension: 26 direct / 26 total; FLOAT
+  - opacity: 23 direct / 23 total; FLOAT
+  - radius: 15 direct / 15 total; FLOAT
+
+**color-primitives**
+- Modes: default (`8:2`; family unresolved; width unresolved; layout none; responsive false; theme none; unresolved/none)
+- Variables: 178; types: COLOR
+- Extension: no
+- Groups:
+- Single-mode values for default (`8:2`): `color/core/black` = `"#000000FF"`; `color/core/white` = `"#FFFFFFFF"`; `color/palette/cod-grey/50` = `"#F6F6F6FF"`; `color/palette/cod-grey/100` = `"#EDEDEDFF"`; `color/palette/cod-grey/200` = `"#D1D1D1FF"`; `color/palette/cod-grey/300` = `"#BDBDBDFF"`; `color/palette/cod-grey/400` = `"#989898FF"`; `color/palette/cod-grey/500` = `"#7C7C7CFF"`; `color/palette/cod-grey/600` = `"#696969FF"`; `color/palette/cod-grey/700` = `"#575757FF"`; `color/palette/cod-grey/800` = `"#4A4A4AFF"`; `color/palette/cod-grey/900` = `"#383838FF"`; `color/palette/cod-grey/950` = `"#0A0A0AFF"`; `color/palette/cognac/50` = `"#FFF6EBFF"`; `color/palette/cognac/100` = `"#FFEAD2FF"`; `color/palette/cognac/200` = `"#FDD5AAFF"`; `color/palette/cognac/300` = `"#FDBB7CFF"`; `color/palette/cognac/400` = `"#FC974FFF"`; `color/palette/cognac/500` = `"#EE701BFF"`; `color/palette/cognac/600` = `"#E45107FF"`; `color/palette/cognac/700` = `"#C73F05FF"`; `color/palette/cognac/800` = `"#A33001FF"`; `color/palette/cognac/900` = `"#7F2601FF"`; `color/palette/cognac/950` = `"#4A1300FF"`; `color/palette/cruise/50` = `"#F3FAF7FF"`; `color/palette/cruise/100` = `"#D7F0E8FF"`; `color/palette/cruise/200` = `"#B2E1D2FF"`; `color/palette/cruise/300` = `"#7FC9B4FF"`; `color/palette/cruise/400` = `"#5EB59FFF"`; `color/palette/cruise/500` = `"#3F9C86FF"`; `color/palette/cruise/600` = `"#358876FF"`; `color/palette/cruise/700` = `"#327768FF"`; `color/palette/cruise/800` = `"#2B5E54FF"`; `color/palette/cruise/900` = `"#23433DFF"`; `color/palette/cruise/950` = `"#0E2521FF"`; `color/palette/deep-teal/50` = `"#EFFEFAFF"`; `color/palette/deep-teal/100` = `"#C9FEF1FF"`; `color/palette/deep-teal/200` = `"#92FDE3FF"`; `color/palette/deep-teal/300` = `"#54F4D4FF"`; `color/palette/deep-teal/400` = `"#21E0BFFF"`; `color/palette/deep-teal/500` = `"#08C4A7FF"`; `color/palette/deep-teal/600` = `"#03AA94FF"`; `color/palette/deep-teal/700` = `"#089180FF"`; `color/palette/deep-teal/800` = `"#0D6D60FF"`; `color/palette/deep-teal/900` = `"#0F524BFF"`; `color/palette/deep-teal/950` = `"#013C38FF"`; `color/palette/desert-storm/50` = `"#F9F8F7FF"`; `color/palette/desert-storm/100` = `"#F3EFEDFF"`; `color/palette/desert-storm/200` = `"#E9E2DFFF"`; `color/palette/desert-storm/300` = `"#D9CDC8FF"`; `color/palette/desert-storm/400` = `"#C5B3ACFF"`; `color/palette/desert-storm/500` = `"#AA9289FF"`; `color/palette/desert-storm/600` = `"#94796EFF"`; `color/palette/desert-storm/700` = `"#7D6358FF"`; `color/palette/desert-storm/800` = `"#68534DFF"`; `color/palette/desert-storm/900` = `"#52413DFF"`; `color/palette/desert-storm/950` = `"#2D2522FF"`; `color/palette/elm/50` = `"#EEFFFDFF"`; `color/palette/elm/100` = `"#C5FFFDFF"`; `color/palette/elm/200` = `"#8BFFFBFF"`; `color/palette/elm/300` = `"#4AFEFAFF"`; `color/palette/elm/400` = `"#15EBECFF"`; `color/palette/elm/500` = `"#00CCD0FF"`; `color/palette/elm/600` = `"#00B1B8FF"`; `color/palette/elm/700` = `"#009199FF"`; `color/palette/elm/800` = `"#06686FFF"`; `color/palette/elm/900` = `"#09494EFF"`; `color/palette/elm/950` = `"#002F35FF"`; `color/palette/fun-green/50` = `"#EEFFF4FF"`; `color/palette/fun-green/100` = `"#D8FFE9FF"`; `color/palette/fun-green/200` = `"#B4FED3FF"`; `color/palette/fun-green/300` = `"#79FCB2FF"`; `color/palette/fun-green/400` = `"#38F087FF"`; `color/palette/fun-green/500` = `"#0ED967FF"`; `color/palette/fun-green/600` = `"#05BD56FF"`; `color/palette/fun-green/700` = `"#09A44EFF"`; `color/palette/fun-green/800` = `"#0F8041FF"`; `color/palette/fun-green/900` = `"#0B562DFF"`; `color/palette/fun-green/950` = `"#003318FF"`; `color/palette/lavender-gray/50` = `"#F7F7FBFF"`; `color/palette/lavender-gray/100` = `"#F0F0F7FF"`; `color/palette/lavender-gray/200` = `"#E3E3F1FF"`; `color/palette/lavender-gray/300` = `"#D5D2EAFF"`; `color/palette/lavender-gray/400` = `"#BEBADDFF"`; `color/palette/lavender-gray/500` = `"#A097C9FF"`; `color/palette/lavender-gray/600` = `"#8A7CB6FF"`; `color/palette/lavender-gray/700` = `"#72639CFF"`; `color/palette/lavender-gray/800` = `"#5C4F82FF"`; `color/palette/lavender-gray/900` = `"#483E65FF"`; `color/palette/lavender-gray/950` = `"#322C49FF"`; `color/palette/lightning-yellow/50` = `"#FFFBEBFF"`; `color/palette/lightning-yellow/100` = `"#FEF4C7FF"`; `color/palette/lightning-yellow/200` = `"#FDE98AFF"`; `color/palette/lightning-yellow/300` = `"#FCD74DFF"`; `color/palette/lightning-yellow/400` = `"#FBC117FF"`; `color/palette/lightning-yellow/500` = `"#F5A40BFF"`; `color/palette/lightning-yellow/600` = `"#D97C06FF"`; `color/palette/lightning-yellow/700` = `"#BB610CFF"`; `color/palette/lightning-yellow/800` = `"#934910FF"`; `color/palette/lightning-yellow/900` = `"#6A3006FF"`; `color/palette/lightning-yellow/950` = `"#451C03FF"`; `color/palette/malibu/50` = `"#F2F8FDFF"`; `color/palette/malibu/100` = `"#E3F0FBFF"`; `color/palette/malibu/200` = `"#CAE4F7FF"`; `color/palette/malibu/300` = `"#9DD1F6FF"`; `color/palette/malibu/400` = `"#61B0E5FF"`; `color/palette/malibu/500` = `"#3A96CFFF"`; `color/palette/malibu/600` = `"#2279AFFF"`; `color/palette/malibu/700` = `"#1C6CA0FF"`; `color/palette/malibu/800` = `"#175782FF"`; `color/palette/malibu/900` = `"#163F5FFF"`; `color/palette/malibu/950` = `"#0F2A42FF"`; `color/palette/mulberry-wood/50` = `"#FBF4F9FF"`; `color/palette/mulberry-wood/100` = `"#F9EAF5FF"`; `color/palette/mulberry-wood/200` = `"#F5D5ECFF"`; `color/palette/mulberry-wood/300` = `"#EEB3DBFF"`; `color/palette/mulberry-wood/400` = `"#E590C8FF"`; `color/palette/mulberry-wood/500` = `"#D96EB2FF"`; `color/palette/mulberry-wood/600` = `"#CF4F9AFF"`; `color/palette/mulberry-wood/700` = `"#B1357AFF"`; `color/palette/mulberry-wood/800` = `"#952864FF"`; `color/palette/mulberry-wood/900` = `"#73214FFF"`; `color/palette/mulberry-wood/950` = `"#561538FF"`; `color/palette/pear/50` = `"#F8FBEBFF"`; `color/palette/pear/100` = `"#F0F7CAFF"`; `color/palette/pear/200` = `"#E5F098FF"`; `color/palette/pear/300` = `"#DAE75DFF"`; `color/palette/pear/400` = `"#D6DF36FF"`; `color/palette/pear/500` = `"#CDCF23FF"`; `color/palette/pear/600` = `"#BDB81EFF"`; `color/palette/pear/700` = `"#A29B1AFF"`; `color/palette/pear/800` = `"#83771BFF"`; `color/palette/pear/900` = `"#5E5217FF"`; `color/palette/pear/950` = `"#3B2D0DFF"`; `color/palette/punch/50` = `"#FEF3F2FF"`; `color/palette/punch/100` = `"#FFE4E1FF"`; `color/palette/punch/200` = `"#FFCFC9FF"`; `color/palette/punch/300` = `"#FEACA3FF"`; `color/palette/punch/400` = `"#FC7C6DFF"`; `color/palette/punch/500` = `"#F4513FFF"`; `color/palette/punch/600` = `"#E23B28FF"`; `color/palette/punch/700` = `"#BD2918FF"`; `color/palette/punch/800` = `"#9C2518FF"`; `color/palette/punch/900` = `"#82251AFF"`; `color/palette/punch/950` = `"#470E08FF"`; `color/palette/shocking/50` = `"#FDF2F8FF"`; `color/palette/shocking/100` = `"#FCE7F2FF"`; `color/palette/shocking/200` = `"#FBCFE6FF"`; `color/palette/shocking/300` = `"#F892C5FF"`; `color/palette/shocking/400` = `"#F571B0FF"`; `color/palette/shocking/500` = `"#ED4792FF"`; `color/palette/shocking/600` = `"#DE3176FF"`; `color/palette/shocking/700` = `"#C21959FF"`; `color/palette/shocking/800` = `"#9D1646FF"`; `color/palette/shocking/900` = `"#7A1539FF"`; `color/palette/shocking/950` = `"#500721FF"`; `color/palette/tangerine/50` = `"#FFF9EDFF"`; `color/palette/tangerine/100` = `"#FEF1D6FF"`; `color/palette/tangerine/200` = `"#FCDFACFF"`; `color/palette/tangerine/300` = `"#FAC677FF"`; `color/palette/tangerine/400` = `"#F7A340FF"`; `color/palette/tangerine/500` = `"#F58C21FF"`; `color/palette/tangerine/600` = `"#E66D10FF"`; `color/palette/tangerine/700` = `"#CB5810FF"`; `color/palette/tangerine/800` = `"#A54718FF"`; `color/palette/tangerine/900` = `"#79320CFF"`; `color/palette/tangerine/950` = `"#421B08FF"`; `color/palette/twine/50` = `"#F9F4EDFF"`; `color/palette/twine/100` = `"#F0E3D1FF"`; `color/palette/twine/200` = `"#E3C7A5FF"`; `color/palette/twine/300` = `"#CC985FFF"`; `color/palette/twine/400` = `"#C4864BFF"`; `color/palette/twine/500` = `"#B5723DFF"`; `color/palette/twine/600` = `"#A15C35FF"`; `color/palette/twine/700` = `"#894934FF"`; `color/palette/twine/800` = `"#6F3C2FFF"`; `color/palette/twine/900` = `"#512B24FF"`; `color/palette/twine/950` = `"#341814FF"`
+  - color: 0 direct / 178 total; COLOR
+    - core: 2 direct / 2 total; COLOR
+    - palette: 0 direct / 176 total; COLOR
+      - cod-grey: 11 direct / 11 total; COLOR
+      - cognac: 11 direct / 11 total; COLOR
+      - cruise: 11 direct / 11 total; COLOR
+      - deep-teal: 11 direct / 11 total; COLOR
+      - desert-storm: 11 direct / 11 total; COLOR
+      - elm: 11 direct / 11 total; COLOR
+      - fun-green: 11 direct / 11 total; COLOR
+      - lavender-gray: 11 direct / 11 total; COLOR
+      - lightning-yellow: 11 direct / 11 total; COLOR
+      - malibu: 11 direct / 11 total; COLOR
+      - mulberry-wood: 11 direct / 11 total; COLOR
+      - pear: 11 direct / 11 total; COLOR
+      - punch: 11 direct / 11 total; COLOR
+      - shocking: 11 direct / 11 total; COLOR
+      - tangerine: 11 direct / 11 total; COLOR
+      - twine: 11 direct / 11 total; COLOR
+
+**color**
+- Modes: light (`8:3`; family unresolved; width unresolved; layout none; responsive false; theme light; theme-name/high) -> dark (`26:0`; family unresolved; width unresolved; layout none; responsive false; theme dark; theme-name/high) -> bttf (`4701:1`; family unresolved; width unresolved; layout none; responsive false; theme bttf; theme-name/high)
+- Variables: 111; types: COLOR
+- Extension: no
+- Groups:
+  - color: 0 direct / 111 total; COLOR
+    - background: 0 direct / 40 total; COLOR
+      - default: 4 direct / 4 total; COLOR
+      - action: 4 direct / 4 total; COLOR
+      - input: 2 direct / 2 total; COLOR
+      - material: 10 direct / 10 total; COLOR
+      - disabled: 4 direct / 4 total; COLOR
+      - focused: 4 direct / 4 total; COLOR
+      - negative: 4 direct / 4 total; COLOR
+      - positive: 4 direct / 4 total; COLOR
+      - warning: 4 direct / 4 total; COLOR
+    - border: 0 direct / 33 total; COLOR
+      - default: 4 direct / 4 total; COLOR
+      - action: 5 direct / 5 total; COLOR
+      - input: 4 direct / 4 total; COLOR
+      - disabled: 4 direct / 4 total; COLOR
+      - focused: 4 direct / 4 total; COLOR
+      - negative: 4 direct / 4 total; COLOR
+      - positive: 4 direct / 4 total; COLOR
+      - warning: 4 direct / 4 total; COLOR
+    - content: 0 direct / 29 total; COLOR
+      - default: 5 direct / 5 total; COLOR
+      - action: 4 direct / 4 total; COLOR
+      - disabled: 4 direct / 4 total; COLOR
+      - focused: 4 direct / 4 total; COLOR
+      - negative: 4 direct / 4 total; COLOR
+      - positive: 4 direct / 4 total; COLOR
+      - warning: 4 direct / 4 total; COLOR
+    - elevation: 9 direct / 9 total; COLOR
+
+**layout**
+- Modes: lg (`89:1`; family lg; width 1280px; layout default; responsive true; theme none; device-width-variable/high) -> sm (`26:1`; family sm; width 375px; layout default; responsive true; theme none; device-width-variable/high) -> md (`8:5`; family md; width 768px; layout default; responsive true; theme none; device-width-variable/high) -> xl (`81:0`; family xl; width 1920px; layout default; responsive true; theme none; device-width-variable/high) -> lg-flush (`2813:1`; family lg; width 1280px; layout flush; responsive true; theme none; device-width-variable/high) -> sm-flush (`2813:2`; family sm; width 375px; layout flush; responsive true; theme none; device-width-variable/high) -> md-flush (`2813:3`; family md; width 768px; layout flush; responsive true; theme none; device-width-variable/high) -> xl-flush (`2813:4`; family xl; width 1920px; layout flush; responsive true; theme none; device-width-variable/high) -> lg-sidebar-main (`2813:5`; family lg; width 1280px; layout sidebar-main; responsive true; theme none; device-width-variable/high) -> lg-sidebar-main-flush (`2813:6`; family lg; width 1280px; layout sidebar-main-flush; responsive true; theme none; device-width-variable/high)
+- Variables: 111; types: FLOAT
+- Extension: no
+- Groups:
+  - device: 2 direct / 10 total; FLOAT
+    - screen-height: 8 direct / 8 total; FLOAT
+  - grid: 11 direct / 74 total; FLOAT
+    - col-span: 12 direct / 12 total; FLOAT
+    - col-start: 12 direct / 12 total; FLOAT
+    - aspect: 0 direct / 39 total; FLOAT
+      - landscape: 13 direct / 13 total; FLOAT
+      - portrait: 13 direct / 13 total; FLOAT
+      - tall: 13 direct / 13 total; FLOAT
+  - space: 7 direct / 7 total; FLOAT
+  - text: 0 direct / 20 total; FLOAT
+    - title: 8 direct / 8 total; FLOAT
+    - body: 12 direct / 12 total; FLOAT
+
+**icon**
+- Modes: 400 (`315:0`; family unresolved; width 400px; layout none; responsive true; theme none; explicit-name/high) -> 100 (`315:1`; family unresolved; width 100px; layout none; responsive true; theme none; explicit-name/high) -> 200 (`315:2`; family unresolved; width 200px; layout none; responsive true; theme none; explicit-name/high) -> 300 (`315:3`; family unresolved; width 300px; layout none; responsive true; theme none; explicit-name/high)
+- Variables: 8; types: FLOAT
+- Extension: no
+- Groups:
+  - icon-weight: 2 direct / 2 total; FLOAT
+  - icon-dimension: 2 direct / 2 total; FLOAT
+  - icon-radius: 4 direct / 4 total; FLOAT
+
+**action**
+- Modes: 100 (`363:0`; family unresolved; width 100px; layout none; responsive true; theme none; explicit-name/high) -> 200 (`804:0`; family unresolved; width 200px; layout none; responsive true; theme none; explicit-name/high) -> 300 (`804:1`; family unresolved; width 300px; layout none; responsive true; theme none; explicit-name/high) -> 400 (`804:2`; family unresolved; width 400px; layout none; responsive true; theme none; explicit-name/high)
+- Variables: 9; types: FLOAT
+- Extension: no
+- Groups:
+  - border-width: 3 direct / 3 total; FLOAT
+  - dimension: 3 direct / 3 total; FLOAT
+  - space: 3 direct / 3 total; FLOAT
+
+**.utility**
+- Modes: Mode 1 (`491:0`; family unresolved; width unresolved; layout none; responsive false; theme none; unresolved/none)
+- Variables: 4; types: FLOAT
+- Extension: no
+- Groups:
+- Single-mode values for Mode 1 (`491:0`): `utility-space-xs` = `16`; `utility-space-sm` = `48`; `utility-space-md` = `96`; `utility-space-lg` = `400`
+  - Ungrouped: 4 direct / 4 total; FLOAT
+
+**motion**
+- Modes: Mode 1 (`1352:0`; family unresolved; width unresolved; layout none; responsive false; theme none; unresolved/none)
+- Variables: 46; types: TIMING, EASING
+- Extension: no
+- Groups:
+- Single-mode values for Mode 1 (`1352:0`): `delay/0` = `0`; `delay/50` = `0.05000000074505806`; `delay/100` = `0.10000000149011612`; `delay/200` = `0.20000000298023224`; `delay/300` = `0.30000001192092896`; `delay/375` = `0.375`; `delay/400` = `0.4000000059604645`; `delay/500` = `0.5`; `delay/600` = `0.6000000238418579`; `delay/700` = `0.699999988079071`; `delay/750` = `0.75`; `delay/800` = `0.800000011920929`; `delay/900` = `0.8999999761581421`; `delay/1000` = `1`; `duration/0` = `0`; `duration/50` = `0.05000000074505806`; `duration/100` = `0.10000000149011612`; `duration/200` = `0.20000000298023224`; `duration/250` = `0.25`; `duration/300` = `0.30000001192092896`; `duration/375` = `0.375`; `duration/400` = `0.4000000059604645`; `duration/500` = `0.5`; `duration/600` = `0.6000000238418579`; `duration/700` = `0.699999988079071`; `duration/750` = `0.75`; `duration/800` = `0.800000011920929`; `duration/900` = `0.8999999761581421`; `duration/1000` = `1`; `duration/1100` = `1.100000023841858`; `duration/1200` = `1.2000000476837158`; `duration/1300` = `1.2999999523162842`; `duration/1400` = `1.399999976158142`; `duration/1500` = `1.5`; `duration/1600` = `1.600000023841858`; `duration/1700` = `1.7000000476837158`; `duration/1800` = `1.7999999523162842`; `duration/1900` = `1.899999976158142`; `duration/2000` = `2`; `easing/circ-in-out` = `{"type":"CUSTOM_CUBIC_BEZIER","easingFunctionCubicBezier":{"x1":0.8500000238418579,"y1":0,"x2":0.15000000596046448,"y2":1}}`; `easing/cubic-out` = `{"type":"CUSTOM_CUBIC_BEZIER","easingFunctionCubicBezier":{"x1":0.2150000035762787,"y1":0.6100000143051147,"x2":0.35499998927116394,"y2":1}}`; `easing/ease-out` = `{"type":"CUSTOM_CUBIC_BEZIER","easingFunctionCubicBezier":{"x1":0,"y1":0,"x2":0.20000000298023224,"y2":1}}`; `easing/expo-out` = `{"type":"CUSTOM_CUBIC_BEZIER","easingFunctionCubicBezier":{"x1":0.1599999964237213,"y1":1,"x2":0.30000001192092896,"y2":1}}`; `easing/linear` = `{"type":"CUSTOM_CUBIC_BEZIER","easingFunctionCubicBezier":{"x1":0,"y1":0,"x2":1,"y2":1}}`; `easing/quad-out` = `{"type":"CUSTOM_CUBIC_BEZIER","easingFunctionCubicBezier":{"x1":0.25,"y1":0.46000000834465027,"x2":0.44999998807907104,"y2":0.9399999976158142}}`; `easing/quart-out` = `{"type":"CUSTOM_CUBIC_BEZIER","easingFunctionCubicBezier":{"x1":0.25,"y1":1,"x2":0.5,"y2":1}}`
+  - delay: 14 direct / 14 total; TIMING
+  - duration: 25 direct / 25 total; TIMING
+  - easing: 7 direct / 7 total; EASING
+
+**effect**
+- Modes: Mode 1 (`2674:0`; family unresolved; width unresolved; layout none; responsive false; theme none; unresolved/none)
+- Variables: 4; types: FLOAT
+- Extension: no
+- Groups:
+- Single-mode values for Mode 1 (`2674:0`): `blur-0` = `0`; `blur-100` = `12`; `blur-200` = `32`; `blur-300` = `50`
+  - Ungrouped: 4 direct / 4 total; FLOAT
+
+### Style groups
+
+**Text**: 52
+- title-style1: 4 direct / 4 total
+- title-action-style1: 4 direct / 4 total
+- body-style1: 4 direct / 4 total
+- body-action-style1: 4 direct / 4 total
+- .text-primitives: 0 direct / 36 total
+  - title: 18 direct / 18 total
+  - body: 18 direct / 18 total
+
+**Effect**: 15
+- border: 1 direct / 1 total
+- effect: 0 direct / 14 total
+  - blur: 4 direct / 4 total
+  - material-blur: 4 direct / 4 total
+  - shadow: 6 direct / 6 total
+
+**Grid**: 7
+- Ungrouped: 7 direct / 7 total
+
+## Policies
+
+- Naming v3: normalize the slash path, drop leading `core`, then a leading segment equal to the collection family/name, then adjacent semantic duplication; format WEB kebab, Android snake, and iOS camel; non-empty manual syntax wins unchanged. Example: collection `color` + `color/background/default/primary` -> `--background-default-primary`.
+- Units v5: opacity and explicit percentages infer one scale per semantic cohort. Classified FLOAT modes carry build cells; blur remains px and grid counts remain unitless. Aliases inherit terminal semantics.
+- Type ramp v2: text styles preserve exact values and bindings while exposing contextual font-size, line-height, and letter-spacing builds.
+- Expressions v1: `COMPOSE_COLOR` resolves to live CSS variable references plus an eight-digit hexadecimal fallback.
+- Modes v3: `layout` sm/md/lg/xl modes and flush/sidebar-main variants are responsive layouts, never themes; every mode in `color`, including `light`, `dark`, and `bttf`, is published as a theme.
+- Responsive v2: gap mode values remain samples; a CSS clamp is recommended only when endpoint interpolation fits every sample within 0.125rem.
+- Fingerprint v1: SHA-256 over UTF-8 canonical variable/style state; recursively sorted object keys; stable identity is key with ID fallback; names are values; volatile export and usage data excluded.
+
+## Responsive gap rules
+
+- `device/width` / default: viewport-width
+- `device/width` / flush: viewport-width
+- `device/width` / sidebar-main: 80rem
+- `device/width` / sidebar-main-flush: 80rem
+- `grid/columns` / default: 0.75rem
+- `device/container-max-width` / default: 134.75rem
+- `device/screen-height/full` / default: viewport-height
+- `device/screen-height/full` / flush: viewport-height
+- `device/screen-height/full` / sidebar-main: 45rem
+- `device/screen-height/full` / sidebar-main-flush: 45rem
+- `device/screen-height/100` / default: viewport-height
+- `device/screen-height/100` / flush: viewport-height
+- `device/screen-height/100` / sidebar-main: 9rem
+- `device/screen-height/100` / sidebar-main-flush: 9rem
+- `device/screen-height/200` / default: viewport-height
+- `device/screen-height/200` / flush: viewport-height
+- `device/screen-height/200` / sidebar-main: 13.5rem
+- `device/screen-height/200` / sidebar-main-flush: 13.5rem
+- `device/screen-height/300` / default: viewport-height
+- `device/screen-height/300` / flush: viewport-height
+- `device/screen-height/300` / sidebar-main: 18rem
+- `device/screen-height/300` / sidebar-main-flush: 18rem
+- `device/screen-height/400` / default: viewport-height
+- `device/screen-height/400` / flush: viewport-height
+- `device/screen-height/400` / sidebar-main: 22.5rem
+- `device/screen-height/400` / sidebar-main-flush: 22.5rem
+- `device/screen-height/500` / default: viewport-height
+- `device/screen-height/500` / flush: viewport-height
+- `device/screen-height/500` / sidebar-main: 31.5rem
+- `device/screen-height/500` / sidebar-main-flush: 31.5rem
+- `device/screen-height/600` / default: viewport-height
+- `device/screen-height/600` / flush: viewport-height
+- `device/screen-height/600` / sidebar-main: 36rem
+- `device/screen-height/600` / sidebar-main-flush: 36rem
+- `device/screen-height/700` / default: viewport-height
+- `device/screen-height/700` / flush: viewport-height
+- `device/screen-height/700` / sidebar-main: 40.5rem
+- `device/screen-height/700` / sidebar-main-flush: 40.5rem
+- `grid/gap` / default: mode-stepped
+- `grid/gap` / flush: mode-stepped
+- `grid/gap` / sidebar-main: 3rem
+- `grid/gap` / sidebar-main-flush: 3rem
+- `grid/gap-sm` / default: mode-stepped
+- `grid/gap-sm` / flush: mode-stepped
+- `grid/gap-sm` / sidebar-main: 1.5rem
+- `grid/gap-sm` / sidebar-main-flush: 1.5rem
+- `grid/gap-md` / default: mode-stepped
+- `grid/gap-md` / flush: mode-stepped
+- `grid/gap-md` / sidebar-main: 3.5rem
+- `grid/gap-md` / sidebar-main-flush: 3.5rem
+- `grid/gap-lg` / default: mode-stepped
+- `grid/gap-lg` / flush: mode-stepped
+- `grid/gap-lg` / sidebar-main: 6rem
+- `grid/gap-lg` / sidebar-main-flush: 6rem
+- `grid/margin-default` / default: mode-stepped
+- `grid/margin-default` / flush: 0rem
+- `grid/margin-default` / sidebar-main: 3rem
+- `grid/margin-default` / sidebar-main-flush: 0rem
+- `grid/margin-offset` / default: mode-stepped
+- `grid/margin-offset` / flush: 0rem
+- `grid/margin-offset` / sidebar-main: 2.25rem
+- `grid/margin-offset` / sidebar-main-flush: 0rem
+- `grid/margin-sm` / default: mode-stepped
+- `grid/margin-sm` / flush: 0rem
+- `grid/margin-sm` / sidebar-main: 2rem
+- `grid/margin-sm` / sidebar-main-flush: 0rem
+- `grid/padding-default` / default: mode-stepped
+- `grid/padding-default` / flush: mode-stepped
+- `grid/padding-default` / sidebar-main: 3rem
+- `grid/padding-default` / sidebar-main-flush: 3rem
+- `grid/padding-offset` / default: mode-stepped
+- `grid/padding-offset` / flush: mode-stepped
+- `grid/padding-offset` / sidebar-main: 2.25rem
+- `grid/padding-offset` / sidebar-main-flush: 2.25rem
+- `grid/padding-sm` / default: mode-stepped
+- `grid/padding-sm` / flush: mode-stepped
+- `grid/padding-sm` / sidebar-main: 2rem
+- `grid/padding-sm` / sidebar-main-flush: 2rem
+- `grid/col-span/col-span-1` / default: mode-stepped
+- `grid/col-span/col-span-1` / flush: clamp(1.953125rem, 0.5208vw + 0.000125rem, 10rem)
+- `grid/col-span/col-span-1` / sidebar-main: 1.8125rem
+- `grid/col-span/col-span-1` / sidebar-main-flush: 4.5625rem
+- `grid/col-start/col-start-1` / default: 0rem
+- `grid/col-start/col-start-2` / default: clamp(1.828125rem, 0.5127vw + -0.0945rem, 9.75rem)
+- `grid/col-start/col-start-2` / flush: clamp(1.953125rem, 0.5208vw + 0.000125rem, 10rem)
+- `grid/col-start/col-start-2` / sidebar-main: 4.8125rem
+- `grid/col-start/col-start-2` / sidebar-main-flush: 4.5625rem
+- `grid/col-start/col-start-3` / default: mode-stepped
+- `grid/col-start/col-start-3` / flush: clamp(3.90625rem, 1.0417vw + -0.000125rem, 20rem)
+- `grid/col-start/col-start-3` / sidebar-main: 9.625rem
+- `grid/col-start/col-start-3` / sidebar-main-flush: 9.125rem
+- `grid/col-start/col-start-4` / default: mode-stepped
+- `grid/col-start/col-start-4` / flush: clamp(5.859375rem, 1.5625vw + 0rem, 30rem)
+- `grid/col-start/col-start-4` / sidebar-main: 14.4375rem
+- `grid/col-start/col-start-4` / sidebar-main-flush: 13.6875rem
+- `grid/col-start/col-start-5` / default: mode-stepped
+- `grid/col-start/col-start-5` / flush: clamp(7.8125rem, 2.0833vw + 0.000125rem, 40rem)
+- `grid/col-start/col-start-5` / sidebar-main: 19.25rem
+- `grid/col-start/col-start-5` / sidebar-main-flush: 18.25rem
+- `grid/col-start/col-start-6` / default: mode-stepped
+- `grid/col-start/col-start-6` / flush: clamp(9.765625rem, 2.6042vw + -0.000125rem, 50rem)
+- `grid/col-start/col-start-6` / sidebar-main: 24.0625rem
+- `grid/col-start/col-start-6` / sidebar-main-flush: 22.8125rem
+- `grid/col-start/col-start-7` / default: mode-stepped
+- `grid/col-start/col-start-7` / flush: clamp(11.71875rem, 3.125vw + 0rem, 60rem)
+- `grid/col-start/col-start-7` / sidebar-main: 28.875rem
+- `grid/col-start/col-start-7` / sidebar-main-flush: 27.375rem
+- `grid/col-start/col-start-8` / default: mode-stepped
+- `grid/col-start/col-start-8` / flush: mode-stepped
+- `grid/col-start/col-start-8` / sidebar-main: 33.6875rem
+- `grid/col-start/col-start-8` / sidebar-main-flush: 31.9375rem
+- `grid/col-start/col-start-9` / default: mode-stepped
+- `grid/col-start/col-start-9` / flush: mode-stepped
+- `grid/col-start/col-start-9` / sidebar-main: 38.5rem
+- `grid/col-start/col-start-9` / sidebar-main-flush: 36.5rem
+- `grid/col-start/col-start-10` / default: mode-stepped
+- `grid/col-start/col-start-10` / flush: mode-stepped
+- `grid/col-start/col-start-10` / sidebar-main: 43.3125rem
+- `grid/col-start/col-start-10` / sidebar-main-flush: 41.0625rem
+- `grid/col-start/col-start-11` / default: mode-stepped
+- `grid/col-start/col-start-11` / flush: mode-stepped
+- `grid/col-start/col-start-11` / sidebar-main: 48.125rem
+- `grid/col-start/col-start-11` / sidebar-main-flush: 45.625rem
+- `grid/col-start/col-start-12` / default: mode-stepped
+- `grid/col-start/col-start-12` / flush: clamp(21.484375rem, 5.7292vw + -0.000125rem, 110rem)
+- `grid/col-start/col-start-12` / sidebar-main: 52.9375rem
+- `grid/col-start/col-start-12` / sidebar-main-flush: 50.1875rem
+- `grid/col-span/col-span-2` / default: mode-stepped
+- `grid/col-span/col-span-2` / flush: clamp(3.90625rem, 1.0417vw + -0.000125rem, 20rem)
+- `grid/col-span/col-span-2` / sidebar-main: 6.625rem
+- `grid/col-span/col-span-2` / sidebar-main-flush: 9.125rem
+- `grid/col-span/col-span-3` / default: mode-stepped
+- `grid/col-span/col-span-3` / flush: clamp(5.859375rem, 1.5625vw + 0rem, 30rem)
+- `grid/col-span/col-span-3` / sidebar-main: 11.4375rem
+- `grid/col-span/col-span-3` / sidebar-main-flush: 13.6875rem
+- `grid/col-span/col-span-4` / default: mode-stepped
+- `grid/col-span/col-span-4` / flush: clamp(7.8125rem, 2.0833vw + 0.000125rem, 40rem)
+- `grid/col-span/col-span-4` / sidebar-main: 16.25rem
+- `grid/col-span/col-span-4` / sidebar-main-flush: 18.25rem
+- `grid/col-span/col-span-5` / default: mode-stepped
+- `grid/col-span/col-span-5` / flush: clamp(9.765625rem, 2.6042vw + -0.000125rem, 50rem)
+- `grid/col-span/col-span-5` / sidebar-main: 21.0625rem
+- `grid/col-span/col-span-5` / sidebar-main-flush: 22.8125rem
+- `grid/col-span/col-span-6` / default: mode-stepped
+- `grid/col-span/col-span-6` / flush: clamp(11.71875rem, 3.125vw + 0rem, 60rem)
+- `grid/col-span/col-span-6` / sidebar-main: 25.875rem
+- `grid/col-span/col-span-6` / sidebar-main-flush: 27.375rem
+- `grid/col-span/col-span-7` / default: mode-stepped
+- `grid/col-span/col-span-7` / flush: clamp(13.671875rem, 3.6458vw + 0.000125rem, 70rem)
+- `grid/col-span/col-span-7` / sidebar-main: 30.6875rem
+- `grid/col-span/col-span-7` / sidebar-main-flush: 31.9375rem
+- `grid/col-span/col-span-8` / default: mode-stepped
+- `grid/col-span/col-span-8` / flush: clamp(15.625rem, 4.1667vw + -0.000125rem, 80rem)
+- `grid/col-span/col-span-8` / sidebar-main: 35.5rem
+- `grid/col-span/col-span-8` / sidebar-main-flush: 36.5rem
+- `grid/col-span/col-span-9` / default: mode-stepped
+- `grid/col-span/col-span-9` / flush: clamp(17.578125rem, 4.6875vw + 0rem, 90rem)
+- `grid/col-span/col-span-9` / sidebar-main: 40.3125rem
+- `grid/col-span/col-span-9` / sidebar-main-flush: 41.0625rem
+- `grid/col-span/col-span-10` / default: mode-stepped
+- `grid/col-span/col-span-10` / flush: clamp(19.53125rem, 5.2083vw + 0.000125rem, 100rem)
+- `grid/col-span/col-span-10` / sidebar-main: 45.125rem
+- `grid/col-span/col-span-10` / sidebar-main-flush: 45.625rem
+- `grid/col-span/col-span-11` / default: mode-stepped
+- `grid/col-span/col-span-11` / flush: clamp(21.484375rem, 5.7292vw + -0.000125rem, 110rem)
+- `grid/col-span/col-span-11` / sidebar-main: 49.9375rem
+- `grid/col-span/col-span-11` / sidebar-main-flush: 50.1875rem
+- `grid/col-span/col-span-12` / default: mode-stepped
+- `grid/col-span/col-span-12` / flush: clamp(23.4375rem, 6.25vw + 0rem, 120rem)
+- `grid/col-span/col-span-12` / sidebar-main: 54.75rem
+- `grid/col-span/col-span-12` / sidebar-main-flush: 54.75rem
+- `grid/aspect/landscape/col-span-1` / default: mode-stepped
+- `grid/aspect/landscape/col-span-1` / flush: clamp(1.3125rem, 0.3479vw + 0.007875rem, 6.6875rem)
+- `grid/aspect/landscape/col-span-1` / sidebar-main: 1.208125rem
+- `grid/aspect/landscape/col-span-1` / sidebar-main-flush: 3.041875rem
+- `grid/aspect/landscape/col-span-2` / default: mode-stepped
+- `grid/aspect/landscape/col-span-2` / flush: clamp(2.625rem, 0.6917vw + 0.031125rem, 13.3125rem)
+- `grid/aspect/landscape/col-span-2` / sidebar-main: 4.416875rem
+- `grid/aspect/landscape/col-span-2` / sidebar-main-flush: 6.083125rem
+- `grid/aspect/landscape/col-span-3` / default: mode-stepped
+- `grid/aspect/landscape/col-span-3` / flush: clamp(3.9375rem, 1.0396vw + 0.039rem, 20rem)
+- `grid/aspect/landscape/col-span-3` / sidebar-main: 7.625rem
+- `grid/aspect/landscape/col-span-3` / sidebar-main-flush: 9.125rem
+- `grid/aspect/landscape/col-span-4` / default: mode-stepped
+- `grid/aspect/landscape/col-span-4` / flush: clamp(5.1875rem, 1.3916vw + -0.031rem, 26.6875rem)
+- `grid/aspect/landscape/col-span-4` / sidebar-main: 10.833125rem
+- `grid/aspect/landscape/col-span-4` / sidebar-main-flush: 12.166875rem
+- `grid/aspect/landscape/col-span-5` / default: mode-stepped
+- `grid/aspect/landscape/col-span-5` / flush: clamp(6.5rem, 1.7354vw + -0.00775rem, 33.3125rem)
+- `grid/aspect/landscape/col-span-5` / sidebar-main: 14.041875rem
+- `grid/aspect/landscape/col-span-5` / sidebar-main-flush: 15.208125rem
+- `grid/aspect/landscape/col-span-6` / default: mode-stepped
+- `grid/aspect/landscape/col-span-6` / flush: clamp(7.8125rem, 2.0833vw + 0.000125rem, 40rem)
+- `grid/aspect/landscape/col-span-6` / sidebar-main: 17.25rem
+- `grid/aspect/landscape/col-span-6` / sidebar-main-flush: 18.25rem
+- `grid/aspect/landscape/col-span-7` / default: mode-stepped
+- `grid/aspect/landscape/col-span-7` / flush: clamp(9.125rem, 2.4312vw + 0.008rem, 46.6875rem)
+- `grid/aspect/landscape/col-span-7` / sidebar-main: 20.458124rem
+- `grid/aspect/landscape/col-span-7` / sidebar-main-flush: 21.291876rem
+- `grid/aspect/landscape/col-span-8` / default: mode-stepped
+- `grid/aspect/landscape/col-span-8` / flush: clamp(10.4375rem, 2.7751vw + 0.030875rem, 53.3125rem)
+- `grid/aspect/landscape/col-span-8` / sidebar-main: 23.666876rem
+- `grid/aspect/landscape/col-span-8` / sidebar-main-flush: 24.333124rem
+- `grid/aspect/landscape/col-span-9` / default: mode-stepped
+- `grid/aspect/landscape/col-span-9` / flush: clamp(11.75rem, 3.123vw + 0.03875rem, 60rem)
+- `grid/aspect/landscape/col-span-9` / sidebar-main: 26.875rem
+- `grid/aspect/landscape/col-span-9` / sidebar-main-flush: 27.375rem
+- `grid/aspect/landscape/col-span-10` / default: mode-stepped
+- `grid/aspect/landscape/col-span-10` / flush: clamp(13rem, 3.4749vw + -0.030875rem, 66.6875rem)
+- `grid/aspect/landscape/col-span-10` / sidebar-main: 30.083124rem
+- `grid/aspect/landscape/col-span-10` / sidebar-main-flush: 30.416876rem
+- `grid/aspect/landscape/col-span-11` / default: mode-stepped
+- `grid/aspect/landscape/col-span-11` / flush: clamp(14.3125rem, 3.8201vw + -0.012875rem, 73.333122rem)
+- `grid/aspect/landscape/col-span-11` / sidebar-main: 33.291874rem
+- `grid/aspect/landscape/col-span-11` / sidebar-main-flush: 33.458126rem
+- `grid/aspect/landscape/col-span-12` / default: mode-stepped
+- `grid/aspect/landscape/col-span-12` / flush: clamp(15.625rem, 4.1667vw + -0.000125rem, 80rem)
+- `grid/aspect/landscape/col-span-12` / sidebar-main: 36.5rem
+- `grid/aspect/landscape/col-span-12` / sidebar-main-flush: 36.5rem
+- `grid/aspect/landscape/full-width` / default: mode-stepped
+- `grid/aspect/landscape/full-width` / flush: clamp(15.625rem, 4.1667vw + -0.000125rem, 80rem)
+- `grid/aspect/landscape/full-width` / sidebar-main: 40.5rem
+- `grid/aspect/landscape/full-width` / sidebar-main-flush: 40.5rem
+- `grid/aspect/portrait/col-span-1` / default: mode-stepped
+- `grid/aspect/portrait/col-span-1` / flush: clamp(2.4375rem, 0.6513vw + -0.004875rem, 12.5rem)
+- `grid/aspect/portrait/col-span-1` / sidebar-main: 2.265625rem
+- `grid/aspect/portrait/col-span-1` / sidebar-main-flush: 5.703125rem
+- `grid/aspect/portrait/col-span-2` / default: mode-stepped
+- `grid/aspect/portrait/col-span-2` / flush: clamp(4.875rem, 1.3026vw + -0.00975rem, 25rem)
+- `grid/aspect/portrait/col-span-2` / sidebar-main: 8.28125rem
+- `grid/aspect/portrait/col-span-2` / sidebar-main-flush: 11.40625rem
+- `grid/aspect/portrait/col-span-3` / default: mode-stepped
+- `grid/aspect/portrait/col-span-3` / flush: clamp(7.3125rem, 1.9539vw + -0.014625rem, 37.5rem)
+- `grid/aspect/portrait/col-span-3` / sidebar-main: 14.296875rem
+- `grid/aspect/portrait/col-span-3` / sidebar-main-flush: 17.109375rem
+- `grid/aspect/portrait/col-span-4` / default: mode-stepped
+- `grid/aspect/portrait/col-span-4` / flush: mode-stepped
+- `grid/aspect/portrait/col-span-4` / sidebar-main: 20.3125rem
+- `grid/aspect/portrait/col-span-4` / sidebar-main-flush: 22.8125rem
+- `grid/aspect/portrait/col-span-5` / default: mode-stepped
+- `grid/aspect/portrait/col-span-5` / flush: mode-stepped
+- `grid/aspect/portrait/col-span-5` / sidebar-main: 26.328125rem
+- `grid/aspect/portrait/col-span-5` / sidebar-main-flush: 28.515625rem
+- `grid/aspect/portrait/col-span-6` / default: mode-stepped
+- `grid/aspect/portrait/col-span-6` / flush: mode-stepped
+- `grid/aspect/portrait/col-span-6` / sidebar-main: 32.34375rem
+- `grid/aspect/portrait/col-span-6` / sidebar-main-flush: 34.21875rem
+- `grid/aspect/portrait/col-span-7` / default: mode-stepped
+- `grid/aspect/portrait/col-span-7` / flush: mode-stepped
+- `grid/aspect/portrait/col-span-7` / sidebar-main: 38.359375rem
+- `grid/aspect/portrait/col-span-7` / sidebar-main-flush: 39.921875rem
+- `grid/aspect/portrait/col-span-8` / default: mode-stepped
+- `grid/aspect/portrait/col-span-8` / flush: mode-stepped
+- `grid/aspect/portrait/col-span-8` / sidebar-main: 44.375rem
+- `grid/aspect/portrait/col-span-8` / sidebar-main-flush: 45.625rem
+- `grid/aspect/portrait/col-span-9` / default: mode-stepped
+- `grid/aspect/portrait/col-span-9` / flush: mode-stepped
+- `grid/aspect/portrait/col-span-9` / sidebar-main: 50.390625rem
+- `grid/aspect/portrait/col-span-9` / sidebar-main-flush: 51.328125rem
+- `grid/aspect/portrait/col-span-10` / default: mode-stepped
+- `grid/aspect/portrait/col-span-10` / flush: mode-stepped
+- `grid/aspect/portrait/col-span-10` / sidebar-main: 56.40625rem
+- `grid/aspect/portrait/col-span-10` / sidebar-main-flush: 57.03125rem
+- `grid/aspect/portrait/col-span-11` / default: mode-stepped
+- `grid/aspect/portrait/col-span-11` / flush: mode-stepped
+- `grid/aspect/portrait/col-span-11` / sidebar-main: 62.421875rem
+- `grid/aspect/portrait/col-span-11` / sidebar-main-flush: 62.734375rem
+- `grid/aspect/portrait/col-span-12` / default: mode-stepped
+- `grid/aspect/portrait/col-span-12` / flush: clamp(29.3125rem, 7.8115vw + 0.019375rem, 150rem)
+- `grid/aspect/portrait/col-span-12` / sidebar-main: 68.4375rem
+- `grid/aspect/portrait/col-span-12` / sidebar-main-flush: 68.4375rem
+- `grid/aspect/portrait/full-width` / default: clamp(29.296875rem, 7.8125vw + 0rem, 150rem)
+- `grid/aspect/portrait/full-width` / flush: clamp(29.3125rem, 7.8115vw + 0.019375rem, 150rem)
+- `grid/aspect/portrait/full-width` / sidebar-main: 75.9375rem
+- `grid/aspect/portrait/full-width` / sidebar-main-flush: 75.9375rem
+- `grid/aspect/tall/col-span-1` / default: mode-stepped
+- `grid/aspect/tall/col-span-1` / flush: clamp(2.9375rem, 0.7807vw + 0.009875rem, 15rem)
+- `grid/aspect/tall/col-span-1` / sidebar-main: 2.71875rem
+- `grid/aspect/tall/col-span-1` / sidebar-main-flush: 6.84375rem
+- `grid/aspect/tall/col-span-2` / default: mode-stepped
+- `grid/aspect/tall/col-span-2` / flush: clamp(5.875rem, 1.5615vw + 0.019375rem, 30rem)
+- `grid/aspect/tall/col-span-2` / sidebar-main: 9.9375rem
+- `grid/aspect/tall/col-span-2` / sidebar-main-flush: 13.6875rem
+- `grid/aspect/tall/col-span-3` / default: mode-stepped
+- `grid/aspect/tall/col-span-3` / flush: clamp(8.8125rem, 2.3422vw + 0.02925rem, 45rem)
+- `grid/aspect/tall/col-span-3` / sidebar-main: 17.15625rem
+- `grid/aspect/tall/col-span-3` / sidebar-main-flush: 20.53125rem
+- `grid/aspect/tall/col-span-4` / default: mode-stepped
+- `grid/aspect/tall/col-span-4` / flush: clamp(11.75rem, 3.123vw + 0.03875rem, 60rem)
+- `grid/aspect/tall/col-span-4` / sidebar-main: 24.375rem
+- `grid/aspect/tall/col-span-4` / sidebar-main-flush: 27.375rem
+- `grid/aspect/tall/col-span-5` / default: mode-stepped
+- `grid/aspect/tall/col-span-5` / flush: clamp(14.625rem, 3.9078vw + -0.02925rem, 75rem)
+- `grid/aspect/tall/col-span-5` / sidebar-main: 31.59375rem
+- `grid/aspect/tall/col-span-5` / sidebar-main-flush: 34.21875rem
+- `grid/aspect/tall/col-span-6` / default: mode-stepped
+- `grid/aspect/tall/col-span-6` / flush: clamp(17.5625rem, 4.6885vw + -0.019375rem, 90rem)
+- `grid/aspect/tall/col-span-6` / sidebar-main: 38.8125rem
+- `grid/aspect/tall/col-span-6` / sidebar-main-flush: 41.0625rem
+- `grid/aspect/tall/col-span-7` / default: mode-stepped
+- `grid/aspect/tall/col-span-7` / flush: clamp(20.5rem, 5.4693vw + -0.009875rem, 105rem)
+- `grid/aspect/tall/col-span-7` / sidebar-main: 46.03125rem
+- `grid/aspect/tall/col-span-7` / sidebar-main-flush: 47.90625rem
+- `grid/aspect/tall/col-span-8` / default: mode-stepped
+- `grid/aspect/tall/col-span-8` / flush: clamp(23.4375rem, 6.25vw + 0rem, 120rem)
+- `grid/aspect/tall/col-span-8` / sidebar-main: 53.25rem
+- `grid/aspect/tall/col-span-8` / sidebar-main-flush: 54.75rem
+- `grid/aspect/tall/col-span-9` / default: mode-stepped
+- `grid/aspect/tall/col-span-9` / flush: clamp(26.375rem, 7.0307vw + 0.009875rem, 135rem)
+- `grid/aspect/tall/col-span-9` / sidebar-main: 60.46875rem
+- `grid/aspect/tall/col-span-9` / sidebar-main-flush: 61.59375rem
+- `grid/aspect/tall/col-span-10` / default: mode-stepped
+- `grid/aspect/tall/col-span-10` / flush: clamp(29.3125rem, 7.8115vw + 0.019375rem, 150rem)
+- `grid/aspect/tall/col-span-10` / sidebar-main: 67.6875rem
+- `grid/aspect/tall/col-span-10` / sidebar-main-flush: 68.4375rem
+- `grid/aspect/tall/col-span-11` / default: mode-stepped
+- `grid/aspect/tall/col-span-11` / flush: mode-stepped
+- `grid/aspect/tall/col-span-11` / sidebar-main: 74.90625rem
+- `grid/aspect/tall/col-span-11` / sidebar-main-flush: 75.28125rem
+- `grid/aspect/tall/col-span-12` / default: mode-stepped
+- `grid/aspect/tall/col-span-12` / flush: mode-stepped
+- `grid/aspect/tall/col-span-12` / sidebar-main: 82.125rem
+- `grid/aspect/tall/col-span-12` / sidebar-main-flush: 82.125rem
+- `grid/aspect/tall/full-width` / default: mode-stepped
+- `grid/aspect/tall/full-width` / flush: clamp(35.1875rem, 9.373vw + 0.03875rem, 180rem)
+- `grid/aspect/tall/full-width` / sidebar-main: 91.125rem
+- `grid/aspect/tall/full-width` / sidebar-main-flush: 91.125rem
+- `space/spacer-0` / default: 0rem
+- `space/spacer-100` / default: mode-stepped
+- `space/spacer-100` / flush: mode-stepped
+- `space/spacer-100` / sidebar-main: 1.5rem
+- `space/spacer-100` / sidebar-main-flush: 1.5rem
+- `space/spacer-200` / default: mode-stepped
+- `space/spacer-200` / flush: mode-stepped
+- `space/spacer-200` / sidebar-main: 2rem
+- `space/spacer-200` / sidebar-main-flush: 2rem
+- `space/spacer-300` / default: mode-stepped
+- `space/spacer-300` / flush: mode-stepped
+- `space/spacer-300` / sidebar-main: 3rem
+- `space/spacer-300` / sidebar-main-flush: 3rem
+- `space/spacer-400` / default: mode-stepped
+- `space/spacer-400` / flush: mode-stepped
+- `space/spacer-400` / sidebar-main: 4rem
+- `space/spacer-400` / sidebar-main-flush: 4rem
+- `space/spacer-500` / default: mode-stepped
+- `space/spacer-500` / flush: mode-stepped
+- `space/spacer-500` / sidebar-main: 6rem
+- `space/spacer-500` / sidebar-main-flush: 6rem
+- `space/spacer-600` / default: mode-stepped
+- `space/spacer-600` / flush: mode-stepped
+- `space/spacer-600` / sidebar-main: 10rem
+- `space/spacer-600` / sidebar-main-flush: 10rem
+- `text/title/font-size-100` / default: clamp(0.875rem, 0.0081vw + 0.844625rem, 1rem)
+- `text/title/font-size-100` / flush: clamp(0.875rem, 0.0081vw + 0.844625rem, 1rem)
+- `text/title/font-size-100` / sidebar-main: 1rem
+- `text/title/font-size-100` / sidebar-main-flush: 1rem
+- `text/title/letter-spacing-100` / default: mode-stepped
+- `text/title/letter-spacing-100` / flush: mode-stepped
+- `text/title/letter-spacing-100` / sidebar-main: -0.015625rem
+- `text/title/letter-spacing-100` / sidebar-main-flush: -0.015625rem
+- `text/title/font-size-200` / default: clamp(1.125rem, 0.0081vw + 1.094625rem, 1.25rem)
+- `text/title/font-size-200` / flush: clamp(1.125rem, 0.0081vw + 1.094625rem, 1.25rem)
+- `text/title/font-size-200` / sidebar-main: 1.25rem
+- `text/title/font-size-200` / sidebar-main-flush: 1.25rem
+- `text/title/letter-spacing-200` / default: -0.015625rem
+- `text/title/font-size-300` / default: mode-stepped
+- `text/title/font-size-300` / flush: mode-stepped
+- `text/title/font-size-300` / sidebar-main: 2.5rem
+- `text/title/font-size-300` / sidebar-main-flush: 2.5rem
+- `text/title/letter-spacing-300` / default: mode-stepped
+- `text/title/letter-spacing-300` / flush: mode-stepped
+- `text/title/letter-spacing-300` / sidebar-main: -0.0625rem
+- `text/title/letter-spacing-300` / sidebar-main-flush: -0.0625rem
+- `text/title/font-size-400` / default: mode-stepped
+- `text/title/font-size-400` / flush: mode-stepped
+- `text/title/font-size-400` / sidebar-main: 5rem
+- `text/title/font-size-400` / sidebar-main-flush: 5rem
+- `text/title/letter-spacing-400` / default: mode-stepped
+- `text/title/letter-spacing-400` / flush: mode-stepped
+- `text/title/letter-spacing-400` / sidebar-main: -0.171875rem
+- `text/title/letter-spacing-400` / sidebar-main-flush: -0.171875rem
+- `text/body/font-size-100` / default: clamp(0.75rem, 0.0081vw + 0.719625rem, 0.875rem)
+- `text/body/font-size-100` / flush: clamp(0.75rem, 0.0081vw + 0.719625rem, 0.875rem)
+- `text/body/font-size-100` / sidebar-main: 0.875rem
+- `text/body/font-size-100` / sidebar-main-flush: 0.875rem
+- `text/body/letter-spacing-100` / default: 0rem
+- `text/body/paragraph-spacing-100` / default: clamp(0.6875rem, 0.0081vw + 0.657125rem, 0.8125rem)
+- `text/body/paragraph-spacing-100` / flush: clamp(0.6875rem, 0.0081vw + 0.657125rem, 0.8125rem)
+- `text/body/paragraph-spacing-100` / sidebar-main: 0.8125rem
+- `text/body/paragraph-spacing-100` / sidebar-main-flush: 0.8125rem
+- `text/body/font-size-200` / default: clamp(0.875rem, 0.0081vw + 0.844625rem, 1rem)
+- `text/body/font-size-200` / flush: clamp(0.875rem, 0.0081vw + 0.844625rem, 1rem)
+- `text/body/font-size-200` / sidebar-main: 1rem
+- `text/body/font-size-200` / sidebar-main-flush: 1rem
+- `text/body/letter-spacing-200` / default: mode-stepped
+- `text/body/letter-spacing-200` / flush: mode-stepped
+- `text/body/letter-spacing-200` / sidebar-main: -0.015625rem
+- `text/body/letter-spacing-200` / sidebar-main-flush: -0.015625rem
+- `text/body/paragraph-spacing-200` / default: clamp(0.8125rem, 0.0081vw + 0.782125rem, 0.9375rem)
+- `text/body/paragraph-spacing-200` / flush: clamp(0.8125rem, 0.0081vw + 0.782125rem, 0.9375rem)
+- `text/body/paragraph-spacing-200` / sidebar-main: 0.9375rem
+- `text/body/paragraph-spacing-200` / sidebar-main-flush: 0.9375rem
+- `text/body/font-size-300` / default: clamp(1.125rem, 0.0081vw + 1.094625rem, 1.25rem)
+- `text/body/font-size-300` / flush: clamp(1.125rem, 0.0081vw + 1.094625rem, 1.25rem)
+- `text/body/font-size-300` / sidebar-main: 1.25rem
+- `text/body/font-size-300` / sidebar-main-flush: 1.25rem
+- `text/body/letter-spacing-300` / default: -0.015625rem
+- `text/body/paragraph-spacing-300` / default: clamp(1.0625rem, 0.0081vw + 1.032125rem, 1.1875rem)
+- `text/body/paragraph-spacing-300` / flush: clamp(1.0625rem, 0.0081vw + 1.032125rem, 1.1875rem)
+- `text/body/paragraph-spacing-300` / sidebar-main: 1.1875rem
+- `text/body/paragraph-spacing-300` / sidebar-main-flush: 1.1875rem
+- `text/body/font-size-400` / default: mode-stepped
+- `text/body/font-size-400` / flush: mode-stepped
+- `text/body/font-size-400` / sidebar-main: 1.75rem
+- `text/body/font-size-400` / sidebar-main-flush: 1.75rem
+- `text/body/letter-spacing-400` / default: mode-stepped
+- `text/body/letter-spacing-400` / flush: mode-stepped
+- `text/body/letter-spacing-400` / sidebar-main: -0.03125rem
+- `text/body/letter-spacing-400` / sidebar-main-flush: -0.03125rem
+- `text/body/paragraph-spacing-400` / default: mode-stepped
+- `text/body/paragraph-spacing-400` / flush: mode-stepped
+- `text/body/paragraph-spacing-400` / sidebar-main: 1.6875rem
+- `text/body/paragraph-spacing-400` / sidebar-main-flush: 1.6875rem
+- `icon-dimension/height` / default: mode-stepped
+- `icon-dimension/width` / default: mode-stepped
+- `icon-radius/icon-radius-100` / default: clamp(0.0625rem, 0.0208vw + 0.0417rem, 0.125rem)
+- `icon-radius/icon-radius-200` / default: clamp(0.125rem, 0.0417vw + 0.0833rem, 0.25rem)
+- `icon-radius/icon-radius-300` / default: clamp(0.1875rem, 0.0625vw + 0.125rem, 0.375rem)
+- `icon-radius/icon-radius-400` / default: mode-stepped
+- `dimension/button-height` / default: mode-stepped
+- `dimension/button-icon-width` / default: mode-stepped
+- `dimension/button-justified-height` / default: mode-stepped
+- `space/button-space-h` / default: clamp(0.5rem, 0.3333vw + 0.1667rem, 1.5rem)
+- `space/button-space-h-offset` / default: clamp(0.75rem, 0.3333vw + 0.4167rem, 1.75rem)
+- `space/button-space-v` / default: mode-stepped
+
+## Breakpoints
+
+- null / null: nullpx (`light`, theme-name/high)
+- null / null: nullpx (`dark`, theme-name/high)
+- null / null: nullpx (`bttf`, theme-name/high)
+- lg / default: 1280px (`lg`, device-width-variable/high)
+- sm / default: 375px (`sm`, device-width-variable/high)
+- md / default: 768px (`md`, device-width-variable/high)
+- xl / default: 1920px (`xl`, device-width-variable/high)
+- lg / flush: 1280px (`lg-flush`, device-width-variable/high)
+- sm / flush: 375px (`sm-flush`, device-width-variable/high)
+- md / flush: 768px (`md-flush`, device-width-variable/high)
+- xl / flush: 1920px (`xl-flush`, device-width-variable/high)
+- lg / sidebar-main: 1280px (`lg-sidebar-main`, device-width-variable/high)
+- lg / sidebar-main-flush: 1280px (`lg-sidebar-main-flush`, device-width-variable/high)
+
+## Changes
+
+- Baseline: 2026-09-12T13:28:50.800Z; fingerprint `eab3d422694a61d30e30e6961dd690023df3d5db3965ced39a562dcdb98498cc`
+- Summary: 0 added; 0 removed; 0 renamed; 0 code names changed; 0 value changed; 0 alias retargeted; 0 policy changed; 0 description changed.
+
+## Raw style properties
+
+- Text `title-style1/100`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:457, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:53]
+- Text `title-style1/200`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:459, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:54]
+- Text `title-style1/300`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:394, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:59]
+- Text `title-style1/400`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:368, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:7:39]
+- Text `title-action-style1/100`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:457, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:53]
+- Text `title-action-style1/200`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:459, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:54]
+- Text `title-action-style1/300`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:394, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:59]
+- Text `title-action-style1/400`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:368, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:7:39]
+- Text `body-style1/100`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 5 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:492:2315, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:492:2316, boundVariables.paragraphSpacing -> VariableID:3926:79766]
+- Text `body-style1/200`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 5 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:505, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:241:510, boundVariables.paragraphSpacing -> VariableID:1577:17085]
+- Text `body-style1/300`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 5 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:507, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:241:506, boundVariables.paragraphSpacing -> VariableID:1577:17083]
+- Text `body-style1/400`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 5 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:504, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:241:503, boundVariables.paragraphSpacing -> VariableID:1577:17082]
+- Text `body-action-style1/100`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 5 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:6, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:51, boundVariables.paragraphSpacing -> VariableID:3926:79766]
+- Text `body-action-style1/200`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 5 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:7, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:52, boundVariables.paragraphSpacing -> VariableID:1577:17085]
+- Text `body-action-style1/300`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 5 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:505, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:53, boundVariables.paragraphSpacing -> VariableID:1577:17085]
+- Text `body-action-style1/400`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 5 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:241:507, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:54, boundVariables.paragraphSpacing -> VariableID:1577:17083]
+- Text `.text-primitives/title/050`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:492:4867, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:2855:7291]
+- Text `.text-primitives/title/100`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:6, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:51]
+- Text `.text-primitives/title/200`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:7, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:52]
+- Text `.text-primitives/title/300`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:8, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:53]
+- Text `.text-primitives/title/400`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:9, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:54]
+- Text `.text-primitives/title/500`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:10, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:55]
+- Text `.text-primitives/title/600`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:11, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:56]
+- Text `.text-primitives/title/700`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:12, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:57]
+- Text `.text-primitives/title/800`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:13, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:58]
+- Text `.text-primitives/title/900`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:14, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:59]
+- Text `.text-primitives/title/1000`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:15, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:60]
+- Text `.text-primitives/title/1100`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:16, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:1:61]
+- Text `.text-primitives/title/1200`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:17, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:7:39]
+- Text `.text-primitives/title/1300`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:18, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:8:44]
+- Text `.text-primitives/title/1400`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:19, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:8:48]
+- Text `.text-primitives/title/1500`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:20, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:8:49]
+- Text `.text-primitives/title/1600`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:21, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:8:56]
+- Text `.text-primitives/title/1700`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:22, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:8:57]
+- Text `.text-primitives/body/100`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:6, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3117]
+- Text `.text-primitives/body/050`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:6, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3117]
+- Text `.text-primitives/body/200`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:7, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3118]
+- Text `.text-primitives/body/300`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:8, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3119]
+- Text `.text-primitives/body/400`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:9, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3120]
+- Text `.text-primitives/body/500`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:10, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3121]
+- Text `.text-primitives/body/600`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:11, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3122]
+- Text `.text-primitives/body/700`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:241:373, boundVariables.fontSize -> VariableID:1:12, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3123]
+- Text `.text-primitives/body/800`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:13, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3124]
+- Text `.text-primitives/body/900`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:241:373, boundVariables.fontSize -> VariableID:1:14, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3125]
+- Text `.text-primitives/body/1000`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:15, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3126]
+- Text `.text-primitives/body/1100`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:16, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3127]
+- Text `.text-primitives/body/1200`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:17, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3128]
+- Text `.text-primitives/body/1300`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:18, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3129]
+- Text `.text-primitives/body/1400`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:19, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3130]
+- Text `.text-primitives/body/1500`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:20, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:504:3131]
+- Text `.text-primitives/body/1600`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:21, boundVariables.fontStyle -> VariableID:241:366, boundVariables.letterSpacing -> VariableID:8:56]
+- Text `.text-primitives/body/1700`: raw 11 [fontFamily, fontSize, fontStyle, letterSpacing.unit, letterSpacing.value, lineHeight.unit, lineHeight.value, paragraphIndent, paragraphSpacing, textCase, textDecoration]; variable-bound 4 [boundVariables.fontFamily -> VariableID:1:3, boundVariables.fontSize -> VariableID:1:22, boundVariables.fontStyle -> VariableID:1:23, boundVariables.letterSpacing -> VariableID:8:57]
+- Effect `border/border-focused`: raw 9 [effects[0].blendMode, effects[0].color, effects[0].offset.x, effects[0].offset.y, effects[0].radius, effects[0].showShadowBehindNode, effects[0].spread, effects[0].type, effects[0].visible]; variable-bound 2 [boundVariables.effects[0] -> VariableID:8:394, effects[0].boundVariables.color -> VariableID:8:394]
+- Effect `effect/blur/blur-0`: raw 4 [effects[0].blurType, effects[0].radius, effects[0].type, effects[0].visible]; variable-bound 2 [boundVariables.effects[0] -> VariableID:2674:10008, effects[0].boundVariables.radius -> VariableID:2674:10008]
+- Effect `effect/blur/blur-100`: raw 4 [effects[0].blurType, effects[0].radius, effects[0].type, effects[0].visible]; variable-bound 2 [boundVariables.effects[0] -> VariableID:2674:10009, effects[0].boundVariables.radius -> VariableID:2674:10009]
+- Effect `effect/blur/blur-200`: raw 4 [effects[0].blurType, effects[0].radius, effects[0].type, effects[0].visible]; variable-bound 2 [boundVariables.effects[0] -> VariableID:2674:10010, effects[0].boundVariables.radius -> VariableID:2674:10010]
+- Effect `effect/blur/blur-300`: raw 4 [effects[0].blurType, effects[0].radius, effects[0].type, effects[0].visible]; variable-bound 2 [boundVariables.effects[0] -> VariableID:2674:10011, effects[0].boundVariables.radius -> VariableID:2674:10011]
+- Effect `effect/material-blur/material-blur-0`: raw 4 [effects[0].blurType, effects[0].radius, effects[0].type, effects[0].visible]; variable-bound 2 [boundVariables.effects[0] -> VariableID:2674:10008, effects[0].boundVariables.radius -> VariableID:2674:10008]
+- Effect `effect/material-blur/material-blur-100`: raw 4 [effects[0].blurType, effects[0].radius, effects[0].type, effects[0].visible]; variable-bound 2 [boundVariables.effects[0] -> VariableID:2674:10009, effects[0].boundVariables.radius -> VariableID:2674:10009]
+- Effect `effect/material-blur/material-blur-200`: raw 4 [effects[0].blurType, effects[0].radius, effects[0].type, effects[0].visible]; variable-bound 2 [boundVariables.effects[0] -> VariableID:2674:10010, effects[0].boundVariables.radius -> VariableID:2674:10010]
+- Effect `effect/material-blur/material-blur-300`: raw 4 [effects[0].blurType, effects[0].radius, effects[0].type, effects[0].visible]; variable-bound 2 [boundVariables.effects[0] -> VariableID:2674:10011, effects[0].boundVariables.radius -> VariableID:2674:10011]
+- Effect `effect/shadow/drop-shadow-0`: raw 9 [effects[0].blendMode, effects[0].color, effects[0].offset.x, effects[0].offset.y, effects[0].radius, effects[0].showShadowBehindNode, effects[0].spread, effects[0].type, effects[0].visible]; variable-bound 2 [boundVariables.effects[0] -> VariableID:1271:16219, effects[0].boundVariables.color -> VariableID:1271:16219]
+- Effect `effect/shadow/drop-shadow-100`: raw 45 [effects[0].blendMode, effects[0].color, effects[0].offset.x, effects[0].offset.y, effects[0].radius, effects[0].showShadowBehindNode, effects[0].spread, effects[0].type, effects[0].visible, effects[1].blendMode, effects[1].color, effects[1].offset.x, +33 more]; variable-bound 10 [boundVariables.effects[0] -> VariableID:1271:16219, boundVariables.effects[1] -> VariableID:1272:16220, boundVariables.effects[2] -> VariableID:1277:16277, boundVariables.effects[3] -> VariableID:1277:16278, boundVariables.effects[4] -> VariableID:1277:16279, effects[0].boundVariables.color -> VariableID:1277:16279, effects[1].boundVariables.color -> VariableID:1277:16278, effects[2].boundVariables.color -> VariableID:1277:16277, effects[3].boundVariables.color -> VariableID:1272:16220, effects[4].boundVariables.color -> VariableID:1271:16219]
+- Effect `effect/shadow/drop-shadow-200`: raw 45 [effects[0].blendMode, effects[0].color, effects[0].offset.x, effects[0].offset.y, effects[0].radius, effects[0].showShadowBehindNode, effects[0].spread, effects[0].type, effects[0].visible, effects[1].blendMode, effects[1].color, effects[1].offset.x, +33 more]; variable-bound 10 [boundVariables.effects[0] -> VariableID:1271:16219, boundVariables.effects[1] -> VariableID:1277:16303, boundVariables.effects[2] -> VariableID:1277:16304, boundVariables.effects[3] -> VariableID:1277:16305, boundVariables.effects[4] -> VariableID:1277:16306, effects[0].boundVariables.color -> VariableID:1277:16306, effects[1].boundVariables.color -> VariableID:1277:16305, effects[2].boundVariables.color -> VariableID:1277:16304, effects[3].boundVariables.color -> VariableID:1277:16303, effects[4].boundVariables.color -> VariableID:1271:16219]
+- Effect `effect/shadow/inner-shadow-0`: raw 8 [effects[0].blendMode, effects[0].color, effects[0].offset.x, effects[0].offset.y, effects[0].radius, effects[0].spread, effects[0].type, effects[0].visible]; variable-bound 2 [boundVariables.effects[0] -> VariableID:1271:16219, effects[0].boundVariables.color -> VariableID:1271:16219]
+- Effect `effect/shadow/inner-shadow-100`: raw 40 [effects[0].blendMode, effects[0].color, effects[0].offset.x, effects[0].offset.y, effects[0].radius, effects[0].spread, effects[0].type, effects[0].visible, effects[1].blendMode, effects[1].color, effects[1].offset.x, effects[1].offset.y, +28 more]; variable-bound 10 [boundVariables.effects[0] -> VariableID:1271:16219, boundVariables.effects[1] -> VariableID:1272:16220, boundVariables.effects[2] -> VariableID:1277:16277, boundVariables.effects[3] -> VariableID:1277:16278, boundVariables.effects[4] -> VariableID:1277:16279, effects[0].boundVariables.color -> VariableID:1277:16279, effects[1].boundVariables.color -> VariableID:1277:16278, effects[2].boundVariables.color -> VariableID:1277:16277, effects[3].boundVariables.color -> VariableID:1272:16220, effects[4].boundVariables.color -> VariableID:1271:16219]
+- Effect `effect/shadow/inner-shadow-200`: raw 40 [effects[0].blendMode, effects[0].color, effects[0].offset.x, effects[0].offset.y, effects[0].radius, effects[0].spread, effects[0].type, effects[0].visible, effects[1].blendMode, effects[1].color, effects[1].offset.x, effects[1].offset.y, +28 more]; variable-bound 10 [boundVariables.effects[0] -> VariableID:1271:16219, boundVariables.effects[1] -> VariableID:1277:16303, boundVariables.effects[2] -> VariableID:1277:16304, boundVariables.effects[3] -> VariableID:1277:16305, boundVariables.effects[4] -> VariableID:1277:16306, effects[0].boundVariables.color -> VariableID:1277:16306, effects[1].boundVariables.color -> VariableID:1277:16305, effects[2].boundVariables.color -> VariableID:1277:16304, effects[3].boundVariables.color -> VariableID:1277:16303, effects[4].boundVariables.color -> VariableID:1271:16219]
+- Grid `default`: raw 7 [layoutGrids[0].alignment, layoutGrids[0].color, layoutGrids[0].count, layoutGrids[0].gutterSize, layoutGrids[0].offset, layoutGrids[0].pattern, layoutGrids[0].visible]; variable-bound 4 [boundVariables.layoutGrids[0] -> VariableID:8:497, boundVariables.layoutGrids[1] -> VariableID:8:498, layoutGrids[0].boundVariables.gutterSize -> VariableID:8:498, layoutGrids[0].boundVariables.offset -> VariableID:8:497]
+- Grid `default-margin-sm`: raw 7 [layoutGrids[0].alignment, layoutGrids[0].color, layoutGrids[0].count, layoutGrids[0].gutterSize, layoutGrids[0].offset, layoutGrids[0].pattern, layoutGrids[0].visible]; variable-bound 4 [boundVariables.layoutGrids[0] -> VariableID:8:498, boundVariables.layoutGrids[1] -> VariableID:241:616, layoutGrids[0].boundVariables.gutterSize -> VariableID:8:498, layoutGrids[0].boundVariables.offset -> VariableID:241:616]
+- Grid `default-xl`: raw 7 [layoutGrids[0].alignment, layoutGrids[0].color, layoutGrids[0].count, layoutGrids[0].gutterSize, layoutGrids[0].pattern, layoutGrids[0].sectionSize, layoutGrids[0].visible]; variable-bound 5 [boundVariables.layoutGrids[0] -> VariableID:8:497, boundVariables.layoutGrids[1] -> VariableID:8:498, boundVariables.layoutGrids[2] -> VariableID:8:499, layoutGrids[0].boundVariables.gutterSize -> VariableID:8:498, layoutGrids[0].boundVariables.sectionSize -> VariableID:8:499]
+- Grid `default-xl-margin-sm`: raw 7 [layoutGrids[0].alignment, layoutGrids[0].color, layoutGrids[0].count, layoutGrids[0].gutterSize, layoutGrids[0].pattern, layoutGrids[0].sectionSize, layoutGrids[0].visible]; variable-bound 5 [boundVariables.layoutGrids[0] -> VariableID:8:497, boundVariables.layoutGrids[1] -> VariableID:8:498, boundVariables.layoutGrids[2] -> VariableID:8:499, layoutGrids[0].boundVariables.gutterSize -> VariableID:8:498, layoutGrids[0].boundVariables.sectionSize -> VariableID:8:499]
+- Grid `flush`: raw 7 [layoutGrids[0].alignment, layoutGrids[0].color, layoutGrids[0].count, layoutGrids[0].gutterSize, layoutGrids[0].offset, layoutGrids[0].pattern, layoutGrids[0].visible]; variable-bound 4 [boundVariables.layoutGrids[0] -> VariableID:8:497, boundVariables.layoutGrids[1] -> VariableID:8:498, layoutGrids[0].boundVariables.gutterSize -> VariableID:8:498, layoutGrids[0].boundVariables.offset -> VariableID:8:497]
+- Grid `sidebar-aside`: raw 7 [layoutGrids[0].alignment, layoutGrids[0].color, layoutGrids[0].count, layoutGrids[0].gutterSize, layoutGrids[0].offset, layoutGrids[0].pattern, layoutGrids[0].visible]; variable-bound 2 [boundVariables.layoutGrids[0] -> VariableID:8:498, layoutGrids[0].boundVariables.gutterSize -> VariableID:8:498]
+- Grid `sidebar-main`: raw 7 [layoutGrids[0].alignment, layoutGrids[0].color, layoutGrids[0].count, layoutGrids[0].gutterSize, layoutGrids[0].offset, layoutGrids[0].pattern, layoutGrids[0].visible]; variable-bound 2 [boundVariables.layoutGrids[0] -> VariableID:8:498, layoutGrids[0].boundVariables.gutterSize -> VariableID:8:498]
+
+## Usage highlights
+
+- Direct bindings: 81567 occurrences / 25987 unique nodes / 9 pages
+- Variable dependency references: 812
+- Style-definition bindings: 304
+- Style-mediated consumers: 5984 unique nodes / 8 pages
+- Pages traversed: 17
+- Variable `family/font-sans`: direct 3203; dependencies 0; style bindings 50; top consumers: Block / 1 / 6 (`23:6` / `I3252:94589;3252:94866;214:436`, 2); Block / 1 / 6 (`23:6` / `I3252:96836;3252:94866;214:436`, 2); Block / Body (`23:6` / `I3905:37566;3906:48487`, 2); Block / Body (`23:6` / `I3905:37606;3906:48487`, 2); Block / Body (`23:6` / `I3905:37686;3906:49807`, 2)
+- Variable `weight/strong`: direct 3204; dependencies 0; style bindings 51; top consumers: Block / 1 / 6 (`23:6` / `I3252:94589;3252:94866;214:436`, 2); Block / 1 / 6 (`23:6` / `I3252:96836;3252:94866;214:436`, 2); Block / Body (`23:6` / `I3905:37566;3906:48487`, 2); Block / Body (`23:6` / `I3905:37606;3906:48487`, 2); Block / Body (`23:6` / `I3905:37686;3906:49807`, 2)
+- Variable `size/050`: direct 1; dependencies 0; style bindings 1; top consumers: Primitive / style (`3044:1104` / `3044:9287`, 2)
+- Variable `size/100`: direct 3; dependencies 2; style bindings 4; top consumers: Foundation / style (`3044:37` / `3923:51356`, 2); Primitive / style (`3044:1104` / `3044:9288`, 2); Primitive / style (`3044:1104` / `3044:9306`, 2)
+- Variable `size/200`: direct 3; dependencies 12; style bindings 3; top consumers: Foundation / style (`3044:37` / `3923:51357`, 2); Primitive / style (`3044:1104` / `3044:9289`, 2); Primitive / style (`3044:1104` / `3044:9307`, 2)
+- Variable `size/300`: direct 35; dependencies 16; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9290`, 2); Primitive / style (`3044:1104` / `3044:9308`, 2);  / Hero Title (`` / `241:515`, 1);  / Hero Title (`` / `241:525`, 1);  / Hero Title (`` / `39:65`, 1)
+- Variable `size/350`: direct 0; dependencies 4; style bindings 0; top consumers: none
+- Variable `size/400`: direct 2; dependencies 16; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9291`, 2); Primitive / style (`3044:1104` / `3044:9309`, 2);  / Hero Title (`` / `39:24`, 1)
+- Variable `size/500`: direct 2; dependencies 2; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9292`, 2); Primitive / style (`3044:1104` / `3044:9310`, 2)
+- Variable `size/600`: direct 2; dependencies 12; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9293`, 2); Primitive / style (`3044:1104` / `3044:9311`, 2)
+- Variable `size/700`: direct 2; dependencies 0; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9294`, 2); Primitive / style (`3044:1104` / `3044:9312`, 2)
+- Variable `size/800`: direct 2; dependencies 6; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9295`, 2); Primitive / style (`3044:1104` / `3044:9313`, 2)
+- Variable `size/900`: direct 12; dependencies 0; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9296`, 2); Primitive / style (`3044:1104` / `3044:9314`, 2); Thumbnail / Documentation (`23:247` / `I26:74;26:31`, 2); Thumbnail / Jarrad Harvey Design (`23:247` / `I26:74;26:29`, 2); Utility / Case Study (`163:310` / `1093:15`, 2)
+- Variable `size/1000`: direct 2; dependencies 2; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9297`, 2); Primitive / style (`3044:1104` / `3044:9315`, 2)
+- Variable `size/1100`: direct 2; dependencies 0; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9298`, 2); Primitive / style (`3044:1104` / `3044:9316`, 2)
+- Variable `size/1200`: direct 2; dependencies 8; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9299`, 2); Primitive / style (`3044:1104` / `3044:9317`, 2)
+- Variable `size/1300`: direct 2; dependencies 0; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9300`, 2); Primitive / style (`3044:1104` / `3044:9318`, 2)
+- Variable `size/1400`: direct 2; dependencies 0; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9301`, 2); Primitive / style (`3044:1104` / `3044:9319`, 2)
+- Variable `size/1500`: direct 2; dependencies 0; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9302`, 2); Primitive / style (`3044:1104` / `3044:9320`, 2)
+- Variable `size/1600`: direct 9; dependencies 0; style bindings 2; top consumers: Brand / Design Handoff (`2080:1391` / `4792:289990`, 2); Brand / Design System Handoff (`2080:1391` / `4792:290243`, 2); Primitive / style (`3044:1104` / `3044:9303`, 2); Primitive / style (`3044:1104` / `3044:9321`, 2); Thumbnail / Title (`23:247` / `I26:74;26:33`, 2)
+- Variable `size/1700`: direct 2; dependencies 0; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9304`, 2); Primitive / style (`3044:1104` / `3044:9322`, 2)
+- Variable `letter-spacing/050`: direct 1; dependencies 0; style bindings 1; top consumers: Primitive / style (`3044:1104` / `3044:9287`, 2)
+- Variable `letter-spacing/100`: direct 2; dependencies 2; style bindings 2; top consumers: Foundation / style (`3044:37` / `3923:51356`, 2); Primitive / style (`3044:1104` / `3044:9288`, 2)
+- Variable `letter-spacing/200`: direct 2; dependencies 12; style bindings 2; top consumers: Foundation / style (`3044:37` / `3923:51357`, 2); Primitive / style (`3044:1104` / `3044:9289`, 2)
+- Variable `letter-spacing/300`: direct 15; dependencies 16; style bindings 4; top consumers: Component / title (`3044:12` / `3923:74319`, 2); Component / title (`3044:12` / `3923:74323`, 2); Component / title (`3044:12` / `3923:74327`, 2); Component / title (`3044:12` / `3923:74331`, 2); Component / title (`3044:12` / `3923:74335`, 2)
+- Variable `letter-spacing/350`: direct 0; dependencies 4; style bindings 0; top consumers: none
+- Variable `letter-spacing/400`: direct 2721; dependencies 16; style bindings 4; top consumers: Block / 1 / 6 (`23:6` / `I3252:94589;3252:94866;214:436`, 2); Block / 1 / 6 (`23:6` / `I3252:96836;3252:94866;214:436`, 2); Block / Subtitle (`23:6` / `I1158:25384;3906:48478`, 2); Block / Subtitle (`23:6` / `I1158:25384;3906:48484`, 2); Block / Subtitle (`23:6` / `I1158:25385;3906:48478`, 2)
+- Variable `letter-spacing/500`: direct 1; dependencies 2; style bindings 1; top consumers: Primitive / style (`3044:1104` / `3044:9292`, 2)
+- Variable `letter-spacing/600`: direct 1; dependencies 12; style bindings 1; top consumers: Primitive / style (`3044:1104` / `3044:9293`, 2)
+- Variable `letter-spacing/700`: direct 3; dependencies 0; style bindings 1; top consumers: Primitive / style (`3044:1104` / `3044:9294`, 2); Foundation / style (`3044:37` / `3923:51335`, 1); Foundation / style (`3044:37` / `3923:51343`, 1)
+- Variable `letter-spacing/800`: direct 1; dependencies 6; style bindings 1; top consumers: Primitive / style (`3044:1104` / `3044:9295`, 2)
+- Variable `letter-spacing/900`: direct 167; dependencies 0; style bindings 3; top consumers: Block / Title (`23:6` / `I1158:25384;3906:48481`, 2); Block / Title (`23:6` / `I1158:25385;3906:48481`, 2); Block / Title (`23:6` / `I1158:25386;3906:48481`, 2); Block / Title (`23:6` / `I1158:25387;3906:48481`, 2); Block / Title (`23:6` / `I1158:25388;3906:48481`, 2)
+- Variable `letter-spacing/1000`: direct 1; dependencies 2; style bindings 1; top consumers: Primitive / style (`3044:1104` / `3044:9297`, 2)
+- Variable `letter-spacing/1100`: direct 1; dependencies 0; style bindings 1; top consumers: Primitive / style (`3044:1104` / `3044:9298`, 2)
+- Variable `letter-spacing/1200`: direct 13; dependencies 8; style bindings 3; top consumers: Component / title (`3044:12` / `326:3568`, 2); Component / title (`3044:12` / `326:3571`, 2); Component / title (`3044:12` / `326:3574`, 2); Component / title (`3044:12` / `326:3577`, 2); Component / title (`3044:12` / `326:3580`, 2)
+- Variable `letter-spacing/1300`: direct 1; dependencies 0; style bindings 1; top consumers: Primitive / style (`3044:1104` / `3044:9300`, 2)
+- Variable `letter-spacing/1400`: direct 1; dependencies 0; style bindings 1; top consumers: Primitive / style (`3044:1104` / `3044:9301`, 2)
+- Variable `letter-spacing/1500`: direct 1; dependencies 0; style bindings 1; top consumers: Primitive / style (`3044:1104` / `3044:9302`, 2)
+- Variable `letter-spacing/1600`: direct 9; dependencies 0; style bindings 2; top consumers: Brand / Design Handoff (`2080:1391` / `4792:289990`, 2); Brand / Design System Handoff (`2080:1391` / `4792:290243`, 2); Primitive / style (`3044:1104` / `3044:9303`, 2); Primitive / style (`3044:1104` / `3044:9321`, 2); Thumbnail / Title (`23:247` / `I26:74;26:33`, 2)
+- Variable `letter-spacing/1700`: direct 2; dependencies 0; style bindings 2; top consumers: Primitive / style (`3044:1104` / `3044:9304`, 2); Primitive / style (`3044:1104` / `3044:9322`, 2)
+- Variable `border/border-100`: direct 30; dependencies 1; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10756`, 4); Foundation / SwatchSimple (`3044:37` / `3044:10757`, 4); Foundation / SwatchSimple (`3044:37` / `3044:10758`, 4); Foundation / SwatchSimple (`3044:37` / `3044:10759`, 4); Foundation / SwatchSimple (`3044:37` / `3044:10833`, 4)
+- Variable `border/border-200`: direct 8; dependencies 3; style bindings 0; top consumers: Example / hover zone (`242:239` / `4408:16210`, 4); Foundation / SwatchSimple (`3044:37` / `3044:10834`, 4)
+- Variable `border/border-300-primary`: direct 974; dependencies 4; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10835`, 4); Foundation / SwatchSimple (`3044:37` / `3044:11786`, 4); Foundation / SwatchSimple (`3044:37` / `3044:11787`, 4); Foundation / SwatchSimple (`3044:37` / `3044:11788`, 4); Foundation / SwatchSimple (`3044:37` / `3044:11789`, 4)
+- Variable `border/border-400`: direct 4; dependencies 2; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10836`, 4)
+- Variable `border/border-500`: direct 4; dependencies 1; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10837`, 4)
+- Variable `border/border-600`: direct 4; dependencies 2; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10838`, 4)
+- Variable `border/border-700`: direct 9; dependencies 3; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10839`, 4); Foundation / content-container (`3044:37` / `3044:14404`, 4); Brand / guide (`2080:1391` / `2080:1422`, 1)
+- Variable `border/border-800`: direct 4; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10840`, 4)
+- Variable `border/border-900`: direct 4; dependencies 1; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10841`, 4)
+- Variable `border/border-1000`: direct 4; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10842`, 4)
+- Variable `border/border-1100`: direct 4; dependencies 1; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10843`, 4)
+- Variable `border/border-1200`: direct 4; dependencies 2; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10844`, 4)
+- Variable `dimension/dimension-0`: direct 118; dependencies 25; style bindings 0; top consumers: Brand / title (`2080:1391` / `4792:289989`, 4); Brand / title (`2080:1391` / `4792:290242`, 4); Thumbnail / title (`23:247` / `I26:74;26:32`, 4); Utility / title (`163:310` / `1093:16`, 4); Utility / title (`163:310` / `26:32`, 4)
+- Variable `opacity/opacity-1000`: direct 4; dependencies 0; style bindings 0; top consumers: Component / state=animating (`3044:12` / `4227:17099`, 1); Example / hover zone (`242:239` / `4408:16210`, 1); Foundation / opacity-1000 (`3044:37` / `3044:13620`, 1); Foundation / radius-0 (`3044:37` / `3044:14412`, 1)
+- Variable `opacity/opacity-0`: direct 2; dependencies 9; style bindings 0; top consumers: Foundation / opacity-0 (`3044:37` / `3044:13600`, 1); Foundation / radius-xs (`3044:37` / `3044:14414`, 1)
+- Variable `opacity/opacity-10`: direct 0; dependencies 2; style bindings 0; top consumers: none
+- Variable `opacity/opacity-20`: direct 0; dependencies 3; style bindings 0; top consumers: none
+- Variable `opacity/opacity-30`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `opacity/opacity-50`: direct 0; dependencies 7; style bindings 0; top consumers: none
+- Variable `opacity/opacity-60`: direct 0; dependencies 3; style bindings 0; top consumers: none
+- Variable `opacity/opacity-70`: direct 0; dependencies 3; style bindings 0; top consumers: none
+- Variable `opacity/opacity-100`: direct 123; dependencies 10; style bindings 0; top consumers: Example / Media (`242:239` / `4421:15955`, 1); Example / Media (`242:239` / `4421:15956`, 1); Example / Media (`242:239` / `4421:15957`, 1); Example / Media (`242:239` / `4421:15958`, 1); Example / Media (`242:239` / `4421:15959`, 1)
+- Variable `opacity/opacity-150`: direct 0; dependencies 3; style bindings 0; top consumers: none
+- Variable `opacity/opacity-200`: direct 4; dependencies 6; style bindings 0; top consumers: Component / 6 (`3044:12` / `4227:17101`, 1); Component / state=default (`3044:12` / `4227:17097`, 1); Foundation / opacity-200 (`3044:37` / `3044:13602`, 1); Foundation / radius-md (`3044:37` / `3044:14416`, 1)
+- Variable `opacity/opacity-250`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `opacity/opacity-300`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / opacity-300 (`3044:37` / `3044:13603`, 1); Foundation / radius-lg (`3044:37` / `3044:14421`, 1)
+- Variable `opacity/opacity-400`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / opacity-400 (`3044:37` / `3044:13610`, 1); Foundation / radius-2xl (`3044:37` / `3044:14424`, 1)
+- Variable `opacity/opacity-500`: direct 2; dependencies 3; style bindings 0; top consumers: Foundation / opacity-500 (`3044:37` / `3044:13609`, 1); Foundation / radius-xl (`3044:37` / `3044:14423`, 1)
+- Variable `opacity/opacity-600`: direct 2; dependencies 7; style bindings 0; top consumers: Foundation / opacity-600 (`3044:37` / `3044:13611`, 1); Foundation / radius-full (`3044:37` / `3044:14425`, 1)
+- Variable `opacity/opacity-700`: direct 2; dependencies 6; style bindings 0; top consumers: Foundation / opacity-700 (`3044:37` / `3044:13612`, 1); Utility / media (`163:310` / `244:826`, 1)
+- Variable `opacity/opacity-800`: direct 1; dependencies 3; style bindings 0; top consumers: Foundation / opacity-800 (`3044:37` / `3044:13618`, 1)
+- Variable `opacity/opacity-900`: direct 1; dependencies 0; style bindings 0; top consumers: Foundation / opacity-900 (`3044:37` / `3044:13619`, 1)
+- Variable `dimension/dimension-100`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / dimension-25 (`3044:37` / `3044:13048`, 2)
+- Variable `dimension/dimension-200`: direct 2047; dependencies 1; style bindings 0; top consumers: Component / title (`3044:12` / `334:1146`, 2); Component / title (`3044:12` / `3923:74334`, 2); Component / title (`3044:12` / `4515:38098`, 2); Component / title (`3044:12` / `4515:38103`, 2); Foundation / dimension-50 (`3044:37` / `3044:13050`, 2)
+- Variable `dimension/dimension-300`: direct 1500; dependencies 0; style bindings 0; top consumers: Block / title (`23:6` / `4709:256925`, 2); Block / title (`23:6` / `4719:258989`, 2); Component / title (`3044:12` / `334:1152`, 2); Component / title (`3044:12` / `334:1153`, 2); Component / title (`3044:12` / `334:1154`, 2)
+- Variable `dimension/dimension-350`: direct 296; dependencies 1; style bindings 0; top consumers: Block / description (`23:6` / `4325:12536`, 2); Block / description (`23:6` / `4513:32601`, 2); Block / description (`23:6` / `4714:257735`, 2); Block / title (`23:6` / `4329:13234`, 2); Block / title (`23:6` / `4513:32599`, 2)
+- Variable `dimension/dimension-400`: direct 18; dependencies 2; style bindings 0; top consumers: Foundation / dimension-100 (`3044:37` / `3044:13054`, 2); Brand / li (`2080:1391` / `4830:23570`, 1); Brand / li (`2080:1391` / `4830:23572`, 1); Brand / li (`2080:1391` / `4830:23575`, 1); Brand / li (`2080:1391` / `4830:23579`, 1)
+- Variable `dimension/dimension-500`: direct 367; dependencies 4; style bindings 0; top consumers: Block / description (`23:6` / `4325:12536`, 2); Block / description (`23:6` / `4513:32601`, 2); Block / description (`23:6` / `4714:257735`, 2); Block / title (`23:6` / `4329:13234`, 2); Block / title (`23:6` / `4513:32599`, 2)
+- Variable `dimension/dimension-600`: direct 3434; dependencies 22; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10756`, 5); Foundation / SwatchSimple (`3044:37` / `3044:10757`, 5); Foundation / SwatchSimple (`3044:37` / `3044:10758`, 5); Foundation / SwatchSimple (`3044:37` / `3044:10759`, 5); Foundation / SwatchSimple (`3044:37` / `3044:10833`, 5)
+- Variable `dimension/dimension-700`: direct 1934; dependencies 6; style bindings 0; top consumers: Block / controls (`23:6` / `I1249:15152;3252:80540`, 4); Block / controls (`23:6` / `I2863:13922;3252:75446`, 4); Block / controls (`23:6` / `I2863:14194;3252:80540`, 4); Block / controls (`23:6` / `I3046:8051;3252:80534`, 4); Block / controls (`23:6` / `I3218:50037;3252:80538`, 4)
+- Variable `dimension/dimension-800`: direct 179; dependencies 22; style bindings 0; top consumers: Brand / Toolbar (`2080:1391` / `4792:290103`, 2); Brand / Toolbar (`2080:1391` / `4792:290245`, 2); Component / .ActionIcon (`3044:12` / `3154:94832`, 2); Component / .ActionIcon (`3044:12` / `3154:94839`, 2); Component / .ActionIcon (`3044:12` / `3154:94841`, 2)
+- Variable `dimension/dimension-900`: direct 2; dependencies 4; style bindings 0; top consumers: Foundation / dimension-350 (`3044:37` / `3044:13064`, 2)
+- Variable `dimension/dimension-1000`: direct 165; dependencies 29; style bindings 0; top consumers: Foundation / dimension-400 (`3044:37` / `3044:13066`, 2); Block / description (`23:6` / `4325:12536`, 1); Block / description (`23:6` / `4513:32601`, 1); Block / description (`23:6` / `4714:257735`, 1); Block / title (`23:6` / `4329:13234`, 1)
+- Variable `dimension/dimension-1050`: direct 0; dependencies 9; style bindings 0; top consumers: none
+- Variable `dimension/dimension-1100`: direct 2; dependencies 2; style bindings 0; top consumers: Foundation / dimension-450 (`3044:37` / `3044:13068`, 2)
+- Variable `dimension/dimension-1150`: direct 0; dependencies 3; style bindings 0; top consumers: none
+- Variable `dimension/dimension-1200`: direct 164; dependencies 27; style bindings 0; top consumers: Foundation / dimension-500 (`3044:37` / `3044:13070`, 2); Foundation / span (`3044:37` / `3044:13884`, 1); Foundation / span (`3044:37` / `3044:13885`, 1); Foundation / span (`3044:37` / `3044:13886`, 1); Foundation / span (`3044:37` / `3044:13887`, 1)
+- Variable `dimension/dimension-1300`: direct 2; dependencies 6; style bindings 0; top consumers: Foundation / dimension-600 (`3044:37` / `3044:13072`, 2)
+- Variable `dimension/dimension-1400`: direct 1008; dependencies 10; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:10833`, 2); Foundation / SwatchSimple (`3044:37` / `3044:10834`, 2); Foundation / SwatchSimple (`3044:37` / `3044:10835`, 2); Foundation / SwatchSimple (`3044:37` / `3044:10836`, 2); Foundation / SwatchSimple (`3044:37` / `3044:10837`, 2)
+- Variable `dimension/dimension-1500`: direct 2; dependencies 4; style bindings 0; top consumers: Foundation / dimension-800 (`3044:37` / `3044:13076`, 2)
+- Variable `dimension/dimension-1600`: direct 2; dependencies 2; style bindings 0; top consumers: Foundation / dimension-900 (`3044:37` / `3044:13078`, 2)
+- Variable `dimension/dimension-1700`: direct 2; dependencies 17; style bindings 0; top consumers: Foundation / dimension-1000 (`3044:37` / `3044:13080`, 2)
+- Variable `dimension/dimension-1800`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / dimension-1100 (`3044:37` / `3044:13082`, 2)
+- Variable `dimension/dimension-1900`: direct 12; dependencies 6; style bindings 0; top consumers: Foundation / dimension-1200 (`3044:37` / `3044:13084`, 2); Example / content (`242:239` / `4125:51287`, 1); Example / content (`242:239` / `4398:22144`, 1); Example / content (`242:239` / `4399:22438`, 1); Example / content (`242:239` / `4399:22709`, 1)
+- Variable `dimension/dimension-2000`: direct 4; dependencies 0; style bindings 0; top consumers: Example / Media (`242:239` / `I4400:25679;519:10459;2863:13922`, 2); Foundation / dimension-1300 (`3044:37` / `3044:13086`, 2)
+- Variable `dimension/dimension-2100`: direct 4; dependencies 0; style bindings 0; top consumers: Example / Media (`242:239` / `I4400:25679;519:10459;2863:13922`, 2); Foundation / dimension-1400 (`3044:37` / `3044:13088`, 2)
+- Variable `dimension/dimension-2200`: direct 33; dependencies 0; style bindings 0; top consumers: Foundation / dimension-1500 (`3044:37` / `3044:13090`, 2); Foundation / overlay (`3044:37` / `3044:13479`, 2); Foundation / overlay (`3044:37` / `3044:13491`, 2); Foundation / overlay (`3044:37` / `3044:13503`, 2); Foundation / overlay (`3044:37` / `3044:13515`, 2)
+- Variable `radius/radius-0`: direct 36; dependencies 0; style bindings 0; top consumers: Foundation / drop-shadow-100 (`3044:37` / `3044:13443`, 4); Foundation / drop-shadow-100 (`3044:37` / `3044:13452`, 4); Foundation / drop-shadow-100 (`3044:37` / `3044:13459`, 4); Foundation / drop-shadow-100 (`3044:37` / `3044:13466`, 4); Foundation / drop-shadow-200 (`3044:37` / `3044:13444`, 4)
+- Variable `radius/radius-100`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `radius/radius-200`: direct 0; dependencies 6; style bindings 0; top consumers: none
+- Variable `radius/radius-300`: direct 0; dependencies 3; style bindings 0; top consumers: none
+- Variable `radius/radius-400`: direct 8; dependencies 4; style bindings 0; top consumers: Component / layout=default (`3044:12` / `2651:9585`, 4); Foundation / radius-xs (`3044:37` / `3044:14414`, 4)
+- Variable `radius/radius-500`: direct 8; dependencies 1; style bindings 0; top consumers: Brand / Markdown preview (`2080:1391` / `4792:290113`, 4); Brand / Markdown preview (`2080:1391` / `4792:290253`, 4)
+- Variable `radius/radius-600`: direct 128; dependencies 1; style bindings 0; top consumers: Brand / Badge (`2080:1391` / `4792:290128`, 4); Brand / Badge (`2080:1391` / `4792:290129`, 4); Brand / Badge (`2080:1391` / `4792:290130`, 4); Brand / Badge (`2080:1391` / `4792:290239`, 4); Brand / Badge (`2080:1391` / `4792:290240`, 4)
+- Variable `radius/radius-700`: direct 4; dependencies 0; style bindings 0; top consumers: Foundation / radius-md (`3044:37` / `3044:14416`, 4)
+- Variable `radius/radius-800`: direct 4; dependencies 0; style bindings 0; top consumers: Foundation / radius-lg (`3044:37` / `3044:14421`, 4)
+- Variable `radius/radius-900`: direct 4; dependencies 0; style bindings 0; top consumers: Foundation / radius-xl (`3044:37` / `3044:14423`, 4)
+- Variable `radius/radius-1000`: direct 4; dependencies 0; style bindings 0; top consumers: Foundation / radius-2xl (`3044:37` / `3044:14424`, 4)
+- Variable `radius/radius-full`: direct 36; dependencies 0; style bindings 0; top consumers: Foundation / drop-shadow-100 (`3044:37` / `3044:13447`, 4); Foundation / drop-shadow-100 (`3044:37` / `3044:13456`, 4); Foundation / drop-shadow-100 (`3044:37` / `3044:13463`, 4); Foundation / drop-shadow-100 (`3044:37` / `3044:13470`, 4); Foundation / drop-shadow-200 (`3044:37` / `3044:13448`, 4)
+- Variable `radius/action-radius-round`: direct 6940; dependencies 0; style bindings 0; top consumers: Block / ActionButton (`23:6` / `4513:35402`, 4); Block / ActionButton (`23:6` / `4709:256929`, 4); Block / ActionButton (`23:6` / `4709:256931`, 4); Block / ActionButton (`23:6` / `4719:258959`, 4); Block / ActionButton (`23:6` / `4719:258961`, 4)
+- Variable `color/core/black`: direct 9; dependencies 47; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9521`, 1); Primitive / title (`3044:1104` / `I3044:9370;1031:7586`, 1); Primitive / title (`3044:1104` / `I3044:9382;1031:7586`, 1); Primitive / title (`3044:1104` / `I3044:9394;1031:7586`, 1); Primitive / title (`3044:1104` / `I3044:9406;1031:7586`, 1)
+- Variable `color/core/white`: direct 1; dependencies 35; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9522`, 1)
+- Variable `color/palette/cod-grey/50`: direct 1; dependencies 2; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9327`, 1)
+- Variable `color/palette/cod-grey/100`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9328`, 1)
+- Variable `color/palette/cod-grey/200`: direct 1; dependencies 3; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9329`, 1)
+- Variable `color/palette/cod-grey/300`: direct 1; dependencies 8; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9330`, 1)
+- Variable `color/palette/cod-grey/400`: direct 1; dependencies 3; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9331`, 1)
+- Variable `color/palette/cod-grey/500`: direct 1; dependencies 7; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9332`, 1)
+- Variable `color/palette/cod-grey/600`: direct 1; dependencies 3; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9333`, 1)
+- Variable `color/palette/cod-grey/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9334`, 1)
+- Variable `color/palette/cod-grey/800`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9335`, 1)
+- Variable `color/palette/cod-grey/900`: direct 1; dependencies 2; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9336`, 1)
+- Variable `color/palette/cod-grey/950`: direct 1; dependencies 1; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9337`, 1)
+- Variable `color/palette/cognac/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9507`, 1)
+- Variable `color/palette/cognac/100`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9508`, 1)
+- Variable `color/palette/cognac/200`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9509`, 1)
+- Variable `color/palette/cognac/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9510`, 1)
+- Variable `color/palette/cognac/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9511`, 1)
+- Variable `color/palette/cognac/500`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9512`, 1)
+- Variable `color/palette/cognac/600`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9513`, 1)
+- Variable `color/palette/cognac/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9514`, 1)
+- Variable `color/palette/cognac/800`: direct 1; dependencies 13; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9515`, 1)
+- Variable `color/palette/cognac/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9516`, 1)
+- Variable `color/palette/cognac/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9517`, 1)
+- Variable `color/palette/cruise/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9411`, 1)
+- Variable `color/palette/cruise/100`: direct 1; dependencies 4; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9412`, 1)
+- Variable `color/palette/cruise/200`: direct 1; dependencies 4; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9413`, 1)
+- Variable `color/palette/cruise/300`: direct 7; dependencies 0; style bindings 0; top consumers: Brand / # Design System Handoff (`2080:1391` / `4792:290254`, 1); Brand / ## Overview (`2080:1391` / `4792:290255`, 1); Brand / ### Collections, modes, and groups (`2080:1391` / `4792:290281`, 1); Brand / ### Diff from last export (`2080:1391` / `4830:23585`, 1); Brand / ### Styles (`2080:1391` / `4830:23578`, 1)
+- Variable `color/palette/cruise/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9415`, 1)
+- Variable `color/palette/cruise/500`: direct 1; dependencies 9; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9416`, 1)
+- Variable `color/palette/cruise/600`: direct 1; dependencies 9; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9417`, 1)
+- Variable `color/palette/cruise/700`: direct 1; dependencies 5; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9418`, 1)
+- Variable `color/palette/cruise/800`: direct 1; dependencies 5; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9419`, 1)
+- Variable `color/palette/cruise/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9420`, 1)
+- Variable `color/palette/cruise/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9421`, 1)
+- Variable `color/palette/deep-teal/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9423`, 1)
+- Variable `color/palette/deep-teal/100`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9424`, 1)
+- Variable `color/palette/deep-teal/200`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9425`, 1)
+- Variable `color/palette/deep-teal/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9426`, 1)
+- Variable `color/palette/deep-teal/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9427`, 1)
+- Variable `color/palette/deep-teal/500`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9428`, 1)
+- Variable `color/palette/deep-teal/600`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9429`, 1)
+- Variable `color/palette/deep-teal/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9430`, 1)
+- Variable `color/palette/deep-teal/800`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9431`, 1)
+- Variable `color/palette/deep-teal/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9432`, 1)
+- Variable `color/palette/deep-teal/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9433`, 1)
+- Variable `color/palette/desert-storm/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9339`, 1)
+- Variable `color/palette/desert-storm/100`: direct 1; dependencies 2; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9340`, 1)
+- Variable `color/palette/desert-storm/200`: direct 1; dependencies 2; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9341`, 1)
+- Variable `color/palette/desert-storm/300`: direct 19; dependencies 0; style bindings 0; top consumers: Foundation / margin (`3044:37` / `3044:13941`, 1); Foundation / margin (`3044:37` / `3044:13965`, 1); Foundation / margin (`3044:37` / `3044:13968`, 1); Foundation / margin (`3044:37` / `3044:13992`, 1); Foundation / margin (`3044:37` / `3044:13995`, 1)
+- Variable `color/palette/desert-storm/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9343`, 1)
+- Variable `color/palette/desert-storm/500`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9344`, 1)
+- Variable `color/palette/desert-storm/600`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9345`, 1)
+- Variable `color/palette/desert-storm/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9346`, 1)
+- Variable `color/palette/desert-storm/800`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9347`, 1)
+- Variable `color/palette/desert-storm/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9348`, 1)
+- Variable `color/palette/desert-storm/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9349`, 1)
+- Variable `color/palette/elm/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9435`, 1)
+- Variable `color/palette/elm/100`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9436`, 1)
+- Variable `color/palette/elm/200`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9437`, 1)
+- Variable `color/palette/elm/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9438`, 1)
+- Variable `color/palette/elm/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9439`, 1)
+- Variable `color/palette/elm/500`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9440`, 1)
+- Variable `color/palette/elm/600`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9441`, 1)
+- Variable `color/palette/elm/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9442`, 1)
+- Variable `color/palette/elm/800`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9443`, 1)
+- Variable `color/palette/elm/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9444`, 1)
+- Variable `color/palette/elm/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9445`, 1)
+- Variable `color/palette/fun-green/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9399`, 1)
+- Variable `color/palette/fun-green/100`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9400`, 1)
+- Variable `color/palette/fun-green/200`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9401`, 1)
+- Variable `color/palette/fun-green/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9402`, 1)
+- Variable `color/palette/fun-green/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9403`, 1)
+- Variable `color/palette/fun-green/500`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9404`, 1)
+- Variable `color/palette/fun-green/600`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9405`, 1)
+- Variable `color/palette/fun-green/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9406`, 1)
+- Variable `color/palette/fun-green/800`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9407`, 1)
+- Variable `color/palette/fun-green/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9408`, 1)
+- Variable `color/palette/fun-green/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9409`, 1)
+- Variable `color/palette/lavender-gray/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9459`, 1)
+- Variable `color/palette/lavender-gray/100`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9460`, 1)
+- Variable `color/palette/lavender-gray/200`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9461`, 1)
+- Variable `color/palette/lavender-gray/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9462`, 1)
+- Variable `color/palette/lavender-gray/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9463`, 1)
+- Variable `color/palette/lavender-gray/500`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9464`, 1)
+- Variable `color/palette/lavender-gray/600`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9465`, 1)
+- Variable `color/palette/lavender-gray/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9466`, 1)
+- Variable `color/palette/lavender-gray/800`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9467`, 1)
+- Variable `color/palette/lavender-gray/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9468`, 1)
+- Variable `color/palette/lavender-gray/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9469`, 1)
+- Variable `color/palette/lightning-yellow/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9375`, 1)
+- Variable `color/palette/lightning-yellow/100`: direct 1; dependencies 4; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9376`, 1)
+- Variable `color/palette/lightning-yellow/200`: direct 1; dependencies 4; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9377`, 1)
+- Variable `color/palette/lightning-yellow/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9378`, 1)
+- Variable `color/palette/lightning-yellow/400`: direct 1; dependencies 2; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9379`, 1)
+- Variable `color/palette/lightning-yellow/500`: direct 1; dependencies 9; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9380`, 1)
+- Variable `color/palette/lightning-yellow/600`: direct 1; dependencies 9; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9381`, 1)
+- Variable `color/palette/lightning-yellow/700`: direct 1; dependencies 5; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9382`, 1)
+- Variable `color/palette/lightning-yellow/800`: direct 1; dependencies 5; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9383`, 1)
+- Variable `color/palette/lightning-yellow/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9384`, 1)
+- Variable `color/palette/lightning-yellow/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9385`, 1)
+- Variable `color/palette/malibu/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9447`, 1)
+- Variable `color/palette/malibu/100`: direct 1; dependencies 3; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9448`, 1)
+- Variable `color/palette/malibu/200`: direct 1; dependencies 5; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9449`, 1)
+- Variable `color/palette/malibu/300`: direct 1; dependencies 3; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9450`, 1)
+- Variable `color/palette/malibu/400`: direct 3; dependencies 0; style bindings 0; top consumers: Brand / # Checkout flow (`2080:1391` / `4792:290114`, 1); Brand / ## Layer tree (`2080:1391` / `4792:290115`, 1); Primitive / SwatchSimple (`3044:1104` / `3044:9451`, 1)
+- Variable `color/palette/malibu/500`: direct 1; dependencies 9; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9452`, 1)
+- Variable `color/palette/malibu/600`: direct 1; dependencies 12; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9453`, 1)
+- Variable `color/palette/malibu/700`: direct 1; dependencies 4; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9454`, 1)
+- Variable `color/palette/malibu/800`: direct 1; dependencies 8; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9455`, 1)
+- Variable `color/palette/malibu/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9456`, 1)
+- Variable `color/palette/malibu/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9457`, 1)
+- Variable `color/palette/mulberry-wood/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9471`, 1)
+- Variable `color/palette/mulberry-wood/100`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9472`, 1)
+- Variable `color/palette/mulberry-wood/200`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9473`, 1)
+- Variable `color/palette/mulberry-wood/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9474`, 1)
+- Variable `color/palette/mulberry-wood/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9475`, 1)
+- Variable `color/palette/mulberry-wood/500`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9476`, 1)
+- Variable `color/palette/mulberry-wood/600`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9477`, 1)
+- Variable `color/palette/mulberry-wood/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9478`, 1)
+- Variable `color/palette/mulberry-wood/800`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9479`, 1)
+- Variable `color/palette/mulberry-wood/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9480`, 1)
+- Variable `color/palette/mulberry-wood/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9481`, 1)
+- Variable `color/palette/pear/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9387`, 1)
+- Variable `color/palette/pear/100`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9388`, 1)
+- Variable `color/palette/pear/200`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9389`, 1)
+- Variable `color/palette/pear/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9390`, 1)
+- Variable `color/palette/pear/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9391`, 1)
+- Variable `color/palette/pear/500`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9392`, 1)
+- Variable `color/palette/pear/600`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9393`, 1)
+- Variable `color/palette/pear/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9394`, 1)
+- Variable `color/palette/pear/800`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9395`, 1)
+- Variable `color/palette/pear/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9396`, 1)
+- Variable `color/palette/pear/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9397`, 1)
+- Variable `color/palette/punch/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9495`, 1)
+- Variable `color/palette/punch/100`: direct 1; dependencies 4; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9496`, 1)
+- Variable `color/palette/punch/200`: direct 1; dependencies 4; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9497`, 1)
+- Variable `color/palette/punch/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9498`, 1)
+- Variable `color/palette/punch/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9499`, 1)
+- Variable `color/palette/punch/500`: direct 1; dependencies 9; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9500`, 1)
+- Variable `color/palette/punch/600`: direct 1; dependencies 11; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9501`, 1)
+- Variable `color/palette/punch/700`: direct 1; dependencies 3; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9502`, 1)
+- Variable `color/palette/punch/800`: direct 1; dependencies 5; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9503`, 1)
+- Variable `color/palette/punch/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9504`, 1)
+- Variable `color/palette/punch/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9505`, 1)
+- Variable `color/palette/shocking/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9483`, 1)
+- Variable `color/palette/shocking/100`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9484`, 1)
+- Variable `color/palette/shocking/200`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9485`, 1)
+- Variable `color/palette/shocking/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9486`, 1)
+- Variable `color/palette/shocking/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9487`, 1)
+- Variable `color/palette/shocking/500`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9488`, 1)
+- Variable `color/palette/shocking/600`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9489`, 1)
+- Variable `color/palette/shocking/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9490`, 1)
+- Variable `color/palette/shocking/800`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9491`, 1)
+- Variable `color/palette/shocking/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9492`, 1)
+- Variable `color/palette/shocking/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9493`, 1)
+- Variable `color/palette/tangerine/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9363`, 1)
+- Variable `color/palette/tangerine/100`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9364`, 1)
+- Variable `color/palette/tangerine/200`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9365`, 1)
+- Variable `color/palette/tangerine/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9366`, 1)
+- Variable `color/palette/tangerine/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9367`, 1)
+- Variable `color/palette/tangerine/500`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9368`, 1)
+- Variable `color/palette/tangerine/600`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9369`, 1)
+- Variable `color/palette/tangerine/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9370`, 1)
+- Variable `color/palette/tangerine/800`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9371`, 1)
+- Variable `color/palette/tangerine/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9372`, 1)
+- Variable `color/palette/tangerine/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9373`, 1)
+- Variable `color/palette/twine/50`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9351`, 1)
+- Variable `color/palette/twine/100`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9352`, 1)
+- Variable `color/palette/twine/200`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9353`, 1)
+- Variable `color/palette/twine/300`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9354`, 1)
+- Variable `color/palette/twine/400`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9355`, 1)
+- Variable `color/palette/twine/500`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9356`, 1)
+- Variable `color/palette/twine/600`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9357`, 1)
+- Variable `color/palette/twine/700`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9358`, 1)
+- Variable `color/palette/twine/800`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9359`, 1)
+- Variable `color/palette/twine/900`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9360`, 1)
+- Variable `color/palette/twine/950`: direct 1; dependencies 0; style bindings 0; top consumers: Primitive / SwatchSimple (`3044:1104` / `3044:9361`, 1)
+- Variable `color/background/default/primary`: direct 2724; dependencies 0; style bindings 0; top consumers: Block / .CardMedia (`23:6` / `431:1945`, 1); Block / .CardMedia (`23:6` / `431:1946`, 1); Block / .CardMedia (`23:6` / `431:2541`, 1); Block / .CardMedia (`23:6` / `431:2542`, 1); Block / .FeatureText (`23:6` / `3905:37566`, 1)
+- Variable `color/border/default/primary`: direct 285; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11959`, 2); Foundation / SwatchSimple (`3044:37` / `3044:11964`, 2); Block / Feature Text (`23:6` / `492:5309`, 1); Block / Hero – Feature (`23:6` / `396:4130`, 1); Block / Hero – Slideshow (`23:6` / `396:4131`, 1)
+- Variable `color/border/default/brand`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11960`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11965`, 1)
+- Variable `color/border/default/secondary`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11961`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11966`, 1)
+- Variable `color/border/default/tertiary`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11962`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11967`, 1)
+- Variable `color/border/action/primary`: direct 63; dependencies 0; style bindings 0; top consumers: Block / ActionButton (`23:6` / `I3252:94589;3477:33906;3379:216351`, 1); Block / ActionButton (`23:6` / `I3252:96836;3477:33906;3379:216351`, 1); Brand / Badge (`2080:1391` / `4792:290128`, 1); Brand / Badge (`2080:1391` / `4792:290129`, 1); Brand / Badge (`2080:1391` / `4792:290130`, 1)
+- Variable `color/border/action/primary-inverse`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11888`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11904`, 1)
+- Variable `color/border/action/brand`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11889`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11905`, 1)
+- Variable `color/border/action/secondary`: direct 12; dependencies 0; style bindings 0; top consumers: Component / layout=secondary, size=100, state=hovered (`3044:12` / `326:3275`, 1); Component / layout=secondary, size=100, state=hovered (`3044:12` / `326:3442`, 1); Component / layout=secondary, size=200, state=hovered (`3044:12` / `326:3229`, 1); Component / layout=secondary, size=200, state=hovered (`3044:12` / `326:3440`, 1); Component / layout=secondary, size=300, state=hovered (`3044:12` / `326:3231`, 1)
+- Variable `color/border/action/tertiary`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11891`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11907`, 1)
+- Variable `color/border/input/primary`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11893`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11898`, 1)
+- Variable `color/border/input/activated`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11894`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11899`, 1)
+- Variable `color/border/input/hovered`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11895`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11900`, 1)
+- Variable `color/border/input/disabled`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11896`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11901`, 1)
+- Variable `color/border/disabled/dark`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11909`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11914`, 1)
+- Variable `color/border/disabled/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11910`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11915`, 1)
+- Variable `color/border/disabled/light`: direct 12; dependencies 0; style bindings 0; top consumers: Component / layout=secondary, size=100, state=disabled (`3044:12` / `326:3287`, 1); Component / layout=secondary, size=100, state=disabled (`3044:12` / `326:3466`, 1); Component / layout=secondary, size=200, state=disabled (`3044:12` / `326:3253`, 1); Component / layout=secondary, size=200, state=disabled (`3044:12` / `326:3464`, 1); Component / layout=secondary, size=300, state=disabled (`3044:12` / `326:3255`, 1)
+- Variable `color/border/disabled/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11912`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11917`, 1)
+- Variable `color/border/focused/dark`: direct 28; dependencies 0; style bindings 2; top consumers: Component / layout=primary, size=100, state=focused (`3044:12` / `326:3265`, 2); Component / layout=primary, size=100, state=focused (`3044:12` / `326:3446`, 2); Component / layout=primary, size=200, state=focused (`3044:12` / `326:3209`, 2); Component / layout=primary, size=200, state=focused (`3044:12` / `326:3444`, 2); Component / layout=primary, size=300, state=focused (`3044:12` / `326:3211`, 2)
+- Variable `color/border/focused/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11920`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11955`, 1)
+- Variable `color/border/focused/light`: direct 3; dependencies 0; style bindings 0; top consumers: Brand / base (`2080:1391` / `4837:23709`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11921`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11956`, 1)
+- Variable `color/border/focused/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11922`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11957`, 1)
+- Variable `color/border/negative/dark`: direct 3; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11924`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11949`, 1); Foundation / content-container (`3044:37` / `3044:14404`, 1)
+- Variable `color/border/negative/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11925`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11950`, 1)
+- Variable `color/border/negative/light`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11926`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11951`, 1)
+- Variable `color/border/negative/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11927`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11952`, 1)
+- Variable `color/border/positive/dark`: direct 3; dependencies 0; style bindings 0; top consumers: Brand / base (`2080:1391` / `4837:23711`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11929`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11944`, 1)
+- Variable `color/border/positive/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11930`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11945`, 1)
+- Variable `color/border/positive/light`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11931`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11946`, 1)
+- Variable `color/border/positive/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11932`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11947`, 1)
+- Variable `color/border/warning/dark`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11934`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11939`, 1)
+- Variable `color/border/warning/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11935`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11940`, 1)
+- Variable `color/border/warning/light`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11936`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11941`, 1)
+- Variable `color/border/warning/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11937`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11942`, 1)
+- Variable `color/background/default/brand`: direct 3; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11853`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11858`, 1); Utility / layout=layout (`163:310` / `2854:1407`, 1)
+- Variable `color/background/default/secondary`: direct 113; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11854`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11859`, 1); Foundation / gap (`3044:37` / `3044:13943`, 1); Foundation / gap (`3044:37` / `3044:13945`, 1); Foundation / gap (`3044:37` / `3044:13947`, 1)
+- Variable `color/background/default/tertiary`: direct 1450; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `1249:15152`, 1); Block / Media (`23:6` / `2863:13922`, 1); Block / Media (`23:6` / `2863:14194`, 1); Block / Media (`23:6` / `3046:8051`, 1); Block / Media (`23:6` / `3218:50037`, 1)
+- Variable `color/background/action/primary`: direct 1437; dependencies 0; style bindings 0; top consumers: Block / ActionButton (`23:6` / `I1158:25384;3906:48490;1364:30429`, 1); Block / ActionButton (`23:6` / `I1158:25384;3906:48490;1364:30430`, 1); Block / ActionButton (`23:6` / `I1158:25385;3906:48490;1364:30429`, 1); Block / ActionButton (`23:6` / `I1158:25385;3906:48490;1364:30430`, 1); Block / ActionButton (`23:6` / `I1158:25386;3906:48490;1364:30429`, 1)
+- Variable `color/background/action/brand`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11787`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11798`, 1)
+- Variable `color/background/action/secondary`: direct 15; dependencies 0; style bindings 0; top consumers: Component / layout=primary, size=100, state=hovered (`3044:12` / `326:3263`, 1); Component / layout=primary, size=100, state=hovered (`3044:12` / `326:3438`, 1); Component / layout=primary, size=200, state=hovered (`3044:12` / `326:3205`, 1); Component / layout=primary, size=200, state=hovered (`3044:12` / `326:3436`, 1); Component / layout=primary, size=300, state=hovered (`3044:12` / `326:3207`, 1)
+- Variable `color/background/action/tertiary`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11789`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11800`, 1)
+- Variable `color/background/input/primary`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11791`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11794`, 1)
+- Variable `color/background/input/disabled`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11792`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11795`, 1)
+- Variable `color/background/material/base`: direct 5; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11862`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11868`, 1); Foundation / overlay (`3044:37` / `3044:13505`, 1); Foundation / overlay (`3044:37` / `3044:13507`, 1); Foundation / overlay (`3044:37` / `3044:13509`, 1)
+- Variable `color/background/material/thick`: direct 5; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11863`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11869`, 1); Foundation / overlay (`3044:37` / `3044:13517`, 1); Foundation / overlay (`3044:37` / `3044:13519`, 1); Foundation / overlay (`3044:37` / `3044:13521`, 1)
+- Variable `color/background/material/thickest`: direct 5; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11864`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11870`, 1); Foundation / overlay (`3044:37` / `3044:13529`, 1); Foundation / overlay (`3044:37` / `3044:13531`, 1); Foundation / overlay (`3044:37` / `3044:13533`, 1)
+- Variable `color/background/material/thin`: direct 5; dependencies 1; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11865`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11871`, 1); Foundation / overlay (`3044:37` / `3044:13493`, 1); Foundation / overlay (`3044:37` / `3044:13495`, 1); Foundation / overlay (`3044:37` / `3044:13497`, 1)
+- Variable `color/background/material/thinnest`: direct 5; dependencies 4; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11866`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11872`, 1); Foundation / overlay (`3044:37` / `3044:13481`, 1); Foundation / overlay (`3044:37` / `3044:13483`, 1); Foundation / overlay (`3044:37` / `3044:13485`, 1)
+- Variable `color/background/material/base-inverse`: direct 5; dependencies 7; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11874`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11880`, 1); Foundation / overlay (`3044:37` / `3044:13565`, 1); Foundation / overlay (`3044:37` / `3044:13567`, 1); Foundation / overlay (`3044:37` / `3044:13569`, 1)
+- Variable `color/background/material/inverse-thick`: direct 30; dependencies 8; style bindings 0; top consumers: Brand / **Card fields** (INSTANCE) (`2080:1391` / `4792:290123`, 1); Brand / **Header** (FRAME) #123:456 (`2080:1391` / `4792:290116`, 1); Brand / **Items** (INSTANCE) (`2080:1391` / `4792:290120`, 1); Brand / **Logo** (INSTANCE) (`2080:1391` / `4792:290117`, 1); Brand / **Nav** (INSTANCE) (`2080:1391` / `4792:290118`, 1)
+- Variable `color/background/material/inverse-thickest`: direct 5; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11876`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11882`, 1); Foundation / overlay (`3044:37` / `3044:13589`, 1); Foundation / overlay (`3044:37` / `3044:13591`, 1); Foundation / overlay (`3044:37` / `3044:13593`, 1)
+- Variable `color/background/material/inverse-thin`: direct 5; dependencies 16; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11877`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11883`, 1); Foundation / overlay (`3044:37` / `3044:13553`, 1); Foundation / overlay (`3044:37` / `3044:13555`, 1); Foundation / overlay (`3044:37` / `3044:13557`, 1)
+- Variable `color/background/material/inverse-thinnest`: direct 1131; dependencies 14; style bindings 0; top consumers: Block / overlay (`23:6` / `I1249:15152;2708:6984`, 1); Block / overlay (`23:6` / `I2863:13922;2708:6972`, 1); Block / overlay (`23:6` / `I2863:14194;2708:6984`, 1); Block / overlay (`23:6` / `I3046:8051;2708:6912`, 1); Block / overlay (`23:6` / `I3218:50037;2708:6960`, 1)
+- Variable `color/background/disabled/dark`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11802`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11842`, 1)
+- Variable `color/background/disabled/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11803`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11843`, 1)
+- Variable `color/background/disabled/light`: direct 3; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11804`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11844`, 1); Utility / media (`163:310` / `244:826`, 1)
+- Variable `color/background/disabled/lighter`: direct 13; dependencies 0; style bindings 0; top consumers: Component / layout=primary, size=100, state=disabled (`3044:12` / `326:3269`, 1); Component / layout=primary, size=100, state=disabled (`3044:12` / `326:3462`, 1); Component / layout=primary, size=200, state=disabled (`3044:12` / `326:3217`, 1); Component / layout=primary, size=200, state=disabled (`3044:12` / `326:3460`, 1); Component / layout=primary, size=300, state=disabled (`3044:12` / `326:3219`, 1)
+- Variable `color/background/focused/dark`: direct 10; dependencies 0; style bindings 0; top consumers: Component / size=100, state=focused (`3044:12` / `3923:74325`, 1); Component / size=100, state=focused (`3044:12` / `4515:38082`, 1); Component / size=200, state=focused (`3044:12` / `326:3558`, 1); Component / size=200, state=focused (`3044:12` / `4515:38077`, 1); Component / size=300, state=focused (`3044:12` / `326:3588`, 1)
+- Variable `color/background/focused/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11808`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11848`, 1)
+- Variable `color/background/focused/light`: direct 3; dependencies 0; style bindings 0; top consumers: Brand / Frame (`2080:1391` / `4792:290107`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11809`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11849`, 1)
+- Variable `color/background/focused/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11810`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11850`, 1)
+- Variable `color/background/negative/dark`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11812`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11837`, 1)
+- Variable `color/background/negative/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11813`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11838`, 1)
+- Variable `color/background/negative/light`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11814`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11839`, 1)
+- Variable `color/background/negative/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11815`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11840`, 1)
+- Variable `color/background/positive/dark`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11817`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11832`, 1)
+- Variable `color/background/positive/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11818`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11833`, 1)
+- Variable `color/background/positive/light`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11819`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11834`, 1)
+- Variable `color/background/positive/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11820`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11835`, 1)
+- Variable `color/background/warning/dark`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11822`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11827`, 1)
+- Variable `color/background/warning/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11823`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11828`, 1)
+- Variable `color/background/warning/light`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11824`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11829`, 1)
+- Variable `color/background/warning/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11825`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11830`, 1)
+- Variable `color/content/default/primary`: direct 4803; dependencies 0; style bindings 0; top consumers: Icon / base (`3126:67288` / `317:2445`, 2); Icon / base (`3126:67288` / `318:2449`, 2); Utility / image (`163:310` / `244:827`, 2); Utility / image (`163:310` / `244:828`, 2); Utility / video (`163:310` / `244:829`, 2)
+- Variable `color/content/action/primary`: direct 4760; dependencies 0; style bindings 0; top consumers: Block / base (`23:6` / `I1158:25384;3906:48490;1364:30429;871:15935;3224:55052;328:5651`, 1); Block / base (`23:6` / `I1158:25384;3906:48490;1364:30429;871:15935;3224:55052;328:5652`, 1); Block / base (`23:6` / `I1158:25384;3906:48490;1364:30429;871:15935;3224:55577;317:2234`, 1); Block / base (`23:6` / `I1158:25384;3906:48490;1364:30429;871:15935;3224:55577;317:2235`, 1); Block / base (`23:6` / `I1158:25384;3906:48490;1364:30430;871:15935;3224:55052;328:5651`, 1)
+- Variable `color/content/action/primary-inverse`: direct 4; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11971`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12016`, 1); Foundation / title (`3044:37` / `I3044:11888;1031:7586`, 1); Foundation / title (`3044:37` / `I3044:11904;1031:7586`, 1)
+- Variable `color/content/default/primary-inverse`: direct 474; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:12021`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12027`, 1); Foundation / base (`3044:37` / `I3044:11787;1031:7595;317:2377`, 1); Foundation / base (`3044:37` / `I3044:11792;1031:7595;317:2377`, 1); Foundation / base (`3044:37` / `I3044:11795;1031:7595;317:2377`, 1)
+- Variable `color/content/default/brand`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:12022`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12028`, 1)
+- Variable `color/content/action/brand`: direct 4; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11972`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12017`, 1); Icon / base (`3126:67288` / `334:1052`, 1); Icon / base (`3126:67288` / `334:1053`, 1)
+- Variable `color/content/default/secondary`: direct 6; dependencies 0; style bindings 0; top consumers: Block / Description (`23:6` / `I3252:94589;3925:76555`, 1); Block / Description (`23:6` / `I3252:96836;3925:76555`, 1); Block / Title (`23:6` / `I3252:94589;3477:33906;3925:76529`, 1); Block / Title (`23:6` / `I3252:96836;3477:33906;3925:76529`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12023`, 1)
+- Variable `color/content/default/tertiary`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:12024`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12030`, 1)
+- Variable `color/content/action/secondary`: direct 20; dependencies 0; style bindings 0; top consumers: Example / title (`242:239` / `I4549:12915;4736:269015;1364:30430;871:15935;686:4385`, 1); Example / title (`242:239` / `I4549:12918;4736:269015;1364:30429;871:15935;686:4385`, 1); Example / title (`242:239` / `I4549:12923;4736:269015;1364:30430;871:15935;686:4385`, 1); Example / title (`242:239` / `I4549:12926;4736:269015;1364:30429;871:15935;686:4385`, 1); Example / title (`242:239` / `I4549:12931;4736:269015;1364:30430;871:15935;686:4385`, 1)
+- Variable `color/content/disabled/dark`: direct 91; dependencies 0; style bindings 0; top consumers: Block / base (`23:6` / `I3252:94589;2638:2268;1375:49567;3923:75788;317:2352`, 1); Block / base (`23:6` / `I3252:96836;2638:2268;1375:49567;3923:75788;317:2352`, 1); Component / base (`3044:12` / `I1375:49532;3923:75788;317:2354`, 1); Component / base (`3044:12` / `I1375:49567;3923:75788;317:2352`, 1); Component / base (`3044:12` / `I3154:94841;879:16521;317:2354`, 1)
+- Variable `color/content/disabled/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:12033`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12038`, 1)
+- Variable `color/content/disabled/light`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:12034`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12039`, 1)
+- Variable `color/content/disabled/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:12035`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12040`, 1)
+- Variable `color/content/focused/dark`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11975`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11995`, 1)
+- Variable `color/content/focused/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11976`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11996`, 1)
+- Variable `color/content/focused/light`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11977`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11997`, 1)
+- Variable `color/content/focused/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11978`, 1); Foundation / SwatchSimple (`3044:37` / `3044:11998`, 1)
+- Variable `color/content/negative/dark`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11990`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12010`, 1)
+- Variable `color/content/negative/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11991`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12011`, 1)
+- Variable `color/content/negative/light`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11992`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12012`, 1)
+- Variable `color/content/negative/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11993`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12013`, 1)
+- Variable `color/content/positive/dark`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11980`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12000`, 1)
+- Variable `color/content/positive/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11981`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12001`, 1)
+- Variable `color/content/positive/light`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11982`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12002`, 1)
+- Variable `color/content/positive/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11983`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12003`, 1)
+- Variable `color/content/warning/dark`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11985`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12005`, 1)
+- Variable `color/content/warning/darker`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11986`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12006`, 1)
+- Variable `color/content/warning/light`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11987`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12007`, 1)
+- Variable `color/content/warning/lighter`: direct 2; dependencies 0; style bindings 0; top consumers: Foundation / SwatchSimple (`3044:37` / `3044:11988`, 1); Foundation / SwatchSimple (`3044:37` / `3044:12008`, 1)
+- Variable `color/elevation/0`: direct 26; dependencies 0; style bindings 12; top consumers: Foundation / drop-shadow-100 (`3044:37` / `3044:13443`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13445`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13447`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13452`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13454`, 2)
+- Variable `color/elevation/100`: direct 14; dependencies 0; style bindings 4; top consumers: Foundation / drop-shadow-100 (`3044:37` / `3044:13443`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13445`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13447`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13452`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13454`, 2)
+- Variable `color/elevation/200`: direct 14; dependencies 0; style bindings 4; top consumers: Foundation / drop-shadow-200 (`3044:37` / `3044:13444`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13446`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13448`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13453`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13455`, 2)
+- Variable `color/elevation/300`: direct 14; dependencies 0; style bindings 4; top consumers: Foundation / drop-shadow-100 (`3044:37` / `3044:13443`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13445`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13447`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13452`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13454`, 2)
+- Variable `color/elevation/400`: direct 14; dependencies 0; style bindings 4; top consumers: Foundation / drop-shadow-200 (`3044:37` / `3044:13444`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13446`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13448`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13453`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13455`, 2)
+- Variable `color/elevation/500`: direct 14; dependencies 0; style bindings 4; top consumers: Foundation / drop-shadow-100 (`3044:37` / `3044:13443`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13445`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13447`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13452`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13454`, 2)
+- Variable `color/elevation/600`: direct 14; dependencies 0; style bindings 4; top consumers: Foundation / drop-shadow-100 (`3044:37` / `3044:13443`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13445`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13447`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13452`, 2); Foundation / drop-shadow-100 (`3044:37` / `3044:13454`, 2)
+- Variable `color/elevation/700`: direct 14; dependencies 0; style bindings 4; top consumers: Foundation / drop-shadow-200 (`3044:37` / `3044:13444`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13446`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13448`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13453`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13455`, 2)
+- Variable `color/elevation/800`: direct 14; dependencies 0; style bindings 4; top consumers: Foundation / drop-shadow-200 (`3044:37` / `3044:13444`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13446`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13448`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13453`, 2); Foundation / drop-shadow-200 (`3044:37` / `3044:13455`, 2)
+- Variable `device/width`: direct 1396; dependencies 0; style bindings 0; top consumers: Block / HeaderSection (`23:6` / `3252:94589`, 1); Block / HeaderSection (`23:6` / `3252:96836`, 1); Block / SpacerBottom (`23:6` / `1182:4992`, 1); Block / SpacerBottom (`23:6` / `1249:15155`, 1); Block / SpacerBottom (`23:6` / `179:158`, 1)
+- Variable `device/container-max-width`: direct 26; dependencies 0; style bindings 0; top consumers: Block / content (`23:6` / `3023:13279`, 1); Example / content (`242:239` / `I4400:27288;3023:13279`, 1); Example / content (`242:239` / `I4400:27411;3023:13279`, 1); Example / content (`242:239` / `I4549:12915;3023:13279`, 1); Example / content (`242:239` / `I4549:12918;3023:13279`, 1)
+- Variable `device/screen-height/full`: direct 214; dependencies 0; style bindings 0; top consumers: Example / D - About - Navigation – Landing (`242:239` / `4549:12919`, 2); Example / D - About - Navigation – Landing (`242:239` / `4754:272691`, 2); Example / D - About - Navigation – Scrolled (`242:239` / `4549:12935`, 2); Example / D - About - Navigation – Scrolled (`242:239` / `4754:272707`, 2); Example / D - About - Navigation – Scrolled Up (`242:239` / `4549:12927`, 2)
+- Variable `device/screen-height/100`: direct 1; dependencies 0; style bindings 0; top consumers: Foundation / size=screen-100 (`3044:37` / `3994:65566`, 1)
+- Variable `device/screen-height/200`: direct 8; dependencies 0; style bindings 0; top consumers: Example / SpacerTop (`242:239` / `4398:22385`, 1); Example / SpacerTop (`242:239` / `4399:22684`, 1); Example / SpacerTop (`242:239` / `4399:22929`, 1); Example / SpacerTop (`242:239` / `4400:25757`, 1); Example / SpacerTop (`242:239` / `4400:25799`, 1)
+- Variable `device/screen-height/300`: direct 11; dependencies 0; style bindings 0; top consumers: Example / M - About - Navigation – Landing (`242:239` / `4549:12892`, 1); Example / M - About - Navigation – Landing (`242:239` / `4754:272667`, 1); Example / M - About - Navigation – Scrolled (`242:239` / `4549:12898`, 1); Example / M - About - Navigation – Scrolled (`242:239` / `4754:272672`, 1); Example / M - Home (`242:239` / `4408:15987`, 1)
+- Variable `device/screen-height/400`: direct 55; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `3252:86947`, 1); Block / Media (`23:6` / `3252:87088`, 1); Block / Media (`23:6` / `3252:87228`, 1); Block / SpacerTop (`23:6` / `4427:36309`, 1); Block / SpacerTop (`23:6` / `4427:36318`, 1)
+- Variable `device/screen-height/500`: direct 35; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `3252:86983`, 1); Block / Media (`23:6` / `3252:87123`, 1); Block / Media (`23:6` / `3252:87263`, 1); Block / header (`23:6` / `4417:12677`, 1); Block / header (`23:6` / `4417:13955`, 1)
+- Variable `device/screen-height/700`: direct 20; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `3252:87018`, 1); Block / Media (`23:6` / `3252:87158`, 1); Block / Media (`23:6` / `3252:87298`, 1); Example / PaginationPage (`242:239` / `4125:51068`, 1); Example / PaginationPage (`242:239` / `4125:51286`, 1)
+- Variable `grid/gap`: direct 1248; dependencies 0; style bindings 14; top consumers: Block / content (`23:6` / `4513:37287`, 4); Example / content (`242:239` / `I4122:47831;4513:37287`, 4); Example / content (`242:239` / `I4125:51286;4513:37287`, 4); Example / content (`242:239` / `I4417:14085;4513:37287`, 4); Example / content (`242:239` / `I4417:14317;4513:37287`, 4)
+- Variable `grid/gap-sm`: direct 124; dependencies 0; style bindings 0; top consumers: Block / menu (`23:6` / `4719:258953`, 2); Example / menu (`242:239` / `I4719:259022;4719:258953`, 2); Example / menu (`242:239` / `I4736:261461;4719:258953`, 2); Example / menu (`242:239` / `I4736:261535;4719:258953`, 2); Example / menu (`242:239` / `I4754:272676;4719:258953`, 2)
+- Variable `grid/gap-lg`: direct 72; dependencies 0; style bindings 0; top consumers: Block / content (`23:6` / `4329:13687`, 2); Example / content (`242:239` / `I4122:47839;4329:13687`, 2); Example / content (`242:239` / `I4408:18892;4329:13687`, 2); Example / content (`242:239` / `I4417:14094;4329:13687`, 2); Example / content (`242:239` / `I4417:14326;4329:13687`, 2)
+- Variable `grid/margin-default`: direct 1570; dependencies 0; style bindings 6; top consumers: Block / SplitContent (`23:6` / `486:1126`, 4); Block / content (`23:6` / `4329:13687`, 4); Brand / content (`2080:1391` / `4792:289983`, 4); Brand / content (`2080:1391` / `4792:290233`, 4); Example / content (`242:239` / `I4122:47839;4329:13687`, 4)
+- Variable `grid/margin-offset`: direct 226; dependencies 0; style bindings 0; top consumers: Block / content (`23:6` / `3023:12881`, 2); Block / content (`23:6` / `3023:13279`, 2); Block / content (`23:6` / `4417:15262`, 2); Block / content (`23:6` / `4714:257732`, 2); Block / menu (`23:6` / `4709:256923`, 2)
+- Variable `grid/padding-default`: direct 56; dependencies 0; style bindings 0; top consumers: Block / .FeatureText (`23:6` / `1158:25384`, 2); Block / .FeatureText (`23:6` / `1158:25385`, 2); Block / .FeatureText (`23:6` / `1158:25386`, 2); Block / .FeatureText (`23:6` / `1158:25387`, 2); Block / .FeatureText (`23:6` / `1158:25388`, 2)
+- Variable `grid/padding-offset`: direct 38; dependencies 0; style bindings 0; top consumers: Block / content (`23:6` / `4513:32596`, 2); Example / content (`242:239` / `I3495:36740;4513:32596`, 2); Example / content (`242:239` / `I4125:51068;4513:32596`, 2); Example / content (`242:239` / `I4398:22143;4513:32596`, 2); Example / content (`242:239` / `I4399:22437;4513:32596`, 2)
+- Variable `grid/padding-sm`: direct 12; dependencies 0; style bindings 0; top consumers: Brand / Body (`2080:1391` / `4792:290109`, 4); Brand / Body (`2080:1391` / `4792:290252`, 4); Brand / Toolbar (`2080:1391` / `4792:290103`, 2); Brand / Toolbar (`2080:1391` / `4792:290245`, 2)
+- Variable `grid/col-span/col-span-1`: direct 107; dependencies 0; style bindings 4; top consumers: Component / ratio=square, col-span=1 (`3044:12` / `1221:13898`, 2);  / content (`` / `214:745`, 1);  / content (`` / `3023:12399`, 1); Component / ratio=landscape, col-span=1 (`3044:12` / `1221:13921`, 1); Component / ratio=portrait, col-span=1 (`3044:12` / `1221:13885`, 1)
+- Variable `grid/col-start/col-start-1`: direct 425; dependencies 0; style bindings 0; top consumers: Block / .CardMedia (`23:6` / `431:1945`, 2); Block / .CardMedia (`23:6` / `431:1946`, 2); Block / .CardMedia (`23:6` / `431:2541`, 2); Block / .CardMedia (`23:6` / `431:2542`, 2); Block / Content (`23:6` / `I431:1911;367:1819`, 2)
+- Variable `grid/col-start/col-start-2`: direct 18; dependencies 0; style bindings 0; top consumers: Example / SpacerHorizontal (`242:239` / `I4408:16170;431:2541;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16172;431:2542;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16175;431:2542;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16184;431:2541;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16186;431:2542;431:1908`, 1)
+- Variable `grid/col-start/col-start-3`: direct 34; dependencies 0; style bindings 0; top consumers: Block / SpacerHorizontal (`23:6` / `I431:2542;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16170;431:2542;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16171;431:2542;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16173;431:2542;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16174;431:2542;431:1908`, 1)
+- Variable `grid/col-start/col-start-4`: direct 25; dependencies 0; style bindings 0; top consumers: Example / SpacerHorizontal (`242:239` / `I4408:16168;431:2542;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16171;431:2541;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16174;431:2541;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16176;431:2542;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16179;431:2541;431:1908`, 1)
+- Variable `grid/col-start/col-start-5`: direct 9; dependencies 0; style bindings 0; top consumers: Foundation / columns=4 (`3044:37` / `367:1705`, 1); Foundation / start (`3044:37` / `3044:14053`, 1); Foundation / start (`3044:37` / `3044:14066`, 1); Foundation / start (`3044:37` / `3044:14079`, 1); Foundation / start (`3044:37` / `3044:14092`, 1)
+- Variable `grid/col-start/col-start-6`: direct 9; dependencies 0; style bindings 0; top consumers: Foundation / columns=5 (`3044:37` / `367:1702`, 1); Foundation / start (`3044:37` / `3044:14054`, 1); Foundation / start (`3044:37` / `3044:14067`, 1); Foundation / start (`3044:37` / `3044:14080`, 1); Foundation / start (`3044:37` / `3044:14093`, 1)
+- Variable `grid/col-start/col-start-7`: direct 12; dependencies 0; style bindings 0; top consumers: Example / SpacerHorizontal (`242:239` / `I4408:16173;431:2541;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16187;431:2541;431:1908`, 1); Example / SpacerHorizontal (`242:239` / `I4408:16203;431:2541;431:1908`, 1); Foundation / columns=6 (`3044:37` / `367:1701`, 1); Foundation / start (`3044:37` / `3044:14055`, 1)
+- Variable `grid/col-start/col-start-8`: direct 7; dependencies 0; style bindings 0; top consumers: Foundation / columns=7 (`3044:37` / `367:1700`, 1); Foundation / start (`3044:37` / `3044:14056`, 1); Foundation / start (`3044:37` / `3044:14069`, 1); Foundation / start (`3044:37` / `3044:14082`, 1); Foundation / start (`3044:37` / `3044:14331`, 1)
+- Variable `grid/col-start/col-start-9`: direct 9; dependencies 0; style bindings 0; top consumers: Foundation / columns=8 (`3044:37` / `367:1699`, 1); Foundation / start (`3044:37` / `3044:14057`, 1); Foundation / start (`3044:37` / `3044:14070`, 1); Foundation / start (`3044:37` / `3044:14083`, 1); Foundation / start (`3044:37` / `3044:14096`, 1)
+- Variable `grid/col-start/col-start-10`: direct 9; dependencies 0; style bindings 0; top consumers: Foundation / columns=9 (`3044:37` / `367:1706`, 1); Foundation / start (`3044:37` / `3044:14058`, 1); Foundation / start (`3044:37` / `3044:14071`, 1); Foundation / start (`3044:37` / `3044:14084`, 1); Foundation / start (`3044:37` / `3044:14097`, 1)
+- Variable `grid/col-start/col-start-11`: direct 9; dependencies 0; style bindings 0; top consumers: Foundation / columns=10 (`3044:37` / `1097:2771`, 1); Foundation / start (`3044:37` / `3044:14059`, 1); Foundation / start (`3044:37` / `3044:14072`, 1); Foundation / start (`3044:37` / `3044:14085`, 1); Foundation / start (`3044:37` / `3044:14098`, 1)
+- Variable `grid/col-start/col-start-12`: direct 11; dependencies 0; style bindings 0; top consumers: Foundation / columns=11 (`3044:37` / `1097:2772`, 1); Foundation / span (`3044:37` / `3044:13909`, 1); Foundation / span (`3044:37` / `3044:14184`, 1); Foundation / start (`3044:37` / `3044:14060`, 1); Foundation / start (`3044:37` / `3044:14073`, 1)
+- Variable `grid/col-span/col-span-2`: direct 83; dependencies 0; style bindings 0; top consumers: Component / ratio=square, col-span=2 (`3044:12` / `1221:13897`, 2); Component / ratio=landscape, col-span=2 (`3044:12` / `1221:13918`, 1); Component / ratio=portrait, col-span=2 (`3044:12` / `1221:13883`, 1); Component / ratio=tall, col-span=2 (`3044:12` / `1221:13869`, 1); Example / Media (`242:239` / `4408:16211`, 1)
+- Variable `grid/col-span/col-span-3`: direct 53; dependencies 0; style bindings 0; top consumers: Component / ratio=square, col-span=3 (`3044:12` / `1221:13896`, 2); Component / layout=primary-icon, state=activated, size=100 (`3044:12` / `972:8825`, 1); Component / layout=primary-icon, state=activated, size=200 (`3044:12` / `972:8829`, 1); Component / layout=primary-icon, state=default, size=100 (`3044:12` / `972:8777`, 1); Component / layout=primary-icon, state=default, size=200 (`3044:12` / `972:8781`, 1)
+- Variable `grid/col-span/col-span-4`: direct 827; dependencies 0; style bindings 0; top consumers: Component / ratio=square, col-span=4 (`3044:12` / `1221:13895`, 2); Example / Media (`242:239` / `I4408:16176;431:2541;431:1911;1219:12181`, 2); Example / Media (`242:239` / `I4408:16190;431:2541;431:1911;1219:12181`, 2); Example / Media (`242:239` / `I4408:16206;431:2541;431:1911;1219:12181`, 2); Foundation / SwatchSimple (`3044:37` / `3044:10757`, 2)
+- Variable `grid/col-span/col-span-5`: direct 319; dependencies 0; style bindings 0; top consumers: Component / ratio=square, col-span=5 (`3044:12` / `1221:13894`, 2); Block / .FeatureText (`23:6` / `3905:37566`, 1); Block / .FeatureText (`23:6` / `3905:37606`, 1); Block / .FeatureText (`23:6` / `3906:46411`, 1); Block / .FeatureText (`23:6` / `3906:46451`, 1)
+- Variable `grid/col-span/col-span-6`: direct 276; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `489:1049`, 2); Component / ratio=square, col-span=6 (`3044:12` / `1221:13893`, 2); Block / Media (`23:6` / `2863:13922`, 1); Block / Media (`23:6` / `489:1046`, 1); Block / Media (`23:6` / `489:1048`, 1)
+- Variable `grid/col-span/col-span-7`: direct 23; dependencies 0; style bindings 0; top consumers: Component / ratio=square, col-span=7 (`3044:12` / `1221:13892`, 2); Component / ratio=landscape, col-span=7 (`3044:12` / `1221:13917`, 1); Component / ratio=portrait, col-span=7 (`3044:12` / `1221:13876`, 1); Component / ratio=tall, col-span=7 (`3044:12` / `1221:13864`, 1); Example / Media (`242:239` / `I4408:16174;431:2541;431:1911;1219:13211`, 1)
+- Variable `grid/col-span/col-span-8`: direct 23; dependencies 0; style bindings 0; top consumers: Component / ratio=square, col-span=8 (`3044:12` / `1221:13891`, 2); Block / .FeatureText (`23:6` / `1158:25384`, 1); Block / .FeatureText (`23:6` / `1158:25386`, 1); Block / .FeatureText (`23:6` / `1158:25389`, 1); Block / .FeatureText (`23:6` / `1158:25390`, 1)
+- Variable `grid/col-span/col-span-9`: direct 18; dependencies 0; style bindings 0; top consumers: Component / ratio=square, col-span=9 (`3044:12` / `1221:13890`, 2); Component / ratio=landscape, col-span=9 (`3044:12` / `1221:13904`, 1); Component / ratio=portrait, col-span=9 (`3044:12` / `1221:13874`, 1); Component / ratio=tall, col-span=9 (`3044:12` / `1221:13862`, 1); Foundation / span (`3044:37` / `3044:13892`, 1)
+- Variable `grid/col-span/col-span-10`: direct 13; dependencies 0; style bindings 0; top consumers: Component / ratio=square, col-span=10 (`3044:12` / `1221:13889`, 2); Component / ratio=landscape, col-span=10 (`3044:12` / `1221:13915`, 1); Component / ratio=portrait, col-span=10 (`3044:12` / `1221:13873`, 1); Component / ratio=tall, col-span=10 (`3044:12` / `1221:13861`, 1); Foundation / span (`3044:37` / `3044:13893`, 1)
+- Variable `grid/col-span/col-span-11`: direct 13; dependencies 0; style bindings 0; top consumers: Component / ratio=square, col-span=11 (`3044:12` / `1221:13919`, 2); Component / ratio=landscape, col-span=11 (`3044:12` / `1221:13902`, 1); Component / ratio=portrait, col-span=11 (`3044:12` / `1221:13872`, 1); Component / ratio=tall, col-span=11 (`3044:12` / `1221:13886`, 1); Foundation / span (`3044:37` / `3044:13894`, 1)
+- Variable `grid/col-span/col-span-12`: direct 222; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `489:1053`, 2); Block / Media (`23:6` / `656:3059`, 2); Component / ratio=square, col-span=12 (`3044:12` / `1221:13888`, 2); Block / .FeatureText (`23:6` / `1158:25385`, 1); Block / .FeatureText (`23:6` / `1158:25387`, 1)
+- Variable `grid/aspect/landscape/col-span-1`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=landscape, col-span=1 (`3044:12` / `1221:13921`, 1)
+- Variable `grid/aspect/landscape/col-span-2`: direct 5; dependencies 0; style bindings 0; top consumers: Component / ratio=landscape, col-span=2 (`3044:12` / `1221:13918`, 1); Example / Media (`242:239` / `4408:16211`, 1); Example / Media (`242:239` / `4408:16212`, 1); Example / Media (`242:239` / `4408:16214`, 1); Example / Media (`242:239` / `4408:16215`, 1)
+- Variable `grid/aspect/landscape/col-span-3`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=landscape, col-span=3 (`3044:12` / `1221:13913`, 1)
+- Variable `grid/aspect/landscape/col-span-4`: direct 9; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `I431:1911;1219:12181`, 1); Component / Media (`3044:12` / `1219:12181`, 1); Component / Media (`3044:12` / `1219:13209`, 1); Component / Media (`3044:12` / `1219:13211`, 1); Component / ratio=landscape, col-span=4 (`3044:12` / `1221:13911`, 1)
+- Variable `grid/aspect/landscape/col-span-5`: direct 10; dependencies 0; style bindings 0; top consumers: Component / ratio=landscape, col-span=5 (`3044:12` / `1221:13910`, 1); Example / Media (`242:239` / `I4408:16170;431:2541;431:1911;1219:12181`, 1); Example / Media (`242:239` / `I4408:16173;431:2541;431:1911;1219:12181`, 1); Example / Media (`242:239` / `I4408:16175;431:2542;431:1911;1219:13211`, 1); Example / Media (`242:239` / `I4408:16184;431:2541;431:1911;1219:12181`, 1)
+- Variable `grid/aspect/landscape/col-span-6`: direct 95; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `489:1046`, 1); Component / ratio=landscape, col-span=6 (`3044:12` / `1221:13908`, 1); Example / Media (`242:239` / `I3086:19815;486:1131;489:1046`, 1); Example / Media (`242:239` / `I3086:19816;486:1184;489:1046`, 1); Example / Media (`242:239` / `I3086:19819;486:1150;489:1046`, 1)
+- Variable `grid/aspect/landscape/col-span-7`: direct 11; dependencies 0; style bindings 0; top consumers: Component / ratio=landscape, col-span=7 (`3044:12` / `1221:13917`, 1); Example / Media (`242:239` / `I4408:16174;431:2541;431:1911;1219:13211`, 1); Example / Media (`242:239` / `I4408:16177;431:2541;431:1911;1219:13211`, 1); Example / Media (`242:239` / `I4408:16179;431:2541;431:1911;1219:13211`, 1); Example / Media (`242:239` / `I4408:16188;431:2541;431:1911;1219:13211`, 1)
+- Variable `grid/aspect/landscape/col-span-8`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=landscape, col-span=8 (`3044:12` / `1221:13906`, 1)
+- Variable `grid/aspect/landscape/col-span-9`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=landscape, col-span=9 (`3044:12` / `1221:13904`, 1)
+- Variable `grid/aspect/landscape/col-span-10`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=landscape, col-span=10 (`3044:12` / `1221:13915`, 1)
+- Variable `grid/aspect/landscape/col-span-11`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=landscape, col-span=11 (`3044:12` / `1221:13902`, 1)
+- Variable `grid/aspect/landscape/col-span-12`: direct 118; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `3046:8051`, 1); Block / Media (`23:6` / `4417:12653`, 1); Block / Media (`23:6` / `489:1051`, 1); Block / Media (`23:6` / `656:3057`, 1); Block / Media (`23:6` / `I431:1930;1219:12181`, 1)
+- Variable `grid/aspect/portrait/col-span-1`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=portrait, col-span=1 (`3044:12` / `1221:13885`, 1)
+- Variable `grid/aspect/portrait/col-span-2`: direct 62; dependencies 0; style bindings 0; top consumers: Component / ratio=portrait, col-span=2 (`3044:12` / `1221:13883`, 1); Example / Media (`242:239` / `4408:16217`, 1); Example / Media (`242:239` / `I4125:51288;1219:12181`, 1); Example / Media (`242:239` / `I4125:51289;1219:12181`, 1); Example / Media (`242:239` / `I4125:51290;1219:12181`, 1)
+- Variable `grid/aspect/portrait/col-span-3`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=portrait, col-span=3 (`3044:12` / `1221:13881`, 1)
+- Variable `grid/aspect/portrait/col-span-4`: direct 8; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `I431:2541;431:1911;1219:12181`, 1); Component / ratio=portrait, col-span=4 (`3044:12` / `1221:13880`, 1); Example / Media (`242:239` / `I4408:16168;431:2541;431:1911`, 1); Example / Media (`242:239` / `I4408:16182;431:2541;431:1911`, 1); Example / Media (`242:239` / `I4408:16183;431:2541;431:1911`, 1)
+- Variable `grid/aspect/portrait/col-span-5`: direct 17; dependencies 0; style bindings 0; top consumers: Component / ratio=portrait, col-span=5 (`3044:12` / `1221:13878`, 1); Example / Media (`242:239` / `I4408:16168;431:2542;431:1911`, 1); Example / Media (`242:239` / `I4408:16172;431:2541;431:1911;1219:13211`, 1); Example / Media (`242:239` / `I4408:16175;431:2541;431:1911;1219:13211`, 1); Example / Media (`242:239` / `I4408:16176;431:2542;431:1911;1219:13211`, 1)
+- Variable `grid/aspect/portrait/col-span-6`: direct 39; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `489:1048`, 1); Block / Media (`23:6` / `I431:2542;431:1911;1219:12181`, 1); Block / Media (`23:6` / `I486:1130;489:1048`, 1); Block / Media (`23:6` / `I486:1131;489:1048`, 1); Block / Media (`23:6` / `I486:1150;489:1048`, 1)
+- Variable `grid/aspect/portrait/col-span-7`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=portrait, col-span=7 (`3044:12` / `1221:13876`, 1)
+- Variable `grid/aspect/portrait/col-span-8`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=portrait, col-span=8 (`3044:12` / `1221:13875`, 1)
+- Variable `grid/aspect/portrait/col-span-9`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=portrait, col-span=9 (`3044:12` / `1221:13874`, 1)
+- Variable `grid/aspect/portrait/col-span-10`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=portrait, col-span=10 (`3044:12` / `1221:13873`, 1)
+- Variable `grid/aspect/portrait/col-span-11`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=portrait, col-span=11 (`3044:12` / `1221:13872`, 1)
+- Variable `grid/aspect/portrait/col-span-12`: direct 25; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `3218:50037`, 1); Block / Media (`23:6` / `4417:13808`, 1); Block / Media (`23:6` / `489:1052`, 1); Block / Media (`23:6` / `656:3065`, 1); Block / Media (`23:6` / `I431:1945;431:1930;1219:12181`, 1)
+- Variable `grid/aspect/tall/col-span-1`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=tall, col-span=1 (`3044:12` / `1221:13870`, 1)
+- Variable `grid/aspect/tall/col-span-2`: direct 2; dependencies 0; style bindings 0; top consumers: Component / ratio=tall, col-span=2 (`3044:12` / `1221:13869`, 1); Example / Media (`242:239` / `4408:16213`, 1)
+- Variable `grid/aspect/tall/col-span-3`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=tall, col-span=3 (`3044:12` / `1221:13868`, 1)
+- Variable `grid/aspect/tall/col-span-4`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=tall, col-span=4 (`3044:12` / `1221:13867`, 1)
+- Variable `grid/aspect/tall/col-span-5`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=tall, col-span=5 (`3044:12` / `1221:13866`, 1)
+- Variable `grid/aspect/tall/col-span-6`: direct 81; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `2863:13922`, 1); Component / ratio=tall, col-span=6 (`3044:12` / `1221:13865`, 1); Example / Media (`242:239` / `I3086:19815;486:1130;2863:13922`, 1); Example / Media (`242:239` / `I3086:19818;486:1130;2863:13922`, 1); Example / Media (`242:239` / `I3086:19818;486:1131;2863:13922`, 1)
+- Variable `grid/aspect/tall/col-span-7`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=tall, col-span=7 (`3044:12` / `1221:13864`, 1)
+- Variable `grid/aspect/tall/col-span-8`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=tall, col-span=8 (`3044:12` / `1221:13863`, 1)
+- Variable `grid/aspect/tall/col-span-9`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=tall, col-span=9 (`3044:12` / `1221:13862`, 1)
+- Variable `grid/aspect/tall/col-span-10`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=tall, col-span=10 (`3044:12` / `1221:13861`, 1)
+- Variable `grid/aspect/tall/col-span-11`: direct 1; dependencies 0; style bindings 0; top consumers: Component / ratio=tall, col-span=11 (`3044:12` / `1221:13886`, 1)
+- Variable `grid/aspect/tall/col-span-12`: direct 28; dependencies 0; style bindings 0; top consumers: Block / Media (`23:6` / `1249:15152`, 1); Block / Media (`23:6` / `2863:14194`, 1); Component / ratio=tall, col-span=12 (`3044:12` / `1221:13860`, 1); Example / Media (`242:239` / `I4122:47821;486:1245;2863:14194`, 1); Example / Media (`242:239` / `I4122:47824;486:1245;2863:14194`, 1)
+- Variable `space/spacer-100`: direct 535; dependencies 0; style bindings 0; top consumers: Block / content (`23:6` / `3023:13279`, 2); Block / controls (`23:6` / `3218:50038`, 2); Example / content (`242:239` / `I4400:27288;3023:13279`, 2); Example / content (`242:239` / `I4400:27411;3023:13279`, 2); Example / content (`242:239` / `I4549:12915;3023:13279`, 2)
+- Variable `space/spacer-200`: direct 175; dependencies 0; style bindings 0; top consumers: Block / content (`23:6` / `3023:12881`, 2); Block / content (`23:6` / `4513:32596`, 2); Block / content (`23:6` / `4714:257732`, 2); Block / menu (`23:6` / `4709:256923`, 2); Example / content (`242:239` / `I3495:36740;4513:32596`, 2)
+- Variable `space/spacer-300`: direct 985; dependencies 0; style bindings 0; top consumers: Block / content (`23:6` / `4417:15262`, 2); Block / content (`23:6` / `4513:37287`, 2); Block / menu (`23:6` / `4719:258953`, 2); Example / content (`242:239` / `4125:51287`, 2); Example / content (`242:239` / `4398:22144`, 2)
+- Variable `space/spacer-400`: direct 1; dependencies 0; style bindings 0; top consumers: Foundation / size=space-400 (`3044:37` / `3822:61903`, 1)
+- Variable `space/spacer-500`: direct 89; dependencies 0; style bindings 0; top consumers: Block / SpacerBottom (`23:6` / `I492:2593;3906:49811`, 1); Block / SpacerTop (`23:6` / `492:5984`, 1); Block / SpacerTop (`23:6` / `492:6302`, 1); Block / SpacerTop (`23:6` / `519:9224`, 1); Block / SpacerTop (`23:6` / `519:9239`, 1)
+- Variable `space/spacer-600`: direct 146; dependencies 0; style bindings 0; top consumers: Block / SpacerBottom (`23:6` / `3905:37568`, 1); Block / SpacerBottom (`23:6` / `3906:46293`, 1); Block / SpacerBottom (`23:6` / `3906:46413`, 1); Block / SpacerBottom (`23:6` / `4173:23337`, 1); Block / SpacerBottom (`23:6` / `492:6000`, 1)
+- Variable `text/title/font-size-100`: direct 13; dependencies 0; style bindings 2; top consumers: Component / title (`3044:12` / `3923:74319`, 2); Component / title (`3044:12` / `3923:74323`, 2); Component / title (`3044:12` / `3923:74327`, 2); Component / title (`3044:12` / `3923:74331`, 2); Component / title (`3044:12` / `3923:74335`, 2)
+- Variable `text/title/font-size-200`: direct 2719; dependencies 0; style bindings 2; top consumers: Block / 1 / 6 (`23:6` / `I3252:94589;3252:94866;214:436`, 2); Block / 1 / 6 (`23:6` / `I3252:96836;3252:94866;214:436`, 2); Block / Subtitle (`23:6` / `I1158:25384;3906:48478`, 2); Block / Subtitle (`23:6` / `I1158:25384;3906:48484`, 2); Block / Subtitle (`23:6` / `I1158:25385;3906:48478`, 2)
+- Variable `text/title/font-size-300`: direct 156; dependencies 0; style bindings 2; top consumers: Block / Title (`23:6` / `I1158:25384;3906:48481`, 2); Block / Title (`23:6` / `I1158:25385;3906:48481`, 2); Block / Title (`23:6` / `I1158:25386;3906:48481`, 2); Block / Title (`23:6` / `I1158:25387;3906:48481`, 2); Block / Title (`23:6` / `I1158:25388;3906:48481`, 2)
+- Variable `text/title/font-size-400`: direct 12; dependencies 0; style bindings 2; top consumers: Component / title (`3044:12` / `326:3568`, 2); Component / title (`3044:12` / `326:3571`, 2); Component / title (`3044:12` / `326:3574`, 2); Component / title (`3044:12` / `326:3577`, 2); Component / title (`3044:12` / `326:3580`, 2)
+- Variable `text/body/font-size-100`: direct 1; dependencies 0; style bindings 1; top consumers: Foundation / style (`3044:37` / `3923:51349`, 2)
+- Variable `text/body/letter-spacing-100`: direct 1; dependencies 0; style bindings 1; top consumers: Foundation / style (`3044:37` / `3923:51349`, 2)
+- Variable `text/body/paragraph-spacing-100`: direct 2; dependencies 0; style bindings 2; top consumers: Foundation / style (`3044:37` / `3923:51349`, 2); Foundation / style (`3044:37` / `3923:51356`, 2)
+- Variable `text/body/font-size-200`: direct 2; dependencies 0; style bindings 2; top consumers: Foundation / style (`3044:37` / `3923:51350`, 2); Foundation / style (`3044:37` / `3923:51358`, 2);  / Body (`` / `498:1913`, 1);  / Text Link (`` / `2475:7562`, 1);  / Text Link (`` / `2475:7570`, 1)
+- Variable `text/body/letter-spacing-200`: direct 1; dependencies 0; style bindings 1; top consumers: Foundation / style (`3044:37` / `3923:51350`, 2)
+- Variable `text/body/paragraph-spacing-200`: direct 3; dependencies 0; style bindings 3; top consumers: Foundation / style (`3044:37` / `3923:51350`, 2); Foundation / style (`3044:37` / `3923:51357`, 2); Foundation / style (`3044:37` / `3923:51358`, 2);  / Body (`` / `498:1913`, 1);  / Text Link (`` / `2475:7562`, 1)
+- Variable `text/body/font-size-300`: direct 243; dependencies 0; style bindings 2; top consumers: Block / Body (`23:6` / `I3905:37566;3906:48487`, 2); Block / Body (`23:6` / `I3905:37606;3906:48487`, 2); Block / Body (`23:6` / `I3905:37686;3906:49807`, 2); Block / Body (`23:6` / `I3905:37726;3906:48487`, 2); Block / Body (`23:6` / `I3906:46291;3906:49906`, 2)
+- Variable `text/body/letter-spacing-300`: direct 242; dependencies 0; style bindings 1; top consumers: Block / Body (`23:6` / `I3905:37566;3906:48487`, 2); Block / Body (`23:6` / `I3905:37606;3906:48487`, 2); Block / Body (`23:6` / `I3905:37686;3906:49807`, 2); Block / Body (`23:6` / `I3905:37726;3906:48487`, 2); Block / Body (`23:6` / `I3906:46291;3906:49906`, 2)
+- Variable `text/body/paragraph-spacing-300`: direct 243; dependencies 0; style bindings 2; top consumers: Block / Body (`23:6` / `I3905:37566;3906:48487`, 2); Block / Body (`23:6` / `I3905:37606;3906:48487`, 2); Block / Body (`23:6` / `I3905:37686;3906:49807`, 2); Block / Body (`23:6` / `I3905:37726;3906:48487`, 2); Block / Body (`23:6` / `I3906:46291;3906:49906`, 2)
+- Variable `text/body/font-size-400`: direct 5; dependencies 0; style bindings 1; top consumers: Block / Description (`23:6` / `I3252:94589;3925:76555`, 2); Block / Description (`23:6` / `I3252:96836;3925:76555`, 2); Block / description (`23:6` / `I431:1930;369:1873;2544:22643`, 2); Block / description (`23:6` / `I431:1946;431:1930;369:1873;2544:22643`, 2); Foundation / style (`3044:37` / `3923:51352`, 2)
+- Variable `text/body/letter-spacing-400`: direct 5; dependencies 0; style bindings 1; top consumers: Block / Description (`23:6` / `I3252:94589;3925:76555`, 2); Block / Description (`23:6` / `I3252:96836;3925:76555`, 2); Block / description (`23:6` / `I431:1930;369:1873;2544:22643`, 2); Block / description (`23:6` / `I431:1946;431:1930;369:1873;2544:22643`, 2); Foundation / style (`3044:37` / `3923:51352`, 2)
+- Variable `text/body/paragraph-spacing-400`: direct 5; dependencies 0; style bindings 1; top consumers: Block / Description (`23:6` / `I3252:94589;3925:76555`, 2); Block / Description (`23:6` / `I3252:96836;3925:76555`, 2); Block / description (`23:6` / `I431:1930;369:1873;2544:22643`, 2); Block / description (`23:6` / `I431:1946;431:1930;369:1873;2544:22643`, 2); Foundation / style (`3044:37` / `3923:51352`, 2)
+- Variable `icon-weight/primary`: direct 5880; dependencies 0; style bindings 0; top consumers: Icon / base (`3126:67288` / `317:2442`, 4); Icon / base (`3126:67288` / `1195:12214`, 2); Icon / base (`3126:67288` / `1195:12215`, 2); Icon / base (`3126:67288` / `1195:12216`, 2); Icon / base (`3126:67288` / `1195:12217`, 2)
+- Variable `icon-dimension/height`: direct 3193; dependencies 0; style bindings 0; top consumers: Block / AddOutlined100 (`23:6` / `I1158:25384;3906:48490;1364:30429;871:15935;3224:55577`, 1); Block / AddOutlined100 (`23:6` / `I1158:25384;3906:48490;1364:30430;871:15935;3224:55577`, 1); Block / AddOutlined100 (`23:6` / `I1158:25385;3906:48490;1364:30429;871:15935;3224:55577`, 1); Block / AddOutlined100 (`23:6` / `I1158:25385;3906:48490;1364:30430;871:15935;3224:55577`, 1); Block / AddOutlined100 (`23:6` / `I1158:25386;3906:48490;1364:30429;871:15935;3224:55577`, 1)
+- Variable `icon-dimension/width`: direct 3193; dependencies 0; style bindings 0; top consumers: Block / AddOutlined100 (`23:6` / `I1158:25384;3906:48490;1364:30429;871:15935;3224:55577`, 1); Block / AddOutlined100 (`23:6` / `I1158:25384;3906:48490;1364:30430;871:15935;3224:55577`, 1); Block / AddOutlined100 (`23:6` / `I1158:25385;3906:48490;1364:30429;871:15935;3224:55577`, 1); Block / AddOutlined100 (`23:6` / `I1158:25385;3906:48490;1364:30430;871:15935;3224:55577`, 1); Block / AddOutlined100 (`23:6` / `I1158:25386;3906:48490;1364:30429;871:15935;3224:55577`, 1)
+- Variable `icon-weight/strikethrough`: direct 14; dependencies 0; style bindings 0; top consumers: Component / overlay (`3044:12` / `I3926:78419;3923:75788;321:2513`, 1); Component / overlay (`3044:12` / `I3926:78419;3923:75788;321:2516`, 1); Component / overlay (`3044:12` / `I3926:78419;3923:75788;321:2519`, 1); Component / overlay (`3044:12` / `I3941:11996;3923:75788;321:2513`, 1); Component / overlay (`3044:12` / `I3941:11996;3923:75788;321:2516`, 1)
+- Variable `border-width/button-border-width`: direct 124; dependencies 0; style bindings 0; top consumers: Component / layout=default (`3044:12` / `2651:9585`, 4); Component / layout=secondary, size=100, state=activated (`3044:12` / `326:3283`, 4); Component / layout=secondary, size=100, state=activated (`3044:12` / `326:3458`, 4); Component / layout=secondary, size=100, state=default (`3044:12` / `326:3271`, 4); Component / layout=secondary, size=100, state=default (`3044:12` / `326:3434`, 4)
+- Variable `border-width/button-justified-border-width`: direct 164; dependencies 0; style bindings 0; top consumers: Brand / Badge (`2080:1391` / `4792:290128`, 4); Brand / Badge (`2080:1391` / `4792:290129`, 4); Brand / Badge (`2080:1391` / `4792:290130`, 4); Brand / Badge (`2080:1391` / `4792:290239`, 4); Brand / Badge (`2080:1391` / `4792:290240`, 4)
+- Variable `border-width/text-border-width`: direct 104; dependencies 0; style bindings 0; top consumers: Block / title (`23:6` / `I4734:260502;4515:38058`, 1); Block / title (`23:6` / `I4734:260503;4515:38058`, 1); Component / title (`3044:12` / `334:1141`, 1); Component / title (`3044:12` / `334:1142`, 1); Component / title (`3044:12` / `334:1144`, 1)
+- Variable `dimension/button-height`: direct 684; dependencies 0; style bindings 0; top consumers: Block / ActionButton (`23:6` / `4513:35402`, 1); Block / ActionButton (`23:6` / `4709:256929`, 1); Block / ActionButton (`23:6` / `4709:256931`, 1); Block / ActionButton (`23:6` / `4719:258959`, 1); Block / ActionButton (`23:6` / `4719:258961`, 1)
+- Variable `dimension/button-icon-width`: direct 2107; dependencies 0; style bindings 0; top consumers: Block / ActionButtonIcon (`23:6` / `I1249:15152;3252:80541;1195:12347`, 2); Block / ActionButtonIcon (`23:6` / `I1249:15152;3252:80541;1195:12445`, 2); Block / ActionButtonIcon (`23:6` / `I2863:13922;3252:75447;1195:12347`, 2); Block / ActionButtonIcon (`23:6` / `I2863:13922;3252:75447;1195:12445`, 2); Block / ActionButtonIcon (`23:6` / `I2863:14194;3252:80541;1195:12347`, 2)
+- Variable `dimension/button-justified-height`: direct 40; dependencies 0; style bindings 0; top consumers: Component / layout=primary-icon, state=activated, size=100 (`3044:12` / `972:8825`, 1); Component / layout=primary-icon, state=activated, size=200 (`3044:12` / `972:8829`, 1); Component / layout=primary-icon, state=default, size=100 (`3044:12` / `972:8777`, 1); Component / layout=primary-icon, state=default, size=200 (`3044:12` / `972:8781`, 1); Component / layout=primary-icon, state=disabled, size=100 (`3044:12` / `972:8841`, 1)
+- Variable `space/button-space-h`: direct 1262; dependencies 0; style bindings 0; top consumers: Block / ActionButton (`23:6` / `4513:35402`, 2); Block / ActionButton (`23:6` / `4709:256929`, 2); Block / ActionButton (`23:6` / `4709:256931`, 2); Block / ActionButton (`23:6` / `4719:258959`, 2); Block / ActionButton (`23:6` / `4719:258961`, 2)
+- Variable `space/button-space-h-offset`: direct 60; dependencies 0; style bindings 0; top consumers: Component / layout=primary-text, state=activated, size=100 (`3044:12` / `972:8833`, 2); Component / layout=primary-text, state=activated, size=200 (`3044:12` / `972:8837`, 2); Component / layout=primary-text, state=default, size=100 (`3044:12` / `972:8785`, 2); Component / layout=primary-text, state=default, size=200 (`3044:12` / `972:8789`, 2); Component / layout=primary-text, state=disabled, size=100 (`3044:12` / `972:8849`, 2)
+- Variable `space/button-space-v`: direct 1341; dependencies 0; style bindings 0; top consumers: Block / ActionButton (`23:6` / `4513:35402`, 2); Block / ActionButton (`23:6` / `4709:256929`, 2); Block / ActionButton (`23:6` / `4709:256931`, 2); Block / ActionButton (`23:6` / `4719:258959`, 2); Block / ActionButton (`23:6` / `4719:258961`, 2)
+- Variable `utility-space-xs`: direct 8; dependencies 0; style bindings 0; top consumers: Foundation / SpacerHorizontal (`3044:37` / `367:1709`, 4); Foundation / SpacerVertical (`3044:37` / `30:159`, 4)
+- Variable `utility-space-sm`: direct 3; dependencies 0; style bindings 0; top consumers: Component / .ControlMedia (`3044:12` / `1195:12465`, 1); Component / .ControlSlider (`3044:12` / `1371:49377`, 1); Foundation / dimension (`3044:37` / `3044:13044`, 1)
+- Variable `utility-space-md`: direct 480; dependencies 0; style bindings 0; top consumers: Foundation / material-blur (`3044:37` / `3044:13473`, 6); Foundation / opacity (`3044:37` / `3044:13595`, 6); Foundation / opacity (`3044:37` / `3044:14407`, 6); Component / ActionGroup (`3044:12` / `491:3443`, 5); Component / CardMedia (`3044:12` / `1207:10042`, 5)
+- Variable `utility-space-lg`: direct 2; dependencies 0; style bindings 0; top consumers: Block / SplitAsymmetric (`23:6` / `314:385`, 1); Foundation / aspect-ratios (`3044:37` / `3044:10755`, 1)
+- Variable `duration/0`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/50`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/100`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/200`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/300`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/375`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/400`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/500`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/600`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/700`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/750`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/800`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/900`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `duration/1000`: direct 0; dependencies 1; style bindings 0; top consumers: none
+- Variable `blur-0`: direct 0; dependencies 0; style bindings 4; top consumers: none
+- Variable `blur-100`: direct 4; dependencies 0; style bindings 4; top consumers: Foundation / overlay (`3044:37` / `3044:13481`, 2); Foundation / overlay (`3044:37` / `3044:13493`, 2); Foundation / overlay (`3044:37` / `3044:13505`, 2); Foundation / overlay (`3044:37` / `3044:13517`, 2);  / ActionButtonRound (`` / `2672:2135`, 1)
+- Variable `blur-200`: direct 4; dependencies 0; style bindings 4; top consumers: Foundation / overlay (`3044:37` / `3044:13483`, 2); Foundation / overlay (`3044:37` / `3044:13495`, 2); Foundation / overlay (`3044:37` / `3044:13507`, 2); Foundation / overlay (`3044:37` / `3044:13519`, 2)
+- Variable `blur-300`: direct 1628; dependencies 0; style bindings 4; top consumers: Block / ActionButton (`23:6` / `I1158:25384;3906:48490;1364:30429`, 2); Block / ActionButton (`23:6` / `I1158:25384;3906:48490;1364:30430`, 2); Block / ActionButton (`23:6` / `I1158:25385;3906:48490;1364:30429`, 2); Block / ActionButton (`23:6` / `I1158:25385;3906:48490;1364:30430`, 2); Block / ActionButton (`23:6` / `I1158:25386;3906:48490;1364:30429`, 2)
+- Style `title-style1/100`: 12 nodes / 2 pages; top consumers: Component / title (`3044:12` / `3923:74319`, 1); Component / title (`3044:12` / `3923:74323`, 1); Component / title (`3044:12` / `3923:74327`, 1); Component / title (`3044:12` / `3923:74331`, 1); Component / title (`3044:12` / `3923:74335`, 1)
+- Style `title-style1/200`: 2939 nodes / 7 pages; top consumers:  / 1 / (`` / `3252:94774`, 1);  / 1 / 6 (`` / `214:436`, 1);  / 1 / 6 (`` / `239:193`, 1);  / 1 / 6 (`` / `I3252:94866;214:436`, 1);  / 6 (`` / `3252:94775`, 1)
+- Style `title-style1/300`: 168 nodes / 5 pages; top consumers:  / Title (`` / `153:70`, 1);  / Title (`` / `153:77`, 1);  / Title (`` / `210:515`, 1);  / Title (`` / `210:573`, 1);  / Title (`` / `212:156`, 1)
+- Style `title-style1/400`: 22 nodes / 2 pages; top consumers:  / Description (`` / `3925:76401`, 1);  / Description (`` / `3925:76403`, 1);  / Text Link (`` / `2476:16047`, 1);  / Text Link (`` / `2476:16055`, 1);  / Text Link (`` / `2476:16063`, 1)
+- Style `title-action-style1/100`: 1 nodes / 1 pages; top consumers: Foundation / style (`3044:37` / `3923:51341`, 1)
+- Style `title-action-style1/200`: 1 nodes / 1 pages; top consumers: Foundation / style (`3044:37` / `3923:51342`, 1)
+- Style `title-action-style1/300`: 1 nodes / 1 pages; top consumers: Foundation / style (`3044:37` / `3923:51344`, 1)
+- Style `title-action-style1/400`: 24 nodes / 1 pages; top consumers:  / Subtitle (`` / `247:335`, 1);  / Text Link (`` / `2476:16084`, 1);  / Text Link (`` / `2476:16088`, 1);  / Text Link (`` / `2476:16092`, 1);  / Text Link (`` / `2632:1122`, 1)
+- Style `body-style1/100`: 1 nodes / 1 pages; top consumers: Foundation / style (`3044:37` / `3923:51349`, 1)
+- Style `body-style1/200`: 1 nodes / 1 pages; top consumers: Foundation / style (`3044:37` / `3923:51350`, 1)
+- Style `body-style1/300`: 242 nodes / 4 pages; top consumers: Block / Body (`23:6` / `I3905:37566;3906:48487`, 1); Block / Body (`23:6` / `I3905:37606;3906:48487`, 1); Block / Body (`23:6` / `I3905:37686;3906:49807`, 1); Block / Body (`23:6` / `I3905:37726;3906:48487`, 1); Block / Body (`23:6` / `I3906:46291;3906:49906`, 1)
+- Style `body-style1/400`: 17 nodes / 2 pages; top consumers:  / Body (`` / `3901:35256`, 1);  / Body (`` / `3901:35258`, 1);  / Body (`` / `3901:35262`, 1);  / Body (`` / `3901:35266`, 1);  / Body (`` / `3901:35268`, 1)
+- Style `body-action-style1/100`: 1 nodes / 1 pages; top consumers: Foundation / style (`3044:37` / `3923:51356`, 1)
+- Style `body-action-style1/200`: 1 nodes / 1 pages; top consumers: Foundation / style (`3044:37` / `3923:51357`, 1)
+- Style `body-action-style1/300`: 8 nodes / 1 pages; top consumers:  / Body (`` / `498:1913`, 1);  / Text Link (`` / `2475:7562`, 1);  / Text Link (`` / `2475:7570`, 1);  / Text Link (`` / `2475:7578`, 1);  / Text Link (`` / `2475:7639`, 1)
+- Style `body-action-style1/400`: 8 nodes / 1 pages; top consumers:  / Body (`` / `498:1911`, 1);  / Text Link (`` / `2475:7538`, 1);  / Text Link (`` / `2475:7546`, 1);  / Text Link (`` / `2475:7554`, 1);  / Text Link (`` / `2475:7615`, 1)
+- Style `.text-primitives/title/050`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9287`, 1)
+- Style `.text-primitives/title/100`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9288`, 1)
+- Style `.text-primitives/title/200`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9289`, 1)
+- Style `.text-primitives/title/300`: 5 nodes / 1 pages; top consumers:  / Hero Title (`` / `241:515`, 1);  / Hero Title (`` / `241:525`, 1);  / Hero Title (`` / `39:65`, 1);  / Title (`` / `88:282`, 1); Primitive / style (`3044:1104` / `3044:9290`, 1)
+- Style `.text-primitives/title/400`: 2 nodes / 1 pages; top consumers:  / Hero Title (`` / `39:24`, 1); Primitive / style (`3044:1104` / `3044:9291`, 1)
+- Style `.text-primitives/title/500`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9292`, 1)
+- Style `.text-primitives/title/600`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9293`, 1)
+- Style `.text-primitives/title/700`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9294`, 1)
+- Style `.text-primitives/title/800`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9295`, 1)
+- Style `.text-primitives/title/900`: 11 nodes / 3 pages; top consumers: Primitive / style (`3044:1104` / `3044:9296`, 1); Thumbnail / Documentation (`23:247` / `I26:74;26:31`, 1); Thumbnail / Jarrad Harvey Design (`23:247` / `I26:74;26:29`, 1); Utility / Case Study (`163:310` / `1093:15`, 1); Utility / Documentation (`163:310` / `26:31`, 1)
+- Style `.text-primitives/title/1000`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9297`, 1)
+- Style `.text-primitives/title/1100`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9298`, 1)
+- Style `.text-primitives/title/1200`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9299`, 1)
+- Style `.text-primitives/title/1300`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9300`, 1)
+- Style `.text-primitives/title/1400`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9301`, 1)
+- Style `.text-primitives/title/1500`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9302`, 1)
+- Style `.text-primitives/title/1600`: 8 nodes / 4 pages; top consumers: Brand / Design Handoff (`2080:1391` / `4792:289990`, 1); Brand / Design System Handoff (`2080:1391` / `4792:290243`, 1); Primitive / style (`3044:1104` / `3044:9303`, 1); Thumbnail / Title (`23:247` / `I26:74;26:33`, 1); Utility / Title (`163:310` / `1093:17`, 1)
+- Style `.text-primitives/title/1700`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9304`, 1)
+- Style `.text-primitives/body/100`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9306`, 1)
+- Style `.text-primitives/body/200`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9307`, 1)
+- Style `.text-primitives/body/300`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9308`, 1)
+- Style `.text-primitives/body/400`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9309`, 1)
+- Style `.text-primitives/body/500`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9310`, 1)
+- Style `.text-primitives/body/600`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9311`, 1)
+- Style `.text-primitives/body/700`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9312`, 1)
+- Style `.text-primitives/body/800`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9313`, 1)
+- Style `.text-primitives/body/900`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9314`, 1)
+- Style `.text-primitives/body/1000`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9315`, 1)
+- Style `.text-primitives/body/1100`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9316`, 1)
+- Style `.text-primitives/body/1200`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9317`, 1)
+- Style `.text-primitives/body/1300`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9318`, 1)
+- Style `.text-primitives/body/1400`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9319`, 1)
+- Style `.text-primitives/body/1500`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9320`, 1)
+- Style `.text-primitives/body/1600`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9321`, 1)
+- Style `.text-primitives/body/1700`: 1 nodes / 1 pages; top consumers: Primitive / style (`3044:1104` / `3044:9322`, 1)
+- Style `border/border-focused`: 98 nodes / 1 pages; top consumers:  / ActionButtonIconCircle/primary/100/focused/left (`` / `972:9937`, 1);  / ActionButtonIconCircle/primary/100/focused/right (`` / `972:9939`, 1);  / ActionButtonIconCircle/primary/200/focused/left (`` / `972:9931`, 1);  / ActionButtonIconCircle/primary/200/focused/right (`` / `972:9933`, 1);  / ActionButtonIconCircle/primary/300/focused/left (`` / `972:9805`, 1)
+- Style `effect/blur/blur-300`: 121 nodes / 1 pages; top consumers: Example / Media (`242:239` / `4421:15955`, 1); Example / Media (`242:239` / `4421:15956`, 1); Example / Media (`242:239` / `4421:15957`, 1); Example / Media (`242:239` / `4421:15958`, 1); Example / Media (`242:239` / `4421:15959`, 1)
+- Style `effect/material-blur/material-blur-100`: 6 nodes / 1 pages; top consumers:  / ActionButtonRound (`` / `2672:2135`, 1);  / ActionButtonRound (`` / `2672:7971`, 1); Foundation / overlay (`3044:37` / `3044:13481`, 1); Foundation / overlay (`3044:37` / `3044:13493`, 1); Foundation / overlay (`3044:37` / `3044:13505`, 1)
+- Style `effect/material-blur/material-blur-200`: 4 nodes / 1 pages; top consumers: Foundation / overlay (`3044:37` / `3044:13483`, 1); Foundation / overlay (`3044:37` / `3044:13495`, 1); Foundation / overlay (`3044:37` / `3044:13507`, 1); Foundation / overlay (`3044:37` / `3044:13519`, 1)
+- Style `effect/material-blur/material-blur-300`: 1851 nodes / 3 pages; top consumers:  / ActionButton (`` / `1364:30426`, 1);  / ActionButton (`` / `1364:30427`, 1);  / ActionButton (`` / `1364:30432`, 1);  / ActionButton (`` / `1364:30625`, 1);  / ActionButton (`` / `1364:30626`, 1)
+- Style `effect/shadow/drop-shadow-100`: 9 nodes / 1 pages; top consumers:  / visual (`` / `2803:17392`, 1);  / visual (`` / `2803:17407`, 1);  / visual (`` / `2803:17408`, 1); Foundation / drop-shadow-100 (`3044:37` / `3044:13443`, 1); Foundation / drop-shadow-100 (`3044:37` / `3044:13445`, 1)
+- Style `effect/shadow/drop-shadow-200`: 9 nodes / 1 pages; top consumers:  / visual (`` / `2803:17425`, 1);  / visual (`` / `2803:17426`, 1);  / visual (`` / `2803:17427`, 1); Foundation / drop-shadow-200 (`3044:37` / `3044:13444`, 1); Foundation / drop-shadow-200 (`3044:37` / `3044:13446`, 1)
+- Style `effect/shadow/inner-shadow-100`: 9 nodes / 1 pages; top consumers:  / visual (`` / `2803:17430`, 1);  / visual (`` / `2803:17431`, 1);  / visual (`` / `2803:17432`, 1); Foundation / drop-shadow-100 (`3044:37` / `3044:13452`, 1); Foundation / drop-shadow-100 (`3044:37` / `3044:13454`, 1)
+- Style `effect/shadow/inner-shadow-200`: 9 nodes / 1 pages; top consumers:  / visual (`` / `2803:17435`, 1);  / visual (`` / `2803:17436`, 1);  / visual (`` / `2803:17437`, 1); Foundation / drop-shadow-200 (`3044:37` / `3044:13453`, 1); Foundation / drop-shadow-200 (`3044:37` / `3044:13455`, 1)
+- Style `default`: 324 nodes / 3 pages; top consumers:  / .HeaderMediaTitle (`` / `2118:206`, 1);  / Device=Mobile (`` / `214:556`, 1);  / Device=mobile (`` / `29:138`, 1);  / GridAsymmetric/mobile (`` / `314:398`, 1);  / HeroSlideshow/mobile (`` / `31:218`, 1)
+- Style `default-margin-sm`: 8 nodes / 0 pages; top consumers:  / content (`` / `214:412`, 1);  / content (`` / `3023:12369`, 1);  / content (`` / `3023:12380`, 1);  / content (`` / `3023:12388`, 1);  / content (`` / `3394:225943`, 1)
+- Style `default-xl`: 2 nodes / 0 pages; top consumers:  / content (`` / `214:745`, 1);  / content (`` / `3023:12399`, 1)
+- Style `flush`: 30 nodes / 3 pages; top consumers:  / content (`` / `1182:5089`, 1);  / content (`` / `1182:5090`, 1);  / content (`` / `1182:5091`, 1);  / content (`` / `1182:5092`, 1);  / content (`` / `1182:5093`, 1)
+
+_Exhaustive variable, style, value, alias, raw-property, and usage records are in the JSON artifact._

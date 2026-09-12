@@ -1,7 +1,5 @@
 // The token stylesheet: one block per collection, one declaration per
 // (variable, effective mode), placed by `modes.mjs`. See docs/POLICIES.md.
-import path from "node:path";
-
 import { aliasBlock } from "./aliases.mjs";
 import { aspectDescriptionFindings } from "./aspect.mjs";
 import { delayAliasFindings } from "./motion.mjs";
@@ -10,8 +8,7 @@ import { layoutBreakpoints, placementsFor, renderGroups, themeModeIds, variantBa
 import { cmp, num, resolveValue, untrustedCells } from "./resolve.mjs";
 import { classify, honours, isViewportClass, VIEWPORT_FRACTION_TOLERANCE } from "./responsive.mjs";
 import { assertSchema, indexById, webName } from "./schema.mjs";
-
-const handAuthoredName = (cfg) => path.basename(cfg.paths.handAuthored);
+import { generatedHeader, handAuthoredName } from "./header.mjs";
 
 export function emitTokens(doc, handDeclared, cfg) {
   assertSchema(doc, cfg);
@@ -30,6 +27,8 @@ export function emitTokens(doc, handDeclared, cfg) {
   // independently of what is emitted, so the count is a property of the EXPORT
   // (a fixed plugin export takes it to zero) rather than of this run's config.
   const untrustedRows = untrustedCells(doc);
+  // P22 — every STRING variable schema 12 states a numeric font weight for.
+  const fontWeightRows = [];
   const warnings = []; // P11/P13 — what the generator would not guess at
   const emitted = new Set(); // every name declared below, for the alias block
   const blocks = []; // rendered CSS blocks
@@ -96,6 +95,20 @@ export function emitTokens(doc, handDeclared, cfg) {
         aliasTarget: defaultResolved.aliasTarget,
         unconverted: defaultResolved.unconverted ?? null,
       });
+
+      // P22 — the weight tokens, named with the style name and the confidence
+      // the export attached to the mapping, so a "medium" the plugin guessed
+      // at is visible rather than folded into the ramp.
+      if (v.fontWeightNumeric) {
+        fontWeightRows.push({
+          collection: c.name,
+          name,
+          value: defaultResolved.value,
+          sourceStyleName: v.fontWeightNumeric.sourceStyleName ?? null,
+          confidence: v.fontWeightNumeric.confidence ?? "none",
+          emitted: hand == null,
+        });
+      }
 
       if (hand != null) {
         // P2 — already declared globally by hand, so it resolves either way.
@@ -314,27 +327,16 @@ export function emitTokens(doc, handDeclared, cfg) {
   const aliases = aliasBlock(emitted, handDeclared, cfg);
   if (aliases.css) blocks.push(aliases.css);
 
-  const header = [
-    "/* GENERATED FILE — DO NOT EDIT BY HAND.",
-    "",
-    `   Source:   ${doc.documentName ?? doc.artifact ?? "design-system handoff export"}`,
-    `   Schema:   ${doc.schema} v${doc.schemaVersion}`,
-    `   Exported: ${doc.generatedAt}`,
-    `   State:    ${doc.fingerprint.designSystemStateHash}`,
-    "",
-    `   Regenerate with:  ${cfg.header.regenerateCommand}`,
+  const header = generatedHeader(doc, cfg, [
     "   Policies (names, cascade, modes, units, aliases) are documented at the",
     `   top of that script. Hand-authored tokens in ${handAuthoredName(cfg)} always win and`,
     "   are omitted here; the reconciliation report lists every one.",
-    "*/",
-    "",
-    "",
-  ].join("\n");
+  ]);
 
   return {
     css: `${header}${blocks.join("\n\n")}\n`,
     rows, privateRows, hiddenRows, excludedRows,
-    responsiveRows, aliasRows: aliases.rows, warnings, untrustedRows,
+    responsiveRows, aliasRows: aliases.rows, warnings, untrustedRows, fontWeightRows,
   };
 }
 

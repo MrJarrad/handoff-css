@@ -1,0 +1,1433 @@
+/* ============================================================
+   JHD HOUSE WEB SYSTEM — the shared layer every JHD web product imports.
+
+   Consumers do:
+     @import "tailwindcss";
+     @import "@jhd/design-system/css";
+     …then their own site compositions.
+
+   Tailwind v4 is NOT imported here — the consumer owns that line, so a
+   product can sit its own `@source`/`@plugin` config around this import.
+
+   WHAT LIVES HERE: Figma-named tokens (names mirror Figma variable paths
+   1:1 — a raw value in a product is a defect, not a shortcut), the type
+   roles + ramp, spacing/grid/dimension/radius/border/motion scales, a thin
+   document base layer, and the two component recipes whose React
+   counterparts ship from this package (action-base, badge-base).
+
+   WHAT DOES NOT: per-product compositions. Navigation chrome, feed/card
+   layouts, case-study panels, print rules and page recipes stay in the app
+   that renders them. If a rule names a product's feature, it is not system.
+
+   FONTS: this package ships no font files. Consumers must supply
+   `--font-suisse` (e.g. next/font/local) — `--font-sans` maps onto it below.
+   ============================================================ */
+
+/* Figma-generated tokens (scripts/ds-from-handoff.mjs, from the design-system
+   handoff export). Imported first so the hand-authored declarations below read
+   as the overrides they are. The generator never emits a name this file already
+   declares — see policy P2 in the script — so this import cannot change any
+   existing computed value; it only adds the tokens styles.css never mirrored.
+   Reconciliation: design/generated/ds-from-handoff-report.md */
+@import "./tokens.generated.css";
+
+/* The Tailwind v4 namespace bridge, also generated (policy P8, operator ruling
+   2026-09-06 `tailwind-for-everything-house-names`). One `@theme` block that
+   resets each namespace the house populates (`--color-*: initial` etc.) and
+   then re-fills it from Figma names, so `bg-background-default-primary`,
+   `rounded-300` and `lg:` (= Figma's 1280) compile while `bg-neutral-500`,
+   `rounded-xl` and `lg:`-as-1024 do not.
+
+   ORDER IS LOAD-BEARING and this import must stay here: it has to come AFTER
+   the consumer's `@import "tailwindcss"` (so the resets have Tailwind's own
+   defaults to clear) and BEFORE every hand-authored `@theme inline` block
+   below (so those blocks are re-additions on top of a cleared namespace, not
+   values the reset wipes out). `--font-weight-*`, `--text-*`, `--z-index-*`
+   and `--spacing` are deliberately NOT reset — the file header says why.
+   Reconciliation: design/generated/ds-from-handoff-report.md §9 */
+@import "./theme.generated.css";
+
+/* P10 (ds-from-handoff.mjs): bttf is a total mode — a `.dark` ancestor that
+   is itself `.bttf` or nested inside `.bttf` no longer arms `dark:`, so
+   dark-only utilities go inert under bttf the same way the generated token
+   block does. */
+@custom-variant dark (&:is(.dark:not(.bttf, .bttf *) *));
+
+/* Tailwind's source detection skips node_modules, but action.tsx / badge.tsx
+   ship from this package and are the only place the `action-base` /
+   `badge-base` class strings appear. Without these two lines the consumer
+   builds every token correctly and then emits no Action or Badge recipe at
+   all — buttons render unstyled. Explicit @source overrides the
+   node_modules exclusion. */
+@source "./action.tsx";
+@source "./badge.tsx";
+
+/* ============================================================
+   1. FONTS & DOCUMENT BASE
+   ============================================================ */
+@theme inline {
+  --font-sans: var(--font-suisse), sans-serif;
+  --font-heading: var(--font-sans);
+}
+
+/* ============================================================
+   2. FIGMA-NAMED COLOR TOKENS
+   ============================================================ */
+
+/* Expose CSS variables to Tailwind's utility layer (bg-primary, text-muted-
+   foreground, rounded-xl, …). Add a line here whenever you add a token. */
+@theme inline {
+  /* House-only colour keys — the ones with no Figma variable behind them, so
+     the generator cannot emit them (report §9 HAND-ONLY).
+
+     The nine Figma-backed keys this block used to carry
+     (--color-background-default-primary/secondary/tertiary,
+     --color-background-action-primary, --color-content-default-primary/
+     secondary, --color-content-action-primary/secondary,
+     --color-border-default-primary) were RETIRED 2026-09-06: P8 now emits all
+     111 semantic colours into theme.generated.css, and all nine were
+     GENERATED-EQUIVALENT — byte-identical `var(--<token>)` aliases — so
+     deleting them changes no computed value and lets the other 102 colours
+     resolve instead of being absent. Generated wins where the two agree.
+     Do NOT re-add a Figma-backed colour here: add it in Figma and regenerate.
+
+     --state-* and --brand below are genuinely house-only: the export has no
+     `state` or `brand` variable at all. They must stay declared AFTER the
+     `--color-*: initial` reset (they are, via the import above) or the utilities
+     that bind them — outline-state-focused, ring-state-negative/20 in
+     action-base and badge-base — stop compiling. */
+  --color-state-focused: var(--state-focused);
+  --color-state-negative: var(--state-negative);
+  --color-state-positive: var(--state-positive);
+  --color-state-warning: var(--state-warning);
+  --color-content-brand: var(--content-brand);
+
+  /* Brand accent (house addition) — reserved for deliberate future use.
+     Buttons/interactive chrome stay soft-grey/ink; do not wire this to
+     --state-focused or --content-action-primary. */
+  --color-brand: var(--brand);
+}
+
+:root {
+  /* ============================================================
+     FIGMA-NAMED COLOR TOKENS — source of truth. Names mirror the Figma
+     variable paths 1:1; every alias below derives from these. Alpha
+     composites stay percentage-derived from the ink primitive — the
+     stated percentage governs (Figma's hex8 0d/1a is byte rounding),
+     so 5% stays 5%, not 5.1%. */
+  /* --background-default-primary/secondary/tertiary, --content-default-
+     primary/secondary, --border-default-primary RETIRED 2026-09-09 (bttf
+     total-mode fix, same P2 pattern as the 2026-09-06 tidy and the
+     Action-conform retirement above): all six were GENERATED-EQUIVALENT
+     (report §2 VALUE-DRIFT rows list them as alias-vs-literal only — the
+     export's `var(--color-core-white)` etc. resolve to the same computed
+     hex this file hardcoded, see design/generated/ds-from-handoff-report.md
+     lines 187-203), so deleting them here lets scripts/ds-from-handoff.mjs
+     emit the generated values in tokens.generated.css, INCLUDING the
+     `.bttf, .bttf .dark` block, instead of leaving these six as a hand-
+     authored `:root`/`.dark` pair the bttf block never carries — that gap
+     was reviewer round-1 red 1. No computed-value change in this :root
+     (light-mode) block — the one value correction this retirement surfaced
+     is dark-mode-only, `--border-default-primary`; see the `.dark` block
+     below. One fewer duplicate source of truth. Do NOT re-add: regenerate
+     via `npm run tokens` if a Figma-side value changes. */
+  --state-focused: #3a96cf;               /* color/border/focused/dark, light mode -> malibu/500 */
+  /* Punch 500, light mode -> color/border/negative/light + color/content/negative/light
+     (shared primitive; token serves both border and content roles per its
+     consumers below). 2026-08-28 token-cleanup rename to match the operator's
+     own state vocabulary (negative, not the prior generic term). Value
+     unchanged by the rename. */
+  --state-negative: #f4513f;
+  /* Cruise 500, light mode -> color/border/positive/light + color/content/positive/light
+     (same shared-primitive pattern as negative, above). 2026-08-28 token-cleanup
+     rename to match the operator's own state vocabulary. Value unchanged by
+     the rename. */
+  --state-positive: #3f9c86;
+  --state-warning: #f5a40b;               /* Lightning Yellow 500 */
+  --content-brand: #a33001;               /* content/brand + background/brand */
+  --brand: var(--content-brand);          /* reserved, not wired to --content-action-primary */
+}
+
+.dark {
+  /* Dark sheet — inverted ground/ink with the same brand + state accents.
+     The capture records Light-sheet hexes verbatim; Dark-sheet hexes were
+     not itemized in the walk, so these are the ink-opacity mirror of the
+     Light values on an inverted ground (flag: confirm exact Dark hexes
+     against Figma if/when the dark theme ships). Figma-named tokens are
+     overridden first so both naming layers flip together. */
+  /* --background-default-primary/secondary/tertiary, --content-default-
+     primary/secondary, --border-default-primary RETIRED 2026-09-09 (bttf
+     total-mode fix round 2, reviewer round-1 red 1): same P2 retirement as
+     the :root block above — all six are GENERATED-EQUIVALENT (VALUE-DRIFT
+     rows, design/generated/ds-from-handoff-report.md lines 187-203) and
+     `npm run tokens` now emits them into tokens.generated.css's `.dark`
+     block (only once the hand-authored copies were gone from BOTH :root and
+     here — P2 checks the whole file for the name, not just one block).
+     Leaving a hand-authored `.dark` copy is exactly the pattern that
+     produced red 1's bug for the `.bttf, .bttf .dark` block (the generated
+     bttf block never carried these because they were still declared here),
+     so retiring the duplicate here too, for the same reason.
+
+     VALUE CORRECTION (reviewer round-2 red 1): this comment previously
+     claimed "no computed-value change" for all six — false for
+     `--border-default-primary` in dark mode. The hand-authored value this
+     file used to carry was `rgb(255 255 255 / 15%)`; the generated value
+     (`--background-material-inverse-thinnest` = white at `--opacity-100` =
+     0.1, tokens.generated.css) is 10%. Figma's `color/border/default/
+     primary` dark-mode row is the contract, and Figma is 10% — the other
+     five names in this list (background-default-*, content-default-*) are
+     still byte-identical alias-vs-literal, unchanged. The 15%→10% delta is
+     an intended correction, shipped, not restored — see "Value corrections"
+     in docs/bttf-total-mode.md. Do NOT re-add a hand-authored copy. */
+  /* --content-action-primary/secondary, --background-action-primary/
+     secondary RETIRED 2026-09-09 — same P2 retirement as the light-mode
+     block above; see that comment. */
+  --state-warning: #bb610c;               /* color/background/warning/dark, dark -> lightning-yellow/700 */
+  --state-focused: #2582bb;               /* color/border/focused/dark, dark -> malibu/600 */
+  /* Missing dark row, added 2026-08-28 token-cleanup audit: color/border/negative/dark
+     + color/content/negative/dark, dark mode -> punch/700. */
+  --state-negative: #bd2918;
+  /* Missing dark row, added 2026-08-28 token-cleanup audit: color/border/positive/dark
+     + color/content/positive/dark, dark mode -> cruise/700. */
+  --state-positive: #327768;
+  --brand: #a33001;
+}
+
+/* bttf total mode, house-only tokens (--state-*, --brand): the export has no
+   `state` or `brand` variable (see the :root comment above), so the
+   generator's P10 `.bttf, .bttf .dark, .bttf.dark` block (which now carries
+   the six Figma-backed tokens retired above) cannot cover these five — there
+   is no export row to emit. Without an explicit rule here, `.bttf .dark`
+   would still resolve them through the hand-authored `.dark` block above:
+   same `(0,1,0)` specificity as a bare `.bttf` selector, and `.dark` sits
+   later in source order, so it would win — reviewer round-1 red 1/red 3 for
+   this file's five house-only tokens. This block is the fix, not a
+   duplicate. `.bttf.dark` (reviewer round-2 amber 1) closes the same-element
+   case (`class="bttf dark"`): plain `.bttf` alone ties the generated `.dark`
+   block at `(0,1,0)` and loses on source order, so the compound selector
+   `(0,2,0)` is needed there too — mirrors the generator's P10 fix in
+   scripts/ds-from-handoff.mjs. Values mirror :root's light values — bttf has
+   no itemized state/brand hex of its own in the capture, and this file
+   already treats bttf as pinned-light wherever the export is silent. */
+.bttf,
+.bttf .dark,
+.bttf.dark {
+  --state-focused: #3a96cf;   /* = :root's light value */
+  --state-negative: #f4513f;  /* = :root's light value */
+  --state-positive: #3f9c86;  /* = :root's light value */
+  --state-warning: #f5a40b;   /* = :root's light value */
+  --brand: #a33001;           /* = :root's light value */
+}
+
+/* ============================================================
+   3. TYPE ROLES — role line-height utilities + fluid role styles
+   (each role's base vars, breakpoint segments, and utility together)
+   ============================================================ */
+
+/* Three type roles with role-specific line-height differentiators (subtitle
+   retired — operator ruling 2026-07-26: the title family absorbed it; every
+   former subtitle usage now binds type-title/title-style1-*, rendered
+   deltas from the old subtitle metrics are intended). Roles from Figma
+   primitives:
+   · title 1.05 flat (for 32–80px band; higher steps 88+ use 1.0)
+   · body 1.5 flat (for 14–128px band; higher steps 160+ use 1.4)
+   · caption 1.10 flat (all sizes).
+   Size and tracking are ramp-step properties (set on text-* classes),
+   line-height is role-only. ADAPTIVE BANDS (for future expansion):
+   – title: ≤14px→1.15 · 16–28px→1.10 · 32–80px→1.05 · 88+→1.00
+   – body: ≤12px→1.60 · 14–128px→1.50 · 160+→1.40
+
+   The title band is LIVE, not future: the settled export gives
+   title-style1/100 and /200 lineHeight 110% and /300, /400 105%, so a flat
+   1.05 under-leads the two small steps by 1px at 16/20px. The role utility
+   still OWNS line-height (size/tracking stay step properties); each title
+   step declares --type-title-leading, which type-title reads. Every step
+   declares it — a step that stayed silent would inherit a parent step's
+   value through the cascade. */
+@utility type-title {
+  line-height: var(--type-title-leading, 1.05);
+}
+@utility type-body {
+  line-height: 1.3;
+}
+@utility type-caption {
+  line-height: 1.1;
+}
+
+/* ============================================================
+   RESPONSIVE ROLE STYLES (fluid revision). Figma's
+   per-mode px values are SAMPLES of continuous responsive behaviour
+   at four widths (375/768/1280/1920), not stepped breakpoint values
+   — so the type/space/grid scale is fluid (clamp(min, vw-based,
+   max)), anchored to pass through every sampled value, in rem.
+   Tracking stays em (ramp convention) so it rides the fluid size
+   automatically. Both title and body tracking are frozen per step — a
+   constant em value at every breakpoint (the style binds letterSpacing
+   directly to a primitive, bypassing the responsive layout-tier alias
+   that would otherwise vary it). Components bind the STYLE (title-style1-400, …),
+   never a fixed text-* primitive; line-height comes from the
+   type-title/body/caption utilities — compose both,
+   e.g. `type-title title-style1-400`.
+
+   Fluid math (Utopia-style): for two anchors (VP1,v1)→(VP2,v2), the
+   linear function is value = slope*100vw + intercept, where
+   slope = (v2-v1)/(VP2-VP1) [unitless] → written as (slope*100)vw,
+   intercept = v1 - slope*VP1 [px] → written in rem. Wrapped in
+   clamp(minRem, calc(slopeVW + interceptRem), maxRem) so the value
+   holds flat outside the anchor range — this reproduces the
+   sampled value at every anchor with 0px error.
+
+   Role-style utilities below (title-style1-100 … caption-100) are font-size +
+   letter-spacing only; pair with the type-title/body/caption
+   utilities above for line-height, e.g. `type-title title-style1-400`.
+   Tracking is frozen (one constant value, not breakpoint-varying) on all
+   four title-style1/* and all 4 body-action-style1/*, title-action-style1/*
+   steps — but as of the 2026-08-26 15:55 bank sync, tracking on all four
+   body-style1/* steps rebinds to the mode-varying layout/text/body/
+   letter-spacing-* alias instead, so fontSize is NOT the only responsive
+   axis for that family any more (see the BODY roles block below).
+
+   NAMING: title-style1-* / body-style1-* mirror the settled Figma named
+   text-style set (title-style1/*, body-style1/*, plus the -action-style1
+   siblings for interactive text — operator ruling: -style1 is permanent
+   styleset structure, not a version marker). caption-* is unchanged — the
+   settled Figma export retired caption as a dedicated named style entirely,
+   so there is no settled name to adopt for it yet (see
+   wave-digest-2026-07-25.md work-list item 12).
+
+   SUBTITLE RETIRED: the title family absorbed subtitle's role. Every former
+   type-subtitle/subtitle-100/200/300 usage keeps its ordinal
+   type-title/title-style1-100/200 bind (see git history on this file for
+   the removed subtitle ramp's values) — the title ramp was re-anchored
+   afterward (see the TITLE roles block below), so the rendered size at each
+   ordinal step has moved again since the original migration. Rendered
+   deltas from subtitle's old metrics are intended by design, not a
+   regression.
+
+   FONT-FAMILY DEFECT (work-list item 13): the settled Figma export's
+   title-style1/* and title-action-style1/* styles carry BROKEN
+   fontFamilyVariable/fontStyleVariable bindings (dangling VariableID
+   refs, 7 of 8 title-family named styles affected) — this is a Figma-side
+   defect, not a naming choice. Font-family here is NOT derived from those
+   bindings; it continues to come from the global --font-sans token
+   (html { @apply font-sans } below). Do not wire title-style1-*,
+   body-style1-* to a per-style font-family until the Figma binding is
+   fixed. */
+
+/* ---------- TITLE roles (title-style1) ---------- */
+:root {
+  /* Chain-resolved from the 2026-08-26 15:52 bank sync (rev-3 audit, "the
+     Action-height fix, executed in the type variables rather than the
+     button"): xl was pulled DOWN a rung to equal lg on every step, so the
+     title ramp is now flat from md through xl on all four steps — sm is the
+     only breakpoint that still differs. 100: 14/16/16/16 (sm/md/lg/xl).
+     200: 18/20/20/20. 300: 28/40/40/40 (the old md-distinct 32px rung and
+     the lg→xl fluid curve both retired). 400: 56/80/80/80 (same). Tracking
+     stays frozen flat on all 4 title-style1/* steps, unaffected by the
+     15:52 sync — each style's letterSpacingVariable binds straight to a
+     text-primitives/letter-spacing/* primitive, bypassing the mode-varying
+     layout alias that fontSize routes through, so it holds one raw px value
+     at every breakpoint regardless of what the alias resolves to at that
+     mode. 100: 0px. 200: 0px. 300: -1px (letter-spacing/900). 400: -2.5px
+     (letter-spacing/1200). No tracking value changed this sync. */
+  --title-style1-100-size: 0.875rem; /* 14px, sm (text-primitives/size/200) */
+  --title-style1-100-tracking: 0px; /* letter-spacing/300, frozen */
+  --title-style1-200-size: var(--size-350); /* 18px, sm (size/350) — bound to the numeric ramp's
+    export's --size-350 (v11) instead of a raw 1.125rem literal. */
+  --title-style1-200-tracking: 0px; /* letter-spacing/400, frozen — bind is direct to the primitive,
+    not the layout/text/title/letter-spacing-200 alias; unaffected by the font-size correction above. */
+  --title-style1-300-size: 1.75rem;  /* 28px, sm (size/600) */
+  --title-style1-300-tracking: -1px; /* letter-spacing/900, frozen */
+  --title-style1-400-size: 3.5rem;  /* 56px, sm/md (size/1000) */
+  --title-style1-400-tracking: -2.5px; /* letter-spacing/1200, frozen */
+}
+@media (min-width: 768px) {
+  :root {
+    /* Type-ramp delta audit rev 3 §6B (2026-08-26): the 15:52 sync flattened
+       every title step's xl to its lg value, so title is now flat md→xl on
+       all four steps — these values are final at 768px and need no lg/xl
+       follow-up (the old md-distinct/fluid-curve architecture is retired,
+       see the 1280px block below). Body's own md declarations do NOT live
+       in this block — cascade order matters: body's unconditional :root
+       (below, after this block) opens AFTER this rule and would win at
+       same specificity, silently reverting any body value declared here
+       back to the sm literal. Body's 768px block sits after body's :root
+       instead (rev-3 re-verify, gap B1). */
+    --title-style1-100-size: 1rem; /* 16px, flat md→xl */
+    --title-style1-200-size: 1.25rem; /* 20px, flat md→xl */
+    --title-style1-300-size: 2.5rem; /* 40px, flat md→xl — curve retired */
+    --title-style1-400-size: 5rem; /* 80px, flat md→xl — curve retired */
+    --title-style1-400-tracking: -2.5px;
+  }
+}
+/* Type-ramp delta audit rev 3 §6C: the title ramp's lg→xl 1280px block that
+   used to live here is DELETED wholesale — the 15:52 sync flattened every
+   title step's xl to its lg value, so title is flat md→xl (see the 768px
+   block above) and re-adding a lg→xl rise here would re-introduce the
+   pre-sync xl values the sync explicitly removed. */
+@utility title-style1-100 { font-size: var(--title-style1-100-size); letter-spacing: var(--title-style1-100-tracking); --type-title-leading: 1.1; }
+@utility title-style1-200 { font-size: var(--title-style1-200-size); letter-spacing: var(--title-style1-200-tracking); --type-title-leading: 1.1; }
+@utility title-style1-300 { font-size: var(--title-style1-300-size); letter-spacing: var(--title-style1-300-tracking); --type-title-leading: 1.05; }
+@utility title-style1-400 { font-size: var(--title-style1-400-size); letter-spacing: var(--title-style1-400-tracking); --type-title-leading: 1.05; }
+
+/* ---------- BODY roles (body-style1) ---------- */
+:root {
+  /* Type-ramp delta audit rev 3, the 15:55 bank sync (8 style rebinds, D2's
+     fix): all four body-style1/* styles' fontSize AND letterSpacing rebind
+     from frozen text-primitives to the mode-varying layout/text/body/*
+     aliases, at the correct ordinal index (100→font-size-100, …,
+     400→font-size-400 — the old rung-offset on /300 and /400 is gone).
+     Both fontSize and letterSpacing are now real responsive axes for this
+     family, unlike title-style1/* whose tracking stays frozen.
+
+     17:16 sync (aliasRepoints): xl was pulled DOWN a rung on every body
+     step's font-size AND letter-spacing alias to equal lg (mirrors the
+     15:52 title fix) — body-style1 is now flat md→xl on all four steps,
+     sm is the only breakpoint that still differs. Resolved chain,
+     sm/md/lg/xl: 100 12/14/14/14, tracking 0.25/0.25/0.25/0.25.
+     200 14/16/16/16, tracking 0.25/0/0/0. 300 18/20/20/20, tracking
+     0/0/0/0 (flat, coincidentally — still routes through the alias).
+     400 24/28/28/28, tracking 0/-0.25/-0.25/-0.25. */
+  --body-style1-100-size: 0.75rem;  /* 12px, sm (text-primitives/size/100) */
+  --body-style1-100-tracking: 0.25px; /* letter-spacing/100, sm */
+  --body-style1-200-size: 0.875rem; /* 14px, sm (text-primitives/size/200) */
+  --body-style1-200-tracking: 0.25px; /* letter-spacing/200, sm */
+  --body-style1-300-size: var(--size-350); /* 18px, sm (size/350) — bound to the numeric ramp's
+    export's --size-350 (v11) instead of a raw 1.125rem literal. */
+  --body-style1-300-tracking: 0px;  /* letter-spacing/300, sm — flat at every mode */
+  --body-style1-400-size: 1.5rem;   /* 24px, sm (size/500) */
+  --body-style1-400-tracking: 0px;  /* letter-spacing/400, sm */
+  /* Figma's paragraph-spacing-100..400 are always the step's own font-size
+     minus 1px (sm 11/13/17/23, md/lg/xl 13/15/19/27 — flat md→xl as of the
+     17:16 sync, which repointed xl's paragraph-spacing down to equal lg;
+     variable tier, confirmed against the fresh bank). One relative rule
+     holds at every step and mode without per-step chains, so it needs no
+     dedicated code change when a step's font-size moves. NOTE: the bank's
+     STYLE tier (body-style1/300, /400 paragraphSpacing bindings) is one
+     rung stale post-15:55 — Figma-side defect D3, raised not resolved, no
+     code impact since this rule is expressed relatively. */
+  --paragraph-spacing: calc(1em - 1px);
+}
+@media (min-width: 768px) {
+  :root {
+    /* Type-ramp delta audit rev 3 §6B, re-verify gap B1: this block MUST
+       come after body's own :root above, not inside the title 768px block
+       — same-specificity CSS cascades in source order, so declaring these
+       inside (or before) that earlier block let the title block's sibling
+       :root win nothing, but body's own later :root (immediately above)
+       would silently overwrite them back to the sm literal if this block
+       were placed any earlier. The 15:55 sync rebound body-style1/*'s
+       fontSize AND letterSpacing from frozen primitives to the mode-varying
+       layout/text/body/* aliases at the correct ordinal index, so body now
+       has real md-distinct values and, for /200 and /400, non-zero tracking
+       starting at md. As of the 17:16 aliasRepoint sync, every one of these
+       md declarations now holds flat through lg AND xl — the alias chain
+       repoints xl down to equal lg on every step, so there is no lg→xl
+       divergence left to declare (mirrors title's md→xl flatness, §6B). */
+    --body-style1-100-size: 0.875rem; /* 14px, flat md→xl */
+    --body-style1-200-size: 1rem; /* 16px, flat md→xl */
+    --body-style1-300-size: 1.25rem; /* 20px, flat md→xl */
+    --body-style1-400-size: 1.75rem; /* 28px, flat md→xl */
+    --body-style1-200-tracking: 0px; /* letter-spacing/300, flat md→xl */
+    --body-style1-400-tracking: -0.25px; /* letter-spacing/600, flat md→xl */
+  }
+}
+/* Type-ramp delta audit, 17:16 aliasRepoint sync: the lg→xl 1280px SIZE
+   clamps and the xl-only 1920px TRACKING block that used to live here are
+   DELETED wholesale — the sync repointed every body step's font-size and
+   letter-spacing alias so xl now equals lg on all four steps (mirrors the
+   15:52 title fix, §6C), so body is flat md→xl and re-adding either block
+   would reintroduce the pre-sync xl values the sync explicitly removed. */
+@utility body-style1-100 { font-size: var(--body-style1-100-size); letter-spacing: var(--body-style1-100-tracking); }
+@utility body-style1-200 { font-size: var(--body-style1-200-size); letter-spacing: var(--body-style1-200-tracking); }
+@utility body-style1-300 { font-size: var(--body-style1-300-size); letter-spacing: var(--body-style1-300-tracking); }
+@utility body-style1-400 { font-size: var(--body-style1-400-size); letter-spacing: var(--body-style1-400-tracking); }
+
+/* ---------- ACTION-STYLE1 roles (interactive/underlined text) ----------
+   Bank-verified bindings (rev-3 audit §6D, "the bank still binds all four
+   body-action-style1/* styles' letterSpacing — and /100,/200's fontSize —
+   to flat primitives"). This is now a DIVERGENT mechanism from
+   body-style1/*, not a "reuse the same alias" story: the 15:55 sync moved
+   body-style1/* onto mode-varying layout aliases, but left every
+   body-action-style1/* binding exactly where it was, frozen:
+     title-action-style1/100-400 -> IDENTICAL fontSize alias AND
+       letterSpacing primitive as title-style1-100-400 (title tracking was
+       already frozen, so this pairing needed no change) — reuse the
+       title-style1-* vars directly, add text-decoration: underline only.
+     body-action-style1/100 -> flat text-primitives/size/100 (own var,
+       --body-action-style1-100-size) + frozen letter-spacing/100 (own var).
+     body-action-style1/200 -> flat text-primitives/size/200 (own var,
+       --body-action-style1-200-size — NOT the same binding as
+       body-style1-200, which now rides the mode-varying alias) + frozen
+       letter-spacing/200 (own var).
+     body-action-style1/300 -> layout/text/body/font-size-200 (the alias,
+       still mode-varying) — reuse --body-style1-200-size — + frozen
+       letter-spacing/300, which happens to equal body-style1-300's own
+       flat-0 tracking, so no dedicated var needed.
+     body-action-style1/400 -> layout/text/body/font-size-300 (the alias)
+       — reuse --body-style1-300-size — + frozen letter-spacing/400 (own
+       var, --body-action-style1-400-tracking, since body-style1-400's
+       tracking is now mode-varying and no longer matches).
+   lineHeight (title ~110%/105%, body ~130%) already matches the existing
+   type-title/type-body role utilities' leading values — no new line-height
+   token needed, compose type-title/type-body as usual. paragraphSpacing on
+   the 4 body-action styles is NOT wired here (formula-derived, same open
+   gap as body-style1's own paragraph-spacing — action/interactive text is
+   inline, not stacked paragraphs, so this is a low-risk, documented
+   non-wire). */
+:root {
+  /* body-action-style1-* are frozen against the bank's still-flat/frozen
+     bindings for those styles — the 15:55 rebind only touched body-style1/*,
+     so body-action-style1/* must NOT silently inherit body-style1's new
+     mode-varying vars where the bank still binds them direct-to-primitive. */
+  --body-action-style1-100-size: 0.75rem; /* 12px flat, ALL modes (size/100, direct bind) */
+  --body-action-style1-100-tracking: 0.25px; /* letter-spacing/100, frozen */
+  --body-action-style1-200-size: 0.875rem; /* 14px flat, ALL modes (text-primitives/size/200, direct primitive bind — not the mode-varying layout alias) */
+  --body-action-style1-200-tracking: 0.25px; /* letter-spacing/200, frozen */
+  --body-action-style1-400-tracking: 0px; /* letter-spacing/400, frozen */
+}
+@utility title-action-style1-100 { font-size: var(--title-style1-100-size); letter-spacing: var(--title-style1-100-tracking); text-decoration: underline; }
+@utility title-action-style1-200 { font-size: var(--title-style1-200-size); letter-spacing: var(--title-style1-200-tracking); text-decoration: underline; }
+@utility title-action-style1-300 { font-size: var(--title-style1-300-size); letter-spacing: var(--title-style1-300-tracking); text-decoration: underline; }
+@utility title-action-style1-400 { font-size: var(--title-style1-400-size); letter-spacing: var(--title-style1-400-tracking); text-decoration: underline; }
+@utility body-action-style1-100 { font-size: var(--body-action-style1-100-size); letter-spacing: var(--body-action-style1-100-tracking); text-decoration: underline; }
+@utility body-action-style1-200 { font-size: var(--body-action-style1-200-size); letter-spacing: var(--body-action-style1-200-tracking); text-decoration: underline; }
+@utility body-action-style1-300 { font-size: var(--body-style1-200-size); letter-spacing: var(--body-style1-300-tracking); text-decoration: underline; }
+@utility body-action-style1-400 { font-size: var(--body-style1-300-size); letter-spacing: var(--body-action-style1-400-tracking); text-decoration: underline; }
+
+/* Multi-paragraph body copy — stacks sibling <p>s with the fluid
+   paragraph-spacing rule instead of a fixed row-gap, so the space between
+   paragraphs scales with whichever body-style1-* size is in effect. */
+@utility paragraph-stack {
+  & > p + p {
+    margin-top: var(--paragraph-spacing);
+  }
+}
+
+/* ---------- CAPTION role ---------- */
+:root {
+  /* ---- caption: sm=md=lg flat at 10px, then xl to 12px. Tracking 0.25px.
+     Single clamp covers the whole range — the lg→xl segment is already
+     built into the clamp, so no @media redefinition is needed. */
+  --caption-100-size: clamp(0.625rem, calc(0.3125vw + 0.375rem), 0.75rem);
+  --caption-100-tracking: 0.024em;
+}
+@utility caption-100 { font-size: var(--caption-100-size); letter-spacing: var(--caption-100-tracking); }
+
+/* ============================================================
+   4. NUMERIC TYPE RAMP
+   ============================================================ */
+@theme inline {
+  /* Type ramp — non-semantic 050–1700, one weight (500). A step carries size +
+     letter-spacing. Line-height comes from the STYLE (title/body below), never
+     from the step. Tracking values per Figma primitive ramp:
+     050/100/200 stay positive (+0.25px → em equiv); 300/350/400/500 neutral (0);
+     600 and up negative adaptive per size (px → em equiv). The gap between
+     300 and 400 (Figma text-primitives/size/350 = 18px) is now the export's
+     own `--size-350` (export v11, `tokens.generated.css`) rather than a
+     hand-authored `--text-350` copy — the sm-tier size title-style1-200 and
+     body-style1-300 both bind straight to it. */
+  --text-050: 0.625rem;  --text-050--letter-spacing: 0.025em;
+  --text-100: 0.75rem;   --text-100--letter-spacing: 0.0208em;
+  --text-200: 0.875rem;  --text-200--letter-spacing: 0.0179em;
+  --text-300: 1rem;      --text-300--letter-spacing: 0em;
+  --text-400: 1.25rem;   --text-400--letter-spacing: 0em;
+  --text-500: 1.5rem;    --text-500--letter-spacing: 0em;
+  --text-600: 1.75rem;   --text-600--letter-spacing: -0.0089em;
+  --text-700: 2rem;      --text-700--letter-spacing: -0.0156em;
+  --text-800: 2.5rem;    --text-800--letter-spacing: -0.0188em;
+  --text-900: 3rem;      --text-900--letter-spacing: -0.0208em;
+  --text-1000: 3.5rem;   --text-1000--letter-spacing: -0.0268em;
+  --text-1100: 4rem;     --text-1100--letter-spacing: -0.0313em;
+  --text-1200: 5rem;     --text-1200--letter-spacing: -0.0313em;
+  --text-1300: 5.5rem;   --text-1300--letter-spacing: -0.0341em;
+  --text-1400: 6rem;     --text-1400--letter-spacing: -0.0313em;
+  --text-1500: 8rem;     --text-1500--letter-spacing: -0.0352em;
+  --text-1600: 10rem;    --text-1600--letter-spacing: -0.0344em;
+  --text-1700: 16rem;    --text-1700--letter-spacing: -0.041em;
+
+  /* Type role line-heights — roles are applied via type-title,
+     type-body, type-caption utilities; sizing comes from
+     numeric text-* steps. Semantic aliases (--text-title, --text-body, etc.)
+     deprecated in favor of role + numeric composition. Exception: --text-body-sm
+     and --text-body-lg retained for case-study-info.tsx (operator reviewing).
+     Mapping for reference (updated): text-title→type-title text-800;
+     text-body→type-body text-300; text-body-sm/lg retained. */
+
+  /* Aliases for case-study-info.tsx (operator reviewing — do not remove).
+     Updated to new ramp: text-200 (14px) and text-400 (20px). */
+  --text-body-sm: var(--text-200); --text-body-sm--letter-spacing: var(--text-200--letter-spacing); --text-body-sm--line-height: 1.3;
+  --text-body-lg: var(--text-400); --text-body-lg--letter-spacing: var(--text-400--letter-spacing); --text-body-lg--line-height: 1.3;
+}
+
+/* ============================================================
+   5. SPACING
+   ============================================================ */
+@theme inline {
+  /* Page-margin spacing (Figma variable grid/padding-default=48).
+     space-md is the desktop page margin (md:px-12 == 48px);
+     space-xs is the mobile page margin (px-6 == 24px). Named so future
+     margin/gap values can reference the same scale instead of a bare
+     Tailwind step. */
+  --space-xs: 1.5rem;  /* 24px */
+  --space-md: 3rem;    /* 48px */
+}
+
+:root {
+  /* ---- space ramp: sm, md, and lg are three genuinely distinct
+     samples (xl==lg), so this needs two fluid segments — sm→md
+     below 768, md→lg above 768 (clamp ceiling then holds flat
+     through xl, since xl repeats lg's value). One media query, at
+     md, same shape for every step. */
+  --space-200: clamp(1rem, calc(1.0178vw + 0.7614rem), 1.25rem);
+  --space-300: clamp(1.5rem, calc(2.0356vw + 1.0231rem), 2rem);
+  --space-400: clamp(2rem, calc(4.0712vw + 1.0457rem), 3rem);
+  --space-500: clamp(3rem, calc(4.0712vw + 2.0457rem), 4rem);
+  --space-600: clamp(4.5rem, calc(6.1069vw + 3.0668rem), 6rem);
+}
+@media (min-width: 768px) {
+  :root {
+    /* space switches to its md→lg segment; clamp's ceiling then
+       holds the lg value flat through xl. */
+    --space-200: clamp(1.25rem, calc(2.34375vw + 0.125rem), 2rem);
+    --space-300: clamp(2rem, calc(3.125vw + 0.5rem), 3rem);
+    --space-400: clamp(3rem, calc(3.125vw + 1.5rem), 4rem);
+    --space-500: clamp(4rem, calc(6.25vw + 1rem), 6rem);
+    --space-600: clamp(6rem, calc(12.5vw + 0rem), 10rem);
+  }
+}
+
+/* ============================================================
+   6. GRID TOKENS & GRID UTILITIES
+   ============================================================ */
+:root {
+  /* ---- grid: identical shape to space-300 (sm24/md32/lg48/xl48). ---- */
+  --grid-gap: clamp(1.5rem, calc(2.0356vw + 1.0231rem), 2rem);
+  /* ---- grid/gap-lg (SplitContent split-text itemSpacing): sm64/md72/lg96/xl96. ---- */
+  --grid-gap-lg: clamp(4rem, calc(2.0356vw + 3.523rem), 4.5rem);
+}
+@media (min-width: 768px) {
+  :root {
+    /* grid switches to its md→lg segment (same shape as space-300);
+       clamp's ceiling then holds the lg value flat through xl. */
+    --grid-gap: clamp(2rem, calc(3.125vw + 0.5rem), 3rem);
+    --grid-gap-lg: clamp(4.5rem, calc(4.6875vw + 2.25rem), 6rem);
+  }
+}
+
+/* `layout` collection's 6 `-flush`/`-sidebar-main` modes (lg-flush,
+   sm-flush, md-flush, xl-flush, lg-sidebar-main, lg-sidebar-main-flush) —
+   Batch E triage (ds-refresh delta audit's mode-coverage table, row 6):
+   DOCUMENTED AS UNWIRED, not wired. This is a structural gap, not a
+   checking omission — code has no distinct flush/sidebar breakpoint block
+   anywhere in this file to bind these modes to; --grid-gap/-margin/-padding
+   above only carry the 4 modes (sm/md/lg/xl) that map onto this file's
+   actual @media breakpoints. Wiring these would require introducing new
+   flush/sidebar-aware breakpoint infrastructure — a layout-architecture
+   decision (product-composition territory, not a package-level token
+   conform), out of this slice's package-only fence. Flagging to parent as
+   real, scoped follow-up work rather than silently wiring a guess. */
+
+/* 12-column grid for title-row geometry (HeaderMedia + PaginationPage). */
+@layer utilities {
+  .grid-cols-12 {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+/* ============================================================
+   7. DIMENSIONS / RADII / BORDERS / BLUR (+ elevation, z-index)
+   ============================================================ */
+@theme inline {
+  /* Prose measure — the one width every paragraph of body copy sets its
+     max-width to (`max-w-lg`, Tailwind's --container-* namespace). Named so
+     the measure is a system value, not an ad-hoc max-w-md/xl per component. */
+  --container-lg: 32rem;
+
+  /* Dimension tokens (Figma core/dimension family) now come from
+     tokens.generated.css — the full 23-step ramp, not the hand-mirrored
+     subset this block used to carry. All 13 steps declared here were
+     byte-identical to the export (report §3 MATCH), so retiring them changes
+     no computed value; it only deletes the duplicate and lets the ramp's
+     other 10 steps resolve instead of falling through undefined. Retired
+     2026-09-05 by the tidy slice following the generate slice — which also
+     settles the "full-parity ruling pending" note this comment used to
+     carry (ruling: projects/portfolio/audits/2026-09-04-dimension-token-parity.md).
+     Do NOT re-add a step here: add it in Figma and regenerate. */
+
+  /* Icon dimension (Figma icon/icon-dimension/width,height — a 4-mode
+     variable, tiers 100/200/300/400 → dimension-600/700/1200/1600). Tier 200
+     is now the export's own `--icon-dimension-width`/`-height` (v11,
+     `tokens.generated.css`), not a hand-authored `--icon-dimension-200`
+     mirror — see the action-button-justified-icon-base and badge icon call
+     sites. Tier 100 joined 2026-09-06 when action-base's default icon size
+     became a bound call site (audit
+     projects/portfolio/audits/2026-09-06-action-badge-recipes-vs-figma.md)
+     and stays hand-authored: the export has no `--icon-dimension-width`
+     mode 100 call site in this file yet. */
+  --icon-dimension-100: var(--dimension-600); /* 16px */
+
+  /* icon-radius-100/200/300/400 and icon-weight/primary,strikethrough
+     (Figma `icon` collection, 6 of 8 variables) — Batch E triage (ds-refresh
+     delta audit §1d/audit-v4.1): DOCUMENTED AS UNWIRED, not wired. Zero code
+     reference exists at any of the 4 modes for either family (exhaustive
+     file grep, this pass and audit-v4.1's independent grep both confirm) —
+     icons in this codebase render with no radius or stroke-weight styling
+     applied anywhere; there is no plausible component call site to bind
+     these to today (unlike icon-dimension above, which has ControlMedia's
+     20px glyphs as a concrete consumer). The one historical "match"
+     (icon-radius-400@mode-100 -> shared --radius-400) is a coincidental
+     numeric collision with core's own radius scale, not a true icon-scoped
+     binding — confirmed by audit-v4.1, not re-litigated here. Wire these if
+     and when a component introduces icon radius/weight styling; inventing a
+     consumer speculatively would be exactly the "architecturally baked,
+     not re-attacked" anti-pattern this slice's scope fence warns against
+     for color-primitives. */
+
+  /* Radius scale (Figma core/radius numerals). Structural surfaces stay 0;
+     interactive surfaces use their own shape scales below. The seven numeral
+     steps moved to tokens.generated.css 2026-09-05 (all were report §3
+     MATCH). --radius-full stays hand-authored: the export publishes
+     62.4375rem (999px re-expressed against the root font size), and 999px is
+     the value every current call site was authored against — kept pending
+     the VALUE-DRIFT ruling, not silently adopted. */
+  --radius-full: 999px;
+
+  /* Border widths (Figma core/border numerals). */
+  --border-100: 0.0625rem;   /* 1px */
+  --border-200: 0.09375rem;  /* 1.5px */
+  --border-400: 0.15625rem;  /* 2.5px */
+  --border-500: 0.1875rem;   /* 3px */
+  --border-600: 0.21875rem;  /* 3.5px */
+  --border-700: 0.25rem;     /* 4px */
+  --border-800: 0.28125rem;  /* 4.5px */
+  --border-900: 0.3125rem;   /* 5px */
+  --border-1000: 0.34375rem; /* 5.5px */
+  --border-1100: 0.375rem;   /* 6px */
+  --border-1200: 0.40625rem; /* 6.5px */
+
+  /* Blur scale — --blur-300 moved to tokens.generated.css 2026-09-05 (report
+     §3 MATCH). It was never a house addition after all: the export publishes
+     it in the `effect` collection at the same 50px. */
+
+  /* Elevation (house addition) — three named depths mapped to surface tiers.
+     raised = cards/inputs · overlay = popovers/menus/dropdowns · modal =
+     dialogs/sheets. Flat by default: most surfaces get none. */
+  --shadow-raised: 0 1px 2px 0 oklch(0 0 0 / 0.06);
+  --shadow-overlay: 0 4px 12px -2px oklch(0 0 0 / 0.10), 0 2px 4px -2px oklch(0 0 0 / 0.06);
+  --shadow-modal: 0 16px 40px -8px oklch(0 0 0 / 0.18);
+
+  /* Z-index scale (house addition) — name the stacking layers so panels stop
+     drifting into raw z-50/z-10. Ordered; leave gaps to insert between.
+     z-sticky raised to 48 (from 40) to ensure sticky header always renders
+     above page content, including .reveal elements that create stacking
+     contexts via animation-timeline transforms. */
+  --z-base: 0;
+  --z-dropdown: 30;
+  --z-sticky: 48;
+  --z-overlay: 50;
+  --z-modal: 60;
+  --z-toast: 70;
+
+  /* Z-index scale exposed to Tailwind theme namespace — generates z-base,
+     z-dropdown, z-sticky, z-overlay, z-modal, z-toast utilities. Tailwind v4
+     requires --z-index-* theme keys for .z-* utility generation. */
+  --z-index-base: 0;
+  --z-index-dropdown: 30;
+  --z-index-sticky: 48;
+  --z-index-overlay: 50;
+  --z-index-modal: 60;
+  --z-index-toast: 70;
+}
+
+:root {
+  /* Content container cap (source: capture §3, device/container-max-width
+     2156). Applied at the layout shell so every page caps consistently. */
+  --container-max: 134.75rem; /* 2156px */
+
+  --radius: 0rem;                         /* brutalist bias: sharp corners (structural surfaces only) */
+}
+
+/* ============================================================
+   8. SCREEN-HEIGHT STOPS & ASPECT RATIOS
+   ============================================================ */
+@theme inline {
+  /* Screen-height stops (Figma `device/screen-height`) and the two
+     `--screen-height-*` / `--height-screen-*` hops over them are GENERATED —
+     see the `aliases` block in `handoff.config.mjs` and `docs/handoff-viewport.md`. */
+
+  /* The two-line alignment system (--line-nav-offset, --height-line-title,
+     --height-line-media) is RETIRED: the redesigned HeroText applies its own
+     screen-height frame stop on every page, so there is no separate 30%/70%
+     line to hold. Its one non-HeroText consumer, the 40dvh box, was
+     calc(screen-500 - screen-200) — exactly --screen-height-300, which those
+     call sites now read directly. */
+
+  /* Media aspect ratios — the only four ratios any hero, card, or
+     LayoutGrid frame may use, anywhere media appears. Never add a fifth —
+     normalize to the nearest of these instead. As of export v11 these are
+     the export's own `core/aspect/*` STRING variables (P20), generated into
+     `tokens.generated.css` byte-identical to the four literals this block
+     used to hand-author (report §3 MATCH) — retired here, not replaced. */
+}
+/* ============================================================
+   9. COMPONENT TOKENS (buttons, badges, …)
+   ============================================================ */
+@theme inline {
+  /* Batch E triage note on the `action` collection's 9 bank variables (ds-
+     refresh delta audit, row 6 — audit flagged this collection "not
+     value-fingerprinted or style-expansion-checked to the same depth" as
+     others, 0/9 matched by name-convention, remaining audit-flagged work).
+     This pass re-attacked it directly against the sync bank
+     (jhd-spec-designsystem-variables-styles.json, action collection, 9
+     variables, modes 100-400) and found:
+       - border-width/button-border-width and border-width/text-border-width
+         ALREADY WIRED below (--button-border-*, --text-border-width-*) —
+         mode-100 spot-checked against the bank and confirmed matching
+         (1px/1.5px respectively); the naming-convention matcher missed
+         these because code names them component-scoped
+         (`--button-border-*`), not literally (`action-border-width-*`).
+       - dimension/button-height, dimension/button-icon-width,
+         space/button-space-h, space/button-space-h-offset,
+         space/button-space-v: mode-100 values (28px/28px/8px/12px/4px)
+         match code's --button-height-100/--button-icon-width-100/
+         --button-space-h-100/-h-offset-100/-v-100 exactly.
+         S6 (2026-08-25) — operator ruling: the 2026-08-04 "07:02 sync"
+         conformance history below is SUPERSEDED. The current sync bank
+         (jhd-spec-designsystem-variables-styles.json, action collection)
+         resolves mode-200 for all five of these variables through
+         core/dimension/*: button-height@200 -> core/dimension/dimension-1000
+         = 32px; button-icon-width@200 -> dimension-1000 = 32px;
+         button-space-h@200 -> dimension-500 = 12px; button-space-h-offset@200
+         -> dimension-600 = 16px; button-space-v@200 -> dimension-400 = 8px.
+         The bank wins per operator instruction (remediation audit
+         2026-08-25, Lane 2) — the 07:02 sync's repoint to dimension-1100/
+         dimension-1150 etc. was itself the deviation, not the correction.
+         History preserved below (not deleted) for lineage; the 07:02 values
+         are dead code as of this pass.
+       - dimension/button-justified-height,
+         border-width/button-justified-border-width: genuinely-unwired,
+         no code consumer — the Action component has no "justified" layout
+         variant today. Wire if/when that variant is built.
+     Four size variants, variables-as-props (size 100/200/300/400).
+     Heights: 100 = 28px · 200 = 40px · 300 = 64px · 400 = 96px (default 300).
+     Icon widths match heights; paddings and borders follow per-size table. */
+  --button-height-100: var(--dimension-900); /* 28px */
+  /* --button-height-200/-300 retired (export v11): action-base's
+     &[data-size="200"]/&[data-size="300"] rules bind `height` straight to
+     `--dimension-1000`/`--dimension-1150` now (the export's own
+     `--dimension-button-height` at action-mode 200/300 — S6's 2026-08-25
+     "bank wins" ruling and the 2026-09-09 mode=300 resolution both still
+     hold; the intermediate hand-authored alias is what's gone, not the
+     value or its history). */
+  --button-height-400: var(--dimension-1700); /* 96px */
+
+  --button-icon-width-100: var(--dimension-900); /* 28px */
+  /* 32px, not 44px: same S6 revert as button-height-200 above (icon width
+     tracks height 1:1 for square icon buttons); bank -> dimension-1000. */
+  --button-icon-width-200: var(--dimension-1000); /* 32px */
+  /* 44px, not 56px: same handoff-authored mode=300 value as button-height-300
+     above (icon width tracks height 1:1 for square icon buttons). */
+  --button-icon-width-300: var(--dimension-1150); /* 44px */
+  --button-icon-width-400: var(--dimension-1700); /* 96px */
+
+  --button-space-h-100: 0.5rem;    /* 8px */
+  /* 12px, not 16px: S6 (2026-08-25) reverts the 07:02 sync, which had
+     repointed action/space/button-space-h mode=200 from
+     core/dimension/dimension-500 to dimension-600 (16px). Current sync
+     bank resolves mode=200 -> core/dimension/dimension-500 = 12px;
+     operator ruling: bank wins. */
+  --button-space-h-200: 0.75rem;   /* 12px */
+  --button-space-h-300: 1.25rem;   /* 20px */
+  --button-space-h-400: 1.5rem;    /* 24px */
+
+  --button-space-h-offset-100: 0.75rem; /* 12px */
+  /* 16px, not 20px: S6 (2026-08-25) reverts the 07:02 sync, which had
+     repointed action/space/button-space-h-offset mode=200 from
+     core/dimension/dimension-600 to dimension-700 (20px). Current sync
+     bank resolves mode=200 -> core/dimension/dimension-600 = 16px;
+     operator ruling: bank wins. */
+  --button-space-h-offset-200: 1rem;    /* 16px */
+  --button-space-h-offset-300: 1.5rem;  /* 24px */
+  --button-space-h-offset-400: 1.75rem; /* 28px */
+
+  /* D4 reduced-padding pass, 08-27 handoff (design-handoff-jhd-spec-
+     designsystem-component-action-2026-08-27.md): $space/button-space-v now
+     resolves one dimension step lower per mode than the prior (08-25) bank —
+     dimension-200@100/dimension-300@200/dimension-400@300/dimension-600@400
+     = 2/4/8/16px. Supersedes the S6 comment below (kept for lineage). */
+  --button-space-v-100: 0.125rem; /* 2px */
+  /* $dimension/dimension-350 = 5px (Action-conform round 3, amber 3): the
+     08-27 D4 comment above mis-stated mode=200 as dimension-300/4px; the
+     2026-09-09 handoff (line ~188) resolves mode=200 -> dimension-350 =
+     0.3125rem/5px. Bound to the token, not a literal. */
+  --button-space-v-200: var(--dimension-350); /* 5px */
+  --button-space-v-300: 0.5rem;   /* 8px */
+  --button-space-v-400: 1rem;     /* 16px */
+
+  --button-border-100: var(--border-100); /* 1px */
+  --button-border-200: var(--border-200); /* 1.5px */
+  --button-border-300: var(--border-400); /* 2.5px */
+  --button-border-400: var(--border-600); /* 3.5px */
+
+  /* Text border-width (Figma action/border-width/text-border-width, 4-mode
+     alias) — a dedicated border-width ramp for text elements (links/
+     underlines), distinct from --button-border-*. Wiring into components
+     is phase 2; this is the token definition only. */
+  --text-border-width-100: var(--border-200);  /* 1.5px */
+  --text-border-width-200: var(--border-300-primary);  /* 2px */
+  --text-border-width-300: var(--border-700);  /* 4px */
+  --text-border-width-400: var(--border-1200); /* 6.5px */
+
+  /* Action-radius vocabulary (Figma core/radius/action-radius-*) — a named
+     3-step shape set for action/button components, verbatim Figma naming
+     including the "elipse" spelling (names are data, not corrected here).
+     Wired into the Action component's buttonStyle variant (ellipse/round/
+     sharp) — elipse (999px) renders identically to the prior
+     rounded-interactive (9999px): both exceed half the button's height and
+     clip to the same full pill. */
+  --action-radius-elipse: 999px;  /* 999 */
+  --action-radius-round: 0.25rem; /* 4px */
+  --action-radius-sharp: 0rem;    /* 0px */
+}
+
+/* ============================================================
+   10. MOTION TOKENS (duration / delay / easing)
+   ============================================================ */
+@theme inline {
+  /* Motion tokens (Figma `motion` collection, settled 2026-07-26 straggler
+     pass) — first code-side capture of this collection; no prior CSS/JS
+     consumer existed in this codebase (repo-wide grep found none), so
+     there is no legacy rendered timing to preserve here. Values are
+     authored directly in SECONDS to match Figma's settled TIMING type
+     (previously authored in raw milliseconds pre-straggler-pass — not
+     relevant here since this is a net-new addition, not a unit migration
+     of an existing consumer). Names are numeric per the settled
+     convention (duration/delay use the same step numbers as --text-*,
+     --space-*, etc.). */
+  /* Every hand-authored motion token that used to live in this block is
+     retired as of export v11 / handoff-css 0.4.0 (P19 — MOTION): Figma now
+     authors `motion/duration/250` and `motion/duration/1600` (the former
+     portfolio promotions, ratified 2026-08-20/2026-08-24/2026-08-27 and
+     2026-08-10 respectively — same values, now Figma's own steps, not house
+     promotions), and the curve-family names replace the old per-consumer
+     suffixes byte-for-byte: `--easing-quad-out-gill` -> `--easing-quad-out`,
+     `--easing-expo-out-card` -> `--easing-expo-out` (a distinct curve from
+     the pre-v11 `--easing-expo-out`, which itself moved to
+     tokens.generated.css 2026-09-05 — v11's export resolves the collision),
+     `--easing-quart-out-flight` -> `--easing-quart-out`. `--easing-linear`
+     is a MATCH now too: v11 authors the explicit `cubic-bezier(0,0,1,1)`
+     rather than the `linear` keyword, so the byte-equal blocker this file
+     used to cite is gone. All ten names (five durations already generated
+     2026-09-05, two more here, four easings) now come from
+     `tokens.generated.css`; every consumer moved to the new names, none
+     stayed on an alias. See `docs/motion-law.md` for the ramp and curve
+     names in ms. */
+}
+
+/* ============================================================
+   11. SHARED BASE LAYER (thin — document defaults only)
+
+   Deliberately minimal. Product-specific document rules (scrollbar-gutter,
+   color-scheme, iOS text-size-adjust, cursor affordances, scroll-reveal)
+   stay in the consuming app: a product that wants a dark sheet must be free
+   to set its own color-scheme without fighting the package.
+   ============================================================ */
+@layer base {
+  * {
+    @apply border-border-default-primary outline-state-focused/50;
+  }
+  /* Windows High Contrast (technical-design-spectrum-2026-08-11.md §6 item
+     2): forced-colors strips box-shadow and background-image entirely, so
+     any focus indication riding on those alone disappears without this
+     block. System colour keywords rather than a token, per the mode's own
+     contract — an author colour would just get remapped anyway, and
+     Highlight is the keyword UAs use for exactly this state. Global
+     :focus-visible rather than scoped to action/badge, so it also covers
+     native controls and any future interactive element. */
+  @media (forced-colors: active) {
+    :focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+  }
+  html {
+    @apply bg-background-default-primary font-sans;
+    font-weight: 500;
+  }
+  body {
+    @apply bg-background-default-primary text-content-default-primary;
+  }
+  /* Document default line-height. On body (unitless, so it inherits as a
+     ratio) — NEVER on * : a universal selector beats inheritance and stamps
+     1.3 onto spans inside role-styled headings (the HeroText line-break-span
+     bug, caught by the operator 2026-07-22). */
+  body {
+    line-height: 1.3;
+  }
+}
+
+/* ============================================================
+   12. COMPONENT RECIPES — the CSS half of this package's React exports
+   ============================================================ */
+
+/* Action's full recipe (Figma Action component). Base anatomy shared by
+   every variant, plus the layout/size/buttonStyle axes themselves — all
+   three now read straight off the data-layout/data-size/data-button-style
+   attributes Action (action.tsx) always renders, so the JSX/cva layer
+   emits zero variant utility strings. [Audit #8, full-extraction pass] —
+   was ~700-1350 chars / 40-45 tokens inlined on every Action instance
+   sitewide; served HTML now carries only "action-base". */
+@utility action-base {
+  /* NO bg-clip-padding (removed 2026-08-04). It is shadcn's default button
+     recipe, and it was the thing still painting a hairline "border" after the
+     2026-08-03 border-color removal — which is why that fix didn't land for
+     the operator and why a computed-style check kept reporting the pill clean.
+     Mechanism: background-clip:padding-box stops the 5% fill at the padding
+     box, while backdrop-filter always applies over the BORDER box, so the
+     outermost border-width painted blurred-but-UNTINTED backdrop — an outline
+     of exactly the fill's own alpha, invisible on a flat ground and a visible
+     hairline over photography. Measured at 2.5-8.5% luminance step on every
+     route, both viewports (scripts/action_edge_check.mjs, which now guards it).
+     Clipping to the border box instead is safe: the border is transparent at
+     rest, and the two states that DO colour it (focus-visible, aria-invalid)
+     use opaque tokens that paint over the fill. */
+  /* Focus ring baseline is OUTLINE, not box-shadow (technical-design-
+     spectrum-2026-08-11.md §6 item 2): box-shadow is dropped entirely under
+     forced-colors (Windows High Contrast), so a box-shadow-only ring is a
+     total loss of focus indication for keyboard users there, not a
+     degradation. outline-2/outline-offset-2 render everywhere, transparent
+     at rest and coloured on :focus-visible; the ring-2 box-shadow stays as
+     a same-token visual enhancement on top for the platforms where it
+     renders (2px = Figma color/border/focused spread, node 326:3200). Rounded outlines (this component is a pill) are supported
+     Firefox 88+/Chrome 94+/Safari 16.4+, so the old "outline won't respect
+     radius" reasoning no longer applies. aria-invalid:ring-2 (operator
+     ruling 2026-09-06, "error ring match focus ring"): was ring-3, an
+     unintentional mismatch with the focus ring's 2px spread — same
+     box-shadow mechanism, so the two states now render the same ring
+     width. */
+  /* transition-[...] enumerates exactly what this component's states
+     change (bg on hover/aria-expanded/copied, border+outline+ring on
+     focus-visible/aria-invalid, translate on active, bg+text on disabled)
+     instead of `transition-all`, which transitions every animatable
+     property including layout ones it never intends to (Vercel Web
+     Interface Guidelines, `NEVER: transition: all`). */
+  /* Motion-law conformance (motion-law.md "Clocks", row 5 of the R1 locked
+     table): this is short UI feedback (hover bg, focus ring, active press),
+     which the law binds to --duration-100…--duration-200, token-bound, not
+     Tailwind's unbound default transition timing. duration-200 (P8.6 bridges
+     Tailwind's --transition-duration-* namespace to the Figma motion leaf,
+     so this is the token, not a coincidental 200ms)
+     + ease-[var(--easing-cubic-out)] replace the bare transition-[...]
+     utility's implicit 150ms/default-ease. Note: motion-law.md's Clocks
+     table binds durations only, not easing — there is no law easing row
+     for short UI feedback; cubic-out is borrowed from the type-enter
+     family pending a dedicated token. */
+  /* Disabled (Action-conform AC3, 2026-09-09): handoff's disabled ActionButton
+     components (326:3217/3219 primary, 326:3253/3255 secondary) bind
+     fill($color/background/disabled/lighter) on primary only — secondary and
+     tertiary disabled carry no fill() at all, matching their default (no-fill)
+     state — and every disabled title TEXT node (e.g. I747:2523;686:4385) binds
+     fill($color/content/disabled/dark), not an opacity ramp on the rest-state
+     color. The former opacity-based disabled treatment was therefore wrong on two counts: it dims a
+     fill secondary/tertiary never had, and it fakes the text color instead of
+     switching to content-disabled-dark. Replaced with explicit token bindings
+     per layout below; pointer-events-none stays here (behavioural, not visual). */
+  @apply inline-flex shrink-0 items-center justify-center border border-transparent font-medium whitespace-nowrap transition-[background-color,border-color,outline-color,box-shadow,translate,opacity] duration-200 ease-[var(--easing-cubic-out)] outline-2 outline-offset-2 outline-transparent select-none focus-visible:border-state-focused focus-visible:outline-state-focused focus-visible:ring-2 focus-visible:ring-state-focused/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:text-content-disabled-dark aria-invalid:border-state-negative aria-invalid:ring-2 aria-invalid:ring-state-negative/20 dark:aria-invalid:border-state-negative/50 dark:aria-invalid:ring-state-negative/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-[var(--icon-dimension-100)];
+
+  /* layout: bg/border/text color. Border removed 2026-08-03 (operator
+     confirmation, in-session): the operator opened the Action component in
+     Figma and confirmed no border/stroke exists on it in either mode ("I
+     can't see a border on them") — that supersedes the prior binding, which
+     was an unauthorized addition made in the absence of a border/action/*
+     map entry (see design/figma-map.json components.entries note on
+     ActionButton). Both primary and secondary inherited the same binding,
+     so both drop it; the operator's confirmation covered actions generally,
+     not one layout in isolation. tertiary never had a border. All three
+     stay at the base's transparent 1px (focus-visible/aria-invalid still
+     set their own explicit border colors below, independent of layout). */
+  /* State -> fill matrix, read directly off the handoff's own state=
+     variants (ActionButton #326:3200, all three layouts x size 100/200/300/
+     400; corrected 2026-09-09 Action-conform round 2 — the prior comment
+     here claimed the handoff authors no distinct hover/expanded/copied fill
+     and that hover reads background/action/secondary on every layout; both
+     were false, verified against the handoff rows below; focused column
+     added round 3 red 1):
+
+       layout     | default                | hovered                 | focused                  | activated
+       -----------|-------------------------|--------------------------|---------------------------|-------------------------
+       primary    | background/action/primary (326:3201/3203) | background/action/secondary (326:3205/3207) | background/action/primary — same as default, no override (326:3209/3211/3265) | background/action/primary — same as default, no override (326:3213/3215)
+       secondary  | no fill() — transparent (326:3221/3223)    | no fill() — stays transparent (326:3229/3231, Smart-Animate gap) | background/default/primary — distinct (326:3237/3239/3279) | background/action/primary — distinct (326:3245/3247)
+       tertiary   | no fill() — transparent (326:3225/3227)    | background/action/secondary (326:3233/3235) | background/default/primary — distinct (326:3241/3243/3281) | background/action/primary — distinct (326:3249/3251)
+
+     focused is bound via focus-visible: (not :focus) to match the ring
+     already bound on action-base; primary needs no rule (matches default).
+     COPIED/aria-expanded reuse whichever fill hover resolves to per layout
+     (this component's own engaged-state vocabulary, not a second palette —
+     CopyAction has no distinct Figma component of its own). :active is the
+     browser equivalent of state=activated; disabled rows are handled by the
+     comment already on the secondary block below.
+
+     Duration/easing: the handoff authors no explicit transition between
+     these component variants (Smart-Animate gap — see motion note below the
+     rule block) — the token-bound duration-200/cubic-out timing on
+     action-base carries all of the above, hover through activated alike. */
+  &[data-layout="primary"] {
+    /* backdrop-blur conformance fix 2026-08-03: was backdrop-blur-2xl, a raw
+       Tailwind scale value (2xl = 40px default), not the system's material
+       blur token. Live Figma MCP read (get_variable_defs, node 326:3261,
+       JHD-Spec-DesignSystem arJSACOFZmIi5rFGlxXoi0) confirms the component
+       binds effect/material-blur/material-blur-300 (BACKGROUND_BLUR radius
+       50) -- code's own --blur-300: 50px is that exact token, already
+       consumed correctly elsewhere via backdrop-blur-[var(--blur-300)]
+       (see the icon-button recipe in the consuming app). Swapped to match.
+       activated (326:3213/3215): fill(background/action/primary) — same
+       token as default, so no override is needed here; the base rule's
+       active:translate-y-px press feedback still applies. */
+    @apply bg-background-action-primary text-content-action-primary backdrop-blur-[var(--blur-300)] hover:bg-background-action-secondary aria-expanded:bg-background-action-secondary data-[state=copied]:bg-background-action-secondary disabled:bg-background-disabled-lighter disabled:hover:bg-background-disabled-lighter;
+  }
+  &[data-layout="secondary"] {
+    /* rest (326:3221/3223) and disabled (326:3253/3255) author no fill() at
+       all — bg-transparent, not background-action-secondary; the prior
+       binding here was a false match on the token's name, not its authored
+       target (Amber 4, round 1). hover (326:3229/3231) authors no distinct
+       fill either — stays transparent, a Smart-Animate gap, not a missing
+       token. focused (326:3237/3239/3279, round 3 red 1) authors a distinct
+       fill, background/default/primary, bound via focus-visible: below to
+       stack with the ring already on action-base. activated (326:3245/3247)
+       DOES author a distinct fill, background/action/primary, bound below
+       via :active. */
+    @apply bg-transparent text-content-action-primary focus-visible:bg-background-default-primary active:bg-background-action-primary disabled:bg-transparent;
+  }
+  &[data-layout="tertiary"] {
+    /* hover/expanded/copied (326:3233/3235): background/action/secondary,
+       the same fill primary's hover uses. focused (326:3241/3243/3281,
+       round 3 red 1): background/default/primary — distinct, bound via
+       focus-visible:. activated (326:3249/3251): background/action/primary
+       — distinct, bound below via :active. Round 3 amber 4: dropped the
+       not-aria-[haspopup] carve-out on this fill binding — the handoff
+       authors no popup-specific activated variant/carve-out anywhere (grep
+       of the handoff for "haspopup"/"popup" is empty) and Justified's
+       equivalent :active rule below was already bare, so the carve-out here
+       was an unauthorized divergence, not a documented exception. The
+       translate-y-px press feedback on action-base (line ~1123) keeps its
+       own not-aria-[haspopup] carve-out — that's a separate, motion-only
+       concern this finding didn't touch. */
+    @apply text-content-action-primary hover:bg-background-action-secondary aria-expanded:bg-background-action-secondary data-[state=copied]:bg-background-action-secondary focus-visible:bg-background-default-primary active:bg-background-action-primary;
+  }
+
+  /* Border width per size — primary/secondary only, kept even with no
+     border color: the transparent border still occupies this thickness in
+     the box model, so focus-visible/aria-invalid (which DO set a border
+     color) render at the same size as everything else rather than jumping
+     dimensions on state change. tertiary has no visible border (stays at
+     the base's transparent 1px) so its box model is unaffected by these
+     size-specific width tokens. */
+  &[data-layout="primary"],
+  &[data-layout="secondary"] {
+    &[data-size="100"] { border-width: var(--button-border-100); }
+    &[data-size="200"] { border-width: var(--button-border-200); }
+    &[data-size="300"] { border-width: var(--button-border-300); }
+    &[data-size="400"] { border-width: var(--button-border-400); }
+  }
+
+  /* size: height, gap, padding, label style; icon-* sizes are square icon
+     buttons (no label). */
+  /* gap (Action-conform AC2, 2026-09-09): .ActionButtonTitle (686:4337) is the
+     icon/title/icon row this gap governs. size=100 (#686:4336) is the only
+     variant at gap:$dimension/dimension-200 (2px); size=200 (#686:4356) is
+     gap:$dimension/dimension-300 (4px) and is the variant sizes 300/400 reuse
+     (no distinct .ActionButtonTitle exists past 200 — e.g. ActionButton
+     326:3203 layout=primary,size=300 nests a "size=200" ActionButtonTitle
+     instance #747:2751). Was hand-picked 0.25rem/0.5rem/0.5rem/0.5rem
+     (4/8/8/8px) — none matched; now bound to the two tokens the handoff
+     actually names, not per-size guesses. */
+  &[data-size="100"] {
+    @apply title-style1-100 type-title;
+    height: var(--button-height-100);
+    gap: var(--dimension-200);
+    padding: var(--button-space-v-100) var(--button-space-h-100);
+    &:has([data-icon="inline-end"]) { padding-right: var(--button-space-h-offset-100); }
+    &:has([data-icon="inline-start"]) { padding-left: var(--button-space-h-offset-100); }
+  }
+  &[data-size="200"] {
+    @apply title-style1-200 type-title;
+    height: var(--dimension-1000); /* export --dimension-button-height, mode 200 (32px) */
+    gap: var(--dimension-300);
+    padding: var(--button-space-v-200) var(--button-space-h-200);
+    &:has([data-icon="inline-end"]) { padding-right: var(--button-space-h-offset-200); }
+    &:has([data-icon="inline-start"]) { padding-left: var(--button-space-h-offset-200); }
+  }
+  &[data-size="300"] {
+    @apply title-style1-200 type-title;
+    height: var(--dimension-1150); /* export --dimension-button-height, mode 300 (44px) */
+    gap: var(--dimension-300);
+    padding: var(--button-space-v-300) var(--button-space-h-300);
+    &:has([data-icon="inline-end"]) { padding-right: var(--button-space-h-offset-300); }
+    &:has([data-icon="inline-start"]) { padding-left: var(--button-space-h-offset-300); }
+  }
+  &[data-size="400"] {
+    @apply title-style1-200 type-title;
+    height: var(--button-height-400);
+    gap: var(--dimension-300);
+    padding: var(--button-space-v-400) var(--button-space-h-400);
+    &:has([data-icon="inline-end"]) { padding-right: var(--button-space-h-offset-400); }
+    &:has([data-icon="inline-start"]) { padding-left: var(--button-space-h-offset-400); }
+  }
+  &[data-size="icon-100"] {
+    width: var(--button-icon-width-100);
+    height: var(--button-icon-width-100);
+  }
+  &[data-size="icon-200"] {
+    width: var(--button-icon-width-200);
+    height: var(--button-icon-width-200);
+  }
+  &[data-size="icon-300"] { width: var(--button-icon-width-300); height: var(--button-icon-width-300); }
+  &[data-size="icon-400"] { width: var(--button-icon-width-400); height: var(--button-icon-width-400); }
+
+  /* buttonStyle (Figma "buttonStyle" variant — shape). */
+  &[data-button-style="ellipse"] { border-radius: var(--action-radius-elipse); }
+  &[data-button-style="round"] { border-radius: var(--action-radius-round); }
+  &[data-button-style="sharp"] { border-radius: var(--action-radius-sharp); }
+}
+
+/* Motion note (Action-conform AC4, 2026-09-09 — the "motion note below" the
+   primary-layout comment above points at): the handoff's hover/aria-expanded/
+   copied states (326:3205 etc.) are separate Figma COMPONENTs, not a Smart-
+   Animate transition on ActionButton — the handoff authors no duration,
+   easing, or "animate to" instruction between them. action-base's hover/
+   press feedback therefore does NOT come from a handoff-authored value; it
+   reuses this package's existing motion tokens (duration-200 bridged from
+   Tailwind's --transition-duration-*, --easing-cubic-out) per motion-law.md
+   "Clocks" row 5 (short UI feedback), same as the rest of action-base's
+   transition-[...] list. This is a documented gap, not an invented timing:
+   if the handoff is later revised with explicit motion, replace duration-200/
+   cubic-out here with the authored value instead of guessing at one now. */
+
+/* ActionGroup (action-group.tsx) — Figma ActionGroup (#491:3443). The
+   handoff authors one variant, "layout=default": hug×hug row, gap:
+   $dimension/dimension-200, two Action children. Nothing else (fill/split
+   layout, has-2nd-action, per-action style) is authored on this component
+   set — only "default" is styled here; a future handoff revision adding
+   more variants extends this rule, not a rewrite of it. */
+@utility action-group-base {
+  @apply inline-flex items-center;
+  gap: var(--dimension-200);
+}
+
+/* ActionButtonJustified (action-button-justified.tsx) — Figma
+   ActionButtonJustified (#972:8776). layout(primary|secondary) x
+   style(icon|text) x size(100|200), read off data-layout/data-style/
+   data-size. The handoff's own size axis maps to Action's action-mode 300
+   (size=100) / 400 (size=200) — not modes 100/200 — so this recipe reuses
+   the EXISTING --button-height-300/-400, --button-space-v/-h/-h-offset-300/
+   -400 tokens (already wired for Action's own size=300/400) rather than
+   authoring a parallel --button-justified-* ramp; $dimension/
+   button-justified-height resolves to the identical per-mode value (see
+   styles.css COMPONENT TOKENS section, S6 audit note on the "genuinely-
+   unwired" justified variables). Width: the handoff's own preview instances
+   are all a fixed 260 (unbound literal, no $ token, no ⚠ flag either — a
+   Figma authoring gap, not a real constraint) — "justified" means fill the
+   available width, so this recipe uses width:100% instead of hardcoding the
+   preview's 260, and files the 260 as a defect to report rather than a
+   binding to reproduce. */
+@utility action-button-justified-base {
+  @apply flex w-full items-center border border-transparent font-medium whitespace-nowrap transition-[background-color,border-color,outline-color,box-shadow] duration-200 ease-[var(--easing-cubic-out)] outline-2 outline-offset-2 outline-transparent select-none focus-visible:border-state-focused focus-visible:outline-state-focused focus-visible:ring-2 focus-visible:ring-state-focused/50 disabled:pointer-events-none disabled:text-content-disabled-dark;
+
+  /* State -> fill matrix, read off the handoff's own ActionButtonJustified
+     state= variants (#972:8776, primary-icon/text + secondary-icon/text x
+     size 100/200; corrected 2026-09-09 Action-conform round 2; focused
+     column added round 3 red 1):
+
+       layout    | default                     | hovered                      | focused                       | activated
+       ----------|------------------------------|-------------------------------|--------------------------------|------------------------------
+       primary   | background/action/primary (972:8777/8781/8785/8789) | background/action/secondary (972:8793/8797/8801/8805) | background/action/primary — same as default, no override (972:8809/8813/8817/8821) | background/action/primary — same as default, no override (972:8825/8829/8833/8837)
+       secondary | no fill() — transparent (972:8857/8861/8865/8869)    | no fill() — stays transparent (972:8873/8877/8881/8885, Smart-Animate gap) | background/default/primary — distinct (972:8889/8893/8897/8901) | background/action/primary — distinct (972:8905/8909/8913/8917) */
+  &[data-layout="primary"] {
+    /* focused (972:8809 etc)/activated (972:8825 etc): fill(background/
+       action/primary) — same as default, no override needed. */
+    @apply bg-background-action-primary text-content-action-primary backdrop-blur-[var(--blur-300)] hover:bg-background-action-secondary disabled:bg-background-disabled-lighter disabled:hover:bg-background-disabled-lighter;
+  }
+  &[data-layout="secondary"] {
+    /* rest/hover author no fill() — stays transparent (hover is a
+       Smart-Animate gap). focused (972:8889/8893/8897/8901, round 3 red 1)
+       authors a distinct fill, background/default/primary, bound via
+       focus-visible:. activated (972:8905 etc) authors a distinct fill,
+       background/action/primary, bound below via :active. */
+    @apply bg-transparent text-content-action-primary focus-visible:bg-background-default-primary active:bg-background-action-primary disabled:bg-transparent;
+  }
+
+  &[data-size="100"] {
+    @apply title-style1-100 type-title;
+    height: var(--dimension-1150); /* export --dimension-button-height, mode 300 (44px) */
+    padding-block: var(--button-space-v-300);
+  }
+  &[data-size="200"] {
+    @apply title-style1-200 type-title;
+    height: var(--button-height-400);
+    padding-block: var(--button-space-v-400);
+  }
+  &[data-style="icon"][data-size="100"] { padding-inline: var(--button-space-h-300) var(--button-space-h-offset-300); }
+  &[data-style="icon"][data-size="200"] { padding-inline: var(--button-space-h-400) var(--button-space-h-offset-400); }
+  &[data-style="text"][data-size="100"] { padding-inline: var(--button-space-h-offset-300); }
+  &[data-style="text"][data-size="200"] { padding-inline: var(--button-space-h-offset-400); }
+}
+
+@utility action-button-justified-content-base {
+  @apply flex w-full items-center;
+  gap: var(--dimension-600);
+}
+
+@utility action-button-justified-title-base {
+  @apply flex flex-col overflow-hidden;
+  gap: var(--dimension-600);
+}
+
+@utility action-button-justified-title-row {
+  @apply flex items-center overflow-hidden;
+  gap: var(--dimension-300);
+}
+
+@utility action-button-justified-subtitle-row {
+  @apply flex items-center overflow-hidden;
+  gap: var(--dimension-300);
+}
+
+@utility action-button-justified-icon-base {
+  @apply flex shrink-0 items-center justify-center [&_svg]:size-[var(--icon-dimension-width)];
+  width: var(--dimension-800);
+  height: var(--dimension-800);
+}
+
+/* Badge (badge.tsx) — variant read from data-variant, same pattern as
+   Action. Verbatim utility strings per variant, moved from cva into
+   attribute-selector rules — served HTML now carries only "badge-base". */
+@utility badge-base {
+  /* Same outline-baseline reasoning as action-base above — see that
+     comment. transition-[...] enumerates exactly what this component's
+     states change (bg+color on hover per variant, border+outline+ring on
+     focus-visible/aria-invalid, text-decoration on the link variant's
+     hover underline) instead of `transition-all` — same reasoning as
+     action-base above.
+     aria-invalid:ring-2 (operator ruling 2026-09-06, "error ring match
+     focus ring"): Tailwind v4 emits no box-shadow at all without a width
+     utility — `ring-state-negative/20` alone set only the ring colour
+     variable and produced zero box-shadow, so the badge error state
+     rendered no ring (reviewer finding, fixed here). There is no
+     "Tailwind default ring width" in v4 the way v3 defaulted ring to 3px;
+     any prose claiming that is wrong. ring-2 matches this component's own
+     focus-visible ring and action-base's aria-invalid ring (same 2px
+     spread, same box-shadow mechanism). */
+  @apply title-style1-200 type-title inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden border border-transparent px-[7px] py-px whitespace-nowrap transition-[background-color,border-color,outline-color,box-shadow,color,text-decoration-color] outline-2 outline-offset-2 outline-transparent focus-visible:border-state-focused focus-visible:outline-state-focused focus-visible:ring-2 focus-visible:ring-state-focused/50 has-data-[icon=inline-end]:pr-[5px] has-data-[icon=inline-start]:pl-[5px] aria-invalid:border-state-negative aria-invalid:ring-2 aria-invalid:ring-state-negative/20 dark:aria-invalid:ring-state-negative/40 [&>svg]:pointer-events-none;
+
+  /* Figma Badge 2651:9585: strokeAlign INSIDE, strokeWeight 1, padding
+     8px/2px, box height 26 — the inside stroke is drawn within the
+     padding, so content-box padding is 8-1=7px horizontal, 2-1=1px
+     vertical (px-[7px] py-px). CSS borders sit outside the padding box,
+     so matching Figma's 26px box requires shrinking the padding by the
+     1px border on each edge; using unadjusted px-2/py-0.5 renders a 28px
+     box. The has-data-[icon]:p{r,l}-1.5 inline-icon offsets (6px in
+     Figma's own box-model) get the same -1px border correction (5px) to
+     hold the same ratio to Figma; that offset isn't separately annotated
+     in the Figma file, so the correction is applied proportionally, not
+     read directly off a documented value.
+     Figma Badge 2651:9606 (single `layout=default` variant, no size/state
+     axis): cornerRadius 4px = radius-400 = --action-radius-round (was
+     rounded-badge/8px); icons 20px = icon-dimension/width mode 200; height
+     HUGS content (was a fixed h-5/20px). Audit + operator ruling
+     ("follow figma"): projects/portfolio/audits/2026-09-06-action-badge-recipes-vs-figma.md */
+  border-radius: var(--action-radius-round);
+  & > svg { width: var(--icon-dimension-width); height: var(--icon-dimension-height); }
+
+  &[data-variant="default"] {
+    @apply bg-content-action-primary text-background-default-primary [a]:hover:bg-content-action-primary/80;
+  }
+  /* dark-mode note: the retired shadcn --secondary token hardcoded
+     rgb(255 255 255 / 10%) for dark, which never matched
+     --background-default-secondary's own dark value (#2d2522) — an
+     unsourced drift, not a deliberate design decision. Re-pointing to the
+     Figma-named token corrects it; only /kit (internal, unlinked) renders
+     this variant, so it has no production surface. */
+  &[data-variant="secondary"] {
+    @apply bg-background-default-secondary text-content-default-primary [a]:hover:bg-background-default-secondary/80;
+  }
+  &[data-variant="destructive"] {
+    @apply bg-state-negative/10 text-state-negative focus-visible:ring-state-negative/20 dark:bg-state-negative/20 dark:focus-visible:ring-state-negative/40 [a]:hover:bg-state-negative/20;
+  }
+  &[data-variant="outline"] {
+    @apply border-border-default-primary text-content-default-primary [a]:hover:bg-background-default-tertiary [a]:hover:text-content-default-secondary;
+  }
+  &[data-variant="ghost"] {
+    @apply hover:bg-background-default-tertiary hover:text-content-default-secondary dark:hover:bg-background-default-tertiary/50;
+  }
+  &[data-variant="link"] {
+    @apply text-content-action-primary underline-offset-4 hover:underline;
+  }
+}
+
+/* ActionText (action-text.tsx) — Figma "Text/Default" ActionText
+   component set (#326:3551). size reads off data-size; text-decoration is
+   unconditional (title-action-style1-* already carries underline for every
+   size, styles.css ~479-482) because every state variant in the handoff
+   (default/hovered/focused/activated/disabled) authors the same title-frame
+   stroke (#334:1141/1142/1144/1145/1146) — this is not a hover-only
+   underline, unlike ActionTextSubtle below.
+   Colour: content-default-primary at rest, content-disabled-dark when
+   data-disabled (326:3565/3580/3595/74335 all fill($color/content/
+   disabled/dark), matching Action's own disabled-token binding, not an
+   opacity ramp).
+   Gap: dimension-300 between icon and title (handoff's `title` FRAME gap
+   is $dimension/dimension-300 at every size, #334:1141 etc.) — one value,
+   no per-size variance, unlike Action's own icon/title gap.
+   Icon size: icon-dimension-100 at size=100 (handoff modes(icon:100)),
+   icon-dimension-200 at size 200/300/400 (handoff modes icon:200/300/400,
+   but only tiers 100/200 are wired tokens in this package — see the
+   icon-dimension-100/200 comment above, styles.css ~655-663; 300/400 reuse
+   200, the same "no distinct further tier" precedent action-base's own
+   icon/title gap already sets at AC2 above).
+   Motion: hover/focus colour transition reuses duration-200 +
+   easing-cubic-out, the same handoff motion gap noted for action-base
+   above (Action-conform AC4) — no distinct timing is authored for
+   ActionText either. */
+@utility action-text-base {
+  @apply inline-flex w-fit items-center text-content-default-primary underline-offset-4 transition-colors duration-200 ease-[var(--easing-cubic-out)] outline-2 outline-offset-2 outline-transparent select-none focus-visible:outline-state-focused data-[disabled]:pointer-events-none data-[disabled]:text-content-disabled-dark [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-[var(--icon-dimension-100)];
+  gap: var(--dimension-300);
+
+  &[data-size="100"] { @apply title-action-style1-100 type-title; }
+  &[data-size="200"] { @apply title-action-style1-200 type-title; }
+  &[data-size="300"] { @apply title-action-style1-300 type-title; }
+  &[data-size="400"] { @apply title-action-style1-400 type-title; }
+
+  &[data-size="200"],
+  &[data-size="300"],
+  &[data-size="400"] {
+    [&_svg:not([class*='size-'])] { width: var(--icon-dimension-width); height: var(--icon-dimension-height); }
+  }
+}
+
+/* ActionTextSubtle (action-text-subtle.tsx) — Figma "Text/Subtile"
+   ActionTextSubtle component set (#4515:38056). Same size/colour/gap/icon
+   bindings as ActionText above, EXCEPT underline: the handoff authors the
+   title-frame stroke ONLY on state=hovered (#4515:38067/38072/38112/38137
+   carry stroke($color/content/default/primary); default/focused/activated/
+   disabled — #4515:38057/38062/38077/38082/38087/38092/38097/38102/38107/
+   38117/38122/38127/38132/38142/38147/38152 — carry none), so this recipe
+   uses the plain title-style1-* utilities (no underline) plus
+   hover:underline, instead of ActionText's unconditional
+   title-action-style1-*. */
+@utility action-text-subtle-base {
+  @apply inline-flex w-fit items-center text-content-default-primary underline-offset-4 hover:underline transition-colors duration-200 ease-[var(--easing-cubic-out)] outline-2 outline-offset-2 outline-transparent select-none focus-visible:outline-state-focused data-[disabled]:pointer-events-none data-[disabled]:text-content-disabled-dark data-[disabled]:hover:no-underline [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-[var(--icon-dimension-100)];
+  gap: var(--dimension-300);
+
+  &[data-size="100"] { @apply title-style1-100 type-title; }
+  &[data-size="200"] { @apply title-style1-200 type-title; }
+  &[data-size="300"] { @apply title-style1-300 type-title; }
+  &[data-size="400"] { @apply title-style1-400 type-title; }
+
+  &[data-size="200"],
+  &[data-size="300"],
+  &[data-size="400"] {
+    [&_svg:not([class*='size-'])] { width: var(--icon-dimension-width); height: var(--icon-dimension-height); }
+  }
+}

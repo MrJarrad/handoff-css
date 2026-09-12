@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jarradhd/handoff-css/schema/design-system-handoff.v12plus.schema.json",
+  "title": "design-system-handoff, schema 12 and up",
+  "description": "Schema 12+ = the 8-13 base document (`design-system-handoff.schema.json`, referenced below) PLUS the four structures schema 12 introduces and this generator now reads by name: `styles.*[].cssClass` (P21), `styles.TEXT[].typeRamp` (type ramp v2), a STRING variable's `fontWeightNumeric` (P22), and `cssCustomPropertySheets` (the export's own `:root`/theme blocks, cross-checked and never emitted). Stating them here rather than in the base keeps a schema 8-11 export validating exactly as it did before: those exports do not carry these fields, and requiring them there would fail a document that is still correct for its own version. `validate-export.mjs` dispatches on `schemaVersion`.",
+  "allOf": [
+    { "$ref": "https://github.com/jarradhd/handoff-css/schema/design-system-handoff.schema.json" },
+    {
+      "type": "object",
+      "required": ["schemaVersion", "styles", "cssCustomPropertySheets"],
+      "properties": {
+        "schemaVersion": { "enum": [12, 13] },
+        "styles": {
+          "type": "object",
+          "required": ["PAINT", "TEXT", "EFFECT", "GRID"],
+          "properties": {
+            "PAINT": { "type": "array", "items": { "$ref": "#/$defs/style" } },
+            "TEXT": { "type": "array", "items": { "$ref": "#/$defs/textStyle" } },
+            "EFFECT": { "type": "array", "items": { "$ref": "#/$defs/style" } },
+            "GRID": { "type": "array", "items": { "$ref": "#/$defs/style" } }
+          }
+        },
+        "cssCustomPropertySheets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["selector", "collectionName", "modeId", "modeName", "declarations"],
+            "properties": {
+              "selector": { "type": "string" },
+              "theme": { "type": ["string", "null"] },
+              "collectionName": { "type": "string" },
+              "modeId": { "type": "string" },
+              "modeName": { "type": "string" },
+              "declarations": { "type": "array", "items": { "type": "string" } },
+              "css": { "type": "string" }
+            }
+          }
+        },
+        "textStyleInheritance": {
+          "type": "object",
+          "description": "Style name -> `basedOn` + the properties that differ from it. Informational: P21 emits each class WHOLE from its own `cssClass`, so nothing here is inherited at build time.",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["basedOn"],
+            "properties": {
+              "basedOn": { "type": "string" },
+              "diff": { "type": "object" }
+            }
+          }
+        },
+        "collections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "variables": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": { "fontWeightNumeric": { "$ref": "#/$defs/fontWeightNumeric" } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "cssClass": {
+      "type": "object",
+      "required": ["selector"],
+      "properties": {
+        "selector": {
+          "type": "string",
+          "description": "Emitted VERBATIM (P21). The generator never recomputes a selector from the style name.",
+          "pattern": "^\\."
+        },
+        "declarations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "`property: value` without the trailing semicolon, in the order the class must state them. Emitted in THIS order; a style with none is reported and not emitted."
+        },
+        "variableReferences": { "type": "array", "items": { "type": "string" } },
+        "css": { "type": "string" },
+        "buildReady": { "type": "boolean" }
+      }
+    },
+    "codeSyntax": {
+      "type": "object",
+      "required": ["className"],
+      "properties": {
+        "className": { "type": "string", "pattern": "^\\." }
+      }
+    },
+    "style": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "type": "string" },
+        "key": { "type": "string" },
+        "name": { "type": "string", "minLength": 1 },
+        "cssClass": { "$ref": "#/$defs/cssClass" },
+        "codeSyntax": { "$ref": "#/$defs/codeSyntax" }
+      }
+    },
+    "textStyle": {
+      "type": "object",
+      "required": ["id", "name", "typeRamp"],
+      "properties": {
+        "id": { "type": "string" },
+        "key": { "type": "string" },
+        "name": { "type": "string", "minLength": 1 },
+        "cssClass": { "$ref": "#/$defs/cssClass" },
+        "codeSyntax": { "$ref": "#/$defs/codeSyntax" },
+        "typeRamp": {
+          "type": "object",
+          "required": ["policyVersion"],
+          "properties": {
+            "policyVersion": { "enum": ["2"] }
+          }
+        },
+        "fontStack": { "type": "array", "items": { "type": "string" } },
+        "fontStackCss": { "type": "string" }
+      }
+    },
+    "fontWeightNumeric": {
+      "type": "object",
+      "required": ["numeric", "css", "cssProperty", "confidence"],
+      "properties": {
+        "numeric": { "type": "number" },
+        "css": {
+          "type": "string",
+          "description": "Emitted VERBATIM as the STRING variable's value (P22) — the generator never derives a weight from a font-style name."
+        },
+        "cssProperty": { "const": "font-weight" },
+        "confidence": { "type": "string" },
+        "sourceStyleName": { "type": "string" }
+      }
+    }
+  }
+}

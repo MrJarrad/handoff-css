@@ -10,10 +10,10 @@ opinions about your design system. Every opinion lives in one config file.
 
 ```
 export.json  ──▶  handoff-css  ──▶  tokens.generated.css
-                      ▲               theme.generated.css
-                      │               report.md
-              handoff.config.mjs      exclusions.json
-              your styles.css
+                      ▲               styles.generated.css
+                      │               theme.generated.css
+              handoff.config.mjs      report.md
+              your styles.css         exclusions.json
 ```
 
 > **Status: 0.2.0, not on npm yet.** Consume it with a local link
@@ -112,6 +112,7 @@ before it is rendered, so you can build your own checks on them.
 | --- | --- |
 | `schema.name` / `schema.versions` | Which export contract you have actually read. A superseded schema still parses, so it is rejected rather than accepted. |
 | `paths.*` | Export in, four artifacts out, plus your own stylesheet. |
+| `paths.styles` | Optional, schema 12+: where the style classes go. One class per Figma style, selector and declarations from the export's own `cssClass`, verbatim (P21). Unset, or an older export, writes no file. |
 | `exclude.paths` | `"<collection>/<variable>"` prefixes that are never emitted — authoring scratch, Figma-only hacks. Applied on path identity, never revived by an alias. |
 | `color.format` | `rgb-slash-percent` (`#rrggbb` at full alpha, else `rgb(r g b / pct)`) or `hex8`. |
 | `motion.timingUnit` | `ms` or `s`. Figma stores a TIMING variable in seconds; `ms` republishes it in milliseconds, so a step named for its milliseconds reads in the unit its name states (P19). |

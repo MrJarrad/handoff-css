@@ -2,6 +2,65 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.5.0 — 2026-09-12
+
+`design-system-handoff` schema 12/13: the export now states its own CSS, so the generator
+stops being a token-only consumer. A design system can delete its hand-authored type
+utilities.
+
+### Added
+
+- **`styles.generated.css` (P21)** — one class per Figma style, from the export's own
+  `cssClass`: **selector and declarations verbatim, in the export's order**, never derived
+  from a style name and never recomputed from `properties`. TEXT, then EFFECT, then GRID,
+  then PAINT. A style the export gives no `declarations` for is reported `NO-DECLARATIONS`
+  and not emitted (PAINT is all of that case today). Named by the new, optional
+  `paths.styles`; an export older than schema 12, or a config that names no path, writes
+  **no file** rather than an empty one.
+- **Hand-authored wins, per class (P21.1).** A selector the consumer declares at top level
+  is MATCH / VALUE-DRIFT and is not emitted, exactly as P2 does per token. `@utility foo`
+  compiles to `.foo` and therefore SHADOWS a generated class, but is not an unconditional
+  declaration of it — the same reading `isGlobalScope` already takes — so it is reported,
+  never obeyed. Sixteen shadows in `jhd-design-system/src/styles.css` today.
+- **Two findings about the export (P21.2).** `STYLE_CLASS_LITERAL`: a declaration freezes a
+  raw literal **outside every `var()`** for a property the same style binds to a variable.
+  `STYLE_CLASS_UNSCOPED`: the selector is the style's bare `leafName`. Both fired on the
+  13:28 schema-12 export (18 and 7); the plugin fixed both at the source, and both report
+  zero on the 13:43 schema-13 export shipped here. Neither is ever repaired in this
+  package — a rewritten selector would break P21's verbatim contract.
+- **Numeric font weights (P22).** A STRING variable carrying schema 12's
+  `fontWeightNumeric` emits the export's own number — `--weight-strong: 500`, not
+  `"Medium"`. Nothing here maps a style name to a number; the report states the Figma style
+  name and the export's confidence. A STRING without one stays quoted.
+- **`cssCustomPropertySheets` cross-check (P21.3).** The export's own `:root` / theme blocks
+  are read and **never emitted** — the consumer's policies decide what a token reads as, and
+  two disagreeing stylesheets in one repo is the failure this package removes. Every
+  declaration is compared against this run instead: 653 differ on the v13 export, including
+  101 the plugin stringified an object into (`--delay-0: [object Object]`).
+- **`schema/design-system-handoff.v12plus.schema.json`** — the 8-13 base document plus the
+  four structures schema 12 introduced (`cssClass`, type ramp v2, `fontWeightNumeric`,
+  `cssCustomPropertySheets`). `validate-export.mjs` dispatches on `schemaVersion`, so an
+  8-11 export is not failed for lacking fields its own version never had. Published as
+  `handoff-css/schema/export/v12plus`.
+- **`fixtures/jhd-v13-2026-09-12/`** — schema 13, plugin export v17, generated
+  2026-09-12T13:43:20.353Z, design-system state `eab3d422…498cc` (the same state `jhd-v11`
+  was exported from). Ships the companion `.md`, the consumer's `styles.css` verbatim from
+  `jhd-design-system`, and five `expected/*` artifacts. `test/styles-v13.test.mjs` pins them
+  byte-for-byte and pins that the two findings still fire on a mutated copy, so a green run
+  means "clean", not "switched off".
+
+### Changed
+
+- `schema/design-system-handoff.schema.json` accepts `schemaVersion` 8-13 (10 and 11 shipped
+  and were generated from, but would have failed validation). The unknown-version tests are
+  repointed from 10 to 14 — assertions unchanged, only the version they pin.
+- `src/header.mjs`: the provenance header extracted from `emit-tokens.mjs` verbatim, so both
+  generated stylesheets state the same export. Byte-neutral — every older fixture is
+  unchanged.
+- `presets/jhd.config.mjs`: `schema.versions` gains `10`-`13`; `paths.styles` added.
+- `skills/handoff-to-code/SKILL.md`: bind the generated class, delete the shadowing
+  `@utility`, report the two class findings rather than patching them. Adapters rebuilt.
+
 ## 0.4.3 — 2026-09-12
 
 Design Handoff schema v11 (export v15+): explicit alignment. `gridPlacement` now carries

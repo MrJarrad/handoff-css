@@ -8,7 +8,7 @@ export default {
   // Which export contract this consumer has vendored and read.
   schema: {
     name: "design-system-handoff",
-    versions: ["7", "8", "9"],
+    versions: ["7", "8", "9", "10", "11", "12", "13"],
   },
 
   // Every path is relative to the consuming repo root.
@@ -16,6 +16,9 @@ export default {
     input: "design/handoff/latest/jhd-spec-designsystem-design-system-handoff.json",
     out: "src/tokens.generated.css",
     theme: "src/theme.generated.css",
+    // P21 — one class per Figma style, from schema 12's `cssClass`. This is
+    // what lets the design system stop hand-authoring its type utilities.
+    styles: "src/styles.generated.css",
     report: "design/generated/ds-from-handoff-report.md",
     handAuthored: "src/styles.css",
     exclusions: "design/generated/exclusions.json",
