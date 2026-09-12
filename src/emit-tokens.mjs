@@ -1,7 +1,5 @@
 // The token stylesheet: one block per collection, one declaration per
 // (variable, effective mode), placed by `modes.mjs`. See docs/POLICIES.md.
-import path from "node:path";
-
 import { aliasBlock } from "./aliases.mjs";
 import { aspectDescriptionFindings } from "./aspect.mjs";
 import { delayAliasFindings } from "./motion.mjs";
@@ -10,8 +8,7 @@ import { layoutBreakpoints, placementsFor, renderGroups, themeModeIds, variantBa
 import { cmp, num, resolveValue, untrustedCells } from "./resolve.mjs";
 import { classify, honours, isViewportClass, VIEWPORT_FRACTION_TOLERANCE } from "./responsive.mjs";
 import { assertSchema, indexById, webName } from "./schema.mjs";
-
-const handAuthoredName = (cfg) => path.basename(cfg.paths.handAuthored);
+import { generatedHeader, handAuthoredName } from "./header.mjs";
 
 export function emitTokens(doc, handDeclared, cfg) {
   assertSchema(doc, cfg);
@@ -314,22 +311,11 @@ export function emitTokens(doc, handDeclared, cfg) {
   const aliases = aliasBlock(emitted, handDeclared, cfg);
   if (aliases.css) blocks.push(aliases.css);
 
-  const header = [
-    "/* GENERATED FILE — DO NOT EDIT BY HAND.",
-    "",
-    `   Source:   ${doc.documentName ?? doc.artifact ?? "design-system handoff export"}`,
-    `   Schema:   ${doc.schema} v${doc.schemaVersion}`,
-    `   Exported: ${doc.generatedAt}`,
-    `   State:    ${doc.fingerprint.designSystemStateHash}`,
-    "",
-    `   Regenerate with:  ${cfg.header.regenerateCommand}`,
+  const header = generatedHeader(doc, cfg, [
     "   Policies (names, cascade, modes, units, aliases) are documented at the",
     `   top of that script. Hand-authored tokens in ${handAuthoredName(cfg)} always win and`,
     "   are omitted here; the reconciliation report lists every one.",
-    "*/",
-    "",
-    "",
-  ].join("\n");
+  ]);
 
   return {
     css: `${header}${blocks.join("\n\n")}\n`,

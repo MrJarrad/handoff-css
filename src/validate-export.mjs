@@ -16,22 +16,36 @@ const require = createRequire(import.meta.url);
 /** The published schema document, also reachable as `handoff-css/schema/export`. */
 export const exportSchema = require("../schema/design-system-handoff.schema.json");
 
+/** Schema 12's own document — the base above plus the structures schema 12
+ * introduced (style classes, type ramp v2, `fontWeightNumeric`,
+ * `cssCustomPropertySheets`). Reachable as `handoff-css/schema/export/v12`. */
+export const exportSchemaV12 = require("../schema/design-system-handoff.v12.schema.json");
+
 /** The schema versions this module knows how to validate. A v7 export is
  * legacy: it parses, it generates, and it is NOT validated (schema 7 predates
  * `responsiveBehavior` and the WEB-name contract). Dropped in 0.4.0. Schema 9
  * is the same shape as 8 — designer-signal viewport gating and whole-percent
  * fraction snapping are semantic changes the export makes, not structural
  * ones this schema needs to distinguish. */
-export const VALIDATED_SCHEMA_VERSIONS = [8, 9];
+export const VALIDATED_SCHEMA_VERSIONS = [8, 9, 10, 11, 12];
 
-let compiled = null;
-const validator = () => {
-  if (compiled == null) {
+/** Which schema document validates a given `schemaVersion` (0.5.0). 8-11 share
+ * the base shape; 12 adds required structures the base must NOT demand of an
+ * older export, so it gets its own document rather than a widened base. */
+export const schemaFor = (schemaVersion) =>
+  Number(schemaVersion) >= 12 ? exportSchemaV12 : exportSchema;
+
+const compiled = new Map(); // $id -> compiled validator
+const validator = (schema) => {
+  if (!compiled.has(schema.$id)) {
     const ajv = new Ajv2020({ allErrors: true, strict: false });
     addFormats(ajv);
-    compiled = ajv.compile(exportSchema);
+    // The v12 document is the base `allOf` its own additions, so the base has
+    // to be resolvable by `$id` before the v12 one compiles.
+    if (schema !== exportSchema) ajv.addSchema(exportSchema);
+    compiled.set(schema.$id, ajv.compile(schema));
   }
-  return compiled;
+  return compiled.get(schema.$id);
 };
 
 /**
@@ -59,7 +73,7 @@ export function validateExport(doc) {
   if (typeof doc.schemaVersion === "number" && doc.schemaVersion < Math.min(...VALIDATED_SCHEMA_VERSIONS)) {
     return { ok: true, skipped: true, errors: [], warnings: [] };
   }
-  const validate = validator();
+  const validate = validator(schemaFor(doc.schemaVersion));
   const ok = validate(doc);
   const findings = Array.isArray(doc.validation?.findings) ? doc.validation.findings : [];
   return {
