@@ -1,7 +1,9 @@
 // P14 — the OTHER half of the pair. The layer brief is markdown, so its
 // contract is a line grammar rather than a JSON Schema: see
 // `schema/design-handoff.v6.grammar.md`, which this module implements line for
-// line and which names every code raised here.
+// line and which names every code raised here. `schema/design-handoff.v9.grammar.md`
+// is the delta for schema v9 (export v11, 2026-09-12): the `→ CSS` token-row
+// form and `col()`/`row()` grid-table cells, implemented in this same module.
 //
 // Two jobs, deliberately one module:
 //   `parseHandoffMarkdown` — the brief as data (identity, tokens, nodes,
@@ -13,6 +15,16 @@
 // ahead of the bold identity lines. `parseFrontMatter` (src/front-matter.mjs)
 // reads it; this module cross-checks it against the bold lines it already
 // parses and prefers it when both exist and agree.
+//
+// 0.4.1 note (module boundary for 0.5.0): the Design Handoff plugin (schema v9)
+// exports the brief as BOTH this markdown and a JSON companion carrying the
+// same content structured. Today's brief downloads only ever carried the .md,
+// so 0.4.1 keeps this file's markdown line-grammar as the contract. The
+// boundary a JSON reader would replace is exactly `parseHandoffMarkdown`'s
+// output shape (identity, tokens, nodes, tables, notes, changes, sections) —
+// `validateHandoffMarkdown` and every downstream consumer read that shape, not
+// the markdown text, so a `parseHandoffJson.mjs` producing the same shape from
+// the JSON companion is a drop-in for 0.5.0, not a rewrite.
 import { parseFrontMatter } from "./front-matter.mjs";
 
 /** Section headers the grammar requires, in the order they must appear. */
@@ -33,6 +45,11 @@ const COMPANION_POLICIES = /^- Policies: (.+)$/;
 const TOKENS_HEADER = /^\*\*Variable tokens \((\d+) unique\):\*\*/;
 const TOKEN_ROW = /^- \$(\S+) ·\s*(.*)$/;
 const WEB_NAME = /(?:^|·)\s*WEB `(--[a-z0-9-]+)`/;
+// schema v9 (export v11, 2026-09-12) dropped the per-platform `WEB`/`ANDROID`/`iOS`
+// columns from the token row in favour of a single `CSS` name followed by the
+// mode-value samples inline; the same fields (`scopes`, `modes`, `(=…)`) move
+// to indented continuation lines below the row rather than trailing `·` cells.
+const TOKEN_ROW_V9 = /^- \$(\S+) → CSS `(--[a-z0-9-]+)`/;
 const RESPONSIVE_ROW = /^\s+Responsive behavior: (.+)$/;
 const NODE_ANCHOR = /^### (.+?) \(([A-Z_]+)\) #(\S+)(.*)$/;
 const NODE_ROW = /^(\s*)- \*\*(.+?)\*\* \(([A-Z_]+)\)(.*)$/;
@@ -54,6 +71,16 @@ const CELL = [
   /^col-span \d+\/\d+$/,
   /^(?:hug|fill)$/,
   /^\d+(?:\.\d+)?(?:px|rem|%)?$/,
+  // schema v9 (export v11, 2026-09-12): `col(S/N of M)` = grid-column: S / span N
+  // on an M-column grid; `row(S/N)` = grid-row: S / span N. A cell may carry
+  // both, `col()` first, space-separated.
+  /^col\(\d+\/\d+ of \d+\)(?: row\(\d+\/\d+\))?$/,
+  /^row\(\d+\/\d+\)$/,
+  // The full Design Handoff plugin (per the operator's Figma-agent overview,
+  // 2026-09-12) also samples `aspect(…)` and the self-alignment hints as
+  // grid-table cell values on some pages, not only as node-row prose.
+  /^aspect\([^()]+\)$/,
+  /^(?:justifySelf|alignSelf):\S+$/,
 ];
 // The plugin's 2026-09-11 export moved the table-note sigil to `†`, freeing
 // `⚠` to mean only "flag this value" (raw/placeholder). Both sigils are
@@ -182,6 +209,11 @@ export function parseHandoffMarkdown(text) {
       if (row) {
         const web = WEB_NAME.exec(line);
         out.tokens.push({ token: row[1], web: web ? web[1] : null, responsive: null, line: at });
+        return;
+      }
+      const rowV9 = TOKEN_ROW_V9.exec(line);
+      if (rowV9) {
+        out.tokens.push({ token: rowV9[1], web: rowV9[2], responsive: null, line: at });
         return;
       }
       if (line.startsWith("###") || line.startsWith("**")) inTokens = false;

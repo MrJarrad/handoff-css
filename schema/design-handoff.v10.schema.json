@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://handoff-css/schema/design-handoff.v10.schema.json",
+  "title": "Design Handoff brief — JSON companion (schema design-handoff v10)",
+  "description": "P17/0.4.1 — the Design Handoff plugin (export v14+) emits this JSON alongside the layer-brief markdown, carrying the same identity and node data structured. Validated SHAPE only: the top-level identity fields the markdown front matter must reconcile against, plus the section keys a brief always carries. What a value MEANS is the plugin's business, not this schema's.",
+  "type": "object",
+  "required": [
+    "schema", "schemaVersion", "contract", "generatedAt", "exportVersion",
+    "documentName", "pageName", "contentHash", "designSystemStateHash", "companion",
+    "breakpoints", "selectedNodes"
+  ],
+  "properties": {
+    "schema": { "const": "design-handoff" },
+    "schemaVersion": { "const": 10 },
+    "contract": { "type": "string" },
+    "lane": { "type": "string" },
+    "generatedAt": { "type": "string" },
+    "exportVersion": { "type": "integer" },
+    "documentName": { "type": "string" },
+    "pageName": { "type": "string" },
+    "contentHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "designSystemStateHash": { "type": "string" },
+    "companion": {
+      "type": "object",
+      "required": ["schema", "schemaVersion", "contentHash", "designSystemStateHash"],
+      "properties": {
+        "schema": { "const": "design-system-handoff" },
+        "schemaVersion": { "type": "integer" },
+        "artifactFilename": { "type": "string" },
+        "contentHash": { "type": "string" },
+        "designSystemStateHash": { "type": "string" },
+        "stale": { "type": "boolean" }
+      }
+    },
+    "breakpoints": { "type": "object" },
+    "selectedNodes": { "type": "array" },
+    "layerTree": {},
+    "componentIndex": {},
+    "variableTokens": {},
+    "changes": {}
+  }
+}
