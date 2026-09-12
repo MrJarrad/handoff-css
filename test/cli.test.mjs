@@ -89,16 +89,21 @@ const sink = () => {
 };
 const FIXTURES = new URL("../fixtures/jhd-v8b-2026-09-10/", import.meta.url).pathname;
 
-test("dispatch routes `validate` and prints ✓ per file, with the one real warning", async () => {
+// 0.5.2 — the real v8b export carries 3 `fluid-clamp` rules whose `css` does
+// not reproduce its own samples (P11, `FLUID_CLAMP_MISMATCH`): the export is
+// wrong about its own numbers, so `validate` now refuses it, exactly as it
+// refuses any other export-stated defect.
+test("dispatch routes `validate` and prints ✗ on the export's own FLUID_CLAMP_MISMATCH, ✓ on the handoff", async () => {
   const stdout = sink();
   const code = await dispatch(
     ["validate", path.join(FIXTURES, "export.json"), path.join(FIXTURES, "design-handoff-block-navigation.md")],
     { stdout, stderr: sink() },
   );
-  assert.equal(code, 0);
+  assert.equal(code, 1);
   const lines = stdout.text.split("\n").filter(Boolean);
-  assert.equal(lines.filter((l) => l.startsWith("✓")).length, 2, stdout.text);
-  assert.equal(lines.filter((l) => l.startsWith("✗")).length, 0);
+  assert.equal(lines.filter((l) => l.startsWith("✓")).length, 1, stdout.text);
+  assert.equal(lines.filter((l) => l.startsWith("✗")).length, 1, stdout.text);
+  assert.equal(stdout.text.match(/FLUID_CLAMP_MISMATCH/g).length, 3);
   assert.equal(stdout.text.match(/POLICY_VERSION_MISMATCH/g).length, 1);
   assert.match(stdout.text, /line 27/);
 });

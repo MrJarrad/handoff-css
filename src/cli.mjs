@@ -131,15 +131,19 @@ function validateJson(file, text, { brief = false } = {}) {
       findings: errors.map((e) => ({ code: "SCHEMA", severity: "error", line: 0, path: e.path, message: `${e.message} (${e.keyword})` })),
     };
   }
-  const { ok, skipped, errors, warnings } = validateExport(doc);
+  const { ok, skipped, errors, warnings, clampFindings } = validateExport(doc);
   return {
     file,
     kind: "export",
-    ok,
+    // P11 — a `FLUID_CLAMP_MISMATCH` is red (the export's own numbers
+    // disagree with each other) even on an otherwise schema-valid document,
+    // so `validate`/`--check` refuse it exactly as a schema error would.
+    ok: ok && clampFindings.length === 0,
     skipped,
     schemaVersion: doc.schemaVersion ?? null,
     findings: [
       ...errors.map((e) => ({ code: "SCHEMA", severity: "error", line: 0, path: e.path, message: `${e.message} (${e.keyword})` })),
+      ...clampFindings.map((f) => ({ code: f.code, severity: "error", line: 0, path: `/${f.variable}`, message: f.detail })),
       ...warnings.map((w) => ({ code: w.code, severity: "warning", line: 0, path: w.variable ? `/${w.variable}` : "/", message: w.detail ?? "" })),
     ],
   };
