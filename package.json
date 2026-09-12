@@ -29,6 +29,7 @@
   ],
   "scripts": {
     "test": "node --test 'test/**/*.test.mjs'",
+    "validate": "node bin/handoff-css.mjs validate",
     "skills": "node scripts/build-skill-adapters.mjs",
     "skills:check": "node scripts/build-skill-adapters.mjs --check"
   },

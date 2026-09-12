@@ -389,6 +389,10 @@ not the number of modes — decides how many declarations it gets.
 | `mode-stepped` | Per-mode, in ascending `@media (min-width)` blocks — the default path (P3, P6). |
 | `sample-only` | Per-mode, from the one published sample. |
 
+For `fixed`, the emitted declaration is the resolved token reference (the alias
+chain), not the literal `css` string the export publishes — the alias binding is
+preferred over the literal because it survives upstream token renames.
+
 **Where the class comes from**, in precedence order:
 
 1. A `responsive` block on the variable —
