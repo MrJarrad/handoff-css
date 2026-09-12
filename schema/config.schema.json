@@ -5,7 +5,7 @@
   "description": "Every house policy handoff-css applies. Nothing in src/ carries a default for these: a consumer states them here, or the generator refuses to run.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "paths", "exclude", "color", "layout", "modes", "themes", "tailwind", "responsive", "viewport", "aliases", "report", "header"],
+  "required": ["schema", "paths", "exclude", "color", "motion", "aspect", "layout", "modes", "themes", "tailwind", "responsive", "viewport", "aliases", "report", "header"],
   "properties": {
     "schema": {
       "type": "object",
@@ -54,6 +54,49 @@
         "format": {
           "enum": ["rgb-slash-percent", "hex8"],
           "description": "How an 8-digit hex renders: `#rrggbb` at full alpha else `rgb(r g b / pct)`, or the export's hex verbatim."
+        }
+      }
+    },
+    "motion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timingUnit", "delayAliasOf"],
+      "description": "P19 — MOTION. An EASING variable renders from the export's own curve (`cubic-bezier(…)`, `linear` for a LINEAR curve) and needs no house policy.",
+      "properties": {
+        "timingUnit": {
+          "enum": ["ms", "s"],
+          "description": "The unit a TIMING variable (`motion/duration/*`, `motion/delay/*`) publishes. Figma stores seconds. `ms` republishes them as milliseconds, so a step the operator named for its milliseconds reads in the unit its name states (ruling 2026-09-12 row 2); `s` is the pre-0.4.0 form."
+        },
+        "delayAliasOf": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["delay", "duration"],
+          "description": "Ruling 2026-09-12 row 4 makes every delay step an ALIAS of the duration step of the same value, so the two can never drift. Naming the two groups lets the generator REPORT a delay Figma authored as its own literal copy (`DELAY_NOT_ALIASED`). It never rewrites one: pairing them here would look identical today and silently overwrite the first delay that legitimately differs. `null` switches the check off.",
+          "properties": {
+            "delay": { "type": "string", "description": "`\"<collection>/<variable>\"` prefix of the delay ramp." },
+            "duration": { "type": "string", "description": "`\"<collection>/<variable>\"` prefix of the duration ramp it aliases." }
+          }
+        }
+      }
+    },
+    "aspect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ratioPaths", "descriptionGroup", "descriptionPattern"],
+      "description": "P20 — ASPECT RATIOS. Figma has no aspect-ratio TYPE, so a design system authors each ratio as a STRING variable holding `a:b`. This states which variables those are, so they render as the CSS ratio `a / b` instead of a quoted string.",
+      "properties": {
+        "ratioPaths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "`\"<collection>/<variable>\"` prefixes whose STRING variables hold a ratio (`core/aspect/`). Their values render as `a / b`; a value that is neither `a:b` nor `a/b` is a hard failure, never emitted as a quoted string. Empty derives nothing and leaves every STRING quoted."
+        },
+        "descriptionGroup": {
+          "type": ["string", "null"],
+          "description": "OPTIONAL cross-check only, never a source of values. The `\"<collection>/<variable>\"` prefix of the per-column-span HEIGHT groups that encode the same ratios in their descriptions (`layout/grid/aspect/`) — normally also in `exclude.paths`. A leaf group whose descriptions contradict the authored `ratioPaths` variable of the same name raises `ASPECT_DESCRIPTION_DISAGREES`. `null` skips the check."
+        },
+        "descriptionPattern": {
+          "type": ["string", "null"],
+          "description": "A JavaScript regular-expression source matched against those descriptions, whose first two capture groups are the ratio's antecedent and consequent."
         }
       }
     },

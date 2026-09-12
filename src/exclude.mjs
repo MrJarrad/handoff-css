@@ -12,11 +12,20 @@ import { webName } from "./schema.mjs";
 //
 //   `.utility/`           durable. Operator ruling 2026-09-06: ".utility ignore
 //                         all together" — a Figma authoring scratch collection.
-//   `layout/grid/aspect/` INTERIM, pending Figma marking these hidden. Operator
-//                         ruling 2026-09-06: "we didn't bring in aspect ratio
-//                         related variables like portrait, tall and landscape.
-//                         They are just figma hacks because i can actually add
-//                         an aspect ratio."
+//   `layout/grid/aspect/` durable as an EXCLUSION, and deliberately READ by P20.
+//                         Operator ruling 2026-09-06: "we didn't bring in aspect
+//                         ratio related variables like portrait, tall and
+//                         landscape. They are just figma hacks because i can
+//                         actually add an aspect ratio." Ruling 2026-09-12 row 6
+//                         adds the other half: "figma has no concept of aspect
+//                         ratios, I tend to just use the col-span as the height".
+//                         The per-col-span heights are the hack and never become
+//                         tokens; the RATIO every one of them states in its
+//                         description is the design decision, and P20 (`aspect`
+//                         below) publishes it once per leaf group. Excluding a
+//                         group and deriving from it is not a contradiction: P7
+//                         governs what is emitted, and this group is the only
+//                         place the ratio is written down.
 export const isHidden = (v) => v.hiddenFromPublishing === true || v.effectivelyHiddenFromPublishing === true;
 
 export const isExcluded = (collection, v, cfg) =>

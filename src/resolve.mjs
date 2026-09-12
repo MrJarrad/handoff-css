@@ -1,6 +1,7 @@
 // Value rendering (policies P4, P5, P9) plus the two determinism primitives
 // every other module needs: `num` (float32 noise rounded off) and `cmp`.
 // See docs/POLICIES.md.
+import { isRatioVariable, ratioValue } from "./aspect.mjs";
 import { webName } from "./schema.mjs";
 
 export const fail = (msg) => {
@@ -33,6 +34,23 @@ export const color = (hex8, cfg) => {
   const ch = (i) => parseInt(rgb.slice(i, i + 2), 16);
   const pct = num((parseInt(aa, 16) / 255) * 100);
   return `rgb(${ch(0)} ${ch(2)} ${ch(4)} / ${pct}%)`;
+};
+
+/**
+ * P19 — MOTION. Figma stores a TIMING variable in SECONDS; `motion.timingUnit`
+ * states which unit the house publishes. Operator ruling 2026-09-12 row 2 —
+ * "should the name reflect the time?" — names the steps by their milliseconds,
+ * so the value has to read in the same unit the name states or the token lies
+ * about itself (`--duration-375: 0.375s`).
+ *
+ * The float32 noise is rounded off in SECONDS (`num`'s six decimal places)
+ * BEFORE the scale, not after: `0.10000000149011612 * 1000` is
+ * `100.00000149011612`, which six decimal places preserve as `100.000001ms`.
+ */
+export const timing = (raw, cfg) => {
+  if (typeof raw !== "number" || !Number.isFinite(raw)) fail(`non-finite TIMING value ${raw}`);
+  if (cfg.motion.timingUnit === "s") return `${num(raw)}s`;
+  return `${num(Math.round(raw * 1e6) / 1e3)}ms`;
 };
 
 const easing = (raw) => {
@@ -139,6 +157,9 @@ export function untrustedCells(doc) {
 const terminalNote = (v, mode, terminal, byId, cfg) => {
   if (v.type === "FLOAT" && mode.build?.status === "resolved") return mode.build.css;
   if (v.type === "COLOR" && typeof terminal === "string") return color(terminal, cfg);
+  // P19 — a delay aliasing a duration step (operator ruling row 4) carries the
+  // duration's own terminal; render it in the unit the token publishes.
+  if (v.type === "TIMING" && typeof terminal === "number") return timing(terminal, cfg);
   // P9: a COMPOSE_COLOR terminal is the expression object, not a hex string —
   // render it the same symbolic way composeColor's own note does rather than
   // stringifying the object.
@@ -245,7 +266,7 @@ function composeColorNote(v, raw, byId) {
  * @returns {{ value: string, note: string|null, aliasTarget: string|null,
  *             unresolvedAlias: boolean, terminal: string|null }}
  */
-export function resolveValue(v, mode, byId, cfg) {
+export function resolveValue(v, mode, byId, cfg, collection = null) {
   if (mode.alias) {
     const hop = mode.alias.chain?.[0];
     const terminal = mode.alias.terminalValue ?? null;
@@ -263,7 +284,12 @@ export function resolveValue(v, mode, byId, cfg) {
     // Remote / not exported: fall back to the terminal so the token still works.
     if (terminal == null) fail(`${webName(v)}: alias with no resolvable target or terminal`);
     return {
-      value: v.type === "COLOR" ? color(terminal, cfg) : String(terminal),
+      value:
+        v.type === "COLOR"
+          ? color(terminal, cfg)
+          : v.type === "TIMING" && typeof terminal === "number"
+            ? timing(terminal, cfg)
+            : String(terminal),
       note: `alias target ${hop?.variableName ?? "?"} not in export — terminal value inlined`,
       aliasTarget: null,
       unresolvedAlias: true,
@@ -279,9 +305,13 @@ export function resolveValue(v, mode, byId, cfg) {
       }
       return plain(color(raw, cfg));
     case "STRING":
+      // P20 — a STRING variable the consumer declared a ratio holder is the
+      // design system's aspect-ratio primitive, and `aspect-ratio: "3:2"` is
+      // not a value CSS accepts. Every other STRING is quoted, as before.
+      if (collection && isRatioVariable(collection, v, cfg)) return plain(ratioValue(v, raw));
       return plain(JSON.stringify(String(raw)));
     case "TIMING":
-      return plain(`${num(raw)}s`);
+      return plain(timing(raw, cfg));
     case "EASING":
       return plain(easing(raw));
     case "BOOLEAN":

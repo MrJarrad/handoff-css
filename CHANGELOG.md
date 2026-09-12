@@ -2,6 +2,86 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.4.0 — 2026-09-12
+
+Motion and aspect ratios become generator output instead of hand-authored copies.
+Operator rulings 2026-09-12 (`2026-09-12-motion-token-naming`), against the design
+system as export v11 authors it.
+
+### Added
+
+- **P19 — MOTION (`config.motion`).** A TIMING variable publishes in the unit
+  `motion.timingUnit` names. Figma stores seconds; the house preset publishes
+  **milliseconds**, because the ramp names each step for its milliseconds and
+  `--duration-375: 0.375s` would lie about itself in the one place a reader looks. Float32
+  noise is rounded off in seconds BEFORE the scale, or `0.1s` reads as `100.000001ms`.
+  Easing needs no policy and gains no key: `LINEAR` emits the keyword `linear`, every other
+  curve emits `cubic-bezier(…)` from the export's own control points.
+- **`DELAY_NOT_ALIASED` (`motion.delayAliasOf`).** Ruling row 4 makes every delay step a
+  Figma ALIAS of the duration step of the same value, *"so values can never drift"*. When
+  Figma authors that, P5 emits `--delay-375: var(--duration-375)` with the terminal comment
+  in milliseconds too. **The generator never pairs the two itself** — rewriting a literal
+  delay on a value match looks identical today and silently overwrites the first delay that
+  legitimately differs. It reports instead, naming the duration to re-point at. A delay with
+  no matching duration step (`delay/50`) is not a finding.
+- **P20 — ASPECT RATIOS (`config.aspect`).** Figma has no aspect-ratio TYPE, but it has
+  STRING variables, and `core/aspect/{landscape, portrait, square, tall}` now hold `"3:2"`,
+  `"4:5"`, `"1:1"`, `"2:3"`. Nothing is derived: they are ordinary published variables under
+  their own `--aspect-<name>` names (P1), and this policy renders `a:b` as the CSS ratio
+  `a / b`. Both spellings and decimals are read; every STRING outside `aspect.ratioPaths`
+  stays quoted; a declared ratio path holding a non-ratio is a hard failure rather than a
+  quoted passthrough that would surface in a browser.
+- **`ASPECT_DESCRIPTION_DISAGREES` (`aspect.descriptionGroup`).** The per-column-span
+  `layout/grid/aspect/*` heights stay EXCLUDED (P7) and still describe the ratio they were
+  computed from, so each leaf group's descriptions are cross-checked against the authored
+  variable of the same name. The finding changes **no value** — the authored variable is
+  always the value; a stale description means a designer is reading the wrong number.
+- **`conform` and the handoff-markdown parser are exported from the package entry.** The
+  `exports` map publishes `.` only, so P16's checker was reachable from the CLI and from
+  this repo's own tests and from nowhere else; `jhd-design-system` calls it from its suite.
+  Exported as `conform`, `FINDINGS`, `renderConformMarkdown`, `renderConformJson`,
+  `parseHandoffMarkdown`, `validateHandoffMarkdown`. The README's old deep-import examples
+  (`handoff-css/src/conform.mjs`) never resolved and are corrected.
+- **`fixtures/jhd-v10-2026-09-12/`** — the plugin's export v11 (schema 9, state
+  `26351f7a…defc`), the design system as the rulings authored it: seven curve-family
+  easings, `duration/0..2000` in 100 ms steps plus 375 and 750, `delay/0..1000` in 100 ms
+  steps plus 50, 375 and 750, and the four `core/aspect/*` string variables.
+
+### Known gap in the fixture
+
+- **Not one of the fourteen delay steps is a Figma alias** in export v11, though the export
+  carries 664 aliases elsewhere. Thirteen hold a duration step's value as their own literal,
+  so a v10 run raises thirteen `DELAY_NOT_ALIASED` findings. The values are correct and
+  nothing is blocked; ruling row 4's *no-drift* guarantee is simply not authored yet, and
+  the fix is re-pointing thirteen variables in Figma. The generator emits them verbatim
+  meanwhile and does not invent the aliasing.
+
+### Changed
+
+- `config.motion` and `config.aspect` are **required**. There are no defaults in this
+  package by design — a silently defaulted house policy is how a token pipeline starts
+  emitting values nobody chose. A consumer on the shipped preset inherits both.
+- `resolveValue(v, mode, byId, cfg)` takes an optional fifth argument, the variable's
+  collection, so P20 can tell a ratio path from any other STRING. Callers inside this
+  package pass it; the default preserves the old behaviour.
+
+### Unchanged
+
+- The `jhd-v7b`, `jhd-v8b`, `jhd-v9`, `jhd-v9b` and `jhd-v9c` fixtures are byte-identical.
+  Their `expected/*` are committed artifacts of exports that predate these rulings, so
+  `test/fixture.mjs` states the policy they were produced under (`PRE_0_4_0`) rather than
+  restating those exports as something they never said.
+
+### For consumers adopting this
+
+Six hand-authored declarations in `jhd-design-system/src/styles.css` are superseded and must
+be deleted, or P2 keeps suppressing the generated token: the four `--aspect-*` copies,
+`--duration-1600: 1.6s` (the file calls it *"not yet a Figma step"* — it is one now, and is a
+VALUE-DRIFT row until the copy goes), and `--easing-linear` (kept by hand because the export
+published the keyword; v11 authors the explicit `0,0,1,1` bezier, so it is a MATCH now).
+`--duration-250` stays: there is still no `duration/250` in Figma. See `consumerCss040` in
+`test/fixture.mjs`.
+
 ## 0.3.4 — 2026-09-11
 
 Generated headers no longer print the export's filename.

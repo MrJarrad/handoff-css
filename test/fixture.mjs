@@ -51,11 +51,34 @@ export { preset };
  * are asserted against the preset in `responsive.test.mjs` and
  * `aliases.test.mjs`.
  */
+/**
+ * The two 0.4.0 policies, pinned to their pre-0.4.0 behaviour.
+ *
+ * `expected/*` in `jhd-v7b`, `jhd-v8b`, `jhd-v9`, `jhd-v9b` and `jhd-v9c` are
+ * committed artifacts of the design system AS IT WAS EXPORTED — motion steps
+ * still named by index rather than by milliseconds (`duration/300` = 0.375s),
+ * and `grid/aspect/*` still carrying one wrong description. Generating them
+ * under the 0.4.0 house policy would restate those exports as something they
+ * never said, so the fixtures state the policy they were produced under and
+ * stay byte-stable. The 0.4.0 behaviour is asserted against `jhd-v9d`, the
+ * export that carries it — exactly as the 0.2.0 deltas are asserted against
+ * the preset rather than folded into these files.
+ *
+ * P19 `timingUnit: "s"`  — Figma's own unit, which is what 0.3.4 emitted.
+ *     `delayAliasOf: null` — no delay/duration cross-check.
+ * P20 `ratioPaths: []`     — no STRING variable is treated as a ratio.
+ */
+export const PRE_0_4_0 = {
+  motion: { timingUnit: "s", delayAliasOf: null },
+  aspect: { ratioPaths: [], descriptionGroup: null, descriptionPattern: null },
+};
+
 export const config = {
   ...preset,
   responsive: { honourClasses: [] },
   viewport: { ...preset.viewport, descriptionFallback: false },
   aliases: {},
+  ...PRE_0_4_0,
 };
 
 /**
@@ -120,6 +143,18 @@ export const expectedV8b = (file) =>
  * that repo's committed artifacts, so reproducing them needs the real pair.
  */
 export const consumerConfig = {
+  ...preset,
+  report: { ...preset.report, policyRef: "docs/handoff-css.md" },
+  header: { ...preset.header, regenerateCommand: "pnpm run tokens" },
+  ...PRE_0_4_0,
+};
+
+/**
+ * The same consumer pair with the 0.4.0 policies ON — the config
+ * `jhd-design-system` ships from 0.4.0 onward. Used by the `jhd-v9d` fixture,
+ * whose `expected/*` this package generated.
+ */
+export const consumerConfig040 = {
   ...preset,
   report: { ...preset.report, policyRef: "docs/handoff-css.md" },
   header: { ...preset.header, regenerateCommand: "pnpm run tokens" },
@@ -192,3 +227,74 @@ export const docV9c = () =>
   );
 
 export const V9C = path.join(path.dirname(FIXTURE), "jhd-v9c-2026-09-11");
+
+/**
+ * The consumer's stylesheet as it ships AFTER adopting 0.4.0 — every
+ * hand-authored declaration the new policies supersede, deleted.
+ *
+ * A global hand-authored declaration suppresses the generated token (P2), so
+ * adoption is a deletion on the consumer's side, exactly as adopting P12 meant
+ * deleting the eighteen `--screen-height-*` lines (see `consumerCss` above).
+ * Six lines go:
+ *
+ *   `--aspect-{landscape,square,portrait,tall}` — ruling row 5, *"no
+ *   hand-authored copies"*. `core/aspect/*` now authors all four, and the
+ *   generated values are byte-equal (report §3 MATCH), so nothing computes
+ *   differently.
+ *
+ *   `--duration-1600: 1.6s` — styles.css ~928 calls it *"not yet a Figma
+ *   step"*. It is one now, and P19 publishes it as `1600ms`, so the stale copy
+ *   is the only thing keeping the file on seconds. `--duration-250` STAYS:
+ *   there is still no `duration/250` in Figma, and the generator can only emit
+ *   what the export publishes.
+ *
+ *   `--easing-linear: cubic-bezier(0, 0, 1, 1)` — styles.css ~960 kept it by
+ *   hand because the export published the keyword `linear`, *"equivalent but
+ *   not byte-equal"*, and would not settle that VALUE-DRIFT row. Export v11
+ *   authors the explicit 0,0,1,1 bezier, so the row is a MATCH now — P2's own
+ *   definition of a duplicate that can simply be deleted.
+ *
+ * Filtered rather than vendored as a second styles.css, because
+ * `jhd-design-system` has not landed the deletion yet, and a fixture
+ * stylesheet no repo ships would prove nothing. `jhd-v8b/styles.css` stays the
+ * pinned, shipped one.
+ */
+export const consumerCss040 = () =>
+  consumerCss().split("\n")
+    .filter((l) => !/^\s*--(?:aspect-[a-z]+|duration-1600|easing-linear):/.test(l))
+    .join("\n");
+
+/**
+ * An EIGHTH real export, `fixtures/jhd-v10-2026-09-12/export.json` — schema 9,
+ * generated 2026-09-12T07:11:41.254Z, the plugin's export v11, design-system
+ * state `26351f7a…defc`. This is THE 0.4.0 fixture: the design system as the
+ * operator's 2026-09-12 rulings authored it.
+ *
+ *   motion — easings renamed to their curve families (`quad-out`, `cubic-out`,
+ *   `quart-out`, `expo-out`, `ease-out`, `circ-in-out`, `linear`); durations a
+ *   0–2000 ms ramp in 100 ms steps plus 375 and 750; delays 0–1000 in 100 ms
+ *   steps plus 50, 375 and 750. Every step is NAMED for its milliseconds.
+ *
+ *   aspect — `core/aspect/{landscape, portrait, square, tall}` are STRING
+ *   variables holding "3:2" / "4:5" / "1:1" / "2:3", with their own
+ *   `--aspect-<name>` WEB names. The `layout/grid/aspect/*` heights stay
+ *   excluded and their descriptions now agree with them.
+ *
+ * One contract statement is NOT met by this export and is left visible rather
+ * than papered over: ruling row 4 makes every delay step a Figma ALIAS of the
+ * matching duration step, and not one of the fourteen is (664 aliases exist
+ * elsewhere in the export, so the shape is available). Eleven of them hold a
+ * duration step's value as their own literal, which is what `DELAY_NOT_ALIASED`
+ * reports — see `test/motion-v10.test.mjs`.
+ */
+export const docV10 = () =>
+  JSON.parse(
+    readFileSync(path.join(path.dirname(FIXTURE), "jhd-v10-2026-09-12", "export.json"), "utf8"),
+  );
+
+export const V10 = path.join(path.dirname(FIXTURE), "jhd-v10-2026-09-12");
+
+/** `expected/*` for the v10 fixture — generated by this package's own CLI
+ * against `docV10()` + `consumerConfig040` + v8b's `consumerCss()`. */
+export const expectedV10 = (file) =>
+  readFileSync(path.join(V10, "expected", file), "utf8");

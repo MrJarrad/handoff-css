@@ -27,6 +27,14 @@ import { indexById } from "./schema.mjs";
 import { assertValidExport } from "./validate-export.mjs";
 
 export { validateConfig, configSchema } from "./config.mjs";
+// P16 — the consumer conformance check, callable as a library. The package's
+// `exports` map publishes `.` only, so a consumer that wants to run conform
+// from its own test suite (rather than through the CLI) reaches it here.
+export {
+  conform, FINDINGS, renderMarkdown as renderConformMarkdown,
+  renderJson as renderConformJson,
+} from "./conform.mjs";
+export { parseHandoffMarkdown, validateHandoffMarkdown } from "./validate-handoff-md.mjs";
 export { validateExport, assertValidExport, exportSchema, VALIDATED_SCHEMA_VERSIONS } from "./validate-export.mjs";
 
 /**

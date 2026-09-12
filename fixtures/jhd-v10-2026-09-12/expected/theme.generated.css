@@ -1,0 +1,258 @@
+/* GENERATED FILE — DO NOT EDIT BY HAND.
+
+   The Tailwind v4 namespace bridge: house/Figma names as `@theme` keys, so
+   every generated utility speaks house vocabulary and Tailwind's own default
+   scale is reset away. Policy P8 (suffix rule, values, resets, breakpoints,
+   hand-authored reconciliation) is documented at the top of
+   docs/handoff-css.md; the name-by-name status of every hand-authored
+   `@theme` entry is in design/generated/ds-from-handoff-report.md §9.
+
+   Source:   JHD-Spec-DesignSystem
+   Schema:   design-system-handoff v9
+   Exported: 2026-09-12T07:11:41.254Z
+   State:    26351f7a09758f626996439752be73090a54f3ec5e5fa371edd44b716e07defc
+
+   Regenerate with:  pnpm run tokens
+
+   NOT reset here, each for a stated reason (P8.3):
+     --spacing — Tailwind derives numeric spacing from one multiplier, not a suffix namespace — nothing to reset or populate. `p-4` still compiles by design.
+     --font-weight-* — action-base still `@apply font-medium` (separate lane); text-primitives publishes weight/strong as the STRING "Medium".
+     --text-* — The hand-authored 050–1700 ramp in styles.css is the blocker: its per-step letter-spacing modifiers have no export equivalent, so a reset would drop them. (`badge-base` no longer `@apply`s `text-xs` as of #18, but `font-medium` still survives in `action-base`.)
+     --z-index-* — Tailwind resolves `z-<number>` as a BARE value, not through the namespace, so a reset removes nothing and `z-10` compiles either way. The export also has no z collection to populate it from; styles.css's hand-authored --z-index-base…toast scale stays authoritative.
+*/
+
+@theme inline {
+  /* --- color ------------------------------------------------- */
+  /* semantic colour only — color-primitives is never bridged (P8.1) */
+  --color-*: initial;
+  --color-background-action-brand: var(--background-action-brand);
+  --color-background-action-primary: var(--background-action-primary);
+  --color-background-action-secondary: var(--background-action-secondary);
+  --color-background-action-tertiary: var(--background-action-tertiary);
+  --color-background-default-brand: var(--background-default-brand);
+  --color-background-default-primary: var(--background-default-primary);
+  --color-background-default-secondary: var(--background-default-secondary);
+  --color-background-default-tertiary: var(--background-default-tertiary);
+  --color-background-disabled-dark: var(--background-disabled-dark);
+  --color-background-disabled-darker: var(--background-disabled-darker);
+  --color-background-disabled-light: var(--background-disabled-light);
+  --color-background-disabled-lighter: var(--background-disabled-lighter);
+  --color-background-focused-dark: var(--background-focused-dark);
+  --color-background-focused-darker: var(--background-focused-darker);
+  --color-background-focused-light: var(--background-focused-light);
+  --color-background-focused-lighter: var(--background-focused-lighter);
+  --color-background-input-disabled: var(--background-input-disabled);
+  --color-background-input-primary: var(--background-input-primary);
+  --color-background-material-base: var(--background-material-base);
+  --color-background-material-base-inverse: var(--background-material-base-inverse);
+  --color-background-material-inverse-thick: var(--background-material-inverse-thick);
+  --color-background-material-inverse-thickest: var(--background-material-inverse-thickest);
+  --color-background-material-inverse-thin: var(--background-material-inverse-thin);
+  --color-background-material-inverse-thinnest: var(--background-material-inverse-thinnest);
+  --color-background-material-thick: var(--background-material-thick);
+  --color-background-material-thickest: var(--background-material-thickest);
+  --color-background-material-thin: var(--background-material-thin);
+  --color-background-material-thinnest: var(--background-material-thinnest);
+  --color-background-negative-dark: var(--background-negative-dark);
+  --color-background-negative-darker: var(--background-negative-darker);
+  --color-background-negative-light: var(--background-negative-light);
+  --color-background-negative-lighter: var(--background-negative-lighter);
+  --color-background-positive-dark: var(--background-positive-dark);
+  --color-background-positive-darker: var(--background-positive-darker);
+  --color-background-positive-light: var(--background-positive-light);
+  --color-background-positive-lighter: var(--background-positive-lighter);
+  --color-background-warning-dark: var(--background-warning-dark);
+  --color-background-warning-darker: var(--background-warning-darker);
+  --color-background-warning-light: var(--background-warning-light);
+  --color-background-warning-lighter: var(--background-warning-lighter);
+  --color-border-action-brand: var(--border-action-brand);
+  --color-border-action-primary: var(--border-action-primary);
+  --color-border-action-primary-inverse: var(--border-action-primary-inverse);
+  --color-border-action-secondary: var(--border-action-secondary);
+  --color-border-action-tertiary: var(--border-action-tertiary);
+  --color-border-default-brand: var(--border-default-brand);
+  --color-border-default-primary: var(--border-default-primary);
+  --color-border-default-secondary: var(--border-default-secondary);
+  --color-border-default-tertiary: var(--border-default-tertiary);
+  --color-border-disabled-dark: var(--border-disabled-dark);
+  --color-border-disabled-darker: var(--border-disabled-darker);
+  --color-border-disabled-light: var(--border-disabled-light);
+  --color-border-disabled-lighter: var(--border-disabled-lighter);
+  --color-border-focused-dark: var(--border-focused-dark);
+  --color-border-focused-darker: var(--border-focused-darker);
+  --color-border-focused-light: var(--border-focused-light);
+  --color-border-focused-lighter: var(--border-focused-lighter);
+  --color-border-input-activated: var(--border-input-activated);
+  --color-border-input-disabled: var(--border-input-disabled);
+  --color-border-input-hovered: var(--border-input-hovered);
+  --color-border-input-primary: var(--border-input-primary);
+  --color-border-negative-dark: var(--border-negative-dark);
+  --color-border-negative-darker: var(--border-negative-darker);
+  --color-border-negative-light: var(--border-negative-light);
+  --color-border-negative-lighter: var(--border-negative-lighter);
+  --color-border-positive-dark: var(--border-positive-dark);
+  --color-border-positive-darker: var(--border-positive-darker);
+  --color-border-positive-light: var(--border-positive-light);
+  --color-border-positive-lighter: var(--border-positive-lighter);
+  --color-border-warning-dark: var(--border-warning-dark);
+  --color-border-warning-darker: var(--border-warning-darker);
+  --color-border-warning-light: var(--border-warning-light);
+  --color-border-warning-lighter: var(--border-warning-lighter);
+  --color-content-action-brand: var(--content-action-brand);
+  --color-content-action-primary: var(--content-action-primary);
+  --color-content-action-primary-inverse: var(--content-action-primary-inverse);
+  --color-content-action-secondary: var(--content-action-secondary);
+  --color-content-default-brand: var(--content-default-brand);
+  --color-content-default-primary: var(--content-default-primary);
+  --color-content-default-primary-inverse: var(--content-default-primary-inverse);
+  --color-content-default-secondary: var(--content-default-secondary);
+  --color-content-default-tertiary: var(--content-default-tertiary);
+  --color-content-disabled-dark: var(--content-disabled-dark);
+  --color-content-disabled-darker: var(--content-disabled-darker);
+  --color-content-disabled-light: var(--content-disabled-light);
+  --color-content-disabled-lighter: var(--content-disabled-lighter);
+  --color-content-focused-dark: var(--content-focused-dark);
+  --color-content-focused-darker: var(--content-focused-darker);
+  --color-content-focused-light: var(--content-focused-light);
+  --color-content-focused-lighter: var(--content-focused-lighter);
+  --color-content-negative-dark: var(--content-negative-dark);
+  --color-content-negative-darker: var(--content-negative-darker);
+  --color-content-negative-light: var(--content-negative-light);
+  --color-content-negative-lighter: var(--content-negative-lighter);
+  --color-content-positive-dark: var(--content-positive-dark);
+  --color-content-positive-darker: var(--content-positive-darker);
+  --color-content-positive-light: var(--content-positive-light);
+  --color-content-positive-lighter: var(--content-positive-lighter);
+  --color-content-warning-dark: var(--content-warning-dark);
+  --color-content-warning-darker: var(--content-warning-darker);
+  --color-content-warning-light: var(--content-warning-light);
+  --color-content-warning-lighter: var(--content-warning-lighter);
+  --color-elevation-0: var(--elevation-0);
+  --color-elevation-100: var(--elevation-100);
+  --color-elevation-200: var(--elevation-200);
+  --color-elevation-300: var(--elevation-300);
+  --color-elevation-400: var(--elevation-400);
+  --color-elevation-500: var(--elevation-500);
+  --color-elevation-600: var(--elevation-600);
+  --color-elevation-700: var(--elevation-700);
+  --color-elevation-800: var(--elevation-800);
+
+  /* --- radius ------------------------------------------------ */
+  --radius-*: initial;
+  --radius-0: 0rem; /* literal, not var(--radius-0): same-name cycle (P8.2) */
+  --radius-100: 0.0625rem; /* literal, not var(--radius-100): same-name cycle (P8.2) */
+  --radius-1000: 8rem; /* literal, not var(--radius-1000): same-name cycle (P8.2) */
+  --radius-200: 0.125rem; /* literal, not var(--radius-200): same-name cycle (P8.2) */
+  --radius-300: 0.1875rem; /* literal, not var(--radius-300): same-name cycle (P8.2) */
+  --radius-400: 0.25rem; /* literal, not var(--radius-400): same-name cycle (P8.2) */
+  --radius-500: 0.375rem; /* literal, not var(--radius-500): same-name cycle (P8.2) */
+  --radius-600: 0.5rem; /* literal, not var(--radius-600): same-name cycle (P8.2) */
+  --radius-700: 1rem; /* literal, not var(--radius-700): same-name cycle (P8.2) */
+  --radius-800: 2rem; /* literal, not var(--radius-800): same-name cycle (P8.2) */
+  --radius-900: 4rem; /* literal, not var(--radius-900): same-name cycle (P8.2) */
+  --radius-action-radius-elipse: 62.4375rem; /* literal, not var(--radius-action-radius-elipse): same-name cycle (P8.2) */
+  --radius-action-radius-round: 0.25rem; /* literal, not var(--radius-action-radius-round): same-name cycle (P8.2) */
+  --radius-action-radius-sharp: 0rem; /* literal, not var(--radius-action-radius-sharp): same-name cycle (P8.2) */
+  --radius-full: 62.4375rem; /* literal, not var(--radius-full): same-name cycle (P8.2) */
+
+  /* --- blur -------------------------------------------------- */
+  --blur-*: initial;
+  --blur-0: 0px; /* literal, not var(--blur-0): same-name cycle (P8.2) */
+  --blur-100: 12px; /* literal, not var(--blur-100): same-name cycle (P8.2) */
+  --blur-200: 32px; /* literal, not var(--blur-200): same-name cycle (P8.2) */
+  --blur-300: 50px; /* literal, not var(--blur-300): same-name cycle (P8.2) */
+
+  /* --- ease -------------------------------------------------- */
+  --ease-*: initial;
+  --ease-circ-in-out: var(--easing-circ-in-out);
+  --ease-cubic-out: var(--easing-cubic-out);
+  --ease-ease-out: var(--easing-ease-out);
+  --ease-expo-out: var(--easing-expo-out);
+  --ease-linear: var(--easing-linear);
+  --ease-quad-out: var(--easing-quad-out);
+  --ease-quart-out: var(--easing-quart-out);
+
+  /* --- transition-duration ----------------------------------- */
+  /* Tailwind's duration-* utility reads THIS namespace, not `--duration-*`; a namespace entry beats the bare-ms fallback, which still covers unpublished suffixes (P8.6) */
+  --transition-duration-*: initial;
+  --transition-duration-0: var(--duration-0);
+  --transition-duration-100: var(--duration-100);
+  --transition-duration-1000: var(--duration-1000);
+  --transition-duration-1100: var(--duration-1100);
+  --transition-duration-1200: var(--duration-1200);
+  --transition-duration-1300: var(--duration-1300);
+  --transition-duration-1400: var(--duration-1400);
+  --transition-duration-1500: var(--duration-1500);
+  --transition-duration-1600: var(--duration-1600);
+  --transition-duration-1700: var(--duration-1700);
+  --transition-duration-1800: var(--duration-1800);
+  --transition-duration-1900: var(--duration-1900);
+  --transition-duration-200: var(--duration-200);
+  --transition-duration-2000: var(--duration-2000);
+  --transition-duration-300: var(--duration-300);
+  --transition-duration-375: var(--duration-375);
+  --transition-duration-400: var(--duration-400);
+  --transition-duration-500: var(--duration-500);
+  --transition-duration-600: var(--duration-600);
+  --transition-duration-700: var(--duration-700);
+  --transition-duration-750: var(--duration-750);
+  --transition-duration-800: var(--duration-800);
+  --transition-duration-900: var(--duration-900);
+
+  /* --- transition-delay -------------------------------------- */
+  /* Tailwind's delay-* utility reads THIS namespace, not `--delay-*`; a namespace entry beats the bare-ms fallback, which still covers unpublished suffixes (P8.6) */
+  --transition-delay-*: initial;
+  --transition-delay-0: var(--delay-0);
+  --transition-delay-100: var(--delay-100);
+  --transition-delay-1000: var(--delay-1000);
+  --transition-delay-200: var(--delay-200);
+  --transition-delay-300: var(--delay-300);
+  --transition-delay-375: var(--delay-375);
+  --transition-delay-400: var(--delay-400);
+  --transition-delay-50: var(--delay-50);
+  --transition-delay-500: var(--delay-500);
+  --transition-delay-600: var(--delay-600);
+  --transition-delay-700: var(--delay-700);
+  --transition-delay-750: var(--delay-750);
+  --transition-delay-800: var(--delay-800);
+  --transition-delay-900: var(--delay-900);
+
+  /* --- tracking ---------------------------------------------- */
+  /* px primitives — the export cannot convert these to em (report §6) */
+  --tracking-*: initial;
+  --tracking-050: var(--letter-spacing-050);
+  --tracking-100: var(--letter-spacing-100);
+  --tracking-1000: var(--letter-spacing-1000);
+  --tracking-1100: var(--letter-spacing-1100);
+  --tracking-1200: var(--letter-spacing-1200);
+  --tracking-1300: var(--letter-spacing-1300);
+  --tracking-1400: var(--letter-spacing-1400);
+  --tracking-1500: var(--letter-spacing-1500);
+  --tracking-1600: var(--letter-spacing-1600);
+  --tracking-1700: var(--letter-spacing-1700);
+  --tracking-200: var(--letter-spacing-200);
+  --tracking-300: var(--letter-spacing-300);
+  --tracking-350: var(--letter-spacing-350);
+  --tracking-400: var(--letter-spacing-400);
+  --tracking-500: var(--letter-spacing-500);
+  --tracking-600: var(--letter-spacing-600);
+  --tracking-700: var(--letter-spacing-700);
+  --tracking-800: var(--letter-spacing-800);
+  --tracking-900: var(--letter-spacing-900);
+
+  /* --- shadow ------------------------------------------------ */
+  /* no Figma shadow collection; the reset clears Tailwind's ramp and styles.css's three house depths stand */
+  --shadow-*: initial;
+
+  /* --- leading ----------------------------------------------- */
+  /* no Figma line-height collection; line-height comes from the type ROLE utilities */
+  --leading-*: initial;
+
+  /* --- breakpoint -------------------------------------------- */
+  /* from breakpoints.entries (P8.4) */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 23.4375rem; /* 375px — Figma sm device width */
+  --breakpoint-md: 48rem; /* 768px — Figma md device width */
+  --breakpoint-lg: 80rem; /* 1280px — Figma lg device width */
+  --breakpoint-xl: 120rem; /* 1920px — Figma xl device width */
+}

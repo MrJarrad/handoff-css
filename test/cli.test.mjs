@@ -44,6 +44,14 @@ test("run() writes the four artifacts, and --check then passes over its own outp
     assert.ok(Array.isArray(out[field]), `${field} must be an array`);
   }
   assert.deepEqual(out.warnings.map((w) => [w.code, w.name]).sort(), [
+    // P19 ruling row 4 — every delay step should be a Figma ALIAS of the
+    // duration step of the same value. In this export all five are their own
+    // literal copy, which the generator reports rather than rewrites.
+    ["DELAY_NOT_ALIASED", "--delay-0"],
+    ["DELAY_NOT_ALIASED", "--delay-100"],
+    ["DELAY_NOT_ALIASED", "--delay-200"],
+    ["DELAY_NOT_ALIASED", "--delay-300"],
+    ["DELAY_NOT_ALIASED", "--delay-400"],
     ["VIEWPORT_UNFLAGGED", "--device-container-max-width"],
     ["VIEWPORT_UNFLAGGED", "--device-screen-height-full"],
     ["VIEWPORT_UNFLAGGED", "--device-width"],

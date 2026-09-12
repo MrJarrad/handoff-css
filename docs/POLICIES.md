@@ -708,6 +708,108 @@ reach generated output. Two exports of the same design-system state that differ 
 
 ---
 
+## P19 — Motion (0.4.0)
+
+`config.motion` · `src/resolve.mjs` (`timing`, `easing`), `src/motion.mjs` · `test/motion-v10.test.mjs`
+
+Figma types motion, so the generator does not have to guess at it.
+
+**EASING.** The export publishes the curve itself. A `LINEAR` curve emits the CSS
+keyword `linear`; anything else emits `cubic-bezier(x1, y1, x2, y2)` from
+`easingFunctionCubicBezier`, rounded once by `num()`. There is no config key: the
+export states the value and CSS has exactly one syntax for it.
+
+Naming is P1's job, not this policy's. Operator ruling 2026-09-12 row 1 retires the
+role-flavoured names (`quad-out-gill`, `power2-out`, `expo-out-card`) in favour of curve
+families — `quad-out`, `cubic-out`, `quart-out`, `expo-out`, `ease-out`, `circ-in-out`,
+`linear` — a rename **in Figma**, which arrived through `codeSyntax.WEB` with export v11
+and changed no code here. A role name, if one is ever wanted, is a semantic alias layer
+(P12), never a second declaration of a curve.
+
+**TIMING.** Figma stores a TIMING variable in SECONDS. `motion.timingUnit` states
+which unit the house publishes:
+
+| `timingUnit` | `duration/375` (0.375 stored) |
+| --- | --- |
+| `"ms"` | `--duration-375: 375ms` |
+| `"s"` | `--duration-375: 0.375s` |
+
+Milliseconds are the house choice because operator ruling 2026-09-12 row 2 names each
+step for its milliseconds. A token named `--duration-375` whose value read `0.375s`
+would be lying about itself in the one place a reader looks.
+
+Float32 noise is rounded off **in seconds, before the scale**. `0.10000000149011612 ×
+1000` is `100.00000149011612`, and `num()`'s six decimal places would faithfully
+preserve that as `100.000001ms`.
+
+**Delays alias durations — in Figma, and the generator only says so.** Ruling row 4
+makes every `motion/delay` step an alias of the `motion/duration` step of the same
+value, *"so values can never drift"*. When Figma authors that, the export carries an
+ordinary alias hop and P5 emits `--delay-375: var(--duration-375)`, with the
+terminal-value comment rendered in the same unit.
+
+**Nothing in the generator pairs a delay with a duration.** Rewriting a literal delay
+into `var(--duration-…)` on a value match would look identical today and would silently
+overwrite the first delay step that legitimately differs — the class of guess this
+package exists to remove. Instead `motion.delayAliasOf` names the two groups and the
+generator REPORTS the gap: a delay step holding a duration step's value as its own
+literal raises `DELAY_NOT_ALIASED`, naming the variable to re-point at in Figma. A delay
+with no matching duration step (`delay/50`, which has no `duration/50`) is not a
+finding — the ruling only pairs steps that exist. Stagger is `index × step` in the
+consumer's code, not a token.
+
+---
+
+## P20 — Aspect ratios (0.4.0)
+
+`config.aspect` · `src/aspect.mjs` · `test/aspect-v10.test.mjs`
+
+Figma has no aspect-ratio **type**, but it has STRING variables, and as of export v11
+the design system authors the four ratios properly:
+`core/aspect/{landscape, portrait, square, tall}` hold `"3:2"`, `"4:5"`, `"1:1"`,
+`"2:3"`.
+
+So **nothing is derived**. These are ordinary published variables carrying their own
+`--aspect-<name>` WEB names under P1, placed by P3 like any other. This policy owns one
+rendering rule: a STRING variable under an `aspect.ratioPaths` prefix emits the CSS
+ratio `a / b`, because `aspect-ratio: "3:2"` is not a value CSS accepts. Both spellings
+(`3:2`, `3/2`) and decimals (`1.85:1`) are read; every STRING *outside* those paths is
+quoted exactly as before.
+
+A declared ratio variable holding something that is not a ratio is a **hard failure**,
+not a quoted passthrough. The consumer has declared the path to hold a ratio, so a value
+that is not one is the design file and the config disagreeing, and emitting
+`aspect-ratio: "banana"` would push that discovery into a browser.
+
+**The height groups are a cross-check now, not a source.** Ruling 2026-09-12 row 6:
+*"figma has no concept of aspect ratios, I tend to just use the col-span as the
+height"*. Those per-column-span heights under `layout/grid/aspect/` are the workaround
+and stay EXCLUDED (P7) — ruling 2026-09-06, *"they are just figma hacks"*. They still
+describe the ratio they were computed from, so `aspect.descriptionGroup` +
+`descriptionPattern` compare each leaf group's descriptions against the authored
+variable of the same name and raise `ASPECT_DESCRIPTION_DISAGREES` when they
+contradict. **That finding changes no value.** The authored variable is the value,
+always; a stale description means a designer is reading the wrong number off the wrong
+place, and the fix is one edit in Figma.
+
+*(Superseded before release: 0.4.0's first cut DERIVED the ratios from those
+descriptions, because no variable held them. `ASPECT_RATIO_MIXED` and
+`ASPECT_RATIO_MISSING` were emission gates then — a contradicting group could publish
+nothing at all. Export v11 authored the variables, so the derivation went and the check
+stayed. Consistent with this file's standing rule: never keep a heuristic once the
+export takes responsibility for the answer.)*
+
+Adopting this means DELETING the consumer's own hand-authored `--aspect-*` block, just
+as adopting P12 meant deleting its `--screen-height-*` one — ruling row 5 is explicit
+that there are to be *"no hand-authored copies"*. Until that lands, P2 suppresses the
+generated token and the report says MATCH.
+
+**Not bridged to Tailwind.** Tailwind v4 owns an `--aspect-*` namespace, but resetting
+it would take `aspect-video` / `aspect-square` with it, and these names compose as
+arbitrary values — `aspect-(--aspect-landscape)` — with no reset needed.
+
+---
+
 ## Determinism
 
 Collections sorted by name, variables by WEB name, numbers rounded to 6 decimal

@@ -1,6 +1,6 @@
 {
   "name": "handoff-css",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "description": "Turn a Figma Design Handoff export into production-ready CSS custom properties, a Tailwind v4 @theme bridge and a reconciliation report.",
   "license": "MIT",
   "type": "module",

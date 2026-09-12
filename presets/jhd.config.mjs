@@ -27,11 +27,21 @@ export default {
   //
   //   `.utility/`           durable. Operator ruling 2026-09-06: ".utility ignore
   //                         all together" — a Figma authoring scratch collection.
-  //   `layout/grid/aspect/` INTERIM, pending Figma marking these hidden. Operator
-  //                         ruling 2026-09-06: "we didn't bring in aspect ratio
-  //                         related variables like portrait, tall and landscape.
-  //                         They are just figma hacks because i can actually add
-  //                         an aspect ratio."
+  //   `layout/grid/aspect/` durable as an EXCLUSION, and deliberately READ by P20.
+  //                         Operator ruling 2026-09-06: "we didn't bring in aspect
+  //                         ratio related variables like portrait, tall and
+  //                         landscape. They are just figma hacks because i can
+  //                         actually add an aspect ratio." Ruling 2026-09-12 row 6
+  //                         adds the other half: "figma has no concept of aspect
+  //                         ratios, I tend to just use the col-span as the height".
+  //                         The per-col-span heights are the hack and never become
+  //                         tokens. As of export v11 the ratio itself is authored
+  //                         properly, as the `core/aspect/*` STRING variables, so
+  //                         P20 publishes THOSE and reads this group only to
+  //                         cross-check its descriptions against them. Excluding a
+  //                         group and reading it is not a contradiction: P7 governs
+  //                         what is emitted, and a stale description here is a real
+  //                         finding about the design file.
   exclude: {
     paths: ["layout/grid/aspect/", ".utility/"],
   },
@@ -40,6 +50,43 @@ export default {
   // `rgb(r g b / <pct>)`. (`hex8` emits the export's 8-digit hex verbatim.)
   color: {
     format: "rgb-slash-percent",
+  },
+
+  // P19 — MOTION. Operator ruling 2026-09-12 row 2 ("should the name reflect
+  // the time?" -> yes): the steps are named for their milliseconds in Figma, so
+  // the value has to read in milliseconds too. Figma stores TIMING in seconds.
+  //
+  // Ruling row 4 ("why wouldn't we have delay values") gives delays their own
+  // ramp, every step of which is a FIGMA ALIAS of the duration step of the same
+  // value so the two can never drift. `delayAliasOf` names the two groups so
+  // the generator can REPORT a step that is a literal copy instead
+  // (DELAY_NOT_ALIASED). It never rewrites one: pairing delay to duration by
+  // value here would look identical today and silently overwrite the first
+  // delay step that legitimately differs. Stagger is index x step in code.
+  motion: {
+    timingUnit: "ms",
+    delayAliasOf: { delay: "motion/delay/", duration: "motion/duration/" },
+  },
+
+  // P20 — ASPECT RATIOS. Figma has no aspect-ratio TYPE, but it has STRING
+  // variables, and `core/aspect/{landscape,portrait,square,tall}` now hold
+  // "3:2" / "4:5" / "1:1" / "2:3" (export v11). They are ordinary published
+  // variables carrying their own `--aspect-<name>` WEB names, so nothing is
+  // derived: this only says they are ratios, so `3:2` renders as the CSS value
+  // `3 / 2` rather than the quoted string `"3:2"`.
+  //
+  // `descriptionGroup` is a CROSS-CHECK, never a source. Operator ruling
+  // 2026-09-12 row 6: *"figma has no concept of aspect ratios, I tend to just
+  // use the col-span as the height"* — those per-col-span heights stay EXCLUDED
+  // (see `exclude.paths` above) and still describe the ratio they were computed
+  // from, so a description that contradicts the authored variable means a
+  // designer is reading a stale number off the wrong one.
+  aspect: {
+    ratioPaths: ["core/aspect/"],
+    descriptionGroup: "layout/grid/aspect/",
+    // "Ratio – 3/2, 3:2" — the fraction is the authoritative half; the `a:b`
+    // restatement after the comma is prose.
+    descriptionPattern: "^Ratio\\s*[\u2013\u2014-]\\s*(\\d+(?:\\.\\d+)?)\\s*/\\s*(\\d+(?:\\.\\d+)?)",
   },
 
   // P3/P6 — the responsive collection: which one it is, how its non-default
