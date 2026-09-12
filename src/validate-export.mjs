@@ -30,13 +30,101 @@ export const exportSchemaV12Plus = require("../schema/design-system-handoff.v12p
  * is the same shape as 8 — designer-signal viewport gating and whole-percent
  * fraction snapping are semantic changes the export makes, not structural
  * ones this schema needs to distinguish. */
-export const VALIDATED_SCHEMA_VERSIONS = [8, 9, 10, 11, 12, 13];
+export const VALIDATED_SCHEMA_VERSIONS = [8, 9, 10, 11, 12, 13, 14, 15];
 
 /** Which schema document validates a given `schemaVersion` (0.5.0). 8-11 share
  * the base shape; 12 adds required structures the base must NOT demand of an
  * older export, so it gets its own document rather than a widened base. */
 export const schemaFor = (schemaVersion) =>
   Number(schemaVersion) >= 12 ? exportSchemaV12Plus : exportSchema;
+
+/**
+ * P11 — a `fluid-clamp` rule's `css` is the export's OWN clamp expression, and
+ * the generator emits it verbatim (never recomputed). But an export can state
+ * a clamp whose numbers do not reproduce the very samples it was fit from —
+ * the 2026-09-12 19:12 export's `vw` coefficient is `slopeRemPerPx × 100`
+ * where it should be `× 1600` (rem-per-px to vw-per-100vw needs the 16px root
+ * AND the /100 in the same step), so every sampled width evaluates 16× too
+ * small. `FLUID_CLAMP_MISMATCH` catches this at the one place it is checkable
+ * without recomputing anything: evaluate the export's own `css` at each
+ * sample's own `widthPx` and compare to that sample's own `rawPx`.
+ */
+const CLAMP_RE = /^clamp\(\s*([-\d.]+)rem\s*,\s*([-\d.]+)vw\s*\+\s*([-\d.]+)rem\s*,\s*([-\d.]+)rem\s*\)$/;
+
+/** rem tolerance the samples are held to (P11) — half the smallest step this
+ * package's own float rounding could introduce, same tolerance the export's
+ * own `fit.toleranceRem` publishes for `mode-stepped`/`fixed`. */
+export const FLUID_CLAMP_TOLERANCE_REM = 0.125;
+const ROOT_FONT_SIZE_PX = 16;
+
+/** Evaluate a `clamp(<min>rem, <slope>vw + <intercept>rem, <max>rem)` string
+ * at one viewport width in px, in px. Returns `null` when `css` is not that
+ * shape — a clamp this checker cannot parse is not silently skipped: the
+ * caller reports `FLUID_CLAMP_UNPARSEABLE` instead of comparing nothing. */
+export function evalClampPx(css, widthPx) {
+  const m = CLAMP_RE.exec(String(css ?? "").trim());
+  if (!m) return null;
+  const [, minRem, slopeVw, interceptRem, maxRem] = m.map(Number);
+  const minPx = minRem * ROOT_FONT_SIZE_PX;
+  const maxPx = maxRem * ROOT_FONT_SIZE_PX;
+  const preferredPx = (slopeVw * widthPx) / 100 + interceptRem * ROOT_FONT_SIZE_PX;
+  return Math.min(maxPx, Math.max(minPx, preferredPx));
+}
+
+/**
+ * Every `fluid-clamp` rule's `css` checked against its own `samples`.
+ *
+ * @returns {{ code: string, variable: string, variant: string, detail: string }[]}
+ *   One finding per (variable, layoutVariant) rule that misses at least one of
+ * its own samples by more than `FLUID_CLAMP_TOLERANCE_REM` — not one per
+ * sample, so a rule wrong at every width is still one line naming all of them.
+ */
+export function fluidClampFindings(doc) {
+  const out = [];
+  for (const c of doc.collections ?? []) {
+    for (const v of c.variables ?? []) {
+      const rules = v.responsiveBehavior?.rules ?? [];
+      for (const r of rules) {
+        if (r.strategy !== "fluid-clamp" || !r.css) continue;
+        const variant = r.layoutVariant ?? "default";
+        const samples = Array.isArray(r.samples) ? r.samples : [];
+        const misses = [];
+        for (const s of samples) {
+          if (typeof s.widthPx !== "number" || typeof s.rawPx !== "number") continue;
+          const evaluated = evalClampPx(r.css, s.widthPx);
+          if (evaluated == null) {
+            out.push({
+              code: "FLUID_CLAMP_UNPARSEABLE",
+              variable: v.name,
+              variant,
+              detail: `${v.name} (${variant}): css ${JSON.stringify(r.css)} is not a recognised clamp() expression`,
+            });
+            misses.length = 0;
+            break;
+          }
+          if (Math.abs(evaluated - s.rawPx) > FLUID_CLAMP_TOLERANCE_REM * ROOT_FONT_SIZE_PX) {
+            misses.push({ sample: s.modeName ?? s.family ?? String(s.widthPx), widthPx: s.widthPx, rawPx: s.rawPx, evaluated });
+          }
+        }
+        if (misses.length > 0) {
+          const detail = misses
+            .map(
+              (m) =>
+                `sample ${m.sample} (${m.widthPx}px): css evaluates to ${(m.evaluated / ROOT_FONT_SIZE_PX).toFixed(6)}rem, sample is ${(m.rawPx / ROOT_FONT_SIZE_PX).toFixed(6)}rem`,
+            )
+            .join("; ");
+          out.push({
+            code: "FLUID_CLAMP_MISMATCH",
+            variable: v.name,
+            variant,
+            detail: `${v.name} (${variant}): css ${JSON.stringify(r.css)} misses ${misses.length} of its own samples — ${detail}`,
+          });
+        }
+      }
+    }
+  }
+  return out;
+}
 
 const compiled = new Map(); // $id -> compiled validator
 const validator = (schema) => {
@@ -71,14 +159,21 @@ const validator = (schema) => {
  */
 export function validateExport(doc) {
   if (doc == null || typeof doc !== "object") {
-    return { ok: false, skipped: false, errors: [{ path: "", message: "export is not an object", keyword: "type" }], warnings: [] };
+    return { ok: false, skipped: false, errors: [{ path: "", message: "export is not an object", keyword: "type" }], warnings: [], clampFindings: [] };
   }
   if (typeof doc.schemaVersion === "number" && doc.schemaVersion < Math.min(...VALIDATED_SCHEMA_VERSIONS)) {
-    return { ok: true, skipped: true, errors: [], warnings: [] };
+    return { ok: true, skipped: true, errors: [], warnings: [], clampFindings: [] };
   }
   const validate = validator(schemaFor(doc.schemaVersion));
   const ok = validate(doc);
   const findings = Array.isArray(doc.validation?.findings) ? doc.validation.findings : [];
+  // P11 — a shape-valid export can still state a `fluid-clamp` rule whose
+  // `css` does not reproduce its own samples. Reported separately from the
+  // SHAPE errors above (which gate `assertValidExport`/`generate` — P14):
+  // this is a semantic defect the export makes about ITS OWN numbers, and
+  // `generate` still emits the export's `css` verbatim (P11 never
+  // recomputes it) while `validate`/`--check` refuse to pass it quietly.
+  const clampFindings = fluidClampFindings(doc);
   return {
     ok,
     skipped: false,
@@ -92,6 +187,7 @@ export function validateExport(doc) {
           keyword: e.keyword,
         })),
     warnings: findings.map((f) => ({ code: "PLUGIN_FINDING", variable: f.variable, detail: f.detail ?? f.code })),
+    clampFindings,
   };
 }
 

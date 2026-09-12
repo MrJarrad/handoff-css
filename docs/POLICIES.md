@@ -478,6 +478,26 @@ full-bleed variable emits `20vw`. That is a wrong token from a wrong
 description, correctable in Figma in one edit and named in the report's §10; a
 plausibility check here would make the export stop being the contract.
 
+**The export's own `fluid-clamp` numbers are checked, never recomputed
+(0.5.2).** `css` is still emitted verbatim — the export publishes the finished
+`clamp()`, and this package composes none of its own. But a plugin defect can
+state a clamp that does not reproduce the very samples it claims to be fit
+from: the 2026-09-12 19:12 export's `vw` coefficient is
+`slopeRemPerPx × 100` where the unit conversion needs `× 1600` (the 16px root
+AND the `vw`-is-per-100 both belong in the same step), so
+`clamp(1.953125rem, 0.5208vw + 0.000125rem, 10rem)` evaluates to ~31.2px at
+every sampled width against samples 31.25 / 64 / 106.7 / 160px — 53 of that
+export's 71 `fluid-clamp` rules miss by more than the tolerance. `validate`
+evaluates every `fluid-clamp` rule's `css` at each of its own `samples[].widthPx`
+(root 16px) and compares to that sample's own `rawPx`; a miss beyond
+`0.125rem` (2px) is `FLUID_CLAMP_MISMATCH`, naming the variable, layout
+variant, sample and both values, and a `css` this checker cannot parse as
+`clamp(<min>rem, <slope>vw + <intercept>rem, <max>rem)` is
+`FLUID_CLAMP_UNPARSEABLE`. Both are red — `validate`/a consumer's `tokens:check`
+refuse the export — but `generate` still emits the export's `css` verbatim, per
+the rule above: the finding is the output, not a silent substitution.
+`evalClampPx`, `fluidClampFindings` · `src/validate-export.mjs`.
+
 `responsive.honourClasses`, `viewport.*` · `src/responsive.mjs`
 
 ---

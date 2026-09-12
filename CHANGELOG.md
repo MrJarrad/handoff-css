@@ -2,6 +2,50 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.5.2 — 2026-09-12
+
+Finding (2026-09-12, export 19:12 schema 15): the plugin's `responsiveBehavior`
+`fluid-clamp` rules carry a `vw` coefficient 16× too small
+(`slopeRemPerPx × 100` instead of `× 1600`) — `grid/col-span/col-span-1` flush
+`clamp(1.953125rem, 0.5208vw + 0.000125rem, 10rem)` evaluates to 31.2px at
+every sampled width against samples 31.25 / 64 / 106.7 / 160px. 53 of 71
+fluid rules in that export miss their own samples by more than 2px; the
+generator emits `css` verbatim (P11), so it never composed the wrong number —
+it published the export's own wrong number unchecked.
+
+### Added
+
+- **`FLUID_CLAMP_MISMATCH` / `FLUID_CLAMP_UNPARSEABLE` (P11).** `validate` now
+  evaluates every `fluid-clamp` rule's own `css` at each of its own samples'
+  `widthPx` (root 16px) and compares to that sample's `rawPx`. A sample off by
+  more than 0.125rem (2px) is `FLUID_CLAMP_MISMATCH`, naming the variable,
+  layout variant, sample and both values; a `css` this checker cannot parse as
+  `clamp(<min>rem, <slope>vw + <intercept>rem, <max>rem)` is
+  `FLUID_CLAMP_UNPARSEABLE` instead of silently skipped. Both are red: `validate`
+  exits non-zero and a consumer's own `tokens:check` refuses the export. The
+  clamp itself is never recomputed or "fixed" here — the export is still the
+  contract (P11), and the finding is the whole of this checker's output.
+  `src/validate-export.mjs` (`evalClampPx`, `fluidClampFindings`), surfaced as
+  `validateExport(doc).clampFindings` — separate from the schema `errors` that
+  gate `assertValidExport`/`generate`, since a shape-valid export can still
+  carry this semantic defect and `generate` still emits its `css` verbatim.
+- Schema versions 14 and 15 accepted for validation (`VALIDATED_SCHEMA_VERSIONS`,
+  both schema documents' `schemaVersion` enums) — 8–13 unchanged.
+- `fixtures/jhd-v15-2026-09-12/` — the real 2026-09-12 19:12 export (schema 15),
+  the fixture `validate` reports its 53 `FLUID_CLAMP_MISMATCH` findings against.
+
+### Changed
+
+- Every schema 8+ fixture's `validate` output now also carries whatever
+  `FLUID_CLAMP_MISMATCH` count its own `fluid-clamp` rules produce — the same
+  plugin defect predates the 19:12 export. Fixture files are byte-stable
+  (nothing in any committed export.json changed); only the finding is new.
+  Counts, pinned in `test/fluid-clamp.test.mjs`: `jhd-v8-2026-09-10` 14,
+  `jhd-v8b-2026-09-10` 3, `jhd-v9-2026-09-11` / `v9b` / `v9c` 53 each,
+  `jhd-v10-2026-09-12` 53, `jhd-v11-2026-09-12` 53, `jhd-v13-2026-09-12` 53,
+  `jhd-v15-2026-09-12` 53. `jhd-v7b`/`jhd-v7c` (schema 7) are unaffected — schema
+  7 is skipped, not validated.
+
 ## 0.5.1 — 2026-09-12
 
 Design-system review of `feat/styles-v13` (2026-09-12), reds 1–4: a generated style class

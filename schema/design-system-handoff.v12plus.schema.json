@@ -9,7 +9,7 @@
       "type": "object",
       "required": ["schemaVersion", "styles", "cssCustomPropertySheets"],
       "properties": {
-        "schemaVersion": { "enum": [12, 13] },
+        "schemaVersion": { "enum": [12, 13, 14, 15] },
         "styles": {
           "type": "object",
           "required": ["PAINT", "TEXT", "EFFECT", "GRID"],

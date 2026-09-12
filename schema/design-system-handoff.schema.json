@@ -14,7 +14,7 @@
   ],
   "properties": {
     "schema": { "const": "design-system-handoff" },
-    "schemaVersion": { "enum": [8, 9, 10, 11, 12, 13] },
+    "schemaVersion": { "enum": [8, 9, 10, 11, 12, 13, 14, 15] },
     "generatedAt": { "type": "string", "format": "date-time" },
     "contentHash": { "$ref": "#/$defs/sha256" },
     "fingerprint": {
