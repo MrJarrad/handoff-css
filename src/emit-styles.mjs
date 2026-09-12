@@ -3,8 +3,12 @@
 // fallback)`, and the `css` those two compose to. This module writes them into
 // `styles.generated.css` VERBATIM — it never derives a selector from a style
 // name, never reorders or recomputes a declaration, and never converts a unit.
-// Everything it decides is WHICH styles are emitted and in WHAT order; every
-// byte inside a rule is the export's.
+// Everything it decides is WHICH styles are emitted, in WHAT order, and AS
+// WHAT RULE FORM (`config.styles.emit`); every byte inside a declaration is
+// the export's, with exactly one documented exception: a TEXT declaration's
+// `font-family` literal is rebound to the export's own font-family variable
+// when the two states the same value (the plugin's own gap — see
+// `bindFontFamily` below).
 //
 // See docs/POLICIES.md P21.
 import { generatedHeader, handAuthoredName } from "./header.mjs";
@@ -68,6 +72,64 @@ const statesLiteral = (decl, value) => {
   return forms.some((f) => new RegExp(`(^|[\\s:,(])${f.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}($|[\\s;,)])`, "i").test(outsideVar));
 };
 
+/**
+ * P21 font binding. A TEXT declaration's `font-family` literal is exactly the
+ * value of a font-family variable elsewhere in the export (`family/*`, or any
+ * STRING variable in a `font`/`family` group) — the plugin gap this closes:
+ * schema 12/13 states the literal rather than the `var()` its own variable
+ * publishes. Matched on VALUE, not name: the binding is provable (the
+ * variable's own raw value equals the class's stated literal), never guessed.
+ */
+const familyVariables = (doc) => {
+  const byValue = new Map(); // variable's raw STRING value -> the variable
+  for (const c of doc.collections ?? []) {
+    for (const v of c.variables ?? []) {
+      if (v.type !== "STRING") continue;
+      const group = v.name.split("/")[0];
+      if (group !== "family" && group !== "font") continue;
+      const raw = v.modes?.[0]?.raw;
+      if (raw != null && !byValue.has(raw)) byValue.set(raw, v);
+    }
+  }
+  return byValue;
+};
+
+const FONT_FAMILY_DECL = /^font-family:\s*(.+)$/;
+
+/**
+ * Bind every TEXT declaration's `font-family` literal to its matching
+ * font-family variable, one substitution per declaration, everything else
+ * untouched. Returns the (possibly rewritten) declarations and the findings
+ * the substitution — or its absence — raises.
+ */
+function bindFontFamily(type, selector, declarations, familyByValue) {
+  if (type !== "TEXT") return { declarations, findings: [] };
+  const findings = [];
+  const out = declarations.map((decl) => {
+    const m = FONT_FAMILY_DECL.exec(decl);
+    if (!m) return decl;
+    const literal = m[1].trim();
+    if (literal.startsWith("var(")) return decl; // already bound
+    const bare = literal.replace(/^"(.*)"$/, "$1");
+    const variable = familyByValue.get(bare);
+    if (!variable) {
+      findings.push({
+        code: "STYLE_CLASS_FONT_LITERAL",
+        name: selector,
+        detail: `\`${decl}\` states the literal ${literal}, and no font-family variable in the export shares that value — emitted verbatim (P21).`,
+      });
+      return decl;
+    }
+    findings.push({
+      code: "STYLE_CLASS_FONT_BOUND",
+      name: selector,
+      detail: `\`font-family\` literal ${literal} bound to \`${webName(variable)}\` (\`${variable.name}\`), the export's own font-family variable of the same value.`,
+    });
+    return `font-family: var(${webName(variable)}, ${literal})`;
+  });
+  return { declarations: out, findings };
+}
+
 function styleFindings(style, declarations, byId) {
   const findings = [];
   const selector = style.cssClass.selector;
@@ -108,13 +170,15 @@ export function emitStyles(doc, byId, handClasses, handUtils, cfg) {
   const rows = [];
   const warnings = [];
   const blocks = [];
+  const familyByValue = familyVariables(doc);
+  const emitAsUtility = cfg.styles?.emit !== "class";
 
   for (const type of TYPE_ORDER) {
     const emitted = [];
     for (const style of doc.styles?.[type] ?? []) {
       const cssClass = style.cssClass;
       const selector = cssClass?.selector ?? style.codeSyntax?.className ?? null;
-      const declarations = normalise(cssClass?.declarations ?? []);
+      let declarations = normalise(cssClass?.declarations ?? []);
       const base = { type, style: style.name, selector, shadowed: false };
 
       // A style the export gives no declarations for is not a class. PAINT is
@@ -125,6 +189,9 @@ export function emitStyles(doc, byId, handClasses, handUtils, cfg) {
         continue;
       }
 
+      const bound = bindFontFamily(type, selector, declarations, familyByValue);
+      declarations = bound.declarations;
+      warnings.push(...bound.findings);
       warnings.push(...styleFindings(style, declarations, byId));
       const shadowed = handUtils.has(selector.slice(1));
       const hand = handClasses.get(selector) ?? null;
@@ -144,7 +211,12 @@ export function emitStyles(doc, byId, handClasses, handUtils, cfg) {
       }
 
       rows.push({ ...base, shadowed, declarations, hand: null, status: "GENERATED" });
-      emitted.push(`${selector} {\n${declarations.map((d) => `  ${d};`).join("\n")}\n}`);
+      // P21 — house policy writes a Tailwind v4 `@utility`, not a plain class:
+      // `@apply` can reach it, and it lives in the utilities layer under the
+      // normal cascade instead of sitting unlayered above it. `cfg.styles.emit`
+      // opts a consumer back into the bare `<selector> { … }` of 0.5.0.
+      const opening = emitAsUtility ? `@utility ${selector.slice(1)}` : selector;
+      emitted.push(`${opening} {\n${declarations.map((d) => `  ${d};`).join("\n")}\n}`);
     }
 
     if (emitted.length) {

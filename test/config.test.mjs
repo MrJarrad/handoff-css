@@ -35,6 +35,7 @@ test("every key the plan locked is present in the preset", () => {
     "viewport.heightUnit", "viewport.widthUnit", "viewport.descriptionFallback",
     "viewport.groups",
     "aliases",
+    "styles.emit",
     "report.title", "report.policyRef", "report.parity", "report.colourCollections",
     "report.notes", "report.notes.breakpointNote",
     "header.regenerateCommand",

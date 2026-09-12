@@ -5,7 +5,7 @@
   "description": "Every house policy handoff-css applies. Nothing in src/ carries a default for these: a consumer states them here, or the generator refuses to run.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "paths", "exclude", "color", "motion", "aspect", "layout", "modes", "themes", "tailwind", "responsive", "viewport", "aliases", "report", "header"],
+  "required": ["schema", "paths", "exclude", "color", "motion", "aspect", "layout", "modes", "themes", "tailwind", "responsive", "viewport", "aliases", "styles", "report", "header"],
   "properties": {
     "schema": {
       "type": "object",
@@ -204,6 +204,18 @@
       "type": "object",
       "additionalProperties": { "type": "string" },
       "description": "P12 — `\"<name pattern>\": \"<target pattern>\"`, each ending in exactly one `*`, expanded over the emitted token leaves into a `:root` alias block. A collision with a generated or hand-authored name is a hard failure."
+    },
+    "styles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["emit"],
+      "description": "P21 — how a style class is written to `paths.styles` (schema 12+, whenever a class is emitted at all).",
+      "properties": {
+        "emit": {
+          "enum": ["utility", "class"],
+          "description": "`utility` (house default) writes every style as `@utility <name> { … }` — a Tailwind v4 utility, reachable from a consumer's own `@apply`, living in the utilities layer under the normal cascade. `class` writes the bare `<selector> { … }` a plain class rule (0.5.0 behaviour): unreachable by `@apply` and unlayered."
+        }
+      }
     },
     "conform": {
       "type": "object",

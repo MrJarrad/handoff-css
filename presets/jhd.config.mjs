@@ -187,6 +187,14 @@ export default {
     "--height-screen-*": "--screen-height-*",
   },
 
+  // P21 — house default is `utility`: a style class is a Tailwind v4
+  // `@utility`, so a consumer's own stylesheet can `@apply` it and it lives in
+  // the utilities layer under the normal cascade, instead of an unlayered
+  // plain class sitting above `@layer` (0.5.0 behaviour, kept as `class`).
+  styles: {
+    emit: "utility",
+  },
+
   report: {
     title: "ds-from-handoff — reconciliation report",
     // Where the human-readable policy write-up lives in the consuming repo.

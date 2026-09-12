@@ -2,6 +2,38 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.5.1 — 2026-09-12
+
+Design-system review of `feat/styles-v13` (2026-09-12), reds 1–4: a generated style class
+was a plain, unlayered class — `@apply` from a consumer stylesheet failed with `Cannot
+apply unknown utility class title-style1-200`, the rule sat above Tailwind's own
+`@layer` cascade, and every TEXT class froze `font-family: "Suisse Intl"`, a literal no
+`@font-face` in the site registers (its face is `--font-suisse` / DS `--font-sans`).
+
+### Added
+
+- **`config.styles.emit: "utility" | "class"` (P21).** House preset default `"utility"`:
+  every style is written as `@utility <name> { … }` — a Tailwind v4 utility a consumer's
+  own stylesheet can `@apply`, living in the utilities layer under the normal cascade.
+  `"class"` keeps the bare `<selector> { … }` of 0.5.0. Declarations are still the
+  export's, in order — this changes the rule's wrapper, nothing inside it.
+- **Font-family binding (P21).** A TEXT declaration's `font-family` literal that equals
+  the value of a font-family variable elsewhere in the export (`family/*`, or any STRING
+  variable in a `font`/`family` group) is rewritten to
+  `font-family: var(<that variable's WEB name>, <literal>)`, and the substitution is
+  recorded as `STYLE_CLASS_FONT_BOUND`. No matching variable raises
+  `STYLE_CLASS_FONT_LITERAL` and leaves the literal untouched. This is the one
+  documented exception to P21's verbatim contract; every other byte stays the export's.
+  On the v13 fixture, all 52 TEXT classes bind to `--family-font-sans`
+  (`family/font-sans`, value `Suisse Intl`) — the plugin gap itself (stating the literal
+  rather than its own `var()`) is reported to the plugin separately, not fixed here.
+
+### Changed
+
+- `fixtures/jhd-v13-2026-09-12/expected/styles.generated.css` and its report
+  regenerated under the new house default (`@utility`, font-family bound). Every other
+  fixture is byte-stable: none but v13 publishes a `cssClass`.
+
 ## 0.5.0 — 2026-09-12
 
 `design-system-handoff` schema 12/13: the export now states its own CSS, so the generator

@@ -819,9 +819,9 @@ arbitrary values — `aspect-(--aspect-landscape)` — with no reset needed.
 
 ---
 
-## P21 — Style classes (0.5.0)
+## P21 — Style classes (0.5.0, extended 0.5.1)
 
-`config.paths.styles` · `src/emit-styles.mjs` · `test/styles-v13.test.mjs`
+`config.paths.styles` · `config.styles.emit` · `src/emit-styles.mjs` · `test/styles-v13.test.mjs`
 
 Schema 12 (and 13) publish a ready `cssClass` on every Figma style: a `selector`, a
 `declarations[]` already bound to `var(--token, fallback)`, and the `css` those two
@@ -895,6 +895,38 @@ keeps as a `var()` hop (P5) where the sheet flattens it to a terminal, a colour 
 house format against the export's 8-digit hex, and 101 motion declarations the plugin
 stringified an object into (`--delay-0: [object Object]`). The first is a deliberate
 policy and the record of it; the last is an export defect with an address.
+
+### P21.4 The rule form: `@utility` (0.5.1)
+
+`config.styles.emit` picks how a GENERATED class is written: `"utility"` (house default)
+writes `@utility <name> { … }` — a Tailwind v4 utility, which a consumer's own
+`@apply` can reach and which lives in the utilities layer under the normal cascade,
+same as any hand-authored `@utility`. `"class"` writes the bare `<selector> { … }` of
+0.5.0: a plain class sits above `@layer` and is invisible to `@apply`
+(`Cannot apply unknown utility class …`), which is the design-system review finding
+(2026-09-12) that made `"utility"` the default. Only the wrapper changes; the
+declarations inside are exactly what P21 already promised — verbatim, in the export's
+order.
+
+### P21.5 Font-family binding (0.5.1)
+
+Schema 12/13 states a TEXT class's `font-family` as a bare literal
+(`font-family: "Suisse Intl"`) even where the design system publishes that exact string
+as its own font-family variable (`family/font-sans`, WEB name `--family-font-sans`) — a
+plugin gap, reported to the plugin separately, not fixed at the source here. Left alone,
+the literal is a value the design system can never retheme, and matches no
+`@font-face` the site actually registers (its face is `--font-suisse` / DS
+`--font-sans`).
+
+This is P21's one documented exception to *verbatim*: a TEXT declaration's `font-family`
+literal is rebound to `font-family: var(<WEB name>, <literal>)` when that literal equals
+the value of a font-family variable elsewhere in the export — `family/*`, or any STRING
+variable in a `font`/`family` group, matched by VALUE, never by name or position. The
+substitution is recorded as `STYLE_CLASS_FONT_BOUND`; a literal with no matching
+variable raises `STYLE_CLASS_FONT_LITERAL` and is left exactly as the export stated it.
+Every other declaration, in every other style, stays untouched.
+
+On the v13 fixture all 52 TEXT classes bind to `--family-font-sans`.
 
 ---
 
