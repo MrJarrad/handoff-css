@@ -151,25 +151,13 @@ on a non-match row is an unauthorised deviation.
 
 An empty table means you built the pair exactly — the expected outcome, not a suspicious one.
 
-## Schema v9 node hints — one rule each (export v11, 2026-09-12)
+## Schema v9 node hints (export v11, 2026-09-12)
 
-A schema-v9 brief adds hints beyond `col-span N/M` (grammar:
-`schema/design-handoff.v9.grammar.md`), each a mechanism rule:
-
-| Hint | Rule |
-| --- | --- |
-| `col(S/N of M)` / `row(S/N)` | `grid-column`/`grid-row: S / span N` — never column maths. |
-| `aspect: $token (stable)` / `varies` | Stable → `aspect-ratio`, intrinsic height. Varies → per-breakpoint dimensions. |
-| `semantic(<tag>)` | Build that exact HTML element. |
-| `interactive(click, hover)` | Wire the named handler(s) — not passive display. |
-| `states(:hover, :focus, …)` | Native CSS pseudo-classes, never a JS-toggled class. |
-| `a11y(…)` | Apply the named `aria-*`/`role` verbatim — not optional. |
-| `position(sticky\|fixed)` | Set that CSS `position`. |
-| `@container` | `container-type`/`container-name` — not a media query. |
-| `desc("…")` | Build context only — never a binding, never shipped copy. |
-
-`references/worked-example.md` (worked `col()`/`row()` read) and `references/export-shape.md`
-(rename ids, prop schemas) cover the rest.
+A schema-v9 brief adds hints beyond `col-span N/M` — grid `col()`/`row()`, `aspect`,
+`semantic`, `interactive`, `states`, `a11y`, `position`, `@container`, `desc` — each one
+mechanism rule. Full table and grammar: `references/schema-v9-hints.md`
+(`schema/design-handoff.v9.grammar.md` is the grammar it reads). Worked read:
+`references/worked-example.md`. Rename ids and prop schemas: `references/export-shape.md`.
 
 ## At JHD
 

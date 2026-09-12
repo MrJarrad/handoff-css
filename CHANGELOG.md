@@ -2,6 +2,54 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.4.1 — 2026-09-12
+
+The layer-brief markdown gets a JSON companion of its own (schema `design-handoff` v10),
+and the brief's own grammar grows a ninth line vocabulary (export v11, schema `design-handoff`
+v9/v10) alongside `handoff-to-code` hints the generator's node table can now carry.
+
+### Added
+
+- **`src/brief.mjs` — the brief JSON reader.** The Design Handoff plugin (export v14+) now
+  emits `*-design-handoff.json` for the layer brief itself, distinct from the
+  `*-design-system-handoff.json` the tokens come from. `validateBriefJson` checks its shape
+  against `schema/design-handoff.v10.schema.json` (also published as `handoff-css/schema/brief`);
+  `validateBriefPair` reconciles the brief JSON's identity fields (`schema`, `schemaVersion`,
+  `contract`, `exportVersion`, `contentHash`, `designSystemStateHash`, and the companion block)
+  against the markdown's front matter. The JSON is the contract; the markdown reconciles
+  against it, never the reverse.
+- **A light structural pass for a paired brief `.md`.** Once a `.json` naming schema
+  `design-handoff` is given alongside its `.md`, `handoff-css validate` drops the markdown to
+  front-matter-present + legend-present + identity-matches-JSON, instead of re-running the
+  full v6/v9 line grammar. A lone `.md` (no companion given) still gets the full grammar
+  unchanged — `validate-handoff-md.mjs` owns that path exactly as before; `brief.mjs` owns only
+  the paired-identity reconciliation. This is the module boundary: grammar parsing stays in
+  one file, brief-JSON/identity reconciliation in the other, and `src/cli.mjs` is the only
+  place that decides which path a given file pair takes.
+- **`schema/design-handoff.v9.grammar.md`** — the ninth schema-version line grammar the
+  markdown parser accepts, adding node-table hints beyond `col-span N/M`: `col(S/N of M)`
+  and `row(S/N)` (grid placement), `aspect: $token (stable|varies)`, `semantic(<tag>)`,
+  `interactive(<events>)`, `states(<pseudo-classes>)`, `a11y(<attrs>)`, `position(sticky|fixed)`,
+  `@container`, and `desc("…")`. Each is documented in `skills/handoff-to-code/references/
+  schema-v9-hints.md` as a one-line mechanism rule for `handoff-to-code`, not style advice.
+- **`fixtures/jhd-v11-2026-09-12/`** — the plugin's export v11 pair: brief `.json` + `.md`
+  (schema `design-handoff` v10/v9), `export.json` (tokens), and `styles.css` (generated
+  output). This is the fixture the DS parity test (`jhd-design-system`'s own suite) should
+  point at going forward — it is the only fixture carrying both the brief JSON companion and
+  the full schema-v9 node-hint vocabulary in one place.
+
+### Changed
+
+- **`skills/handoff-to-code/SKILL.md` trimmed to fit its 1,200-word ceiling.** The schema-v9
+  node-hints table moved to `skills/handoff-to-code/references/schema-v9-hints.md` in full;
+  the skill body keeps a one-paragraph pointer naming every hint. No law sentence
+  (`test/skill-law-sentences.mjs`) moved or changed; `description` is unchanged; every host
+  adapter under `skills/handoff-to-code/dist/` was regenerated (`npm run skills`).
+
+### Unchanged
+
+- All fixtures other than `jhd-v11-2026-09-12/` are untouched by this release.
+
 ## 0.4.0 — 2026-09-12
 
 Motion and aspect ratios become generator output instead of hand-authored copies.
