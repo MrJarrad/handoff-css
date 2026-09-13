@@ -2,6 +2,37 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.5.3 — 2026-09-13
+
+Export (2026-09-13 05:49, schema 16, responsive policy v4, design-system state
+`eab3d422`) fixes the 0.5.2 finding at its source: the plugin's `fluid-clamp`
+`vw` coefficient is now `slopeRemPerPx × rootFontSizePx × 100`, so all 52 of
+this export's fluid rules reproduce their own samples — zero
+`FLUID_CLAMP_MISMATCH`. Schema 16 also adds a round-trip CSS self-check
+(`FLUID_CSS_MISMATCH`, plugin-side), 2-distinct-value step-function detection,
+and `changes.strategyChanged` — 123 variables whose responsive strategy
+flipped between this export and its `eab3d422` baseline (mostly `none` →
+`fixed`/`mode-stepped`, first-classification on variables the previous
+snapshot left unclassified).
+
+### Added
+
+- Schema version 16 accepted for validation (`VALIDATED_SCHEMA_VERSIONS`, both
+  schema documents' `schemaVersion` enums, prose retitled "8–16") — 8–15
+  unchanged. `changes` (including `changes.strategyChanged` and
+  `changes.summary.strategyChanged`) needs no new schema entry: the top level
+  is already open by design (P14), and `changes` was never a typed structure —
+  only `codeSyntax.WEB` and `responsiveBehavior.rules[]` are closed.
+- `fixtures/jhd-v16-2026-09-13/` — the real 2026-09-13 05:49 export (schema
+  16), `validate` reports zero `FLUID_CLAMP_MISMATCH` against it
+  (`test/fluid-clamp.test.mjs`).
+
+### Unchanged
+
+- `fixtures/jhd-v15-2026-09-12/` stays red by design — the 0.5.2 finding was
+  about that export's own numbers, and this release does not rewrite history.
+  Byte-stable, still 53 `FLUID_CLAMP_MISMATCH`.
+
 ## 0.5.2 — 2026-09-12
 
 Finding (2026-09-12, export 19:12 schema 15): the plugin's `responsiveBehavior`

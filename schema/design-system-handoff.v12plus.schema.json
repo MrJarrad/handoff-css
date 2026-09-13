@@ -1,15 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/jarradhd/handoff-css/schema/design-system-handoff.v12plus.schema.json",
-  "title": "design-system-handoff, schema 12–15",
-  "description": "Schema 12+ = the 8–15 base document (`design-system-handoff.schema.json`, referenced below) PLUS the four structures schema 12 introduces and this generator now reads by name: `styles.*[].cssClass` (P21), `styles.TEXT[].typeRamp` (type ramp v2), a STRING variable's `fontWeightNumeric` (P22), and `cssCustomPropertySheets` (the export's own `:root`/theme blocks, cross-checked and never emitted). Stating them here rather than in the base keeps a schema 8-11 export validating exactly as it did before: those exports do not carry these fields, and requiring them there would fail a document that is still correct for its own version. `validate-export.mjs` dispatches on `schemaVersion`.",
+  "title": "design-system-handoff, schema 12–16",
+  "description": "Schema 12+ = the 8–16 base document (`design-system-handoff.schema.json`, referenced below) PLUS the four structures schema 12 introduces and this generator now reads by name: `styles.*[].cssClass` (P21), `styles.TEXT[].typeRamp` (type ramp v2), a STRING variable's `fontWeightNumeric` (P22), and `cssCustomPropertySheets` (the export's own `:root`/theme blocks, cross-checked and never emitted). Stating them here rather than in the base keeps a schema 8-11 export validating exactly as it did before: those exports do not carry these fields, and requiring them there would fail a document that is still correct for its own version. `validate-export.mjs` dispatches on `schemaVersion`.",
   "allOf": [
     { "$ref": "https://github.com/jarradhd/handoff-css/schema/design-system-handoff.schema.json" },
     {
       "type": "object",
       "required": ["schemaVersion", "styles", "cssCustomPropertySheets"],
       "properties": {
-        "schemaVersion": { "enum": [12, 13, 14, 15] },
+        "schemaVersion": { "enum": [12, 13, 14, 15, 16] },
         "styles": {
           "type": "object",
           "required": ["PAINT", "TEXT", "EFFECT", "GRID"],

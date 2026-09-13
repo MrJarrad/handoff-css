@@ -30,7 +30,7 @@ export const exportSchemaV12Plus = require("../schema/design-system-handoff.v12p
  * is the same shape as 8 — designer-signal viewport gating and whole-percent
  * fraction snapping are semantic changes the export makes, not structural
  * ones this schema needs to distinguish. */
-export const VALIDATED_SCHEMA_VERSIONS = [8, 9, 10, 11, 12, 13, 14, 15];
+export const VALIDATED_SCHEMA_VERSIONS = [8, 9, 10, 11, 12, 13, 14, 15, 16];
 
 /** Which schema document validates a given `schemaVersion` (0.5.0). 8-11 share
  * the base shape; 12 adds required structures the base must NOT demand of an

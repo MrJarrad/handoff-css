@@ -122,6 +122,20 @@ test("the real 2026-09-12 19:12 export (schema 15) reports exactly 53 FLUID_CLAM
   assert.equal(res.clampFindings.filter((f) => f.code === "FLUID_CLAMP_UNPARSEABLE").length, 0);
 });
 
+// Schema 16 (responsive policy v4) fixes the coefficient this whole file is
+// about: `slopeRemPerPx * rootFontSizePx * 100`, not `slopeRemPerPx * 100`
+// alone. The 2026-09-13 05:49 export's 52 `fluid-clamp` rules all reproduce
+// their own samples now.
+test("the real 2026-09-13 05:49 export (schema 16) reports zero FLUID_CLAMP_MISMATCH findings", () => {
+  const exportDoc = JSON.parse(readFileSync(path.join(FIXTURES, "jhd-v16-2026-09-13", "export.json"), "utf8"));
+  assert.equal(exportDoc.schemaVersion, 16);
+  const res = validateExport(exportDoc);
+  assert.equal(res.ok, true);
+  const mismatches = res.clampFindings.filter((f) => f.code === "FLUID_CLAMP_MISMATCH");
+  assert.equal(mismatches.length, 0);
+  assert.equal(res.clampFindings.filter((f) => f.code === "FLUID_CLAMP_UNPARSEABLE").length, 0);
+});
+
 // The bug predates the 19:12 export — every committed fixture from schema 8
 // on carries the same `slopeRemPerPx × 100` plugin defect, at whatever count
 // its own variable set produces. Recorded here (and in CHANGELOG.md) rather
