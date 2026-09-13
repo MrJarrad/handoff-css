@@ -406,3 +406,49 @@ export const consumerCssV13 = () => readFileSync(path.join(V13, "styles.css"), "
  * against `docV13()` + `consumerConfig042` + `consumerCssV13()`. */
 export const expectedV13 = (file) =>
   readFileSync(path.join(V13, "expected", file), "utf8");
+
+/**
+ * An ELEVENTH real export, `fixtures/jhd-v17-2026-09-13/` — the design-system
+ * handoff at schema **17**, generated 2026-09-13T17:08:05.918Z, design-system
+ * state `4dd755a1…20bf`, content hash `2b855aa0…f30f`. Vendored verbatim from
+ * the plugin's own artifact pair:
+ *
+ *   `vault/main/projects/portfolio/artifacts/design-handoff-2026-09-13-exports/`
+ *   `jhd-spec-designsystem-design-system-handoff-2026-09-13-17-08-05/`
+ *     `…-17-08-05.json` -> `export.json`
+ *        sha256 9c5d66a6dbdfb8f318ff98922ef45ec197698ff5f3c2d3686ec96c2cce063697
+ *     `…-17-08-05.md`   -> `design-system-handoff.md`
+ *        sha256 0d0fff5c7c1d9b372d725252a8a0e9e3a74653c76e33b78e6abc9ae16cf2a649
+ *
+ * Schema 17's one delta is `policies.units` v5 -> v6 (the export's own
+ * `changes.policyChanges` states it: `{ field: "units", before: "5", after:
+ * "6" }`, `changes.summary.policyChanged: 1`). Units v6 adds ONE rule:
+ *
+ *   "Letter-spacing and line-height variables resolve their associated
+ *    font-size divisor from sibling variables: same-step `size/<n>` for
+ *    primitives; `text/<fam>/font-size-<step>` for layout collections. The
+ *    divisor is never invented; unresolvable associations emit
+ *    `status: unresolved`."
+ *
+ * So the typography cells this generator has emitted as raw px + UNCONVERTED
+ * since schema 5 are now RESOLVED at the variable level, each with its own
+ * `build.css` in `em` / unitless (`0em`, `-0.01em`, `1.15`, `1.3`). Nothing in
+ * `src/` changes to consume them: they take the existing resolved path and the
+ * generator emits `build.css` verbatim (P4). P13 is untouched — an export that
+ * still cannot resolve a divisor keeps emitting raw + UNCONVERTED, which is
+ * what `jhd-v16-2026-09-13` still does and `test/schema-17.test.mjs` pins.
+ */
+export const docV17 = () =>
+  JSON.parse(
+    readFileSync(path.join(path.dirname(FIXTURE), "jhd-v17-2026-09-13", "export.json"), "utf8"),
+  );
+
+export const V17 = path.join(path.dirname(FIXTURE), "jhd-v17-2026-09-13");
+
+/** The schema-16 export of the same design system, for the before/after pin in
+ * `test/schema-17.test.mjs` — the same typography variables, still
+ * `status: "unresolved"` under units v5. */
+export const docV16 = () =>
+  JSON.parse(
+    readFileSync(path.join(path.dirname(FIXTURE), "jhd-v16-2026-09-13", "export.json"), "utf8"),
+  );

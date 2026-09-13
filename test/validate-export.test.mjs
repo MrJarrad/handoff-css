@@ -29,13 +29,13 @@ test("the real v9 export validates with zero errors", () => {
   assert.equal(res.skipped, false);
 });
 
-// 0.5.3 — repointed from 15 to 17. Schemas 14-16 are accepted now (the
-// 2026-09-12 19:12 export ships 15 and the 2026-09-13 05:49 export ships 16,
-// both read by this package's own fluid-clamp check, P11); 17 is the first
-// version this package has not read, so it must not pass.
-test("a v9 export mutated to schemaVersion 17 fails at /schemaVersion", () => {
+// 0.6.0 — repointed from 17 to 18. Schema 17 is accepted now (the 2026-09-13
+// 17:08 export ships it, `policies.units` v6 — see
+// `test/schema-17.test.mjs`); 18 is the first version this package has not
+// read, so it must not pass.
+test("a v9 export mutated to schemaVersion 18 fails at /schemaVersion", () => {
   const doc = docV9();
-  doc.schemaVersion = 17;
+  doc.schemaVersion = 18;
   const res = validateExport(doc);
   assert.equal(res.skipped, false);
   assert.equal(res.ok, false);
@@ -49,12 +49,12 @@ test("a schema-7 export is skipped, not validated — and says so", () => {
   const res = validateExport(v7);
   assert.equal(res.ok, true);
   assert.equal(res.skipped, true);
-  assert.deepEqual(VALIDATED_SCHEMA_VERSIONS, [8, 9, 10, 11, 12, 13, 14, 15, 16]);
+  assert.deepEqual(VALIDATED_SCHEMA_VERSIONS, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
 });
 
 test("an unknown future schema version fails at /schemaVersion, not skipped", () => {
   const doc = docV8b();
-  doc.schemaVersion = 17;
+  doc.schemaVersion = 18;
   const res = validateExport(doc);
   assert.equal(res.skipped, false);
   assert.equal(res.ok, false);
@@ -196,6 +196,6 @@ test("assertValidExport names at most five pointers and counts the rest", () => 
 });
 
 test("the schema document is published as part of the package", () => {
-  assert.deepEqual(exportSchema.properties.schemaVersion.enum, [8, 9, 10, 11, 12, 13, 14, 15, 16]);
+  assert.deepEqual(exportSchema.properties.schemaVersion.enum, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
   assert.equal(exportSchema.$schema, "https://json-schema.org/draft/2020-12/schema");
 });

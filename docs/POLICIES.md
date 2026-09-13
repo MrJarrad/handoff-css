@@ -84,6 +84,15 @@ Driven **entirely** by the per-mode `build` cell the export publishes
   emit the raw source value with an `UNCONVERTED:` comment and list it in the
   report's §6. **The divisor is never invented.**
 
+  Schema 17 (`units.policy` v6) resolves that case AT THE SOURCE: the plugin
+  takes the divisor from a sibling variable (same-step `size/<n>` for
+  primitives, `text/<fam>/font-size-<step>` for layout collections), so every
+  `letter-spacing/*` and `line-height/*` cell arrives `resolved` and takes the
+  bullet above — `--letter-spacing-350: -0.01em`, `--line-height-title-050:
+  1.15`, verbatim. This policy is unchanged by that: an export that still
+  cannot resolve an association publishes `status: "unresolved"` and is still
+  emitted raw and counted. The generator never divides.
+
 Non-FLOAT types are rendered by type, since unit does not apply: TIMING →
 seconds (`0.375s`); EASING → `cubic-bezier(…)`, LINEAR → `linear`; COLOR → per
 `color.format`; STRING → quoted.
