@@ -8,7 +8,7 @@ export default {
   // Which export contract this consumer has vendored and read.
   schema: {
     name: "design-system-handoff",
-    versions: ["7", "8", "9", "10", "11", "12", "13"],
+    versions: ["7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"],
   },
 
   // Every path is relative to the consuming repo root.
@@ -247,14 +247,21 @@ the export publishes, so the follow-up knows what it is taking on.`,
    the unconditional base from the collection's default mode (\`lg\`) to the
    smallest-width \`default\`-variant mode (\`sm\`) — see §7. Nothing left to
    decide unless the widths themselves are wrong.
-2. **Unresolved units — CLOSED by schema 5, final value CLOSED by schema 6.**
-   Every FLOAT mode now carries a \`build\` cell (\`units.policy\` v4), so
+2. **Unresolved units — CLOSED by schema 5; typography residue CLOSED by
+   schema 17.** Every FLOAT mode carries a \`build\` cell (\`units.policy\` v4), so
    \`core/border/*\` emits \`px\`, opacity emits a fraction, effect blur emits
    \`px\`, and grid columns emit unitless — verbatim from the export, no
-   generator-side scope heuristic. The residue is §6 UNCONVERTED: {{unconverted}}
-   \`divide-by-associated-font-size\` tokens (letter-spacing) that need a font
-   size the export does not carry for a standalone variable. Should the export
-   publish an associated font size for these, or should they stay raw px?
+   generator-side scope heuristic. The residue was §6 UNCONVERTED: the
+   \`divide-by-associated-font-size\` tokens (letter-spacing, line-height) that
+   needed a font size the export did not carry for a standalone variable. RULING
+   (2026-09-13, \`units.policy\` v6 / schema 17): the PLUGIN resolves them, at the
+   variable level, per mode — the divisor comes from a sibling variable
+   (same-step \`size/<n>\` for primitives, \`text/<fam>/font-size-<step>\` for
+   layout collections) and is never invented. The generator emits the resulting
+   \`build.css\` verbatim (\`0em\`, \`-0.01em\`, \`1.15\`), never raw px. An
+   association the plugin still cannot resolve stays \`status: "unresolved"\` and
+   keeps P13's behaviour: raw source value emitted, listed as §6 UNCONVERTED
+   ({{unconverted}} on this run).
 3. **Colour name prefix — CLOSED by schema 5.** \`policies.naming\` v3 drops the
    \`color-\` prefix, so the export's WEB names now match the hand-authored ones
    exactly (\`--background-default-primary\`). {{colourSuppressed}} colour tokens

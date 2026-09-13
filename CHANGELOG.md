@@ -2,6 +2,48 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.6.0 — 2026-09-13
+
+Export (2026-09-13 17:08, schema 17, `policies.units` v6, design-system state
+`4dd755a1`) closes the last UNCONVERTED family. Units v6 adds one rule:
+letter-spacing and line-height variables resolve their font-size divisor from
+sibling variables — same-step `size/<n>` for primitives,
+`text/<fam>/font-size-<step>` for layout collections — so those cells arrive
+`build.status: "resolved"` with their own `css` in `em` / unitless. The
+generator emits that `css` verbatim, as it already does for every resolved
+cell; no conversion code was added and P13 is untouched.
+
+The export states its own delta: `changes.policyChanges: [{ field: "units",
+before: "5", after: "6" }]`, `changes.summary.policyChanged: 1`, and nothing
+else structural moved between 16 and 17.
+
+### Added
+
+- Schema version 17 accepted for validation (`VALIDATED_SCHEMA_VERSIONS`, both
+  schema documents' `schemaVersion` enums, prose retitled "8-17" / "12–17") —
+  8–16 unchanged.
+- `fixtures/jhd-v17-2026-09-13/` — the real 2026-09-13 17:08 export (schema 17)
+  and its companion markdown, vendored verbatim with sha256 provenance in
+  `test/fixture.mjs`. All 57 typography tokens (19 `letter-spacing/*`, 38
+  `line-height/*`) emit the export's own `css`; §6 UNCONVERTED is **0**, where
+  the schema-16 export of the same system reports 19 raw-px rows.
+  `test/schema-17.test.mjs` pins both halves.
+
+### Changed
+
+- `presets/jhd.config.mjs` `schema.versions` now runs `"7"`–`"17"`, so
+  `jhd-design-system`'s `handoff.config.mjs` override can be dropped.
+- The preset's open question 2 ("plugin publishes an associated font size vs
+  stay raw px") is replaced by the 2026-09-13 ruling: the plugin resolves
+  em/unitless per mode, the generator emits `build.css` verbatim.
+  `docs/POLICIES.md` P4 records the same.
+
+### Unchanged
+
+- P13 and `cellTrust` — a cell the plugin still cannot resolve keeps emitting
+  its raw source value with `UNCONVERTED:`. Every pre-17 fixture is
+  byte-stable.
+
 ## 0.5.3 — 2026-09-13
 
 Export (2026-09-13 05:49, schema 16, responsive policy v4, design-system state
