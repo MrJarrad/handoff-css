@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/jarradhd/handoff-css/schema/design-system-handoff.schema.json",
-  "title": "design-system-handoff, schema 8-13",
+  "title": "design-system-handoff, schema 8-16",
   "description": "The companion export the generator reads. This document states the SHAPE the generator depends on — not every field the plugin emits. Schema 12 added style classes, a type ramp, numeric font weights and custom-property sheets; those are stated in design-system-handoff.v12plus.schema.json, which is this document plus the v12 requirements. The top level is open (a plugin may add fields; a consumer that fails on a new field would make every export a breaking change), while the two structures whose keys the generator reads by name — codeSyntax.WEB and responsiveBehavior.rules[] — are closed, so a renamed or mistyped key is an error rather than a silent default.",
   "type": "object",
   "required": [
@@ -14,7 +14,7 @@
   ],
   "properties": {
     "schema": { "const": "design-system-handoff" },
-    "schemaVersion": { "enum": [8, 9, 10, 11, 12, 13, 14, 15] },
+    "schemaVersion": { "enum": [8, 9, 10, 11, 12, 13, 14, 15, 16] },
     "generatedAt": { "type": "string", "format": "date-time" },
     "contentHash": { "$ref": "#/$defs/sha256" },
     "fingerprint": {
