@@ -282,6 +282,35 @@ export default {
 An allowed name never raises `UNKNOWN_NAME`. It is not a mute button: a name your own
 stylesheet declares is still `LOCAL_ONLY`.
 
+### Roadmap — `conform` on a served DOM (spec only, not implemented)
+
+Today's `conform` reads **source CSS files** (`--css <file…>`) and static text — it never
+sees what actually renders. The next scope is a second `conform` mode that reads
+**computed styles from a live DOM** instead:
+
+```
+handoff-css conform --export <export>.json --handoff <design-handoff>.md \
+                    --url <served page> [--json]
+```
+
+- The page is loaded (a headless browser drives it), and for every node the handoff names,
+  `getComputedStyle()` on the matching DOM element replaces the source-file scan `--css`
+  does today. This catches what a source read cannot: a build step that inlines or purges a
+  custom property, a CSS-in-JS layer that never touches a `.css` file, a cascade override
+  from a later stylesheet the source list didn't include.
+- Findings keep the same vocabulary (`UNKNOWN_NAME`, `SAMPLE_PX_LITERAL`, `GRID_ARITHMETIC`,
+  `PLACEHOLDER_COPY`, …) — the *source* of a value changes from "declared in this file" to
+  "resolved at this element," the severity table does not.
+- `--url` and `--css` are mutually exclusive inputs to the same command, not two different
+  commands: one reads static declarations, the other reads what the browser actually
+  computed, and a consumer picks whichever matches how their build ships CSS.
+- Out of scope for this spec: which headless browser, how node→selector matching is
+  authored (most likely the handoff's own node ids via a `data-node-id` convention, still
+  to be decided), and whether markup itself (not just CSS) gets a served-DOM check. Those
+  are open questions for whoever implements this, not settled here.
+
+This section states the shape only — no code in this package implements `--url` yet.
+
 ## Pair it with the skill
 
 `skills/handoff-to-code/SKILL.md` ships in this package. It is the procedure for the other

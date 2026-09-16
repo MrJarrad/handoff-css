@@ -319,6 +319,23 @@ A bare-number second argument (instead of a `VARIABLE_ALIAS`) is kept as a
 defensive branch — one earlier export in this schema family carried the shape,
 and nothing proves Figma cannot reintroduce it.
 
+**Bare-pair raw shape (0.7.1, 2026-09-16 14:05 export).** Figma's own API can
+carry the same two `VARIABLE_ALIAS` arguments as `{ color, opacity }` with no
+`type` / `expressionFunction` wrapper, instead of the
+`VARIABLE_EXPRESSION`/`COMPOSE_COLOR` wrapper above — confirmed by the same
+variable/mode/argument-ids appearing wrapped in the 2026-09-13 export and
+bare in the 2026-09-16 one. The design-system-handoff plugin's own
+COMPOSE_COLOR detector does not recognise the bare shape, so every bare-pair
+mode's `build.status` reports `"unresolved"` even though both arguments
+resolve cleanly. `composeColorAliasPair` (`src/resolve.mjs`, exported)
+normalizes both shapes to `[colorArg, opacityArg]`; for the bare-pair shape
+the generator builds the `rgb(from var(<color>) r g b / var(<opacity>))`
+string itself from the two resolved argument names rather than trusting
+`build.css` (which the plugin marks unresolved for this shape only) — the
+wrapped shape's contract is unchanged: `build.status !== "resolved"` is still
+a hard failure for it, and its `build.css` is still emitted verbatim, never
+re-derived. `test/compose-color-bare-pair.test.mjs`.
+
 ### P9.1 Theme modes, driven by the export's own flag
 
 `breakpoints.entries` carries `isTheme: true` / `theme: "<name>"` /

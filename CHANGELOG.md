@@ -2,6 +2,28 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.7.2 — 2026-09-16
+
+Documentation-only release: no generator behaviour changed, no fixture moved.
+
+### Added
+
+- `docs/POLICIES.md` P9 records the 0.7.1 bare-pair COMPOSE_COLOR raw shape
+  (`{ color, opacity }`, no `expressionFunction` wrapper) alongside the
+  wrapped shape it already documented — same normalization
+  (`composeColorAliasPair`), same generated-CSS guarantee, same test
+  (`test/compose-color-bare-pair.test.mjs`). This closes the gap where the
+  ruling landed in code and `CHANGELOG.md` but not in the policy doc.
+- `README.md` — a "Roadmap — `conform` on a served DOM" section under
+  `## CLI`, spec-only: `conform --url <served page>` would read
+  `getComputedStyle()` off a live page instead of source CSS files, same
+  finding vocabulary, not implemented in this release.
+
+### Unchanged
+
+- Every generator code path, every fixture, every test. `npm test` is
+  byte-identical to 0.7.1's 439 passing tests.
+
 ## 0.7.1 — 2026-09-16
 
 `generate()` (and the CLI) hard-failed on the 2026-09-16 14:05 export
