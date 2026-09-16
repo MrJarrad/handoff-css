@@ -2,6 +2,48 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.7.1 — 2026-09-16
+
+`generate()` (and the CLI) hard-failed on the 2026-09-16 14:05 export
+(`fixtures/jhd-v17c-2026-09-16/`, the same export 0.7.0 added for the
+typeRamp v3 fixture) with `unrecognised COLOR value {...}` at
+`src/resolve.mjs:29`, called from `resolveValue`'s COLOR case.
+
+**Diagnosis.** Figma's own API changed COMPOSE_COLOR's on-wire `raw` shape
+between this export and the 2026-09-13 one of the same design system state
+family: the wrapped form (`{ type: "VARIABLE_EXPRESSION", expressionFunction:
+"COMPOSE_COLOR", expressionArguments: [colorArg, opacityArg] }`) became a
+bare alias pair (`{ color: colorArg, opacity: opacityArg }`, no `type` / no
+`expressionFunction` wrapper) — same two `VARIABLE_ALIAS` arguments, same
+variables (`color/border/action/primary` and every other COMPOSE_COLOR
+token), confirmed by comparing `color/border/action/primary`'s `bttf` mode
+across both exports: identical argument ids, different wrapper. This is an
+upstream export-shape change, not a new authoring pattern in the file — the
+design-system-handoff plugin's own COMPOSE_COLOR detector does not recognise
+the new shape yet, so every bare-pair mode's `build.status` reports
+`"unresolved"` even though both arguments resolve cleanly in the export.
+
+### Fixed
+
+- `composeColorAliasPair` (`src/resolve.mjs`, exported) normalizes both raw
+  shapes to `[colorArg, opacityArg]`. `resolveValue`'s COLOR case,
+  `composeColor`, `composeColorNote`, `terminalNote`, and `exclude.mjs`'s
+  alias-closure walk all go through it, so a hidden colour/opacity primitive
+  behind either shape's argument still lands PRIVATE (P7), never HIDDEN.
+- For the bare-pair shape, `composeColor` builds the relative-colour-syntax
+  string itself (`rgb(from var(<color>) r g b / var(<opacity>))`) from the
+  two resolved argument names, rather than trusting `build.css` — the
+  plugin's own detector reports that shape `"unresolved"`. The wrapped
+  shape's behaviour is completely unchanged: `build.status !== "resolved"`
+  is still a hard failure for that form, and `build.css` is still emitted
+  verbatim, never re-derived.
+- `test/compose-color-bare-pair.test.mjs` — pins that `generate()` completes
+  over the 2026-09-16 14:05 export, that the bare-pair shape emits
+  byte-identical CSS to the wrapped shape's pinned string for the same
+  argument pair, that a downstream alias's terminal comment stays symbolic,
+  and that a genuinely malformed raw object (neither shape) is still a hard
+  failure.
+
 ## 0.7.0 — 2026-09-16
 
 Export (2026-09-16 14:05, schema 17, `policies.typeRamp` v3, design-system

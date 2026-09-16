@@ -162,8 +162,9 @@ const terminalNote = (v, mode, terminal, byId, cfg) => {
   if (v.type === "TIMING" && typeof terminal === "number") return timing(terminal, cfg);
   // P9: a COMPOSE_COLOR terminal is the expression object, not a hex string —
   // render it the same symbolic way composeColor's own note does rather than
-  // stringifying the object.
-  if (v.type === "COLOR" && terminal && typeof terminal === "object" && terminal.type === "VARIABLE_EXPRESSION") {
+  // stringifying the object. Either COMPOSE_COLOR raw shape qualifies —
+  // see `composeColorAliasPair`.
+  if (v.type === "COLOR" && terminal && typeof terminal === "object" && composeColorAliasPair(terminal)) {
     return composeColorNote(v, terminal, byId);
   }
   return String(terminal);
@@ -185,6 +186,40 @@ export const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
  * behaviour, superseded now that the export states the answer.
  */
 /**
+ * Both COMPOSE_COLOR raw shapes this export family has published, normalized
+ * to `[colorArg, opacityArg]` — or `null` when `raw` is neither.
+ *
+ *   wrapped   (schema 7, every export through 2026-09-13):
+ *             `{ type: "VARIABLE_EXPRESSION", expressionFunction:
+ *             "COMPOSE_COLOR", expressionArguments: [colorArg, opacityArg] }`
+ *   bare pair (schema 17, export 2026-09-16 14:05 onward):
+ *             `{ color: colorArg, opacity: opacityArg }` — no `type`, no
+ *             `expressionFunction` wrapper, same two arguments.
+ *
+ * The bare-pair shape is Figma's own API changing how it reports this
+ * expression, not a new authoring pattern in the file: the same variables
+ * (`color/border/action/primary` etc.) carried the wrapped shape in the
+ * 2026-09-13 export of the same design system and the bare pair in
+ * 2026-09-16's, with identical argument ids. The design-system-handoff
+ * plugin's own `isComposeColorExpression` detector (schema 17, `code.ts`)
+ * still requires the wrapped shape, so `build.status` for a bare-pair mode
+ * reports `"unresolved"` — this generator resolves the expression itself for
+ * that shape instead of trusting `build` (see `composeColor` below).
+ */
+export function composeColorAliasPair(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  if (raw.type === "VARIABLE_EXPRESSION") {
+    const args = raw.expressionArguments;
+    if (raw.expressionFunction === "COMPOSE_COLOR" && Array.isArray(args) && args.length === 2) {
+      return [args[0], args[1]];
+    }
+    return null;
+  }
+  if (raw.type === undefined && "color" in raw && "opacity" in raw) return [raw.color, raw.opacity];
+  return null;
+}
+
+/**
  * Resolve a COMPOSE_COLOR expression's colour and opacity argument WEB names,
  * for the terminal-value comment (`COMPOSE_COLOR(colour, opacity)`) and as a
  * shape/reachability validation independent of `build`. Shared by
@@ -200,12 +235,10 @@ export const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
  * export's own number is used verbatim, rounded once by `num()`.
  */
 function composeColorArgs(v, raw, byId) {
-  const args = raw.expressionArguments;
-  const [colorArg, opacityArg] = args ?? [];
+  const pair = composeColorAliasPair(raw);
+  const [colorArg, opacityArg] = pair ?? [];
   if (
-    raw.expressionFunction !== "COMPOSE_COLOR" ||
-    !Array.isArray(args) ||
-    args.length !== 2 ||
+    !pair ||
     colorArg?.type !== "VARIABLE_ALIAS" ||
     !(opacityArg?.type === "VARIABLE_ALIAS" || typeof opacityArg === "number")
   ) {
@@ -219,7 +252,8 @@ function composeColorArgs(v, raw, byId) {
   const colorName = webName(colorTarget);
 
   if (typeof opacityArg === "number") {
-    return { colorName, note: `${colorName}, ${num(opacityArg)}%` };
+    const pct = `${num(opacityArg)}%`;
+    return { colorName, opacityName: null, opacityLiteral: pct, note: `${colorName}, ${pct}` };
   }
   const opacityTarget = byId.get(opacityArg.id);
   if (!opacityTarget) fail(`${webName(v)}: COMPOSE_COLOR opacity argument ${opacityArg.id} not in export`);
@@ -227,7 +261,7 @@ function composeColorArgs(v, raw, byId) {
     fail(`${webName(v)}: COMPOSE_COLOR arg 2 (${webName(opacityTarget)}) is ${opacityTarget.type}, expected FLOAT`);
   }
   const opacityName = webName(opacityTarget);
-  return { colorName, note: `${colorName}, ${opacityName}` };
+  return { colorName, opacityName, opacityLiteral: null, note: `${colorName}, ${opacityName}` };
 }
 
 /**
@@ -240,10 +274,24 @@ function composeColorArgs(v, raw, byId) {
  * moved off the generator), and a `build.raw` that disagrees with `mode.raw`
  * is a hard failure, never a silent pick of one side (mirrors the FLOAT
  * check, P4).
+ *
+ * The bare-pair raw shape (`composeColorAliasPair`, 2026-09-16 export) is the
+ * one exception to "trust `build`": the plugin's own detector for this
+ * expression does not recognise that shape yet, so every bare-pair mode's
+ * `build.status` reports `"unresolved"` even though both arguments resolve
+ * cleanly in this export. Nothing here re-derives a NEW value — it is the
+ * exact same `rgb(from var(<color>) r g b / var(<opacity>))` string schema 7
+ * has always published for this pair (pinned against the 2026-09-13 export of
+ * the same design system in `test/compose-color.test.mjs`), built from the
+ * two argument names `composeColorArgs` already resolved and validated.
  */
 function composeColor(v, mode, byId) {
   const raw = mode.raw;
-  const { note } = composeColorArgs(v, raw, byId);
+  const { colorName, opacityName, opacityLiteral, note } = composeColorArgs(v, raw, byId);
+  if (raw.type !== "VARIABLE_EXPRESSION") {
+    const opacityTerm = opacityName ? `var(${opacityName})` : opacityLiteral;
+    return plain(`rgb(from var(${colorName}) r g b / ${opacityTerm})`, `COMPOSE_COLOR(${note})`);
+  }
   const b = mode.build;
   if (!b || !b.status) fail(`${webName(v)} mode ${mode.modeName}: no build cell published for COMPOSE_COLOR`);
   if (b.raw && JSON.stringify(b.raw) !== JSON.stringify(raw)) {
@@ -300,7 +348,7 @@ export function resolveValue(v, mode, byId, cfg, collection = null) {
   const raw = mode.raw;
   switch (v.type) {
     case "COLOR":
-      if (raw && typeof raw === "object" && raw.type === "VARIABLE_EXPRESSION") {
+      if (raw && typeof raw === "object" && composeColorAliasPair(raw)) {
         return composeColor(v, mode, byId);
       }
       return plain(color(raw, cfg));

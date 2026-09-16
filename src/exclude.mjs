@@ -3,7 +3,7 @@
 // custom property that is referenced and not declared is invalid at
 // computed-value time. The emit set is therefore the alias closure, not the
 // published set. See docs/POLICIES.md.
-import { cmp } from "./resolve.mjs";
+import { cmp, composeColorAliasPair } from "./resolve.mjs";
 import { webName } from "./schema.mjs";
 
 // P7 — the EXCLUDED policy list, matched against `"<collection.name>/<v.name>"`.
@@ -52,23 +52,21 @@ export function privateIds(doc, cfg) {
   // different primitives, and both declarations get emitted.
   //
   // P9: a COMPOSE_COLOR mode has no `mode.alias` at all — its two arguments
-  // live in `mode.raw.expressionArguments` and are emitted as `var()`
-  // references exactly like an alias hop, so they must feed the same
-  // reachability closure or a hidden colour/opacity primitive behind a
-  // COMPOSE_COLOR argument would wrongly land HIDDEN (dropped) instead of
-  // PRIVATE (emitted) and the composing token would dangle.
+  // (either raw shape `composeColorAliasPair` recognises — the wrapped
+  // `VARIABLE_EXPRESSION` form or the bare `{ color, opacity }` pair the
+  // 2026-09-16 export started publishing) are emitted as `var()` references
+  // exactly like an alias hop, so they must feed the same reachability
+  // closure or a hidden colour/opacity primitive behind a COMPOSE_COLOR
+  // argument would wrongly land HIDDEN (dropped) instead of PRIVATE (emitted)
+  // and the composing token would dangle.
   const hops = (v) =>
     v.modes
       .filter((m) => m.effective !== false)
       .flatMap((m) => {
         const aliasHop = m.alias?.chain?.[0]?.variableId;
         if (aliasHop) return [aliasHop];
-        const raw = m.raw;
-        if (raw?.type === "VARIABLE_EXPRESSION" && raw.expressionFunction === "COMPOSE_COLOR") {
-          return (raw.expressionArguments ?? [])
-            .filter((a) => a?.type === "VARIABLE_ALIAS")
-            .map((a) => a.id);
-        }
+        const pair = composeColorAliasPair(m.raw);
+        if (pair) return pair.filter((a) => a?.type === "VARIABLE_ALIAS").map((a) => a.id);
         return [];
       });
 
