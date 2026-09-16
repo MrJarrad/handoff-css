@@ -39,10 +39,10 @@ export const LAW_SENTENCES = [
   // Step 6 — the deviation table.
   "| element | Figma binding | token used | value | status | ruling ref |",
   "**match**",
-  "**drift**",
+  "**resolved-to-export**",
   "**unflagged-viewport**",
   "**hand-authored-override**",
-  "Drift is not yours to resolve: name it, propose one fix, and wait for a ruling.",
+  "Ask only when the export binds no token where one is expected, or building\n  the export's value breaks something — never over plain value drift.",
   "An empty `ruling ref` on a non-match row is an unauthorised deviation.",
 ];
 

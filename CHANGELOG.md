@@ -2,6 +2,36 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.7.3 — 2026-09-16
+
+`skills/handoff-to-code/SKILL.md` (single source; adapters rebuilt in
+`dist/{standalone,claude-plugin,cursor,codex}` and `AGENTS.md` via
+`scripts/build-skill-adapters.mjs`) gains four queued rows:
+
+### Added
+
+- §2 warning table: `UNCONVERTED` / `build.status: unresolved` — build the
+  raw value as generated, file the missing divisor against the plugin as a
+  deviation, never hand-divide.
+- Build standards gain a 7th mechanism rule for Spacer instances, per
+  `fleet/rulings/spacers-are-margins-2026-09-13.md`: the export's
+  `spacer(edge:start|end|both|mid)` marker decides margin-on-block
+  (`start`/`end`) vs container `gap` (`mid`); a Spacer never renders a DOM
+  node.
+- §7 deviation-table status renamed `drift` → `resolved-to-export`, per
+  `fleet/rulings/export-values-win-no-drift-questions-2026-09-13.md`: an
+  export/code disagreement resolves to the export without asking; the doer
+  asks only when a token is missing or the export's value breaks something.
+- §6 (`conform`) gains an enumeration step: grep for every rendering of the
+  export's nodes (style classes, slot names, duplicate markup) before
+  running `conform`, per
+  `fleet/lessons/conform-every-rendering-not-the-component-file-2026-09-14.md`
+  — a pass on the component file alone leaves sibling renderings unchecked.
+
+`test/skill-law-sentences.mjs` updated to match (`**drift**` →
+`**resolved-to-export**` and its sentence). 439 tests, no fixture or
+generator code changed.
+
 ## 0.7.2 — 2026-09-16
 
 Documentation-only release: no generator behaviour changed, no fixture moved.
