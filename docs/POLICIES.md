@@ -855,7 +855,13 @@ arbitrary values — `aspect-(--aspect-landscape)` — with no reset needed.
 Schema 12 (and 13) publish a ready `cssClass` on every Figma style: a `selector`, a
 `declarations[]` already bound to `var(--token, fallback)`, and the `css` those two
 compose to. A TEXT style also carries type ramp v2 (`typeRamp.*.build` with
-`cssProperty`, `css`, `buildReady`) and a `fontStack` / `fontStackCss`.
+`cssProperty`, `css`, `buildReady`) and a `fontStack` / `fontStackCss`. Type ramp v3
+(2026-09-16) adds `typeRamp.textDecorationDetail` — the underline/strikethrough
+geometry (`style`, `thickness`, `offset`, `skipInk`, `color`) beside `textDecoration`,
+with its own `build.css` map when resolved. It changes nothing here: the plugin folds
+that `css` into the SAME `cssClass.declarations` this policy already copies verbatim, so
+a v3 style's class needed no new code — only `schema/design-system-handoff.v12plus.schema.json`
+widening `typeRamp.policyVersion`'s enum to accept `"3"` alongside `"2"`.
 
 **The export states the class; this package copies it.** The selector is emitted
 verbatim and never derived from a style name; the declarations are emitted in the

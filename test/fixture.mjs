@@ -452,3 +452,33 @@ export const docV16 = () =>
   JSON.parse(
     readFileSync(path.join(path.dirname(FIXTURE), "jhd-v16-2026-09-13", "export.json"), "utf8"),
   );
+
+/**
+ * A TWELFTH real export, `fixtures/jhd-v17c-2026-09-16/` — schema **17**,
+ * generated 2026-09-16T14:05:41.614Z, design-system state
+ * `8cb5f9d3…f60c8`, content hash `7a93a9eb…c649f44`. Vendored verbatim from
+ * the plugin's own artifact pair:
+ *
+ *   `vault/main/projects/portfolio/artifacts/design-system-handoff-2026-09-16/`
+ *     `…-14-05-41.json` -> `export.json`
+ *        sha256 eec3b8a2bf6541f8cb297e8598ebbb5a44a81789cac7686325360a7ded1777fa
+ *     `…-14-05-41.md`   -> `design-system-handoff.md`
+ *        sha256 18ab4c1c91106f9db62ed5bc603b439f6b801eb7bed8ab78f811ff4c2a2c46eb
+ *
+ * Its one delta from `jhd-v17-2026-09-13` is `policies.typeRamp` v2 -> v3
+ * (`TYPE_RAMP_POLICY_VERSION` in the design-system-handoff plugin): every
+ * `styles.TEXT[].typeRamp` now carries `textDecorationDetail`, a `raw`
+ * property whose `build` states the underline/strikethrough geometry
+ * (`style`, `thickness`, `offset`, `skipInk`, `color`) plus the `css` map
+ * those compose to, when `build.status` is `resolved`. `title-action-style1/200`
+ * and `body-action-style1/200` are the two styles this fixture is pinned on —
+ * both carry a resolved detail, and both already fold its `css` entries into
+ * `cssClass.declarations` (P21 emits the class verbatim; nothing in `src/`
+ * re-derives underline geometry).
+ */
+export const docV17c = () =>
+  JSON.parse(
+    readFileSync(path.join(path.dirname(FIXTURE), "jhd-v17c-2026-09-16", "export.json"), "utf8"),
+  );
+
+export const V17C = path.join(path.dirname(FIXTURE), "jhd-v17c-2026-09-16");

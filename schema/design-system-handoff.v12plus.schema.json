@@ -117,11 +117,39 @@
           "type": "object",
           "required": ["policyVersion"],
           "properties": {
-            "policyVersion": { "enum": ["2"] }
+            "policyVersion": { "enum": ["2", "3"] },
+            "textDecorationDetail": { "$ref": "#/$defs/textDecorationDetail" }
           }
         },
         "fontStack": { "type": "array", "items": { "type": "string" } },
         "fontStackCss": { "type": "string" }
+      }
+    },
+    "textDecorationDetail": {
+      "type": "object",
+      "description": "Type ramp policy v3 — the underline/strikethrough geometry `buildTextDecorationDetail` (design-system-handoff plugin) adds beside `textDecoration`. `build.value`/`build.css` are present when `build.status` is `resolved`; a shared TEXT style whose sub-fields the plugin cannot read reports `unresolved` and states neither.",
+      "required": ["developerName", "status", "build"],
+      "properties": {
+        "developerName": { "const": "textDecorationDetail" },
+        "status": { "type": "string" },
+        "rawFigma": {},
+        "build": {
+          "type": "object",
+          "required": ["status"],
+          "properties": {
+            "status": { "enum": ["resolved", "unresolved"] },
+            "value": {},
+            "unit": { "const": "detail" },
+            "css": {
+              "type": "object",
+              "description": "Emitted VERBATIM into the style's `cssClass.declarations` (P21) — never recomputed here.",
+              "additionalProperties": { "type": "string" }
+            },
+            "cssProperties": { "type": "array", "items": { "type": "string" } },
+            "buildReady": { "type": "boolean" },
+            "unresolved": { "type": "array", "items": { "type": "string" } }
+          }
+        }
       }
     },
     "fontWeightNumeric": {

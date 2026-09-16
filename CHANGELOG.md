@@ -2,6 +2,41 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.7.0 — 2026-09-16
+
+Export (2026-09-16 14:05, schema 17, `policies.typeRamp` v3, design-system
+state `8cb5f9d3`) adds `styles.TEXT[].typeRamp.textDecorationDetail`: the
+underline/strikethrough geometry (`style`, `thickness`, `offset`, `skipInk`,
+`color`) `buildTextDecorationDetail` (design-system-handoff plugin) states
+beside `textDecoration`, plus the `css` map those compose to when
+`build.status` is `resolved`. Schema 12's P21 contract already emits
+`cssClass.declarations` verbatim, and the plugin already folds
+`textDecorationDetail.build.css` into that array — so no generator code
+changed to consume it. Blocked before this release: `validate` rejected
+every TEXT style in a v3 export at `typeRamp.policyVersion` (`"3"` vs the v2
+enum `["2"]`) — all 52 styles in the 2026-09-16 14:05 export.
+
+### Added
+
+- `typeRamp.policyVersion` enum widened `["2"]` -> `["2", "3"]`
+  (`schema/design-system-handoff.v12plus.schema.json`); a v2 export still
+  validates unchanged.
+- `typeRamp.textDecorationDetail` schema `$defs.textDecorationDetail` — shape
+  only (P14): `developerName`, `status`, `build.status`, and, when resolved,
+  `build.value`/`build.css`/`cssProperties`/`buildReady`; when unresolved,
+  `build.unresolved`. Optional on every text style — a v2 or v3 style with
+  `textDecoration: "NONE"` states `build.value: null` and no `css`.
+- `fixtures/jhd-v17c-2026-09-16/` — the real 2026-09-16 14:05 export (schema
+  17, typeRamp v3) and its companion markdown, vendored verbatim with sha256
+  provenance in `test/fixture.mjs`. `title-action-style1/200` and
+  `body-action-style1/200` are the two styles pinned: both carry a resolved
+  `textDecorationDetail` and both already fold its `css` into
+  `cssClass.declarations`. `test/type-ramp-v3.test.mjs` pins the schema
+  acceptance and the class emission (via `emitStyles` directly — this
+  fixture's `color` collection carries an unrelated, pre-existing
+  COMPOSE_COLOR raw-shape gap in `emitTokens`, filed separately, not touched
+  here).
+
 ## 0.6.0 — 2026-09-13
 
 Export (2026-09-13 17:08, schema 17, `policies.units` v6, design-system state
