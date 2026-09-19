@@ -29,9 +29,23 @@ export const briefSchema = require("../schema/design-handoff.v10.schema.json");
  */
 export const briefSchemaV11 = require("../schema/design-handoff.v11.schema.json");
 
+/**
+ * 0.8.0 — schema v12 (export v16+) is additive over v11: every layer node may
+ * carry per-node token/variable-binding provenance (`tokenBindings`,
+ * `variableBindings`, `styleBindings`), spacer/variant metadata
+ * (`componentPropertyDefinitions`, `variantStates`, `siblingIndex`), semantic
+ * inference detail (`semanticSource`, `semanticRejected`), and cosmetic node
+ * state (`opacity`, `rotation`, `description`, `descriptionHints`); the
+ * document itself may carry `schemaNote` and `validation.findings`. v10/v11
+ * stay accepted for older exports; dispatch is by the document's own
+ * `schemaVersion`, never a flag.
+ */
+export const briefSchemaV12 = require("../schema/design-handoff.v12.schema.json");
+
 const schemasByVersion = new Map([
   [10, briefSchema],
   [11, briefSchemaV11],
+  [12, briefSchemaV12],
 ]);
 
 const compiledByVersion = new Map();

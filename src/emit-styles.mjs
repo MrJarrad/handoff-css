@@ -97,6 +97,43 @@ const familyVariables = (doc) => {
 const FONT_FAMILY_DECL = /^font-family:\s*(.+)$/;
 
 /**
+ * P23 (0.8.0) — a TEXT style's `paragraphSpacing` is bound to a variable
+ * (`properties.boundVariables.paragraphSpacing`) whenever the design system
+ * gives it a token, the same as every other typographic property — but the
+ * export's own `cssClass.declarations` states nothing for it (a plugin gap,
+ * the paragraph-spacing counterpart of the `font-family` gap `bindFontFamily`
+ * already closes). Per operator ruling 2026-09-19 ("they were both design
+ * system things — the text style should carry them") and the spacer-margins
+ * mechanism (`handoff-to-code` § Build standards item 7 — a paragraph gap is
+ * a trailing margin on the block it edges, never a literal), one additive
+ * declaration is appended: `margin-block-end: var(<token>, <raw>px)`.
+ *
+ * Additive only — never touches an existing declaration, and never fires when
+ * the style already states `margin-block*` itself.
+ */
+function bindParagraphSpacing(type, style, declarations, byId) {
+  if (type !== "TEXT") return { declarations, findings: [] };
+  const bound = style.properties?.boundVariables?.paragraphSpacing;
+  if (!bound?.id) return { declarations, findings: [] };
+  if (declarations.some((d) => /^margin-block/.test(d))) return { declarations, findings: [] };
+
+  const variable = byId.get(bound.id);
+  if (!variable) return { declarations, findings: [] };
+  const name = webName(variable);
+  const raw = style.properties.paragraphSpacing;
+  const fallback = typeof raw === "number" ? `${raw}px` : "0px";
+  const selector = style.cssClass.selector;
+  return {
+    declarations: [...declarations, `margin-block-end: var(${name}, ${fallback})`],
+    findings: [{
+      code: "STYLE_CLASS_PARAGRAPH_SPACING_BOUND",
+      name: selector,
+      detail: `\`paragraphSpacing\` bound to \`${name}\` (\`${variable.name}\`), stated nowhere in this style's own \`cssClass.declarations\` — appended as \`margin-block-end: var(${name}, ${fallback})\` (P23, spacer-margins policy).`,
+    }],
+  };
+}
+
+/**
  * Bind every TEXT declaration's `font-family` literal to its matching
  * font-family variable, one substitution per declaration, everything else
  * untouched. Returns the (possibly rewritten) declarations and the findings
@@ -192,6 +229,9 @@ export function emitStyles(doc, byId, handClasses, handUtils, cfg) {
       const bound = bindFontFamily(type, selector, declarations, familyByValue);
       declarations = bound.declarations;
       warnings.push(...bound.findings);
+      const spacing = bindParagraphSpacing(type, style, declarations, byId);
+      declarations = spacing.declarations;
+      warnings.push(...spacing.findings);
       warnings.push(...styleFindings(style, declarations, byId));
       const shadowed = handUtils.has(selector.slice(1));
       const hand = handClasses.get(selector) ?? null;
