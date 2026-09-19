@@ -42,10 +42,21 @@ export const briefSchemaV11 = require("../schema/design-handoff.v11.schema.json"
  */
 export const briefSchemaV12 = require("../schema/design-handoff.v12.schema.json");
 
+/**
+ * 0.8.2 — schema v13 (export v17+) is additive over v12: `dimensions` may
+ * carry minWidth/minWidthToken/maxWidth/maxWidthToken/minHeight/
+ * minHeightToken/maxHeight/maxHeightToken — variable bindings for
+ * auto-layout min/max size constraints, matching the existing
+ * padding/gap binding pattern. v10/v11/v12 stay accepted for older
+ * exports; dispatch is by the document's own `schemaVersion`, never a flag.
+ */
+export const briefSchemaV13 = require("../schema/design-handoff.v13.schema.json");
+
 const schemasByVersion = new Map([
   [10, briefSchema],
   [11, briefSchemaV11],
   [12, briefSchemaV12],
+  [13, briefSchemaV13],
 ]);
 
 const compiledByVersion = new Map();
