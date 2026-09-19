@@ -1,13 +1,17 @@
-// 0.8.0 — operator ruling 2026-09-19 ("they were both design system things —
+// 0.8.1 — operator ruling 2026-09-19 ("they were both design system things —
 // the text style should carry them"): a TEXT style whose `paragraphSpacing`
 // is bound to a variable (`properties.boundVariables.paragraphSpacing`)
 // states that binding nowhere in `cssClass.declarations` — a plugin gap, the
 // same shape P21's `bindFontFamily` already closes for `font-family`. This
-// module closes the paragraph-spacing half: one additive `margin-block-end:
-// var(<token>, <fallback>)` declaration, appended (never replacing an
-// existing declaration), spacer-margins policy (handoff-to-code § Build
-// standards item 7 — a paragraph gap is a trailing margin on the block it
-// edges, never a literal).
+// module closes the paragraph-spacing half: an adjacent-sibling rule,
+// `<selector> + <selector> { margin-block-start: var(<token>, <fallback>) }`
+// — the gap BETWEEN paragraphs, never a trailing margin after the last one
+// (spacer-margins policy, handoff-to-code § Build standards item 7). 0.8.0
+// (`ea48aee`) shipped an unconditional `margin-block-end` on every instance
+// instead — reverted here because it stacked a trailing gap and, alongside
+// jhd-design-system's hand-authored sibling rule (#56, `1e79f3a`), double-
+// counted the gap between paragraphs. The sibling shape matches #56 exactly
+// so that hand-authored copy can retire once the DS regenerates against this.
 //
 // `text-wrap: pretty` is authored on individual TEXT NODES in a block export
 // (`design-handoff`), never on a `design-system-handoff` TEXT STYLE — grepped
@@ -34,11 +38,16 @@ test("the real schema-17 export states body-style1/100's paragraphSpacing bound 
     "fixture's own declarations must NOT already carry the binding (this is the gap being closed)");
 });
 
-test("generated styles.css carries a margin-block-end declaration bound to the paragraph-spacing token", () => {
+test("generated styles.css carries the class's own declarations untouched, followed by an adjacent-sibling margin-block-start rule bound to the paragraph-spacing token", () => {
   const out = generate(doc, consumerConfig042, { handAuthoredCss: consumerCssV13() });
   assert.ok(out.stylesCss.includes(
-    "@utility body-style1-100 {\n  font-size: var(--text-body-font-size-100, 1rem);\n  line-height: var(--text-body-line-height-100, 1.3);\n  letter-spacing: var(--text-body-letter-spacing-100, 0em);\n  font-weight: 600;\n  font-family: var(--family-font-sans, \"Inter Tight\");\n  margin-block-end: var(--text-body-paragraph-spacing-100, 16px);\n}",
+    "@utility body-style1-100 {\n  font-size: var(--text-body-font-size-100, 1rem);\n  line-height: var(--text-body-line-height-100, 1.3);\n  letter-spacing: var(--text-body-letter-spacing-100, 0em);\n  font-weight: 600;\n  font-family: var(--family-font-sans, \"Inter Tight\");\n}\n.body-style1-100 + .body-style1-100 {\n  margin-block-start: var(--text-body-paragraph-spacing-100, 16px);\n}",
   ), out.stylesCss.slice(out.stylesCss.indexOf("body-style1-100"), out.stylesCss.indexOf("body-style1-100") + 400));
+});
+
+test("no paragraph-spacing-bound style ever emits margin-block-end — the sibling rule states margin-block-start only", () => {
+  const out = generate(doc, consumerConfig042, { handAuthoredCss: consumerCssV13() });
+  assert.ok(!out.stylesCss.includes("margin-block-end"));
 });
 
 test("every TEXT style whose paragraphSpacing is bound gets exactly one STYLE_CLASS_PARAGRAPH_SPACING_BOUND finding", () => {

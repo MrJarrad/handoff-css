@@ -2,6 +2,29 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.8.1 — 2026-09-19
+
+### Fixed
+
+- `bindParagraphSpacing` (P23, `src/emit-styles.mjs`) — 0.8.0 (`ea48aee`) emitted an
+  unconditional `margin-block-end: var(<token>, <raw>px)` appended to every
+  paragraph-spacing-bound TEXT style's own declarations: a trailing margin on every
+  instance, not the gap between consecutive paragraphs. Reverted to an adjacent-sibling
+  rule instead — `.<selector> + .<selector> { margin-block-start: var(<token>, <raw>px) }`
+  — the same shape `jhd-design-system` already hand-authors on its own `body-style1-N`
+  classes (#56, `1e79f3a`), so that hand-authored copy can retire once the design system
+  regenerates against this. Per the spacer-margins mechanism
+  (`handoff-to-code` § Build standards item 7) and operator ruling 2026-09-19: a paragraph
+  gap is the space between paragraphs, never a trailing margin after the last one; 0.8.0's
+  shape both added a spurious trailing gap and, alongside the hand-authored sibling rule,
+  double-counted the gap between paragraphs. `docs/POLICIES.md` gains a P23 section
+  stating the corrected shape. `STYLE_CLASS_PARAGRAPH_SPACING_BOUND` still fires once per
+  bound style; its detail message now names the sibling rule. No migration for a 0.8.0
+  consumer beyond regenerating. 453 tests (7 new/repointed in
+  `test/paragraph-spacing-textwrap.test.mjs` and `test/styles-v13.test.mjs`), the v13
+  fixture's `styles.generated.css` and `ds-from-handoff-report.md` regenerated for the new
+  shape.
+
 ## 0.7.3 — 2026-09-16
 
 `skills/handoff-to-code/SKILL.md` (single source; adapters rebuilt in

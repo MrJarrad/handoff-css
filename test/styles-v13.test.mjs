@@ -18,11 +18,12 @@ const out = generate(doc, consumerConfig042, { handAuthoredCss: consumerCssV13()
 const style = (type, name) => doc.styles[type].find((s) => s.name === name);
 const byId = indexById(doc);
 
-/** 0.8.0 (P23) — a TEXT style's bound-but-undeclared `paragraphSpacing`
- * appends `margin-block-end: var(<token>, <raw>px)`, the same additive shape
- * `font-family` binding already gets. `null` when the style declares no
- * such addition (unbound, or already stating `margin-block*` itself). */
-const paragraphSpacingAddition = (s) => {
+/** 0.8.1 (P23) — a TEXT style's bound-but-undeclared `paragraphSpacing` emits
+ * an adjacent-sibling rule, `<selector> + <selector> { margin-block-start:
+ * var(<token>, <raw>px) }`, never touching the class's own declarations.
+ * `null` when the style gets no such rule (unbound, or already stating
+ * `margin-block*` itself). */
+const paragraphSpacingSiblingRule = (s) => {
   const bound = s.properties?.boundVariables?.paragraphSpacing;
   if (!bound?.id) return null;
   if (s.cssClass.declarations.some((d) => /^margin-block/.test(d))) return null;
@@ -30,7 +31,8 @@ const paragraphSpacingAddition = (s) => {
   if (!variable) return null;
   const raw = s.properties.paragraphSpacing;
   const fallback = typeof raw === "number" ? `${raw}px` : "0px";
-  return `margin-block-end: var(${webName(variable)}, ${fallback})`;
+  const selector = s.cssClass.selector;
+  return `${selector} + ${selector} {\n  margin-block-start: var(${webName(variable)}, ${fallback});\n}`;
 };
 
 for (const [field, file] of [
@@ -89,11 +91,11 @@ test("every style with declarations is emitted as an @utility, verbatim (font-fa
         type === "TEXT" && d === 'font-family: "Suisse Intl"'
           ? 'font-family: var(--family-font-sans, "Suisse Intl")'
           : d);
+      let block = `@utility ${s.cssClass.selector.slice(1)} {\n${decls.map((d) => `  ${d};`).join("\n")}\n}`;
       if (type === "TEXT") {
-        const addition = paragraphSpacingAddition(s);
-        if (addition) decls = [...decls, addition];
+        const siblingRule = paragraphSpacingSiblingRule(s);
+        if (siblingRule) block = `${block}\n${siblingRule}`;
       }
-      const block = `@utility ${s.cssClass.selector.slice(1)} {\n${decls.map((d) => `  ${d};`).join("\n")}\n}`;
       assert.ok(out.stylesCss.includes(block), `missing ${s.cssClass.selector}`);
     }
   }
@@ -114,9 +116,9 @@ test("the emitted rule reproduces the export's own `cssClass.css` for every prop
       'font-family: "Suisse Intl";',
       'font-family: var(--family-font-sans, "Suisse Intl");',
     );
-    const addition = paragraphSpacingAddition(s);
-    if (addition) rebound = rebound.replace(/\n}$/, `\n  ${addition};\n}`);
-    assert.ok(out.stylesCss.includes(rebound), `${s.cssClass.selector} does not match cssClass.css modulo font-family/paragraph-spacing binding`);
+    const siblingRule = paragraphSpacingSiblingRule(s);
+    if (siblingRule) rebound = `${rebound}\n${siblingRule}`;
+    assert.ok(out.stylesCss.includes(rebound), `${s.cssClass.selector} does not match cssClass.css modulo font-family binding/paragraph-spacing sibling rule`);
   }
 });
 

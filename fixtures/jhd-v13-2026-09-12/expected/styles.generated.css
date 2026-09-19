@@ -80,7 +80,9 @@
   letter-spacing: var(--text-body-letter-spacing-100, 0em);
   font-weight: 500;
   font-family: var(--family-font-sans, "Suisse Intl");
-  margin-block-end: var(--text-body-paragraph-spacing-100, 13px);
+}
+.body-style1-100 + .body-style1-100 {
+  margin-block-start: var(--text-body-paragraph-spacing-100, 13px);
 }
 @utility body-style1-200 {
   font-size: var(--text-body-font-size-200, 1rem);
@@ -88,7 +90,9 @@
   letter-spacing: var(--text-body-letter-spacing-200, -0.015625em);
   font-weight: 500;
   font-family: var(--family-font-sans, "Suisse Intl");
-  margin-block-end: var(--text-body-paragraph-spacing-200, 15px);
+}
+.body-style1-200 + .body-style1-200 {
+  margin-block-start: var(--text-body-paragraph-spacing-200, 15px);
 }
 @utility body-style1-300 {
   font-size: var(--text-body-font-size-300, 1.25rem);
@@ -96,7 +100,9 @@
   letter-spacing: var(--text-body-letter-spacing-300, -0.0125em);
   font-weight: 500;
   font-family: var(--family-font-sans, "Suisse Intl");
-  margin-block-end: var(--text-body-paragraph-spacing-300, 19px);
+}
+.body-style1-300 + .body-style1-300 {
+  margin-block-start: var(--text-body-paragraph-spacing-300, 19px);
 }
 @utility body-style1-400 {
   font-size: var(--text-body-font-size-400, 1.75rem);
@@ -104,7 +110,9 @@
   letter-spacing: var(--text-body-letter-spacing-400, -0.017857em);
   font-weight: 500;
   font-family: var(--family-font-sans, "Suisse Intl");
-  margin-block-end: var(--text-body-paragraph-spacing-400, 27px);
+}
+.body-style1-400 + .body-style1-400 {
+  margin-block-start: var(--text-body-paragraph-spacing-400, 27px);
 }
 @utility body-action-style1-100 {
   font-size: var(--size-100, 0.75rem);
@@ -113,7 +121,9 @@
   font-weight: 500;
   font-family: var(--family-font-sans, "Suisse Intl");
   text-decoration: underline;
-  margin-block-end: var(--text-body-paragraph-spacing-100, 13px);
+}
+.body-action-style1-100 + .body-action-style1-100 {
+  margin-block-start: var(--text-body-paragraph-spacing-100, 13px);
 }
 @utility body-action-style1-200 {
   font-size: var(--size-200, 0.875rem);
@@ -122,7 +132,9 @@
   font-weight: 500;
   font-family: var(--family-font-sans, "Suisse Intl");
   text-decoration: underline;
-  margin-block-end: var(--text-body-paragraph-spacing-200, 15px);
+}
+.body-action-style1-200 + .body-action-style1-200 {
+  margin-block-start: var(--text-body-paragraph-spacing-200, 15px);
 }
 @utility body-action-style1-300 {
   font-size: var(--text-body-font-size-200, 1rem);
@@ -131,7 +143,9 @@
   font-weight: 500;
   font-family: var(--family-font-sans, "Suisse Intl");
   text-decoration: underline;
-  margin-block-end: var(--text-body-paragraph-spacing-200, 15px);
+}
+.body-action-style1-300 + .body-action-style1-300 {
+  margin-block-start: var(--text-body-paragraph-spacing-200, 15px);
 }
 @utility body-action-style1-400 {
   font-size: var(--text-body-font-size-300, 1.25rem);
@@ -140,7 +154,9 @@
   font-weight: 500;
   font-family: var(--family-font-sans, "Suisse Intl");
   text-decoration: underline;
-  margin-block-end: var(--text-body-paragraph-spacing-300, 19px);
+}
+.body-action-style1-400 + .body-action-style1-400 {
+  margin-block-start: var(--text-body-paragraph-spacing-300, 19px);
 }
 @utility text-primitives-title-050 {
   font-size: var(--size-050, 0.625rem);
