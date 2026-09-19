@@ -1003,6 +1003,45 @@ Same shape as P20 (a STRING that is really a typed value) and the same disciplin
 
 ---
 
+## P23 — Paragraph-spacing binding, as an adjacent-sibling rule (0.8.1)
+
+`src/emit-styles.mjs` (`bindParagraphSpacing`) · `test/paragraph-spacing-textwrap.test.mjs`
+· `test/styles-v13.test.mjs`
+
+A TEXT style's `paragraphSpacing` is bound to a variable
+(`properties.boundVariables.paragraphSpacing`) whenever the design system gives it a
+token, the same as every other typographic property — but the export's own
+`cssClass.declarations` states nothing for it (a plugin gap, the paragraph-spacing
+counterpart of the `font-family` gap P21.5 already closes).
+
+Per the spacer-margins mechanism (`handoff-to-code` § Build standards item 7) and
+operator ruling 2026-09-19 ("they were both design system things — the text style should
+carry them"), the gap a paragraph style states is the space **between** paragraphs, never
+a trailing margin after the last one. The binding is emitted as an adjacent-sibling rule,
+never a declaration inside the class's own block:
+
+```css
+.<selector> + .<selector> {
+  margin-block-start: var(<token>, <raw>px);
+}
+```
+
+— the same shape `jhd-design-system` hand-authors on its own `body-style1-N` classes
+(#56, `1e79f3a`), so that hand-authored copy retires once the design system regenerates
+against this. The substitution is recorded as `STYLE_CLASS_PARAGRAPH_SPACING_BOUND`; the
+class's own declarations are never touched, and nothing is emitted when the style already
+states `margin-block*` itself (the export/hand-authored declaration wins).
+
+**0.8.0 (`ea48aee`) shipped a different, wrong shape**: an unconditional
+`margin-block-end: var(<token>, <raw>px)` appended to every bound style's own
+declarations — a trailing margin on every instance, not a gap between instances. That
+stacks a trailing gap after the last paragraph and, alongside `jhd-design-system`'s
+hand-authored sibling rule, double-counts the gap between paragraphs. 0.8.1 reverts to
+the sibling-rule shape above; there is no migration for a 0.8.0 consumer beyond
+regenerating.
+
+---
+
 ## Determinism
 
 Collections sorted by name, variables by WEB name, numbers rounded to 6 decimal

@@ -97,7 +97,7 @@ const familyVariables = (doc) => {
 const FONT_FAMILY_DECL = /^font-family:\s*(.+)$/;
 
 /**
- * P23 (0.8.0) — a TEXT style's `paragraphSpacing` is bound to a variable
+ * P23 (0.8.1) — a TEXT style's `paragraphSpacing` is bound to a variable
  * (`properties.boundVariables.paragraphSpacing`) whenever the design system
  * gives it a token, the same as every other typographic property — but the
  * export's own `cssClass.declarations` states nothing for it (a plugin gap,
@@ -105,30 +105,40 @@ const FONT_FAMILY_DECL = /^font-family:\s*(.+)$/;
  * already closes). Per operator ruling 2026-09-19 ("they were both design
  * system things — the text style should carry them") and the spacer-margins
  * mechanism (`handoff-to-code` § Build standards item 7 — a paragraph gap is
- * a trailing margin on the block it edges, never a literal), one additive
- * declaration is appended: `margin-block-end: var(<token>, <raw>px)`.
+ * the space BETWEEN paragraphs, never a trailing margin after the last one),
+ * the binding is emitted as an adjacent-sibling rule:
+ * `<selector> + <selector> { margin-block-start: var(<token>, <raw>px) }` —
+ * the same shape jhd-design-system hand-authors on its own `body-style1-N`
+ * classes (#56, `1e79f3a`), so that hand-authored copy can retire once this
+ * generates it. Never a `margin-block-end` on every instance (0.8.0's
+ * `ea48aee` shape, reverted — see CHANGELOG 0.8.1): that stacks a trailing
+ * gap after the last paragraph and, alongside a hand-authored sibling rule,
+ * double-counts the gap between paragraphs.
  *
- * Additive only — never touches an existing declaration, and never fires when
- * the style already states `margin-block*` itself.
+ * `declarations` are never touched — the sibling rule is a wholly separate
+ * statement — and nothing is emitted when the style already states
+ * `margin-block*` itself (the export/hand-authored declaration wins).
  */
 function bindParagraphSpacing(type, style, declarations, byId) {
-  if (type !== "TEXT") return { declarations, findings: [] };
+  if (type !== "TEXT") return { declarations, findings: [], siblingRule: null };
   const bound = style.properties?.boundVariables?.paragraphSpacing;
-  if (!bound?.id) return { declarations, findings: [] };
-  if (declarations.some((d) => /^margin-block/.test(d))) return { declarations, findings: [] };
+  if (!bound?.id) return { declarations, findings: [], siblingRule: null };
+  if (declarations.some((d) => /^margin-block/.test(d))) return { declarations, findings: [], siblingRule: null };
 
   const variable = byId.get(bound.id);
-  if (!variable) return { declarations, findings: [] };
+  if (!variable) return { declarations, findings: [], siblingRule: null };
   const name = webName(variable);
   const raw = style.properties.paragraphSpacing;
   const fallback = typeof raw === "number" ? `${raw}px` : "0px";
   const selector = style.cssClass.selector;
+  const declaration = `margin-block-start: var(${name}, ${fallback})`;
   return {
-    declarations: [...declarations, `margin-block-end: var(${name}, ${fallback})`],
+    declarations,
+    siblingRule: `${selector} + ${selector} {\n  ${declaration};\n}`,
     findings: [{
       code: "STYLE_CLASS_PARAGRAPH_SPACING_BOUND",
       name: selector,
-      detail: `\`paragraphSpacing\` bound to \`${name}\` (\`${variable.name}\`), stated nowhere in this style's own \`cssClass.declarations\` — appended as \`margin-block-end: var(${name}, ${fallback})\` (P23, spacer-margins policy).`,
+      detail: `\`paragraphSpacing\` bound to \`${name}\` (\`${variable.name}\`), stated nowhere in this style's own \`cssClass.declarations\` — emitted as the adjacent-sibling rule \`${selector} + ${selector} { ${declaration} }\` (P23, spacer-margins policy).`,
     }],
   };
 }
@@ -212,6 +222,7 @@ export function emitStyles(doc, byId, handClasses, handUtils, cfg) {
 
   for (const type of TYPE_ORDER) {
     const emitted = [];
+    let classCount = 0;
     for (const style of doc.styles?.[type] ?? []) {
       const cssClass = style.cssClass;
       const selector = cssClass?.selector ?? style.codeSyntax?.className ?? null;
@@ -232,6 +243,7 @@ export function emitStyles(doc, byId, handClasses, handUtils, cfg) {
       const spacing = bindParagraphSpacing(type, style, declarations, byId);
       declarations = spacing.declarations;
       warnings.push(...spacing.findings);
+      const siblingRule = spacing.siblingRule;
       warnings.push(...styleFindings(style, declarations, byId));
       const shadowed = handUtils.has(selector.slice(1));
       const hand = handClasses.get(selector) ?? null;
@@ -257,10 +269,15 @@ export function emitStyles(doc, byId, handClasses, handUtils, cfg) {
       // opts a consumer back into the bare `<selector> { … }` of 0.5.0.
       const opening = emitAsUtility ? `@utility ${selector.slice(1)}` : selector;
       emitted.push(`${opening} {\n${declarations.map((d) => `  ${d};`).join("\n")}\n}`);
+      classCount += 1;
+      // The sibling rule is a plain CSS rule, never a `@utility` — `@apply`
+      // has no adjacent-sibling form, and the rule targets a relationship
+      // between two elements, not a single one `@apply` could stand in for.
+      if (siblingRule) emitted.push(siblingRule);
     }
 
     if (emitted.length) {
-      const label = `${type} (${emitted.length})`;
+      const label = `${type} (${classCount})`;
       blocks.push([`/* --- ${label} ${"-".repeat(Math.max(0, 60 - label.length))} */`, "", ...emitted].join("\n"));
     }
   }
