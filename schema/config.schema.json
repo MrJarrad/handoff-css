@@ -104,13 +104,18 @@
     "layout": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["collection", "variantAttribute", "baseMode"],
+      "required": ["collection", "variantAttribute", "baseMode", "breakpoints"],
       "properties": {
         "collection": { "type": "string", "description": "The collection whose modes are responsive breakpoints, not themes (P3)." },
         "variantAttribute": { "type": "string", "description": "The attribute selecting a non-default layout variant." },
         "baseMode": {
           "enum": ["smallest-default-variant", "collection-default"],
           "description": "Which mode seeds the unconditional base. `collection-default` is the superseded, non-mobile-first rule (P6)."
+        },
+        "breakpoints": {
+          "type": "object",
+          "additionalProperties": { "type": "number" },
+          "description": "P6.1 — house MIN-WIDTH THRESHOLD policy, `{ family: px }` keyed by `breakpoints.entries[].family` (e.g. `\"lg\"`). Overrides the emitted `@media (min-width)` threshold and the matching `--breakpoint-<family>` token; a family absent from the map keeps the Figma sample `widthPx` unchanged. Figma `device/width` samples are never rewritten by this key — required (may be `{}`) so a consumer states the policy rather than inheriting a silent default. Lock row 31 (operator, 2026-09-20): `{ md: 768, lg: 1025, xl: 1440 }`, Figma samples stay 375/768/1280/1920."
         }
       }
     },

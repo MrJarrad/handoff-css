@@ -27,7 +27,7 @@ test("every key the plan locked is present in the preset", () => {
     "color.format",
     "motion.timingUnit", "motion.delayAliasOf",
     "aspect.ratioPaths", "aspect.descriptionGroup", "aspect.descriptionPattern",
-    "layout.collection", "layout.variantAttribute", "layout.baseMode",
+    "layout.collection", "layout.variantAttribute", "layout.baseMode", "layout.breakpoints",
     "modes.collectionModeAttribute",
     "themes.collection", "themes.total",
     "tailwind.namespaces", "tailwind.held", "tailwind.rootFontSizePx",

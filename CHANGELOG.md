@@ -2,6 +2,22 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.9.0 — 2026-09-20
+
+### Added
+
+- `layout.breakpoints` (P6.1) — a house MIN-WIDTH THRESHOLD policy, `{ family: px }`
+  keyed by `breakpoints.entries[].family`, that overrides the emitted `@media
+  (min-width)` threshold and the matching `--breakpoint-<family>` token. A family
+  absent from the map keeps the Figma sample `widthPx` unchanged; Figma's own
+  `device/width` samples are never rewritten — this is a pipeline-policy layer on
+  top of the sample, not a correction to it. Required in every config (may be `{}`).
+  `src/report.mjs` §7 states both the emitted **Width** and the untouched **Figma
+  sample** per mode whenever an override is in effect. Operator ruling 2026-09-20
+  (lock row 31): *"I think our lg breakpoint starts too late, ideally starts at
+  1025px"* / *"yes, 1440"* — the shipped `presets/jhd.config.mjs` now states
+  `{ md: 768, lg: 1025, xl: 1440 }`; Figma's samples stay 375/768/1280/1920.
+
 ## 0.8.1 — 2026-09-19
 
 ### Fixed

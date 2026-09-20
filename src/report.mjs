@@ -171,21 +171,34 @@ ${unconverted.length
 ${note("layoutModes")}
 
 ${widths.size
-  ? `All ${widths.size} layout modes resolve to a width, so they are emitted as
+  ? (() => {
+      const overridden = [...widths.keys()].some((id) => layout.samples.get(id) !== widths.get(id));
+      const header = overridden
+        ? ["| Mode | Width | Figma sample | layoutVariant | Emitted as |", "| --- | --- | --- | --- | --- |"]
+        : ["| Mode | Width | layoutVariant | Emitted as |", "| --- | --- | --- | --- |"];
+      const rows = (doc.collections.find((c) => c.name === cfg.layout.collection)?.modes ?? []).map((m) => {
+        const variant = variants.get(m.id) ?? "default";
+        const sel = variant === "default" ? ":root" : `[${cfg.layout.variantAttribute}="${variant}"]`;
+        const base = m.id === layout.baseModeId ? ` (also the unconditional \`${sel}\` base)` : "";
+        const width = widths.get(m.id);
+        const sampleCell = overridden
+          ? ` ${layout.samples.get(m.id) === width ? "same" : `${num(layout.samples.get(m.id))}px`} |`
+          : "";
+        return `| \`${m.name}\` | ${num(width)}px |${sampleCell} ${variant} | \`@media (min-width: ${num(width)}px) { ${sel} }\`${base} |`;
+      });
+      return `All ${widths.size} layout modes resolve to a width, so they are emitted as
 mobile-first \`@media (min-width: …)\` blocks in ascending width order. The
 second axis — \`layoutVariant\` — is a selector, not a width: \`default\` lands on
 \`:root\`, every other variant on \`[${cfg.layout.variantAttribute}="<variant>"]\` inside
-the same media block.
+the same media block.${overridden ? ` **Width** is the emitted min-width
+threshold; **Figma sample** is the untouched \`device/width\` sample
+\`breakpoints.entries\` publishes — the two differ only where
+\`layout.breakpoints\` states a policy override for that family (P6.1).` : ""}
 
-${["| Mode | Width | layoutVariant | Emitted as |", "| --- | --- | --- | --- |",
-   ...(doc.collections.find((c) => c.name === cfg.layout.collection)?.modes ?? []).map((m) => {
-     const variant = variants.get(m.id) ?? "default";
-     const sel = variant === "default" ? ":root" : `[${cfg.layout.variantAttribute}="${variant}"]`;
-     const base = m.id === layout.baseModeId ? ` (also the unconditional \`${sel}\` base)` : "";
-     return `| \`${m.name}\` | ${num(widths.get(m.id))}px | ${variant} | \`@media (min-width: ${num(widths.get(m.id))}px) { ${sel} }\`${base} |`;
-   })].join("\n")}
+${overridden ? `${note("breakpointPolicy")}\n\n` : ""}${[...header, ...rows].join("\n")}
 
-${note("baseMode")}`
+${note("baseMode")}`;
+    })()
   : `The export does not publish a resolvable width for every layout mode in
 \`breakpoints.entries\`, so the generator keeps the \`[${cfg.modes.collectionModeAttribute.replace("{collection}", cfg.layout.collection)}="…"]\`
 placeholder rather than guessing breakpoints. **Open question 1 stays open.**`}

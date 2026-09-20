@@ -30,20 +30,38 @@ export function themeModeIds(doc) {
   return new Set((doc.breakpoints?.entries ?? []).filter((e) => e.isTheme).map((e) => e.modeId));
 }
 
+/**
+ * P6.1 — the house MIN-WIDTH THRESHOLD policy, `cfg.layout.breakpoints`: a
+ * `{ family: px }` map (family = `breakpoints.entries[].family`, e.g. `"lg"`)
+ * that overrides the emitted `@media (min-width)` / `--breakpoint-<family>`
+ * threshold. A family absent from the map keeps the Figma sample `widthPx`
+ * unchanged — Figma's `device/width` variables are never rewritten; this is a
+ * pipeline-policy layer on top of the sample, not a correction to it (lock
+ * row 31: "my breakpoints in figma are fixed point within a range, i don't
+ * have the same min max functionality in figma").
+ */
+export function thresholdPx(family, samplePx, cfg) {
+  const override = cfg.layout.breakpoints?.[family];
+  return typeof override === "number" ? override : samplePx;
+}
+
 export function layoutBreakpoints(doc, cfg) {
   const name = cfg.layout.collection;
   const layout = doc.collections.find((c) => c.name === name);
   const entries = (doc.breakpoints?.entries ?? []).filter((e) => e.collectionName === name);
   const widths = new Map();
+  const samples = new Map();
   const variants = new Map();
   let baseModeId = null;
   let baseWidth = Infinity;
   for (const e of entries) {
     if (typeof e.widthPx !== "number" || !Number.isFinite(e.widthPx)) continue;
-    widths.set(e.modeId, e.widthPx);
+    const width = thresholdPx(e.family, e.widthPx, cfg);
+    widths.set(e.modeId, width);
+    samples.set(e.modeId, e.widthPx);
     variants.set(e.modeId, e.layoutVariant ?? "default");
-    if ((e.layoutVariant ?? "default") === "default" && e.widthPx < baseWidth) {
-      baseWidth = e.widthPx;
+    if ((e.layoutVariant ?? "default") === "default" && width < baseWidth) {
+      baseWidth = width;
       baseModeId = e.modeId;
     }
   }
@@ -53,7 +71,9 @@ export function layoutBreakpoints(doc, cfg) {
   // narrowest, which is why "smallest-default-variant" is the other option.
   if (cfg.layout.baseMode === "collection-default") baseModeId = layout?.defaultModeId ?? null;
   const resolved = layout && widths.size === layout.modes.length;
-  return resolved ? { widths, variants, baseModeId } : { widths: new Map(), variants: new Map(), baseModeId: null };
+  return resolved
+    ? { widths, samples, variants, baseModeId }
+    : { widths: new Map(), samples: new Map(), variants: new Map(), baseModeId: null };
 }
 
 /**

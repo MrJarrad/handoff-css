@@ -2,6 +2,7 @@
 // speaks the design system's own vocabulary and Tailwind's default scale is
 // reset away. Namespaces and held namespaces are `tailwind.namespaces` /
 // `tailwind.held`. See docs/POLICIES.md.
+import { thresholdPx } from "./modes.mjs";
 import { cmp, fail, num, resolveValue } from "./resolve.mjs";
 import { webName } from "./schema.mjs";
 
@@ -36,23 +37,34 @@ export function themeEntries(doc, byId, cfg) {
 
   for (const spec of cfg.tailwind.namespaces) {
     if (spec.from === "breakpoints") {
-      // P8.4 — default-variant rows only, one per family, px -> rem at 16.
+      // P8.4/P6.1 — default-variant rows only, one per family, px -> rem at
+      // 16. `thresholdPx` applies the house `layout.breakpoints` policy
+      // override on top of the Figma sample width, same as the `@media`
+      // emission in modes.mjs, so the token and the media query can never
+      // disagree.
       const seen = new Map();
+      const sampleSeen = new Map();
       for (const e of doc.breakpoints?.entries ?? []) {
         if ((e.layoutVariant ?? "default") !== "default") continue;
         if (typeof e.widthPx !== "number" || !Number.isFinite(e.widthPx)) continue;
+        const width = thresholdPx(e.family, e.widthPx, cfg);
         const prev = seen.get(e.family);
-        if (prev != null && prev !== e.widthPx) {
-          fail(`breakpoint family ${e.family} has two widths (${prev}, ${e.widthPx})`);
+        if (prev != null && prev !== width) {
+          fail(`breakpoint family ${e.family} has two widths (${prev}, ${width})`);
         }
-        seen.set(e.family, e.widthPx);
+        seen.set(e.family, width);
+        sampleSeen.set(e.family, e.widthPx);
       }
       for (const [family, px] of [...seen].sort((a, b) => a[1] - b[1])) {
+        const sample = sampleSeen.get(family);
+        const note = px === sample
+          ? `${num(px)}px — Figma ${family} device width`
+          : `${num(px)}px — jhd policy threshold (Figma ${family} sample ${num(sample)}px)`;
         rows.push({
           ns: spec.ns,
           key: `--${spec.ns}-${family}`,
           value: `${num(px / rootFontSizePx(doc, cfg))}rem`,
-          note: `${num(px)}px — Figma ${family} device width`,
+          note,
           source: `breakpoints.entries ${family}`,
         });
       }
