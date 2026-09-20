@@ -92,12 +92,25 @@ export default {
     descriptionPattern: "^Ratio\\s*[\u2013\u2014-]\\s*(\\d+(?:\\.\\d+)?)\\s*/\\s*(\\d+(?:\\.\\d+)?)",
   },
 
-  // P3/P6 — the responsive collection: which one it is, how its non-default
-  // layout variants are selected, and which mode seeds the unconditional base.
+  // P3/P6/P6.1 — the responsive collection: which one it is, how its
+  // non-default layout variants are selected, which mode seeds the
+  // unconditional base, and the house MIN-WIDTH THRESHOLD policy.
+  //
+  // `breakpoints` — operator ruling 2026-09-20 (lock row 31): *"I think our lg
+  // breakpoint starts too late, ideally starts at 1025px"* / *"yes, 1440"* /
+  // *"my breakpoints in figma are fixed point within a range, i don't have the
+  // same min max functionality in figma"*. The threshold is therefore pipeline
+  // POLICY, not a Figma value: `md`/`lg`/`xl` each get a stated threshold (`md`
+  // restated at its sample value so the policy reads as the complete ramp),
+  // `sm` is left unset (no ruling moved it off its sample). Figma's own
+  // `device/width` samples (375/768/1280/1920) are untouched — `thresholdPx`
+  // in `src/modes.mjs` layers this map on top of the sample, never rewrites
+  // it, and the report's §7 table states both numbers per family.
   layout: {
     collection: "layout",
     variantAttribute: "data-jhd-layout-variant",
     baseMode: "smallest-default-variant",
+    breakpoints: { md: 768, lg: 1025, xl: 1440 },
   },
 
   // P3 — the fallback selector for a multi-mode collection the export
@@ -214,6 +227,16 @@ the primitive color are alias's in semantic colors"*.`,
 sizes, z-index, elevation, Tailwind \`@theme\` namespace aliases) with no Figma
 variable behind them, plus the colour tokens styles.css names without the
 export's \`color-\` prefix. Listed for the tidy follow-up, not changed here.`,
+      breakpointPolicy: `**P6.1 (2026-09-20, operator ruling, lock row 31) — min-width THRESHOLD is
+house policy, not a Figma value:** \`layout.breakpoints\` states \`{ md: 768,
+lg: 1025, xl: 1440 }\`. Figma's own \`device/width\` samples (375/768/1280/1920)
+are untouched — *"my breakpoints in figma are fixed point within a range, i
+don't have the same min max functionality in figma"*. \`lg\`'s threshold moves
+from its 1280px sample to 1025px (*"I think our lg breakpoint starts too
+late, ideally starts at 1025px"*); \`xl\` moves from its 1920px sample to
+1440px (*"yes, 1440"*); \`sm\`/\`md\` stay at their sample widths. The table
+below states the emitted **Width** (the threshold) against the **Figma
+sample** for every mode; they read \`same\` wherever no override applies.`,
       layoutModes: `The export's own \`breakpoints.entries\` (schema 6) states that layout's
 sm/md/lg/xl and their flush / sidebar-main variants are **responsive layout
 variants, never themes**, and publishes each mode's \`widthPx\` directly — the

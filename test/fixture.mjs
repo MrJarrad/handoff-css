@@ -78,6 +78,7 @@ export const config = {
   responsive: { honourClasses: [] },
   viewport: { ...preset.viewport, descriptionFallback: false },
   aliases: {},
+  layout: { ...preset.layout, breakpoints: {} },
   ...PRE_0_4_0,
 };
 
@@ -161,12 +162,23 @@ export const expectedV8b = (file) =>
 // byte-stable regardless of what the preset does next.
 const PRE_0_4_2_RESPONSIVE = { responsive: { honourClasses: ["viewport-height", "viewport-width"] } };
 
+// P6.1 — pinned on every fixture config below, same reasoning as
+// `PRE_0_4_2_RESPONSIVE`: 0.9.0 adds `layout.breakpoints: { md: 768, lg: 1025,
+// xl: 1440 }` to the house preset (lock row 31), and every `expected/*` file
+// these configs back was generated against the pre-0.9.0 preset — sample
+// widths only, no threshold override. `breakpoints: {}` keeps them
+// byte-stable regardless of what the shipped preset's policy does next; the
+// mechanism itself (an override DOES change the emitted width) is asserted
+// directly in `test/layout-breakpoints.test.mjs`.
+const PRE_0_9_0_BREAKPOINTS = { layout: { ...preset.layout, breakpoints: {} } };
+
 export const consumerConfig = {
   ...preset,
   report: { ...preset.report, policyRef: "docs/handoff-css.md" },
   header: { ...preset.header, regenerateCommand: "pnpm run tokens" },
   ...PRE_0_4_0,
   ...PRE_0_4_2_RESPONSIVE,
+  ...PRE_0_9_0_BREAKPOINTS,
 };
 
 /**
@@ -181,6 +193,7 @@ export const consumerConfig040 = {
   report: { ...preset.report, policyRef: "docs/handoff-css.md" },
   header: { ...preset.header, regenerateCommand: "pnpm run tokens" },
   ...PRE_0_4_2_RESPONSIVE,
+  ...PRE_0_9_0_BREAKPOINTS,
 };
 
 /**
@@ -193,6 +206,7 @@ export const consumerConfig042 = {
   ...preset,
   report: { ...preset.report, policyRef: "docs/handoff-css.md" },
   header: { ...preset.header, regenerateCommand: "pnpm run tokens" },
+  ...PRE_0_9_0_BREAKPOINTS,
 };
 
 /**

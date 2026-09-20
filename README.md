@@ -122,6 +122,7 @@ before it is rendered, so you can build your own checks on them.
 | `layout.collection` | The collection whose modes are responsive breakpoints rather than themes. |
 | `layout.variantAttribute` | The attribute that selects a non-default layout variant. |
 | `layout.baseMode` | `smallest-default-variant` (mobile-first) or `collection-default`. |
+| `layout.breakpoints` | `{ family: px }` house MIN-WIDTH THRESHOLD policy, keyed by `breakpoints.entries[].family` (e.g. `"lg"`). Overrides the emitted `@media (min-width)` threshold and the matching `--breakpoint-<family>` token; a family not in the map keeps the Figma sample `widthPx` unchanged — Figma's `device/width` samples are never rewritten (P6.1). Required, may be `{}`. |
 | `modes.collectionModeAttribute` | Selector template for a multi-mode collection with no width or theme semantics. `{collection}` is substituted. |
 | `themes.collection` | Fallback gate if an export ever stops publishing `isTheme`. |
 | `themes.total` | Theme modes that replace their siblings entirely (see P10). |
