@@ -177,6 +177,104 @@ function bindFontFamily(type, selector, declarations, familyByValue) {
   return { declarations: out, findings };
 }
 
+/**
+ * P24 — a PROGRESSIVE `BACKGROUND_BLUR` effect (`effects[0].blurType:
+ * "PROGRESSIVE"`) fades the blur radius along an axis instead of holding it
+ * constant. The export's `cssClass.declarations` states none of that: every
+ * `effect/progressive-blur/N` style emits the SAME
+ * `backdrop-filter: blur(var(--blur-0, 0px))`, because the plugin's `cssClass`
+ * builder reads only `effects[0].boundVariables.radius` — the effect's
+ * terminal (end) radius, which this design system always ties to `blur-0`
+ * (i.e. no blur) — and never looks at `blurType`, `startRadius` or the
+ * start/end offset axis (a plugin gap, the progressive-blur counterpart of
+ * the font-family (P21.5) and paragraph-spacing (P23) gaps).
+ *
+ * CSS has no progressive/gradient `backdrop-filter` — one element, one blur
+ * radius — so the web equivalent this binds is the same approximation any
+ * hand-authored progressive blur uses: `backdrop-filter: blur(<start
+ * radius>)` uniformly, masked by a `mask-image` gradient along the effect's
+ * own start->end offset axis so the blur reads as fading OUT toward the end.
+ * That is only a faithful approximation when the effect's end radius is 0
+ * (no blur at the end) — the design system's own convention — so the bind is
+ * skipped, and the declaration left exactly as the export stated it, when the
+ * end radius is anything else: a wrong mask is worse than the export's own
+ * flat (if also wrong) blur.
+ *
+ * The start radius's `var()` name comes from the export's OWN second
+ * binding: `properties.boundVariables.effects[1]` is the style-level alias
+ * for `startRadius` (`effects[0]` is always the terminal `radius` binding,
+ * proved by its id matching `effects[0].boundVariables.radius.id`) — present
+ * whenever start and end differ. When they don't (`effect/progressive-blur/0`,
+ * start === end === 0), there is no second binding and the SAME `effects[0]`
+ * variable is both start and end, which is exactly correct.
+ *
+ * Emitted as `STYLE_CLASS_PROGRESSIVE_BLUR_BOUND`; a style this cannot bind
+ * (non-zero end radius) raises `STYLE_CLASS_PROGRESSIVE_BLUR_UNRESOLVED` and
+ * is left verbatim. Every other style, and every other declaration, is
+ * untouched.
+ */
+function bindProgressiveBlur(type, style, declarations, byId) {
+  if (type !== "EFFECT") return { declarations, findings: [] };
+  const effects = style.properties?.effects;
+  if (!Array.isArray(effects) || effects.length !== 1) return { declarations, findings: [] };
+  const effect = effects[0];
+  if (effect?.blurType !== "PROGRESSIVE") return { declarations, findings: [] };
+  const backdropIndex = declarations.findIndex((d) => /^backdrop-filter:/.test(d));
+  if (backdropIndex === -1) return { declarations, findings: [] };
+
+  const selector = style.cssClass.selector;
+
+  if (effect.radius !== 0) {
+    return {
+      declarations,
+      findings: [{
+        code: "STYLE_CLASS_PROGRESSIVE_BLUR_UNRESOLVED",
+        name: selector,
+        detail: `\`blurType: "PROGRESSIVE"\` with a non-zero end radius (${effect.radius}) — a uniform \`backdrop-filter\` masked toward transparent only approximates an end radius of 0, so nothing was rebound; \`${declarations[backdropIndex]}\` is left verbatim (P24).`,
+      }],
+    };
+  }
+
+  const boundEffects = style.properties?.boundVariables?.effects ?? [];
+  const endBindingId = effect.boundVariables?.radius?.id ?? null;
+  const startBinding = boundEffects.find((e) => e.id !== endBindingId) ?? boundEffects[boundEffects.length - 1] ?? null;
+  const startVariable = startBinding?.id ? byId.get(startBinding.id) : null;
+  const startRadius = effect.startRadius;
+  const startCss = startVariable != null
+    ? `var(${webName(startVariable)}, ${startRadius}px)`
+    : `${startRadius}px`;
+
+  const direction = gradientDirection(effect.startOffset, effect.endOffset);
+  const out = declarations.slice();
+  out[backdropIndex] = `backdrop-filter: blur(${startCss})`;
+  out.push(`mask-image: linear-gradient(${direction}, black, transparent)`);
+
+  return {
+    declarations: out,
+    findings: [{
+      code: "STYLE_CLASS_PROGRESSIVE_BLUR_BOUND",
+      name: selector,
+      detail: `\`blurType: "PROGRESSIVE"\` (startRadius ${startRadius}, end radius 0, axis ${JSON.stringify(effect.startOffset)} -> ${JSON.stringify(effect.endOffset)}) rebound to \`backdrop-filter: blur(${startCss})\` plus \`mask-image: linear-gradient(${direction}, black, transparent)\` — the export's own \`cssClass.declarations\` stated only \`${declarations[backdropIndex]}\`, the flat terminal-radius blur every \`effect/progressive-blur/N\` class shared before this bind (P24).`,
+    }],
+  };
+}
+
+/**
+ * CSS gradient direction for a PROGRESSIVE effect's own start->end offset
+ * (Figma's normalised bounding-box space, y downward) — never invented: the
+ * export states the two offsets, this derives only the direction between
+ * them. The four cardinal cases map to CSS's own keyword; anything else is
+ * the equivalent angle.
+ */
+function gradientDirection(startOffset, endOffset) {
+  const dx = (endOffset?.x ?? 0) - (startOffset?.x ?? 0);
+  const dy = (endOffset?.y ?? 0) - (startOffset?.y ?? 0);
+  if (dx === 0 && dy !== 0) return dy > 0 ? "to bottom" : "to top";
+  if (dy === 0 && dx !== 0) return dx > 0 ? "to right" : "to left";
+  const deg = ((Math.atan2(dx, -dy) * 180) / Math.PI + 360) % 360;
+  return `${Math.round(deg * 100) / 100}deg`;
+}
+
 function styleFindings(style, declarations, byId) {
   const findings = [];
   const selector = style.cssClass.selector;
@@ -244,6 +342,9 @@ export function emitStyles(doc, byId, handClasses, handUtils, cfg) {
       declarations = spacing.declarations;
       warnings.push(...spacing.findings);
       const siblingRule = spacing.siblingRule;
+      const progressiveBlur = bindProgressiveBlur(type, style, declarations, byId);
+      declarations = progressiveBlur.declarations;
+      warnings.push(...progressiveBlur.findings);
       warnings.push(...styleFindings(style, declarations, byId));
       const shadowed = handUtils.has(selector.slice(1));
       const hand = handClasses.get(selector) ?? null;

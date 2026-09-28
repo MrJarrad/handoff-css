@@ -2,6 +2,29 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.10.0 — 2026-09-28
+
+### Added
+
+- `bindProgressiveBlur` (P24, `src/emit-styles.mjs`) — every `effect/progressive-blur/N`
+  EFFECT style states `blurType: "PROGRESSIVE"`, a `startRadius` and a start/end offset
+  axis, but the plugin's own `cssClass` builder reads only
+  `effects[0].boundVariables.radius` (the effect's terminal/end radius, always `blur-0`
+  in this design system) — so every N emitted the identical
+  `backdrop-filter: blur(var(--blur-0, 0px))` (a plugin gap, found regenerating
+  `jhd-design-system` on `chore/ds-regen-v19-2026-09-28`). CSS has no gradient
+  `backdrop-filter`, so this binds the same approximation a hand-authored progressive
+  blur uses: `backdrop-filter: blur(<start radius, bound to the export's OWN
+  `properties.boundVariables.effects[1]` token>)` uniformly, plus a `mask-image:
+  linear-gradient(<axis from startOffset/endOffset>, black, transparent)` fading it out
+  toward the end. Only applied when the effect's end radius is 0 (this design system's
+  own convention) — a non-zero end radius raises `STYLE_CLASS_PROGRESSIVE_BLUR_UNRESOLVED`
+  and is left verbatim rather than approximated wrong. A `blurType: "NORMAL"`
+  `BACKGROUND_BLUR` (material blur, also a `backdrop-filter` declaration) is untouched —
+  the guard is `blurType`, not the declaration's property name. `docs/POLICIES.md` gains
+  a P24 section; `test/progressive-blur.test.mjs` (6 tests, fixture styles lifted verbatim
+  from the real schema-17 design-system export).
+
 ## 0.9.0 — 2026-09-20
 
 ### Added

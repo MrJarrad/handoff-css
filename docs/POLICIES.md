@@ -1042,6 +1042,58 @@ regenerating.
 
 ---
 
+## P24 — Progressive blur binding (0.10.0)
+
+`src/emit-styles.mjs` (`bindProgressiveBlur`, `gradientDirection`) · `test/progressive-blur.test.mjs`
+
+A `BACKGROUND_BLUR` effect can be `blurType: "PROGRESSIVE"` — the blur radius fades
+along an axis instead of holding constant — and every `effect/progressive-blur/N` style
+in the design system is one: `startRadius` (the raw px at the axis's start), a `radius`
+(the terminal/end radius, always 0 in this design system), and a `startOffset` /
+`endOffset` pair (Figma's normalised bounding-box axis). None of that reaches the
+export's own `cssClass.declarations`: the plugin's builder reads only
+`effects[0].boundVariables.radius` — the END radius — so every `effect/progressive-blur/N`
+class emitted the identical `backdrop-filter: blur(var(--blur-0, 0px))` (a plugin gap,
+found regenerating `jhd-design-system` on `chore/ds-regen-v19-2026-09-28`, `77aaf57`).
+
+CSS has no gradient `backdrop-filter` — one element, one blur radius — so this binds the
+same approximation any hand-authored progressive blur uses:
+
+```css
+.<selector> {
+  backdrop-filter: blur(<start radius>);
+  mask-image: linear-gradient(<axis>, black, transparent);
+}
+```
+
+**The start radius's `var()`** comes from the export's own second binding:
+`properties.boundVariables.effects[1]` is the style-level alias for `startRadius`
+(`effects[0]` is always the terminal `radius` binding, proved by its id matching
+`effects[0].boundVariables.radius.id`) — present whenever start and end differ. When they
+don't (`effect/progressive-blur/0`, start === end === 0), there is no second binding and
+the SAME `effects[0]` variable is both start and end, which is exactly correct — no
+literal is invented either way.
+
+**The mask axis** comes from `startOffset` / `endOffset` — never invented: the four
+cardinal directions (the only ones this design system uses; every `progressive-blur/N`
+is `{0.5, 0} -> {0.5, 1}`, top to bottom) map to CSS's own `linear-gradient()` keyword,
+anything else falls back to the equivalent angle.
+
+**Only applied when the end radius is 0** — this design system's own convention, and the
+only case where "uniform blur, masked toward transparent" is a faithful approximation. A
+style whose end radius is non-zero raises `STYLE_CLASS_PROGRESSIVE_BLUR_UNRESOLVED` and
+is left exactly as the export stated it — a wrong mask is worse than the export's own
+flat (if also wrong) blur. The successful bind is recorded as
+`STYLE_CLASS_PROGRESSIVE_BLUR_BOUND`.
+
+**A `blurType: "NORMAL"` `BACKGROUND_BLUR`** (material blur — also a `backdrop-filter`
+declaration) is untouched: the guard is `blurType`, never "does this declaration say
+`backdrop-filter`". A `LAYER_BLUR` (`filter:`, never `backdrop-filter:`) is untouched for
+the same reason it already was — this bind only looks at declarations starting
+`backdrop-filter:`.
+
+---
+
 ## Determinism
 
 Collections sorted by name, variables by WEB name, numbers rounded to 6 decimal
