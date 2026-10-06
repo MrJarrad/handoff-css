@@ -2,6 +2,19 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## Unreleased
+
+### Added
+
+- `bindParagraphIndent` (P25, `src/emit-styles.mjs`) — a TEXT style's
+  `properties.paragraphIndent` (bound to `text/paragraph-indent` ->
+  `--text-paragraph-indent` on the 8 `*-style1/indent/N` styles) is stated nowhere in
+  the export's own `cssClass.declarations`, so the indent styles generated unindented
+  (a plugin gap). Now appended as `text-indent: var(--text-paragraph-indent, 308px)`;
+  an unbound non-zero indent emits `text-indent: <n>px`; indent 0 and a class that
+  already states `text-indent` are unchanged. Finding `STYLE_CLASS_PARAGRAPH_INDENT_BOUND`.
+  Against the 2026-10-06 export only those 8 styles change.
+
 ## 0.10.0 — 2026-09-28
 
 ### Added
