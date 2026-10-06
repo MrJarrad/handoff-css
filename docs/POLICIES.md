@@ -1100,3 +1100,12 @@ Collections sorted by name, variables by WEB name, numbers rounded to 6 decimal
 places (Figma stores float32, so raws arrive as `0.10000000149011612`). Same
 inputs → byte-identical output. `--check` writes nothing and exits 1 if any
 committed artifact would change, which is what a consumer's CI runs.
+
+## P25 — Paragraph indent binding (unreleased)
+
+A TEXT style's `properties.paragraphIndent` (bound via `boundVariables.paragraphIndent`,
+e.g. `text/paragraph-indent` -> `--text-paragraph-indent`) is absent from the export's
+`cssClass.declarations`. The generator appends `text-indent: var(<token>, <n>px)` (bound),
+`text-indent: <n>px` (unbound, non-zero), and nothing for 0 or when the class already
+states `text-indent`. Finding: `STYLE_CLASS_PARAGRAPH_INDENT_BOUND`. Implemented by
+`bindParagraphIndent` in `src/emit-styles.mjs`.

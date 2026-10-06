@@ -144,6 +144,42 @@ function bindParagraphSpacing(type, style, declarations, byId) {
 }
 
 /**
+ * P25 — a TEXT style's `paragraphIndent` is bound to a variable
+ * (`properties.boundVariables.paragraphIndent`, `text/paragraph-indent` ->
+ * `--text-paragraph-indent`) on the design system's `*-style1/indent/N` styles,
+ * but the export's own `cssClass.declarations` states no `text-indent` (a
+ * plugin gap, the paragraph-indent counterpart of the font-family (P21.5) and
+ * paragraph-spacing (P23) gaps) — so the indent styles rendered unindented.
+ *
+ * Emits `text-indent: var(<token>, <raw>px)` appended to the class's own
+ * declarations (a property of the paragraph itself, so a plain declaration,
+ * not P23's sibling rule). A non-zero indent with no variable binding emits the
+ * raw `<raw>px`. An indent of 0 / absent emits nothing, so every non-indent
+ * style is byte-unchanged; a style that already states `text-indent` wins.
+ */
+function bindParagraphIndent(type, style, declarations, byId) {
+  if (type !== "TEXT") return { declarations, findings: [] };
+  const raw = style.properties?.paragraphIndent;
+  if (typeof raw !== "number" || raw === 0) return { declarations, findings: [] };
+  if (declarations.some((d) => /^text-indent:/.test(d))) return { declarations, findings: [] };
+
+  const selector = style.cssClass.selector;
+  const boundId = style.properties?.boundVariables?.paragraphIndent?.id;
+  const variable = boundId ? byId.get(boundId) : null;
+  const declaration = variable
+    ? `text-indent: var(${webName(variable)}, ${raw}px)`
+    : `text-indent: ${raw}px`;
+  return {
+    declarations: [...declarations, declaration],
+    findings: [{
+      code: "STYLE_CLASS_PARAGRAPH_INDENT_BOUND",
+      name: selector,
+      detail: `\`paragraphIndent\` ${raw} ${variable ? `bound to \`${webName(variable)}\` (\`${variable.name}\`)` : "unbound"}, stated nowhere in this style's own \`cssClass.declarations\` — emitted as \`${declaration}\` (P25).`,
+    }],
+  };
+}
+
+/**
  * Bind every TEXT declaration's `font-family` literal to its matching
  * font-family variable, one substitution per declaration, everything else
  * untouched. Returns the (possibly rewritten) declarations and the findings
@@ -342,6 +378,9 @@ export function emitStyles(doc, byId, handClasses, handUtils, cfg) {
       declarations = spacing.declarations;
       warnings.push(...spacing.findings);
       const siblingRule = spacing.siblingRule;
+      const indent = bindParagraphIndent(type, style, declarations, byId);
+      declarations = indent.declarations;
+      warnings.push(...indent.findings);
       const progressiveBlur = bindProgressiveBlur(type, style, declarations, byId);
       declarations = progressiveBlur.declarations;
       warnings.push(...progressiveBlur.findings);
