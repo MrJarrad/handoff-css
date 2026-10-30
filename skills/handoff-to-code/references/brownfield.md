@@ -64,5 +64,10 @@ until every item is ruled.
 | `new` | the code has no counterpart: add the brief's own name | declare the brief's CSS name; its value is the brief's, by mode |
 | `skip` | not built in this project | a deviation row citing the ruling |
 
+Checking the build (SKILL.md step 6): `conform --export <design-handoff>.json` (the brief's own
+JSON — it carries the breakpoints, no export names) `--tokens <the project's token stylesheet>`
+`--allow-name <each ruled use name declared outside it>`. Every `UNMAPPED_BINDING` is then a
+ruled item.
+
 A row with an empty `ruling` is still waiting and is not read. Keep the table in the project,
 beside its other rulings, so every later brief reuses it.

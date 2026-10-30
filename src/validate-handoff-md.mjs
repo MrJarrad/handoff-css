@@ -236,7 +236,8 @@ export function parseHandoffMarkdown(text) {
       }
       const rowV9 = TOKEN_ROW_V9.exec(line);
       if (rowV9) {
-        const values = [...new Set([...line.matchAll(MODE_SAMPLE)].map((m) => m[1]))];
+        // `?` is the plugin's mark for a mode it could not resolve — no value.
+        const values = [...new Set([...line.matchAll(MODE_SAMPLE)].map((m) => m[1]))].filter((v) => v !== "?");
         out.tokens.push({ token: rowV9[1], web: rowV9[2], responsive: null, values, line: at });
         return;
       }

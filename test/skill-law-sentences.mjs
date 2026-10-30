@@ -27,6 +27,8 @@ export const LAW_SENTENCES = [
 
   // Brownfield (HT-21) — a match is proposed, never adopted.
   "**A proposal is a question, never a binding.**",
+  "In brownfield the name is the one the ruling table records: a `use` ruling's code name, or the brief's own CSS name for `new`.",
+  "In brownfield, pass the brief's JSON as `--export`, the project's token stylesheet as `--tokens`, and each ruled `use` name declared outside it as `--allow-name`;",
 
   // Step 3 — the name is the export's name.
   "### 3. Map every binding to `codeSyntax.WEB` — an unmapped binding is a defect",

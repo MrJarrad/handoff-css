@@ -108,7 +108,8 @@ name which export covers each library's variables), take **`codeSyntax.WEB.value
 write `var(<name>)`.
 
 - **`codeSyntax.WEB` is the name.** Not the variable's path, not a derived name, not one
-  already in the stylesheet.
+  already in the stylesheet — unless a ruling chose it. In brownfield the name is the one the
+  ruling table records: a `use` ruling's code name, or the brief's own CSS name for `new`.
 - **An alias is not the name.** Bind the handoff's name — an alias hides which token you
   consumed.
 - **No emitted token is a defect, not a guess.** If a binding maps to no custom property, stop
@@ -171,6 +172,10 @@ against all of them. A pass on the component file alone leaves sibling rendering
 (`UNKNOWN_NAME`), a device sample as a literal (`SAMPLE_PX_LITERAL`), column maths in place of
 `col-span N/M` (`GRID_ARITHMETIC`), or shipped `⚠ placeholder` copy (`PLACEHOLDER_COPY`). Red
 fails; amber is a deviation row with a reason. CSS only — markup is checked by hand.
+
+In brownfield, pass the brief's JSON as `--export`, the project's token stylesheet as
+`--tokens`, and each ruled `use` name declared outside it as `--allow-name`; each
+`UNMAPPED_BINDING` that follows is a ruled item, and its deviation row cites the ruling.
 
 **Done when** the run is red-free, or every red has a deviation row and a ruling.
 

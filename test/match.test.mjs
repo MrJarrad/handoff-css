@@ -20,9 +20,9 @@ const briefMd = gunzipSync(readFileSync(path.join(dir, "navigation.md.gz"))).toS
 const brief = parseHandoffMarkdown(briefMd);
 
 /** Write `files` (path → text) under a temp project, run `match --json`, return {code, result}. */
-async function match(files, extra = []) {
+async function match(files, extra = [], { handoff = briefMd } = {}) {
   const cwd = mkdtempSync(path.join(tmpdir(), "handoff-css-match-"));
-  writeFileSync(path.join(cwd, "brief.md"), briefMd);
+  writeFileSync(path.join(cwd, "brief.md"), handoff);
   mkdirSync(path.join(cwd, "src"));
   for (const [name, text] of Object.entries(files)) {
     mkdirSync(path.dirname(path.join(cwd, "src", name)), { recursive: true });
@@ -177,4 +177,22 @@ test("only a PascalCase export from a .tsx/.jsx file is a component — a consta
     "c.tsx": `export const ${label.toUpperCase()} = 1;\n`,
   });
   assert.equal(item(result, "component", label).status, "unmatched");
+});
+
+test("a token row with no CSS name (older grammar, no codeSyntax.WEB) is unmatched with that reason, never a crash", async () => {
+  const row = briefMd.split("\n").find((l) => l.startsWith(`- $${brief.tokens[0].token} → CSS`));
+  const handoff = briefMd.replace(row, `- $${brief.tokens[0].token} · light #fff`);
+  const { result } = await match({ "a.css": ":root { --anything: #fff; }\n" }, [], { handoff });
+  const it = item(result, "token", brief.tokens[0].token);
+  assert.equal(it.status, "unmatched");
+  assert.ok(it.reason.includes("no CSS name"));
+});
+
+test("an unresolved mode sample (`?`) is never a value the brief states", async () => {
+  const unresolved = brief.tokens.find((t) => briefMd.split("\n")[t.line - 1].includes("=?"));
+  assert.ok(unresolved, "the fixture carries an unresolved sample");
+  assert.ok(!unresolved.values.includes("?"));
+  const { result } = await match({ "a.css": `:root { ${unresolved.web}: #123456; }\n` });
+  const value = item(result, "token", unresolved.token).proposal.why.find((w) => w.startsWith("value"));
+  assert.ok(value.includes("no resolved value") && !value.includes("states ?"));
 });

@@ -127,7 +127,7 @@ function evidence(token, candidate, figmaValues) {
   if (exact) why.push("name: the code has the brief's CSS name");
   else if (nameShare > 0) why.push(`name: shares ${segments(token.web).filter((s) => segments(candidate.name).includes(s)).join(", ")} with ${token.web}`);
   if (agrees) why.push(`value: code declares ${agrees}, a value the brief states`);
-  else if (candidate.values.length) why.push(`value: code declares ${candidate.values[0]}; the brief states ${token.values.join(", ") || "no value"}`);
+  else if (candidate.values.length) why.push(`value: code declares ${candidate.values[0]}; the brief states ${token.values.join(", ") || "no resolved value"}`);
   why.push(candidate.declaredAt.length
     ? `usage: declared at ${candidate.declaredAt[0]}, used ${candidate.uses}× in the scanned code`
     : `usage: used ${candidate.uses}× in the scanned code, declared outside it`);
@@ -139,6 +139,12 @@ function evidence(token, candidate, figmaValues) {
 }
 
 function matchToken(token, code) {
+  // An older-grammar row can carry no CSS name (no codeSyntax.WEB): there is no
+  // name to match on, and a value alone is never a proposal.
+  if (!token.web) {
+    return { kind: "token", figma: token.token, css: null, status: "unmatched", proposal: null, alternatives: [],
+      reason: "no CSS name in the brief (codeSyntax.WEB is missing)" };
+  }
   const figmaValues = new Set(token.values.map(normalizeValue));
   const ranked = [...code.tokens.values()]
     .map((c) => evidence(token, c, figmaValues))
@@ -215,7 +221,7 @@ export function renderMarkdown({ items, findings, counts }) {
     for (const i of open) {
       const note = i.proposal
         ? `${i.proposal.confidence}: ${i.proposal.why.join("; ")}`
-        : `unmatched${i.alternatives.length ? `; nearest ${i.alternatives.map((a) => a.code).join(", ")}` : ""}`;
+        : `unmatched${i.reason ? ` — ${i.reason}` : ""}${i.alternatives.length ? `; nearest ${i.alternatives.map((a) => a.code).join(", ")}` : ""}`;
       lines.push(`| ${i.kind} | ${cell(i.figma)} |  | ${cell(i.proposal?.code ?? "")} | ${cell(note)} |`);
     }
   }
