@@ -10,6 +10,7 @@ import { createRequire } from "node:module";
 
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
+import { UNKNOWN_FIELD_KEYWORDS } from "./brief.mjs";
 
 const require = createRequire(import.meta.url);
 
@@ -150,7 +151,7 @@ const validator = (schema) => {
  *   reported as a valid one. A version NEWER than the newest one known is the
  *   plugin ahead of this checker (HT-25): it is checked as the newest known
  *   version and passes, never silently — `SCHEMA_NEWER_THAN_CHECKER` warnings
- *   name the version and every difference.
+ *   name the version and each unknown field; a missing required field or a wrong type is still an error.
  *
  *   `warnings` surfaces the plugin's OWN `validation.findings` (schema 9+) as
  *   `PLUGIN_FINDING` — the export self-reporting something the generator did
@@ -165,7 +166,7 @@ export function validateExport(doc) {
     return { ok: true, skipped: true, errors: [], warnings: [], clampFindings: [] };
   }
   // HT-25 — a version newer than the newest known is the plugin ahead of its
-  // checker: checked as the newest known, every difference a warning.
+  // checker: checked as the newest known; a field it has never seen is a warning, any other shape error stays an error.
   const newest = Math.max(...VALIDATED_SCHEMA_VERSIONS);
   const newer = typeof doc.schemaVersion === "number" && doc.schemaVersion > newest;
   const validate = validator(schemaFor(doc.schemaVersion));
@@ -187,14 +188,16 @@ export function validateExport(doc) {
           message: (e.params?.additionalProperty ?? e.params?.unevaluatedProperty) ? `${e.message}: \`${e.params.additionalProperty ?? e.params.unevaluatedProperty}\`` : e.message ?? "invalid",
           keyword: e.keyword,
         }));
+  const unknownFields = newer ? shapeErrors.filter((e) => UNKNOWN_FIELD_KEYWORDS.has(e.keyword)) : [];
+  const hardErrors = newer ? shapeErrors.filter((e) => !UNKNOWN_FIELD_KEYWORDS.has(e.keyword)) : shapeErrors;
   const newerWarnings = newer
     ? [{ code: "SCHEMA_NEWER_THAN_CHECKER", detail: `design-system-handoff v${doc.schemaVersion} is newer than this handoff-css knows (v${newest}); checked against v${newest} — update handoff-css to check it in full` },
-       ...shapeErrors.map((e) => ({ code: "SCHEMA_NEWER_THAN_CHECKER", variable: e.path.slice(1) || undefined, detail: `not in v${newest}: ${e.message} (${e.keyword})` }))]
+       ...unknownFields.map((e) => ({ code: "SCHEMA_NEWER_THAN_CHECKER", variable: e.path.slice(1) || undefined, detail: `not in v${newest}: ${e.message} (${e.keyword})` }))]
     : [];
   return {
-    ok: newer || ok,
+    ok: hardErrors.length === 0,
     skipped: false,
-    errors: newer ? [] : shapeErrors,
+    errors: hardErrors,
     warnings: [...newerWarnings, ...findings.map((f) => ({ code: "PLUGIN_FINDING", variable: f.variable, detail: f.detail ?? f.code }))],
     clampFindings,
   };

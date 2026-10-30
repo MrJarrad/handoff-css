@@ -19,8 +19,9 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 - **A newer export passes with a warning.** A brief or Design System Handoff export whose
   `schemaVersion` is newer than this package knows is checked as the newest known version and
-  passes with `SCHEMA_NEWER_THAN_CHECKER` warnings naming the version and each difference —
-  never an error. Supersedes 0.5.0's "an unknown future version fails at `/schemaVersion`".
+  passes with `SCHEMA_NEWER_THAN_CHECKER` warnings naming the version and each field it has
+  never seen. A missing required field or a wrong type is still an error, so a newer export
+  cannot reach `generate` broken. Supersedes 0.5.0's "an unknown future version fails at `/schemaVersion`".
   `generate` still refuses a version the consumer's config does not list.
 - **`STALE_PAIR` names its fix**: the `design-handoff --regenerate` command when the export is
   the newer half, the run the brief names when it is the older.

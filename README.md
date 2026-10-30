@@ -266,7 +266,7 @@ handoff-css validate design-handoff-overlay.json design-handoff-overlay.md \
 | `SPEC_NOT_INDEXED` | warning | a spec has no row in the spec index (matched by file key + node id) |
 | every `linkRun.findings[].code` | warning | the link-run script's own findings, under their own codes |
 | `DS_EXPORT_OUT_OF_DATE` | warning | the link-run findings say this file's Design System Handoff export is behind the file: one ask, that plugin run on the named file |
-| `SCHEMA_NEWER_THAN_CHECKER` | warning | (brief or export result) a `schemaVersion` newer than this package knows: checked as the newest known, each difference listed, never an error |
+| `SCHEMA_NEWER_THAN_CHECKER` | warning | (brief or export result) a `schemaVersion` newer than this package knows: checked as the newest known; each field it has never seen is listed as a warning, while a missing required field or a wrong type stays an error |
 
 The spec index is a markdown table with `file key | spec node id | spec | path` columns; the
 path is a markdown link, resolved against the index's own folder. Each listed spec's file is
