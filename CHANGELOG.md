@@ -20,6 +20,13 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Fixed
 
+- Design System Handoff schema 18 and 19 are accepted (`VALIDATED_SCHEMA_VERSIONS`, both
+  export schema documents, the house preset's `schema.versions`), with their own fields typed:
+  v18 `specs[]` / `builtReference[]`, v19 `annotations` (categories + annotations by node id)
+  and `mixedStrokeCaps[]` (figma-plugins #28/#30). The current export is v19, so every real
+  set run exited 1 at `validate` step 1 (reviewer amber A1 on #35). `test/schema-19.test.mjs`
+  runs the operator's 29 Oct 22:03 export and its Overlay brief pair
+  (`fixtures/jhd-v19-2026-10-29/`); a malformed v19 field and schema 20 are still refused.
 - Brief schema v13 rejected every current export: it lacked the plugin's `screenshots`,
   layer `spacer`, and `string | null` annotation `labelMarkdown`/`categoryId`/`category`,
   and the script's `linkRun`. All five are now typed; the plugin's Navigation export and the
