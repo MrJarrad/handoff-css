@@ -6,6 +6,29 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Added
 
+- **Export sets** (`src/set.mjs`, HT-15/HT-6/HT-10). `validate` given a brief pair plus
+  Design System Handoff exports adds a `(set)` result: the brief's `companion` hashes must
+  match the given export of that name (`STALE_PAIR`), every export the link-run script
+  joined (`linkRun.designSystemExports`) must be given as that run (`SET_MEMBER_MISSING`,
+  `STALE_PAIR`), and every `linkRun.findings[]` entry is reported as a warning under its own
+  code. `--spec-index <md>` resolves each spec the export carries without text to its file
+  (`SPEC_NOT_INDEXED`, `SPEC_INDEX_PATH_MISSING`; `SPEC_TEXT_NOT_IN_EXPORT` without the
+  flag). `test/validate-set.test.mjs` runs it on the script's own Navigation and Overlay
+  exports (`fixtures/script-2026-10-29/`).
+- Brief schema v14 (`schema/design-handoff.v14.schema.json`, `./schema/brief/v14`): v13 plus
+  `specs[]` and `builtReference[]`, written when a selection holds a spec or a code layer.
+
+### Fixed
+
+- Brief schema v13 rejected every current export: it lacked the plugin's `screenshots`,
+  layer `spacer`, and `string | null` annotation `labelMarkdown`/`categoryId`/`category`,
+  and the script's `linkRun`. All five are now typed; the plugin's Navigation export and the
+  script's both validate. (A v14 export fell back to v10 and reported 1,449 errors.)
+- `handoff-to-code` skill: the canonical copy now carries what only the discipline plugin's
+  copy had (Build standards 8-10, the aspect-lock reference section, the MCP and
+  live-annotation lines in the plugin host), and the script approach — the export set,
+  link-run findings (`references/export-set.md`) and the spec index.
+
 - `bindParagraphIndent` (P25, `src/emit-styles.mjs`) — a TEXT style's
   `properties.paragraphIndent` (bound to `text/paragraph-indent` ->
   `--text-paragraph-indent` on the 8 `*-style1/indent/N` styles) is stated nowhere in

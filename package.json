@@ -16,7 +16,8 @@
     "./schema/brief": "./schema/design-handoff.v10.schema.json",
     "./schema/brief/v11": "./schema/design-handoff.v11.schema.json",
     "./schema/brief/v12": "./schema/design-handoff.v12.schema.json",
-    "./schema/brief/v13": "./schema/design-handoff.v13.schema.json"
+    "./schema/brief/v13": "./schema/design-handoff.v13.schema.json",
+    "./schema/brief/v14": "./schema/design-handoff.v14.schema.json"
   },
   "files": [
     "bin",

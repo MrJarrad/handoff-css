@@ -21,6 +21,10 @@ export const LAW_SENTENCES = [
   // Step 2 — warnings are decisions, never things to build around.
   "A warning you build *around* is drift.",
 
+  // Step 1 — the export set (0.11.0): findings are reported, specs come from the index.
+  "**A link-run finding is a reported item, never a reason to inline a value.**",
+  "**Specs are read from the spec index, never from the design tool.**",
+
   // Step 3 — the name is the export's name.
   "### 3. Map every binding to `codeSyntax.WEB` — an unmapped binding is a defect",
   "**`codeSyntax.WEB` is the name.**",

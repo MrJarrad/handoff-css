@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://handoff-css/schema/design-handoff.v13.schema.json",
   "title": "Design Handoff brief \u2014 JSON companion (schema design-handoff v13)",
-  "description": "0.8.2 \u2014 schema v13 is additive over v12: dimensions may carry minWidth/minWidthToken/maxWidth/maxWidthToken/minHeight/minHeightToken/maxHeight/maxHeightToken (variable bindings for auto-layout min/max size constraints, matching the padding/gap binding pattern). None of v12's own fields change meaning. Validated SHAPE only, as v10/v11/v12 were. `additionalProperties: false` throughout: an unknown field is still a finding \u2014 bump the schema rather than let it validate silently.",
+  "description": "0.8.2 \u2014 schema v13 is additive over v12: dimensions may carry minWidth/minWidthToken/maxWidth/maxWidthToken/minHeight/minHeightToken/maxHeight/maxHeightToken (variable bindings for auto-layout min/max size constraints, matching the padding/gap binding pattern). None of v12's own fields change meaning. Validated SHAPE only, as v10/v11/v12 were. `additionalProperties: false` throughout: an unknown field is still a finding \u2014 bump the schema rather than let it validate silently. 0.11.0 catch-up: fields the plugin already emits at v13 that this schema missed \u2014 document `screenshots`, layer `spacer`, and annotation `labelMarkdown`/`categoryId`/`category` as `string | null` (the plugin's own type) \u2014 plus `linkRun`, which only the link-run script appends.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -343,13 +343,22 @@
                 "type": "string"
               },
               "labelMarkdown": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "categoryId": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "category": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "properties": {
                 "type": "array"
@@ -446,6 +455,35 @@
             },
             "scaleMode": {
               "type": "string"
+            }
+          }
+        },
+        "spacer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "marker"
+          ],
+          "properties": {
+            "marker": {
+              "enum": [
+                "edge:start",
+                "edge:end",
+                "edge:both",
+                "mid"
+              ]
+            },
+            "spacingToken": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "spacingBinding": {
+              "type": [
+                "object",
+                "null"
+              ]
             }
           }
         }
@@ -569,6 +607,113 @@
         },
         "kind": {
           "type": "string"
+        }
+      }
+    },
+    "linkRun": {
+      "description": "Appended by the link-run script (figma-plugins handoff/design-handoff-script), never by the plugin: the Figma file version it read, the Design System Handoff exports it joined, each source file the layer uses, and its findings. `handoff-css validate` reports every finding as a warning and requires every named export in the set.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generatedBy",
+        "fileVersion",
+        "designSystemExports",
+        "sources",
+        "findings"
+      ],
+      "properties": {
+        "generatedBy": {
+          "const": "design-handoff-script"
+        },
+        "fileVersion": {
+          "type": "string"
+        },
+        "designSystemExports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "artifactFilename",
+              "documentName",
+              "generatedAt"
+            ],
+            "properties": {
+              "artifactFilename": {
+                "type": "string"
+              },
+              "documentName": {
+                "type": "string"
+              },
+              "generatedAt": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "role",
+              "fileKey"
+            ],
+            "properties": {
+              "role": {
+                "enum": [
+                  "this file",
+                  "library"
+                ]
+              },
+              "fileKey": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label": {
+                "type": "string"
+              },
+              "components": {
+                "type": "array"
+              },
+              "styles": {
+                "type": "array"
+              },
+              "variables": {
+                "type": "integer"
+              },
+              "designSystemExport": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     }
@@ -707,6 +852,41 @@
           "type": "array"
         }
       }
+    },
+    "screenshots": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "exported": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "nodeId",
+              "scale"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "nodeId": {
+                "type": "string"
+              },
+              "scale": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "failed": {
+          "type": "array"
+        }
+      }
+    },
+    "linkRun": {
+      "$ref": "#/$defs/linkRun"
     }
   }
 }

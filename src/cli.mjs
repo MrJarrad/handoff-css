@@ -11,6 +11,7 @@ import { run } from "./index.mjs";
 import { validateExport } from "./validate-export.mjs";
 import { validateHandoffMarkdown } from "./validate-handoff-md.mjs";
 import { validateBriefJson, validateBriefPair } from "./brief.mjs";
+import { validateSet } from "./set.mjs";
 
 export const SUBCOMMANDS = ["validate", "conform"];
 
@@ -18,7 +19,7 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
 
   handoff-css [--config <mjs>] [--input <json>] [--out <css>] [--theme <css>]
               [--report <md>] [--exclusions <json>] [--check]
-  handoff-css validate <file…> [--json]
+  handoff-css validate <file…> [--spec-index <md>] [--json]
   handoff-css conform --export <json> --handoff <md> --tokens <css> --css <file…>
               [--config <mjs>] [--allow-name <name>…] [--json]
 `;
@@ -41,10 +42,16 @@ export async function dispatch(argv, { cwd = process.cwd(), stdout = process.std
   return generateCommand(argv, { cwd, stdout, stderr });
 }
 
-/** `handoff-css validate <file…> [--json]` — one line per file, exit 1 on any error. */
+/** `handoff-css validate <file…> [--spec-index <md>] [--json]` — one line per file, exit 1 on any error. */
 export function validateCommand(args, { cwd = process.cwd(), stdout = process.stdout, stderr = process.stderr } = {}) {
   const asJson = args.includes("--json");
-  const files = args.filter((a) => !a.startsWith("--"));
+  const at = args.indexOf("--spec-index");
+  const specIndex = at === -1 ? null : args[at + 1];
+  if (at !== -1 && (!specIndex || specIndex.startsWith("--"))) {
+    stderr.write("handoff-css validate: --spec-index needs a path\n");
+    return 1;
+  }
+  const files = args.filter((a, i) => !a.startsWith("--") && (at === -1 || i !== at + 1));
   if (files.length === 0) {
     stderr.write("handoff-css validate: name at least one .json export or .md handoff\n");
     return 1;
@@ -78,6 +85,12 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
         ? { file: r.file, kind: "unreadable", ok: false, findings: [{ code: "UNREADABLE", severity: "error", line: 0, message: r.error.message }] }
         : r.abs.endsWith(".md") ? validateMd(r.file, r.text) : validateJson(r.file, r.text));
     }
+    const exports = read
+      .map((r) => ({ file: r.file, doc: r.abs.endsWith(".json") && r.text != null ? safeParse(r.text) : null }))
+      .filter((e) => e.doc?.schema === "design-system-handoff");
+    results.push({ file: "(set)", kind: "set", ...validateSet(safeParse(briefJson.text) ?? {}, exports, {
+      specIndex: specIndex && (path.isAbsolute(specIndex) ? specIndex : path.join(cwd, specIndex)),
+    }) });
   } else {
     for (const r of read) {
       results.push(r.text == null
@@ -98,8 +111,9 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
           ? warnings.length === 0 ? "" : `  ${warnings.length} warning${warnings.length === 1 ? "" : "s"}`
           : `  ${errors.length} error${errors.length === 1 ? "" : "s"}`;
       stdout.write(`${errors.length === 0 ? "✓" : "✗"} ${r.file}  ${r.kind}${tail}\n`);
+      for (const s of r.specs ?? []) stdout.write(`    spec ${s.id} ${s.name} — ${s.path}\n`);
       for (const f of r.findings) {
-        stdout.write(`    ${f.severity === "error" ? "✗" : "⚠"} ${f.code} ${r.kind === "export" ? f.path : `line ${f.line}`} — ${f.message}\n`);
+        stdout.write(`    ${f.severity === "error" ? "✗" : "⚠"} ${f.code} ${r.kind === "export" || r.kind === "set" ? f.path : `line ${f.line}`} — ${f.message}\n`);
       }
     }
   }

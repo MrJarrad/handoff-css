@@ -223,7 +223,7 @@ handoff-css [--config <mjs>]        default: ./handoff.config.mjs
             [--report <md>] [--exclusions <json>]
             [--check]
 
-handoff-css validate <file…> [--json]
+handoff-css validate <file…> [--spec-index <md>] [--json]
 
 handoff-css conform --export <json> --handoff <md> --tokens <css>
                     --css <file…> [--json]
@@ -245,6 +245,29 @@ standards 1–5, token rows, node rows, the responsive grid tables. One line per
 findings under it, exit 1 on any **error**. A warning never fails the run: it is a decision
 waiting on a human. `--json` prints the same result machine-readably. Table/footnote notes
 accept either the plugin's current `†` sigil or the pre-2026-09-11 `⚠` (0.3.2).
+
+**An export set** (Unreleased). Give a brief's `.json` + `.md` with every Design System
+Handoff export it was made from, and `validate` adds a `(set)` result:
+
+```sh
+handoff-css validate design-handoff-overlay.json design-handoff-overlay.md \
+                     jhd-spec-designsystem-design-system-handoff.json \
+                     --spec-index spec-index.md
+```
+
+| Finding | Severity | What it means |
+| --- | --- | --- |
+| `STALE_PAIR` | error | a given export is not the run the brief names (companion hashes, or `linkRun` `generatedAt`) |
+| `SET_MEMBER_MISSING` | error | `linkRun.designSystemExports` names an export that was not given |
+| `SPEC_INDEX_PATH_MISSING` | error | the spec index lists a file that is not there |
+| `SPEC_TEXT_NOT_IN_EXPORT` | warning | a spec has no text in the export and no `--spec-index` was given |
+| `SPEC_NOT_INDEXED` | warning | a spec has no row in the spec index (matched by file key + node id) |
+| every `linkRun.findings[].code` | warning | the link-run script's own findings, under their own codes |
+
+The spec index is a markdown table with `file key | spec node id | spec | path` columns; the
+path is a markdown link, resolved against the index's own folder. Each listed spec's file is
+printed under the `(set)` line (`specs[]` in `--json`). Brief schemas v13 (catch-up) and v14
+(`specs[]`, `builtReference[]`) validate the script's and the plugin's current exports.
 
 ### `conform` — does the built CSS honour the pair?
 
