@@ -13,7 +13,8 @@ import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 
 import { dispatch } from "../src/cli.mjs";
-import { VALIDATED_SCHEMA_VERSIONS } from "../src/validate-export.mjs";
+import { VALIDATED_SCHEMA_VERSIONS, validateExport, assertValidExport } from "../src/validate-export.mjs";
+import { validateBriefJson } from "../src/brief.mjs";
 
 const fixtures = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "fixtures");
 const fixture = (dir, name) => gunzipSync(readFileSync(path.join(fixtures, dir, `${name}.gz`))).toString("utf8");
@@ -58,6 +59,21 @@ test("a Design System Handoff export newer than this checker knows passes with a
   assert.deepEqual(codes(exported, "error"), []);
   assert.deepEqual(codes(exported, "warning"), ["SCHEMA_NEWER_THAN_CHECKER"]);
   assert.equal(code, 0);
+});
+
+test("a newer version excuses only fields it adds — a missing required field or a wrong type is still an error, and generate still refuses it", () => {
+  const doc = JSON.parse(fixture("jhd-v19-2026-10-29", "design-system-handoff.json"));
+  const next = Math.max(...VALIDATED_SCHEMA_VERSIONS) + 1;
+  const { contentHash, ...withoutHash } = doc;
+  const broken = { ...withoutHash, schemaVersion: next, styles: "nope" };
+  const result = validateExport(broken);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((e) => e.keyword === "required"), JSON.stringify(result.errors));
+  assert.ok(result.errors.some((e) => e.keyword === "type" && e.path === "/styles"), JSON.stringify(result.errors));
+  assert.throws(() => assertValidExport(broken));
+  const brief = validateBriefJson({ schema: "design-handoff", schemaVersion: 99 });
+  assert.equal(brief.ok, false);
+  assert.ok(brief.errors.some((e) => e.keyword === "required"), JSON.stringify(brief.errors));
 });
 
 test("a brief made from an older Design System Handoff run names the command that regenerates it against the newer one", async () => {
