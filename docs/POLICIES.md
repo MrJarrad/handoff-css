@@ -1110,7 +1110,7 @@ e.g. `text/paragraph-indent` -> `--text-paragraph-indent`) is absent from the ex
 states `text-indent`. Finding: `STYLE_CLASS_PARAGRAPH_INDENT_BOUND`. Implemented by
 `bindParagraphIndent` in `src/emit-styles.mjs`.
 
-## P26 — Brownfield match (unreleased)
+## P26 — Brownfield match (0.12.0)
 
 A project that already has code and no Design System Handoff export (HT-21, operator
 2026-10-30: *"does the skill / script do anything to match things that already exist in the

@@ -248,7 +248,7 @@ findings under it, exit 1 on any **error**. A warning never fails the run: it is
 waiting on a human. `--json` prints the same result machine-readably. Table/footnote notes
 accept either the plugin's current `†` sigil or the pre-2026-09-11 `⚠` (0.3.2).
 
-**An export set** (Unreleased). Give a brief's `.json` + `.md` with every Design System
+**An export set** (0.11.0). Give a brief's `.json` + `.md` with every Design System
 Handoff export it was made from, and `validate` adds a `(set)` result:
 
 ```sh
