@@ -5,8 +5,9 @@ description: >-
   design-system-handoff JSON companion — treating the pair as the contract. Trigger on
   "consume the handoff", "build from the handoff", "handoff pair", "the export says",
   "regenerate tokens", a `*-design-system-handoff.json` or `design-handoff-*.md` path, a
-  Figma link to export with the design-handoff script, or any implementation whose values
-  come from a handoff export rather than from the canvas.
+  Figma link to export with the design-handoff script, a brief for a project that already
+  has its own tokens and components and no Design System Handoff export (brownfield), or any
+  implementation whose values come from a handoff export rather than from the canvas.
   Every node, token, copy string and annotation in the pair is built; deviations are
   returned as a table and drift stops for a ruling. Not for reading a Figma file itself —
   that's capture-figma, which owns pixels, screenshots, variant walks and live selection;
@@ -41,6 +42,24 @@ plugin's in-Figma export is superseded); you may run it yourself when you hold a
 token. It joins one Design System Handoff export per source file — this file and each library
 the layer uses, by key. That **set** is the contract: the pair below means the brief plus every
 export it names. Command, joins, `linkRun` codes, spec index: `references/export-set.md`.
+
+## Brownfield — existing code, no Design System Handoff export
+
+When the project already has its own tokens and components and no Design System Handoff
+export exists for its design file, the brief is the set: its token rows carry each variable's
+CSS name and mode values, its component list each component. When one exists, give it —
+`SET_MEMBER_MISSING` still stops you.
+
+`handoff-css match --handoff <design-handoff>.md --src <code paths…> --rulings <ruling table>.md`
+proposes, for every Figma variable and component, the closest existing code match with its
+evidence (name, value, usage) and a confidence, and lists every item with no match.
+**A proposal is a question, never a binding.** Each item is ruled in the project's ruling table
+— `use` a code name, add the brief's name as `new`, or `skip` — and the next run reads that
+table back; a `use` whose code has gone is `RULING_STALE` and is ruled again. Step 3 then binds
+each variable to its ruled name. Output shape, confidence rules and the table:
+`references/brownfield.md`.
+
+**Done when** `match` exits 0: every item ruled, none stale.
 
 ## Inputs — four required, one optional
 

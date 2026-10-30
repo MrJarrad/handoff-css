@@ -227,6 +227,8 @@ handoff-css validate <file…> [--spec-index <md>] [--json]
 
 handoff-css conform --export <json> --handoff <md> --tokens <css>
                     --css <file…> [--json]
+
+handoff-css match --handoff <md> --src <path…> [--rulings <md>] [--json]
 ```
 
 Flags override `paths.*`. `--check` writes nothing and exits 1 on any
@@ -305,6 +307,23 @@ export default {
 
 An allowed name never raises `UNKNOWN_NAME`. It is not a mute button: a name your own
 stylesheet declares is still `LOCAL_ONLY`.
+
+### `match` — brownfield: a brief against code that already exists
+
+For a project with its own tokens and components and no Design System Handoff export:
+
+```sh
+handoff-css match --handoff design-handoff-block-overlay.md --src src --rulings handoff-rulings.md
+```
+
+Every Figma variable (the brief's token rows) and component (its component list) gets the
+closest existing code match — evidence on name, value and usage, and a confidence
+(`high`/`medium`/`low`) — or is reported unmatched. A value alone is never a proposal. The text
+report ends with every unruled item as a row of the ruling table (`| kind | figma | ruling |
+code | note |`, ruling `use`/`new`/`skip`); pass the filled table back with `--rulings` and the
+next run reuses it, reporting `RULING_STALE` when a `use` names code that has gone. Exit 1 until
+every item is ruled. Rules and shape: `docs/POLICIES.md` P26,
+`skills/handoff-to-code/references/brownfield.md`.
 
 ### Roadmap — `conform` on a served DOM (spec only, not implemented)
 
