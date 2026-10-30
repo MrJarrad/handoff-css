@@ -2,6 +2,28 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## Unreleased
+
+### Fixed (30 Oct process test)
+
+- **HT-29 — a Design System Handoff `.md` is no longer read as a brief.** `validate` ran the
+  design-handoff line grammar over the export's own markdown and reported 10 false errors
+  (`MISSING_SECTION`, `ARTIFACT_LINE_MALFORMED`, …). It is now recognised by its
+  `- Schema: \`design-system-handoff\`` line, reported as `design-system-handoff (md)` and
+  skipped, and can no longer be picked as the brief's `.md` in a pair.
+- **HT-31 — a brief reads the same alone and paired.** A node row whose copy (or a TEXT prop)
+  spans lines carries its `[→]` link on the string's last line; the lone-markdown grammar read
+  only the first, so 4 rows of the real overlay brief raised a false `NODE_LINK_MISSING`. The
+  parser now follows the open quote. The paired path now reports `POLICY_VERSION_MISMATCH` too,
+  from the same check, so both report the brief's units v5/v6 disagreement once.
+
+### Added
+
+- **`handoff-css vendor`** (HT-32). Adds a new export as a new `v<N+1>-<date>` folder (current
+  set carried forward) and repoints `latest`, instead of a copy into `latest/` that overwrote the
+  version folder it linked to. The `handoff-to-code` skill (step 1) and
+  `references/export-set.md` now name it.
+
 ## 0.12.0 — 2026-10-30
 
 ### Added

@@ -15,6 +15,7 @@ import { createRequire } from "node:module";
 import Ajv2020 from "ajv/dist/2020.js";
 
 import { parseFrontMatter } from "./front-matter.mjs";
+import { parseHandoffMarkdown, policyMismatches } from "./validate-handoff-md.mjs";
 
 const require = createRequire(import.meta.url);
 
@@ -164,6 +165,7 @@ export function validateBriefPair(doc, mdText) {
   check("companion.schemaVersion", doc.companion?.schemaVersion, fm.companion?.schemaVersion);
   check("companion.contentHash", doc.companion?.contentHash, fm.companion?.contentHash);
   check("companion.designSystemStateHash", doc.companion?.designSystemStateHash, fm.companion?.designSystemStateHash);
+  for (const f of policyMismatches(parseHandoffMarkdown(mdText))) add(f.code, f.severity, f.message);
 
   return { ok: findings.every((f) => f.severity !== "error"), findings };
 }

@@ -101,11 +101,35 @@ const RAGGED_NOTE = /^[†⚠] [\w-]+$/;
 // the single-word form the legacy ragged cell used.
 const NOTES_CELL = /^[†⚠] .+$/;
 
+const quoteCount = (text) => text.split('"').length - 1;
+
 const policyVersions = (text) => {
   const out = {};
   for (const [, name, version] of text.matchAll(POLICY_PAIR)) out[name] = Number(version);
   return out;
 };
+
+/**
+ * `POLICY_VERSION_MISMATCH` — a policy version the Fingerprint line and the
+ * companion block both state, disagreeing. Shared with the paired path
+ * (`validateBriefPair`) so a brief reads the same alone and beside its JSON
+ * (HT-31).
+ */
+export function policyMismatches(parsed) {
+  const out = [];
+  if (parsed.companion == null) return out;
+  for (const [policy, version] of Object.entries(parsed.companion.policies)) {
+    const header = parsed.fingerprint?.policies?.[policy];
+    if (header != null && header !== version) {
+      out.push({
+        code: "POLICY_VERSION_MISMATCH", severity: "warning", line: parsed.companion.policiesLine ?? parsed.companion.line,
+        message: `\`${policy}\` policy is v${header} in the Fingerprint line (line ${parsed.fingerprint.line}) ` +
+          `and v${version} in the companion block`,
+      });
+    }
+  }
+  return out;
+}
 
 /**
  * The brief as data. Pure, no filesystem, no validation — a malformed line is
@@ -154,10 +178,34 @@ export function parseHandoffMarkdown(text) {
   let inTokens = false;
   let inChangelog = false;
   let table = null;
+  // HT-31 — a node row whose quoted string (copy or a TEXT prop) holds line
+  // breaks continues on unindented lines; its `[→]` link, `⚠ placeholder` and
+  // `📝` sit after the closing quote, on the last of them.
+  let open = null;
+  const closeOpen = () => {
+    const { node, text: rowText } = open;
+    const link = NODE_LINK.exec(rowText);
+    const copy = COPY.exec(rowText);
+    Object.assign(node, {
+      link: link ? link[1] : null, copy: copy ? copy[1] : null,
+      placeholder: rowText.includes("⚠ placeholder"), annotation: rowText.includes("📝"),
+    });
+    open = null;
+  };
 
   lines.forEach((raw, i) => {
     const line = raw.replace(/\s+$/, "");
     const at = i + 1 + offset;
+
+    if (open) {
+      if (line.trim() === "" || NODE_ROW.test(line) || NODE_ANCHOR.test(line) || /^(#|\*\*)/.test(line)) {
+        closeOpen();
+      } else {
+        open.text += `\n${line}`;
+        if (quoteCount(open.text) % 2 === 0) closeOpen();
+        return;
+      }
+    }
 
     for (const s of REQUIRED_SECTIONS) if (line.startsWith(s)) out.sections.add(s);
 
@@ -267,6 +315,7 @@ export function parseHandoffMarkdown(text) {
         link: link ? link[1] : null, copy: copy ? copy[1] : null,
         placeholder: rest.includes("⚠ placeholder"), annotation: rest.includes("📝"), line: at,
       });
+      if (link == null && quoteCount(rest) % 2 === 1) open = { node: out.nodes[out.nodes.length - 1], text: rest };
       return;
     }
 
@@ -302,6 +351,7 @@ export function parseHandoffMarkdown(text) {
     const footnote = FOOTNOTE.exec(line);
     if (footnote) out.notes.push({ marker: footnote[1], text: footnote[2], line: at });
   });
+  if (open) closeOpen();
 
   out.frontMatterMismatches = frontMatterMismatches(out);
   return out;
@@ -394,14 +444,7 @@ export function validateHandoffMarkdown(text) {
         `companion state \`${parsed.companion.state}\` is not the header fingerprint state ` +
         `\`${parsed.fingerprint.state}\` — the pair is stale, ask for a re-export`);
     }
-    for (const [policy, version] of Object.entries(parsed.companion.policies)) {
-      const header = parsed.fingerprint?.policies?.[policy];
-      if (header != null && header !== version) {
-        add("POLICY_VERSION_MISMATCH", "warning", parsed.companion.policiesLine ?? parsed.companion.line,
-          `\`${policy}\` policy is v${header} in the Fingerprint line (line ${parsed.fingerprint.line}) ` +
-          `and v${version} in the companion block`);
-      }
-    }
+    for (const f of policyMismatches(parsed)) add(f.code, f.severity, f.line, f.message);
   }
 
   const numbers = parsed.buildStandards.map((s) => s.n);
