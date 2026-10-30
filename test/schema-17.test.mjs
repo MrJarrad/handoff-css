@@ -61,9 +61,10 @@ test("schema 17 validates", () => {
   assert.ok(VALIDATED_SCHEMA_VERSIONS.includes(17));
 });
 
-test("an unknown schemaVersion is still refused — widening is 19, not `any`", () => {
+test("an unknown newer schemaVersion passes only with a warning naming it (HT-25) — never silently", () => {
   const res = validateExport({ ...doc, schemaVersion: 20 });
-  assert.equal(res.ok, false);
+  assert.equal(res.ok, true);
+  assert.ok(res.warnings.some((w) => w.code === "SCHEMA_NEWER_THAN_CHECKER"));
 });
 
 test("the house preset accepts schema 17, so the DS consumer can drop its override", () => {

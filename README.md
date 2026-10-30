@@ -259,12 +259,14 @@ handoff-css validate design-handoff-overlay.json design-handoff-overlay.md \
 
 | Finding | Severity | What it means |
 | --- | --- | --- |
-| `STALE_PAIR` | error | a given export is not the run the brief names (companion hashes, or `linkRun` `generatedAt`) |
+| `STALE_PAIR` | error | a given export is not the run the brief names (companion hashes, or `linkRun` `generatedAt`); the message names the fix — `design-handoff --regenerate …` when the export is the newer half, the run the brief names when it is the older |
 | `SET_MEMBER_MISSING` | error | `linkRun.designSystemExports` names an export that was not given |
 | `SPEC_INDEX_PATH_MISSING` | error | the spec index lists a file that is not there |
 | `SPEC_TEXT_NOT_IN_EXPORT` | warning | a spec has no text in the export and no `--spec-index` was given |
 | `SPEC_NOT_INDEXED` | warning | a spec has no row in the spec index (matched by file key + node id) |
 | every `linkRun.findings[].code` | warning | the link-run script's own findings, under their own codes |
+| `DS_EXPORT_OUT_OF_DATE` | warning | the link-run findings say this file's Design System Handoff export is behind the file: one ask, that plugin run on the named file |
+| `SCHEMA_NEWER_THAN_CHECKER` | warning | (brief or export result) a `schemaVersion` newer than this package knows: checked as the newest known, each difference listed, never an error |
 
 The spec index is a markdown table with `file key | spec node id | spec | path` columns; the
 path is a markdown link, resolved against the index's own folder. Each listed spec's file is

@@ -15,6 +15,23 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
   brief's `components`. The `handoff-to-code` skill gains § Brownfield and
   `references/brownfield.md`, and one law sentence.
 
+### Changed (HT-25, HT-22)
+
+- **A newer export passes with a warning.** A brief or Design System Handoff export whose
+  `schemaVersion` is newer than this package knows is checked as the newest known version and
+  passes with `SCHEMA_NEWER_THAN_CHECKER` warnings naming the version and each difference —
+  never an error. Supersedes 0.5.0's "an unknown future version fails at `/schemaVersion`".
+  `generate` still refuses a version the consumer's config does not list.
+- **`STALE_PAIR` names its fix**: the `design-handoff --regenerate` command when the export is
+  the newer half, the run the brief names when it is the older.
+- **`DS_EXPORT_OUT_OF_DATE`** (set, warning): the link-run findings that mean this file's
+  Design System Handoff export is behind the file become one ask — that plugin run, by file.
+- **Schema 12+ exports are closed at the top level** (`unevaluatedProperties: false`): a field
+  the plugin adds without a new `schemaVersion` fails `validate`. figma-plugins validates what
+  its plugins emit against these schemas (HT-22).
+- `handoff-to-code`: a stale pair is brought up to date by the agent; the only ask is a Design
+  System Handoff plugin run, named by file.
+
 ## 0.11.0 — 2026-10-30
 
 ### Added

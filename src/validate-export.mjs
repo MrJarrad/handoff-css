@@ -147,10 +147,10 @@ const validator = (schema) => {
  *             warnings: {code: string, variable?: string, detail?: string}[] }}
  *   `skipped` is true only for a schema version OLDER than every version this
  *   module validates (legacy, e.g. 7) — an unvalidated document is never
- *   reported as a valid one. A version NEWER than the newest one known (e.g.
- *   a future 10) is not skipped: it is run through the schema, whose
- *   `schemaVersion` enum fails it at `/schemaVersion` — "unrecognized" must
- *   never read as "passed."
+ *   reported as a valid one. A version NEWER than the newest one known is the
+ *   plugin ahead of this checker (HT-25): it is checked as the newest known
+ *   version and passes, never silently — `SCHEMA_NEWER_THAN_CHECKER` warnings
+ *   name the version and every difference.
  *
  *   `warnings` surfaces the plugin's OWN `validation.findings` (schema 9+) as
  *   `PLUGIN_FINDING` — the export self-reporting something the generator did
@@ -164,8 +164,12 @@ export function validateExport(doc) {
   if (typeof doc.schemaVersion === "number" && doc.schemaVersion < Math.min(...VALIDATED_SCHEMA_VERSIONS)) {
     return { ok: true, skipped: true, errors: [], warnings: [], clampFindings: [] };
   }
+  // HT-25 — a version newer than the newest known is the plugin ahead of its
+  // checker: checked as the newest known, every difference a warning.
+  const newest = Math.max(...VALIDATED_SCHEMA_VERSIONS);
+  const newer = typeof doc.schemaVersion === "number" && doc.schemaVersion > newest;
   const validate = validator(schemaFor(doc.schemaVersion));
-  const ok = validate(doc);
+  const ok = validate(newer ? { ...doc, schemaVersion: newest } : doc);
   const findings = Array.isArray(doc.validation?.findings) ? doc.validation.findings : [];
   // P11 — a shape-valid export can still state a `fluid-clamp` rule whose
   // `css` does not reproduce its own samples. Reported separately from the
@@ -174,19 +178,24 @@ export function validateExport(doc) {
   // `generate` still emits the export's `css` verbatim (P11 never
   // recomputes it) while `validate`/`--check` refuse to pass it quietly.
   const clampFindings = fluidClampFindings(doc);
-  return {
-    ok,
-    skipped: false,
-    errors: ok
-      ? []
-      : (validate.errors ?? []).map((e) => ({
+  const shapeErrors = ok
+    ? []
+    : (validate.errors ?? []).map((e) => ({
           // Ajv's `instancePath` IS a JSON pointer, which is what a defect
           // report against a 5 MB export needs to be addressable at all.
           path: e.instancePath || "/",
-          message: e.message ?? "invalid",
+          message: (e.params?.additionalProperty ?? e.params?.unevaluatedProperty) ? `${e.message}: \`${e.params.additionalProperty ?? e.params.unevaluatedProperty}\`` : e.message ?? "invalid",
           keyword: e.keyword,
-        })),
-    warnings: findings.map((f) => ({ code: "PLUGIN_FINDING", variable: f.variable, detail: f.detail ?? f.code })),
+        }));
+  const newerWarnings = newer
+    ? [{ code: "SCHEMA_NEWER_THAN_CHECKER", detail: `design-system-handoff v${doc.schemaVersion} is newer than this handoff-css knows (v${newest}); checked against v${newest} — update handoff-css to check it in full` },
+       ...shapeErrors.map((e) => ({ code: "SCHEMA_NEWER_THAN_CHECKER", variable: e.path.slice(1) || undefined, detail: `not in v${newest}: ${e.message} (${e.keyword})` }))]
+    : [];
+  return {
+    ok: newer || ok,
+    skipped: false,
+    errors: newer ? [] : shapeErrors,
+    warnings: [...newerWarnings, ...findings.map((f) => ({ code: "PLUGIN_FINDING", variable: f.variable, detail: f.detail ?? f.code }))],
     clampFindings,
   };
 }
