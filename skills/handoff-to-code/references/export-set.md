@@ -3,6 +3,18 @@
 Read from `SKILL.md` § The export is a set, whenever the brief carries `linkRun` (every
 export `design-handoff-script` writes).
 
+## Making it
+
+From the plugins repo, with a Figma token (its README covers setup):
+
+```sh
+node handoff/design-handoff-script/bin/design-handoff.mjs "<link to the layer>" \
+  --ds <this file's Design System Handoff export> --ds <each library's export> --out <dir>
+```
+
+It writes `design-handoff-<file>-<page>-<layer>-<date-time>.md` and `.json`: the plugin's
+export, then **Link-run findings** and **Sources** in the brief and `linkRun` in the JSON.
+
 ## How the set joins
 
 | Join | Key | What `validate` does when it fails |

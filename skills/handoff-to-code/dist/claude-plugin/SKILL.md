@@ -36,21 +36,18 @@ when the pair is silent — not instead of it.
 
 ## The export is a set
 
-The Design Handoff export is made by **`design-handoff-script`** from a Figma link — the
-Design Handoff plugin's own export code, run over the REST API; the plugin's in-Figma export
-is superseded. You may run it yourself when you hold a link and a token:
-`design-handoff.mjs "<link>" --ds <this file's Design System Handoff export> --ds <each
-library's> --out <dir>`. It writes the brief pair and joins one Design System Handoff export
-per source file — this file and each library the layer uses, joined by key. That **set** is
-the contract: the pair below means the brief plus every export it names. Joins, `linkRun`
-codes and the spec index: `references/export-set.md`.
+The Design Handoff export is made by **`design-handoff-script`** from a Figma link (the
+plugin's in-Figma export is superseded); you may run it yourself when you hold a link and a
+token. It joins one Design System Handoff export per source file — this file and each library
+the layer uses, by key. That **set** is the contract: the pair below means the brief plus every
+export it names. Command, joins, `linkRun` codes, spec index: `references/export-set.md`.
 
 ## Inputs — four required, one optional
 
 | Input | What it is |
 | --- | --- |
-| `design-handoff-*.md` + `.json` | Layer brief and its JSON: node tree, sizing chains, props, Build standards, changelog; the script appends **Link-run findings** and `linkRun` (Sources, findings). |
-| `*-design-system-handoff.json` | Companion, one per source in the brief's Sources: every variable's `codeSyntax`, mode builds, `responsiveBehavior`. |
+| `design-handoff-*.md` + `.json` | Layer brief: node tree, sizing chains, props, Build standards, changelog, **Link-run findings** (`linkRun`). |
+| `*-design-system-handoff.json` | Companion, one per source the brief lists: every variable's `codeSyntax`, mode builds, `responsiveBehavior`. |
 | `handoff.config.mjs` | Consumer policy — schema versions, viewport units, aliases, paths. |
 | Generated tokens + theme | The CSS the JSON produced — the only place a value is stated. |
 | Generated style classes | `styles.generated.css` (schema 12+) — one class per Figma style. Bind the class; never re-author its declarations. |
