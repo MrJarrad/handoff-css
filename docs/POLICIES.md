@@ -1109,3 +1109,29 @@ e.g. `text/paragraph-indent` -> `--text-paragraph-indent`) is absent from the ex
 `text-indent: <n>px` (unbound, non-zero), and nothing for 0 or when the class already
 states `text-indent`. Finding: `STYLE_CLASS_PARAGRAPH_INDENT_BOUND`. Implemented by
 `bindParagraphIndent` in `src/emit-styles.mjs`.
+
+## P26 — Brownfield match (unreleased)
+
+A project that already has code and no Design System Handoff export (HT-21, operator
+2026-10-30: *"does the skill / script do anything to match things that already exist in the
+codebase?"* → no → "Yes" to adding it). `handoff-css match` reads the brief markdown — the
+only half that carries each variable's CSS name and mode values, and the component list —
+and the project's sources, and proposes per Figma item the closest code match. It never
+adopts one: a match is a question for a human until the project's ruling table answers it,
+so the run exits 1 while any item is unruled.
+
+Evidence is three axes, each named in `why`: **name** (the brief's CSS name exactly, else
+the share of `-` segments; components by name with case and punctuation set aside, then
+containment, then shared words), **value** (a declared code value equal to a mode sample or
+an alias's resolved colour, compared lowercase, `#rrggbb`, px as rem at 16px, zero bare),
+**usage** (where it is declared, how often `var()` or `<Name` uses it). A name shared at half
+or more of its segments is the floor for a proposal; a value alone is listed as an
+alternative, never proposed — a matching literal is a coincidence until ruled. A name only
+used, never declared, in the scanned code (a design-system package) still matches, and says
+so. Implemented by `matchBrownfield` in `src/match.mjs`; run on jhd-portfolio against the
+29 Oct Navigation and Overlay briefs in the vault's HT-21 evidence.
+
+Named gaps: component props are not compared (a name match only); a code value that aliases
+a property declared outside the scanned code is compared as written, not resolved; Tailwind
+utilities and inline style objects count as usage only when they spell `var(--name)`.
+

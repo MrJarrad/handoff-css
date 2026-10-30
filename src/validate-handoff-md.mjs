@@ -42,6 +42,8 @@ const CONTENT_HASH = /^\*\*Content hash:\*\* `([^`]*)`/;
 const FINGERPRINT = /^\*\*Fingerprint:\*\* current design-system state `([^`]*)`(.*)$/;
 const COMPANION = /^- Last-known companion `([^`]+)` · `design-system-handoff` v(\d+) · content `([^`]*)` · state `([^`]*)`/;
 const COMPANION_POLICIES = /^- Policies: (.+)$/;
+// HT-21 — the brief's component inventory: `- [Label](link) #id — N instances (…)`.
+const COMPONENT_ROW = /^- \[([^\]]+)\]\([^)]*\) #(\S+) — (\d+) instances?/;
 const TOKENS_HEADER = /^\*\*Variable tokens \((\d+) unique\):\*\*/;
 const TOKEN_ROW = /^- \$(\S+) ·\s*(.*)$/;
 const WEB_NAME = /(?:^|·)\s*WEB `(--[a-z0-9-]+)`/;
@@ -51,6 +53,11 @@ const WEB_NAME = /(?:^|·)\s*WEB `(--[a-z0-9-]+)`/;
 // to indented continuation lines below the row rather than trailing `·` cells.
 const TOKEN_ROW_V9 = /^- \$(\S+) → CSS `(--[a-z0-9-]+)`/;
 const RESPONSIVE_ROW = /^\s+Responsive behavior: (.+)$/;
+// HT-21 — the values a v9 row states: its `· mode=value` samples, and the
+// colour literal each alias resolves to on its `(=$alias→#hex @mode / …)` line.
+const MODE_SAMPLE = /·\s*[\w.-]+=(\S+)/g;
+const RESOLVED_ROW = /^\s+\(=(.+)\)$/;
+const RESOLVED_LITERAL = /→(#[0-9a-f]{3,8}) @/gi;
 const NODE_ANCHOR = /^### (.+?) \(([A-Z_]+)\) #(\S+)(.*)$/;
 const NODE_ROW = /^(\s*)- \*\*(.+?)\*\* \(([A-Z_]+)\)(.*)$/;
 const NODE_ID = /(?:^|\s)#([0-9I][^\s]*)/;
@@ -132,6 +139,7 @@ export function parseHandoffMarkdown(text) {
     companion: null,
     buildStandards: [],
     tokens: [],
+    components: [],
     declaredTokenCount: null,
     nodes: [],
     tables: [],
@@ -196,6 +204,12 @@ export function parseHandoffMarkdown(text) {
       else if (line.startsWith("**")) inBuildStandards = false;
     }
 
+    const component = COMPONENT_ROW.exec(line);
+    if (component) {
+      out.components.push({ label: component[1], id: component[2], instances: Number(component[3]), line: at });
+      return;
+    }
+
     const tokensHeader = TOKENS_HEADER.exec(line);
     if (tokensHeader) {
       out.declaredTokenCount = { count: Number(tokensHeader[1]), line: at };
@@ -203,6 +217,12 @@ export function parseHandoffMarkdown(text) {
       return;
     }
     if (inTokens) {
+      const resolved = RESOLVED_ROW.exec(line);
+      if (resolved && out.tokens.length > 0) {
+        const last = out.tokens[out.tokens.length - 1];
+        for (const m of resolved[1].matchAll(RESOLVED_LITERAL)) if (!last.values.includes(m[1])) last.values.push(m[1]);
+        return;
+      }
       const responsive = RESPONSIVE_ROW.exec(line);
       if (responsive && out.tokens.length > 0) {
         out.tokens[out.tokens.length - 1].responsive = responsive[1];
@@ -211,12 +231,14 @@ export function parseHandoffMarkdown(text) {
       const row = TOKEN_ROW.exec(line);
       if (row) {
         const web = WEB_NAME.exec(line);
-        out.tokens.push({ token: row[1], web: web ? web[1] : null, responsive: null, line: at });
+        out.tokens.push({ token: row[1], web: web ? web[1] : null, responsive: null, values: [], line: at });
         return;
       }
       const rowV9 = TOKEN_ROW_V9.exec(line);
       if (rowV9) {
-        out.tokens.push({ token: rowV9[1], web: rowV9[2], responsive: null, line: at });
+        // `?` is the plugin's mark for a mode it could not resolve — no value.
+        const values = [...new Set([...line.matchAll(MODE_SAMPLE)].map((m) => m[1]))].filter((v) => v !== "?");
+        out.tokens.push({ token: rowV9[1], web: rowV9[2], responsive: null, values, line: at });
         return;
       }
       if (line.startsWith("###") || line.startsWith("**")) inTokens = false;

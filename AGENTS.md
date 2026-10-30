@@ -26,6 +26,24 @@ token. It joins one Design System Handoff export per source file — this file a
 the layer uses, by key. That **set** is the contract: the pair below means the brief plus every
 export it names. Command, joins, `linkRun` codes, spec index: `references/export-set.md`.
 
+### Brownfield — existing code, no Design System Handoff export
+
+When the project already has its own tokens and components and no Design System Handoff
+export exists for its design file, the brief is the set: its token rows carry each variable's
+CSS name and mode values, its component list each component. When one exists, give it —
+`SET_MEMBER_MISSING` still stops you.
+
+`handoff-css match --handoff <design-handoff>.md --src <code paths…> --rulings <ruling table>.md`
+proposes, for every Figma variable and component, the closest existing code match with its
+evidence (name, value, usage) and a confidence, and lists every item with no match.
+**A proposal is a question, never a binding.** Each item is ruled in the project's ruling table
+— `use` a code name, add the brief's name as `new`, or `skip` — and the next run reads that
+table back; a `use` whose code has gone is `RULING_STALE` and is ruled again. Step 3 then binds
+each variable to its ruled name. Output shape, confidence rules and the table:
+`references/brownfield.md`.
+
+**Done when** `match` exits 0: every item ruled, none stale.
+
 ### Inputs — four required, one optional
 
 | Input | What it is |
@@ -90,7 +108,8 @@ name which export covers each library's variables), take **`codeSyntax.WEB.value
 write `var(<name>)`.
 
 - **`codeSyntax.WEB` is the name.** Not the variable's path, not a derived name, not one
-  already in the stylesheet.
+  already in the stylesheet — unless a ruling chose it. In brownfield the name is the one the
+  ruling table records: a `use` ruling's code name, or the brief's own CSS name for `new`.
 - **An alias is not the name.** Bind the handoff's name — an alias hides which token you
   consumed.
 - **No emitted token is a defect, not a guess.** If a binding maps to no custom property, stop
@@ -153,6 +172,10 @@ against all of them. A pass on the component file alone leaves sibling rendering
 (`UNKNOWN_NAME`), a device sample as a literal (`SAMPLE_PX_LITERAL`), column maths in place of
 `col-span N/M` (`GRID_ARITHMETIC`), or shipped `⚠ placeholder` copy (`PLACEHOLDER_COPY`). Red
 fails; amber is a deviation row with a reason. CSS only — markup is checked by hand.
+
+In brownfield, pass the brief's JSON as `--export`, the project's token stylesheet as
+`--tokens`, and each ruled `use` name declared outside it as `--allow-name`; each
+`UNMAPPED_BINDING` that follows is a ruled item, and its deviation row cites the ruling.
 
 **Done when** the run is red-free, or every red has a deviation row and a ruling.
 

@@ -2,6 +2,19 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## Unreleased
+
+### Added
+
+- **Brownfield match** (`handoff-css match`, `src/match.mjs`, P26, HT-21). For a project with
+  existing code and no Design System Handoff export: every Figma variable and component in the
+  brief gets the closest code token or component, with name/value/usage evidence and a
+  confidence, or is reported unmatched. Rulings (`use`/`new`/`skip`) are read back from the
+  project's ruling table (`--rulings`); a stale `use` is `RULING_STALE`. Exit 1 until every
+  item is ruled. The brief parser now also returns each v9 token row's `values` and the
+  brief's `components`. The `handoff-to-code` skill gains § Brownfield and
+  `references/brownfield.md`, and one law sentence.
+
 ## 0.11.0 — 2026-10-30
 
 ### Added
