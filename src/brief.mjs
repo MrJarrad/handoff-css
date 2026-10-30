@@ -52,11 +52,21 @@ export const briefSchemaV12 = require("../schema/design-handoff.v12.schema.json"
  */
 export const briefSchemaV13 = require("../schema/design-handoff.v13.schema.json");
 
+/**
+ * 0.11.0 — schema v14 is additive over v13, written only when the selection
+ * holds a spec or a code layer: `specs[]` (markdown null when Figma gives the
+ * exporter no spec text) and `builtReference[]`. v13 also gained the fields
+ * the plugin already wrote at v13 (`screenshots`, `spacer`, nullable
+ * annotation fields) and the link-run script's `linkRun`.
+ */
+export const briefSchemaV14 = require("../schema/design-handoff.v14.schema.json");
+
 const schemasByVersion = new Map([
   [10, briefSchema],
   [11, briefSchemaV11],
   [12, briefSchemaV12],
   [13, briefSchemaV13],
+  [14, briefSchemaV14],
 ]);
 
 const compiledByVersion = new Map();
@@ -70,7 +80,7 @@ const validatorFor = (schemaVersion) => {
 
 /**
  * Validate a parsed brief JSON document against its published shape. Dispatches
- * on the document's own `schemaVersion` (10 or 11); an unrecognised version
+ * on the document's own `schemaVersion` (10–14); an unrecognised version
  * falls back to v10 so it still surfaces as a clear `schemaVersion` const
  * mismatch rather than a thrown error.
  *

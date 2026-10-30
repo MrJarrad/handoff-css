@@ -4,8 +4,9 @@ description: >-
   Build code from a Design Handoff export pair — the design-handoff markdown and its
   design-system-handoff JSON companion — treating the pair as the contract. Trigger on
   "consume the handoff", "build from the handoff", "handoff pair", "the export says",
-  "regenerate tokens", a `*-design-system-handoff.json` or `design-handoff-*.md` path, or
-  any implementation whose values come from a handoff export rather than from the canvas.
+  "regenerate tokens", a `*-design-system-handoff.json` or `design-handoff-*.md` path, a
+  Figma link to export with the design-handoff script, or any implementation whose values
+  come from a handoff export rather than from the canvas.
   Every node, token, copy string and annotation in the pair is built; deviations are
   returned as a table and drift stops for a ruling. Not for reading a Figma file live —
   pixels, screenshots, variant walks and selection are a different job; not for measuring an
@@ -17,7 +18,8 @@ description: >-
 **The handoff pair is the contract: every node, token, copy string and annotation in it is
 built — never Figma pixels, never inferred values.** A value the pair does not state is not
 yours to supply. The pair is read, not re-described: a task description that paraphrases the
-pair has replaced the contract with a summary of it, and the pair still wins.
+pair has replaced the contract with a summary of it, and the pair still wins. A design tool's live API does not replace the
+pair: it cannot return per-mode code-named tokens, generated CSS, the changelog or the pair hashes.
 
 ## When it fires
 
@@ -31,12 +33,23 @@ The pair cannot carry everything: renders, interaction and prototype detail, and
 binding proofs verified against the design tool's own API stay with a live read of the file.
 Reach for one *inside* step 4 when the pair is silent — not instead of the pair.
 
+## The export is a set
+
+The Design Handoff export is made by **`design-handoff-script`** from a Figma link — the
+Design Handoff plugin's own export code, run over the REST API; the plugin's in-Figma export
+is superseded. You may run it yourself when you hold a link and a token:
+`design-handoff.mjs "<link>" --ds <this file's Design System Handoff export> --ds <each
+library's> --out <dir>`. It writes the brief pair and joins one Design System Handoff export
+per source file — this file and each library the layer uses, joined by key. That **set** is
+the contract: the pair below means the brief plus every export it names. Joins, `linkRun`
+codes and the spec index: `references/export-set.md`.
+
 ## Inputs — four required, one optional
 
 | Input | What it is |
 | --- | --- |
-| `design-handoff-*.md` | Layer brief: node tree, sizing chains, props, Build standards, changelog. |
-| `*-design-system-handoff.json` | Companion: every variable's `codeSyntax`, mode builds, `responsiveBehavior`. |
+| `design-handoff-*.md` + `.json` | Layer brief and its JSON: node tree, sizing chains, props, Build standards, changelog; the script appends **Link-run findings** and `linkRun` (Sources, findings). |
+| `*-design-system-handoff.json` | Companion, one per source in the brief's Sources: every variable's `codeSyntax`, mode builds, `responsiveBehavior`. |
 | `handoff.config.mjs` | Consumer policy — schema versions, viewport units, aliases, paths. |
 | Generated tokens + theme | The CSS the JSON produced — the only place a value is stated. |
 | Generated style classes | `styles.generated.css` (schema 12+) — one class per Figma style. Bind the class; never re-author its declarations. |
@@ -55,10 +68,19 @@ Read identity first: markdown's schema version + companion block; JSON's `schema
 `content` hash — one design-system state, not simultaneous export. A mismatch is a
 **stale-pair defect**: stop and ask for a re-export. Never build the newer half alone.
 
-`handoff-css validate <export>.json <design-handoff>.md` — an **error** stops you, a
-**warning** is a decision waiting on a human: carry it into your deviation table, and build.
+`handoff-css validate <design-handoff>.json <design-handoff>.md <every design-system-handoff>.json
+--spec-index <index>.md` checks the whole set — an **error** stops you (`STALE_PAIR`,
+`SET_MEMBER_MISSING`), a **warning** is a decision waiting on a human: carry it into your
+deviation table, and build. Each link-run finding is one of those warnings; its move is in
+`references/export-set.md`. **A link-run finding is a reported item, never a reason to inline
+a value.**
 
-**Done when** all three hashes reconcile and `schemaVersion` is one the config declares.
+**Specs are read from the spec index, never from the design tool.** The export lists each spec
+without its text; `validate --spec-index` prints the file that holds it — read it as part of the
+pair. `SPEC_NOT_INDEXED` is a finding: name the spec and ask; never build from a guess of it.
+
+**Done when** all three hashes reconcile for every set member, `schemaVersion` is one the
+config declares, and every listed spec's file is read.
 
 ### 2. Regenerate, then read every warning
 
@@ -81,7 +103,8 @@ generated, naming it in your deviation table — is correct.
 
 ### 3. Map every binding to `codeSyntax.WEB` — an unmapped binding is a defect
 
-Walk every `$variable` per node, find it in the companion JSON, take **`codeSyntax.WEB.value`**,
+Walk every `$variable` per node, find it in the set member that owns it (the brief's Sources
+name which export covers each library's variables), take **`codeSyntax.WEB.value`**,
 write `var(<name>)`.
 
 - **`codeSyntax.WEB` is the name.** Not the variable's path, not a derived name, not one
@@ -114,6 +137,16 @@ wrong mechanism is a defect.
    marker says which: `start`/`end` builds as `margin-block-start`/`-end` (or inline) on the
    block it edges, `mid` (between siblings) builds as the container's `gap`, always token-bound,
    never a literal.
+8. A component set's property `defaultValue` in an export is a display convention — Figma
+   components are left "everything on" so the set shows all it can do — never the build
+   default and never a deviation. Code defaults come from locked rulings and from the
+   instances placed in the examples and pages; a ruling (e.g. no header overlay) sets the
+   default, and the Figma-named prop stays exposed with that value set per route.
+9. Annotations never restate or contradict a component property: a property is the only
+   home for what it can express. Annotations carry motion, interaction and behaviour only;
+   a note that lists a property's options or states its value is a defect, and code-only
+   concepts (parallax, per-asset settings) are notes, never a requested Figma property.
+10. A locked `aspectRatio` builds the ratio, never the fixed height — `schema-v9-hints.md` § Aspect lock.
 
 **Done when** every node in scope is built and each standard applied or deviation-noted.
 
