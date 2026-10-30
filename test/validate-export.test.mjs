@@ -31,11 +31,11 @@ test("the real v9 export validates with zero errors", () => {
 
 // 0.6.0 — repointed from 17 to 18. Schema 17 is accepted now (the 2026-09-13
 // 17:08 export ships it, `policies.units` v6 — see
-// `test/schema-17.test.mjs`); 18 is the first version this package has not
-// read, so it must not pass.
-test("a v9 export mutated to schemaVersion 18 fails at /schemaVersion", () => {
+// `test/schema-17.test.mjs`, 18-19 in `test/schema-19.test.mjs`); 20 is the first version this
+// package has not read, so it must not pass.
+test("a v9 export mutated to schemaVersion 20 fails at /schemaVersion", () => {
   const doc = docV9();
-  doc.schemaVersion = 18;
+  doc.schemaVersion = 20;
   const res = validateExport(doc);
   assert.equal(res.skipped, false);
   assert.equal(res.ok, false);
@@ -49,12 +49,12 @@ test("a schema-7 export is skipped, not validated — and says so", () => {
   const res = validateExport(v7);
   assert.equal(res.ok, true);
   assert.equal(res.skipped, true);
-  assert.deepEqual(VALIDATED_SCHEMA_VERSIONS, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
+  assert.deepEqual(VALIDATED_SCHEMA_VERSIONS, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
 });
 
 test("an unknown future schema version fails at /schemaVersion, not skipped", () => {
   const doc = docV8b();
-  doc.schemaVersion = 18;
+  doc.schemaVersion = 20;
   const res = validateExport(doc);
   assert.equal(res.skipped, false);
   assert.equal(res.ok, false);
@@ -196,6 +196,6 @@ test("assertValidExport names at most five pointers and counts the rest", () => 
 });
 
 test("the schema document is published as part of the package", () => {
-  assert.deepEqual(exportSchema.properties.schemaVersion.enum, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
+  assert.deepEqual(exportSchema.properties.schemaVersion.enum, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
   assert.equal(exportSchema.$schema, "https://json-schema.org/draft/2020-12/schema");
 });

@@ -61,15 +61,15 @@ test("schema 17 validates", () => {
   assert.ok(VALIDATED_SCHEMA_VERSIONS.includes(17));
 });
 
-test("an unknown schemaVersion is still refused — widening is 17, not `any`", () => {
-  const res = validateExport({ ...doc, schemaVersion: 18 });
+test("an unknown schemaVersion is still refused — widening is 19, not `any`", () => {
+  const res = validateExport({ ...doc, schemaVersion: 20 });
   assert.equal(res.ok, false);
 });
 
 test("the house preset accepts schema 17, so the DS consumer can drop its override", () => {
   assert.ok(preset.schema.versions.includes("17"));
   assert.doesNotThrow(() => assertSchema(doc, preset));
-  assert.throws(() => assertSchema({ ...doc, schemaVersion: 18 }, preset), /unsupported schemaVersion 18/);
+  assert.throws(() => assertSchema({ ...doc, schemaVersion: 20 }, preset), /unsupported schemaVersion 20/);
 });
 
 test("every letter-spacing/line-height cell in the schema-17 export is resolved with a css in em or unitless", () => {
