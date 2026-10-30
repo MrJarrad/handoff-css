@@ -38,10 +38,12 @@ test("a v19 export's own fields are typed: a malformed annotation, stroke-cap id
   }
 });
 
-test("a schema 20 export is still refused", () => {
+test("a schema 20 export passes only with a warning naming it (HT-25)", () => {
   const doc = fresh();
   doc.schemaVersion = 20;
-  assert.equal(validateExport(doc).ok, false);
+  const res = validateExport(doc);
+  assert.equal(res.ok, true);
+  assert.equal(res.warnings[0].code, "SCHEMA_NEWER_THAN_CHECKER");
 });
 
 test("the real 22:03 set — Overlay brief pair + its export — passes validate", async () => {

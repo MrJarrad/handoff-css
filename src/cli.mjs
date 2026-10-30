@@ -95,6 +95,7 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
       .filter((e) => e.doc?.schema === "design-system-handoff");
     results.push({ file: "(set)", kind: "set", ...validateSet(safeParse(briefJson.text) ?? {}, exports, {
       specIndex: specIndex && (path.isAbsolute(specIndex) ? specIndex : path.join(cwd, specIndex)),
+      briefFile: briefJson.file,
     }) });
   } else {
     for (const r of read) {
@@ -141,13 +142,16 @@ function validateJson(file, text, { brief = false } = {}) {
     return { file, kind: brief ? "brief" : "export", ok: false, findings: [{ code: "UNPARSEABLE", severity: "error", line: 0, path: "/", message: err.message }] };
   }
   if (brief || doc?.schema === "design-handoff") {
-    const { ok, errors } = validateBriefJson(doc);
+    const { ok, errors, warnings } = validateBriefJson(doc);
     return {
       file,
       kind: "brief",
       ok,
       schemaVersion: doc.schemaVersion ?? null,
-      findings: errors.map((e) => ({ code: "SCHEMA", severity: "error", line: 0, path: e.path, message: `${e.message} (${e.keyword})` })),
+      findings: [
+        ...errors.map((e) => ({ code: "SCHEMA", severity: "error", line: 0, path: e.path, message: `${e.message} (${e.keyword})` })),
+        ...warnings.map((w) => ({ ...w, severity: "warning", line: 0 })),
+      ],
     };
   }
   const { ok, skipped, errors, warnings, clampFindings } = validateExport(doc);

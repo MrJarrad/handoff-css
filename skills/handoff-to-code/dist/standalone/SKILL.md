@@ -81,13 +81,16 @@ behaviour, links, copy overrides. The pair wins over anything else there.
 Read identity first: markdown's schema version + companion block; JSON's `schemaVersion`,
 `contentHash`, `fingerprint.designSystemStateHash`. The markdown's `state` and JSON's
 `designSystemStateHash` must match, and JSON's `contentHash` must equal the companion's
-`content` hash — one design-system state, not simultaneous export. A mismatch is a
-**stale-pair defect**: stop and ask for a re-export. Never build the newer half alone.
+`content` hash — one design-system state, not simultaneous export. A mismatch is a **stale-pair defect**: bring the set up to date yourself — run the command `validate` names, then validate again. Never build the newer half alone.
 
 `handoff-css validate <design-handoff>.json <design-handoff>.md <every design-system-handoff>.json
---spec-index <index>.md` checks the whole set — an **error** stops you (`STALE_PAIR`,
-`SET_MEMBER_MISSING`), a **warning** is a decision waiting on a human: carry it into your
-deviation table, and build. Each link-run finding is one of those warnings; its move is in
+--spec-index <index>.md` checks the whole set. An **error** means not yet one state: `STALE_PAIR`
+names its fix — `design-handoff --regenerate …` when the brief is the older half, the run the
+brief names when the export is; `SET_MEMBER_MISSING` names the export to add. A **warning** is a
+decision waiting on a human: carry it into your deviation table, and build.
+`SCHEMA_NEWER_THAN_CHECKER` is one: the export is ahead of this checker — build, and note the
+version. **The one thing to ask a person for is a Design System Handoff plugin run, named by file.**
+`DS_EXPORT_OUT_OF_DATE` is that ask, ready to relay: variables cannot be read without the plugin. Each link-run finding is one of those warnings; its move is in
 `references/export-set.md`. **A link-run finding is a reported item, never a reason to inline
 a value.**
 

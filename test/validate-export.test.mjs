@@ -32,15 +32,16 @@ test("the real v9 export validates with zero errors", () => {
 // 0.6.0 — repointed from 17 to 18. Schema 17 is accepted now (the 2026-09-13
 // 17:08 export ships it, `policies.units` v6 — see
 // `test/schema-17.test.mjs`, 18-19 in `test/schema-19.test.mjs`); 20 is the first version this
-// package has not read, so it must not pass.
-test("a v9 export mutated to schemaVersion 20 fails at /schemaVersion", () => {
+// package has not read: a real newer export passes with SCHEMA_NEWER_THAN_CHECKER warnings (`test/self-sync.test.mjs`);
+// an old-shape document relabelled 20 does not (HT-25 A1).
+test("a v9 export relabelled schemaVersion 20 is not skipped and is not excused by it: the structures the newest schema requires are still errors (HT-25)", () => {
   const doc = docV9();
   doc.schemaVersion = 20;
   const res = validateExport(doc);
   assert.equal(res.skipped, false);
   assert.equal(res.ok, false);
-  const hit = res.errors.find((e) => e.path === "/schemaVersion");
-  assert.ok(hit, `expected an error at /schemaVersion, got ${res.errors.map((e) => e.path).join(", ")}`);
+  assert.ok(res.warnings.some((w) => w.code === "SCHEMA_NEWER_THAN_CHECKER"));
+  assert.ok(res.errors.some((e) => e.keyword === "required"));
 });
 
 test("a schema-7 export is skipped, not validated — and says so", () => {
@@ -52,14 +53,14 @@ test("a schema-7 export is skipped, not validated — and says so", () => {
   assert.deepEqual(VALIDATED_SCHEMA_VERSIONS, [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
 });
 
-test("an unknown future schema version fails at /schemaVersion, not skipped", () => {
+test("an old export relabelled with an unknown future schema version is not skipped and is not excused by it: the structures the newest schema requires are still errors (HT-25)", () => {
   const doc = docV8b();
   doc.schemaVersion = 20;
   const res = validateExport(doc);
   assert.equal(res.skipped, false);
   assert.equal(res.ok, false);
-  const hit = res.errors.find((e) => e.path === "/schemaVersion");
-  assert.ok(hit, `expected an error at /schemaVersion, got ${res.errors.map((e) => e.path).join(", ")}`);
+  assert.ok(res.warnings.some((w) => w.code === "SCHEMA_NEWER_THAN_CHECKER"));
+  assert.ok(res.errors.some((e) => e.keyword === "required"));
 });
 
 // 0.5.0 — the point of a SEPARATE v12 document: an 8-11 export must not be

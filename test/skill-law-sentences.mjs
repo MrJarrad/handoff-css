@@ -16,7 +16,9 @@ export const LAW_SENTENCES = [
   "A value the pair does not state is not yours to supply.",
 
   // Step 1 — the pair is one design-system state.
-  "A mismatch is a **stale-pair defect**: stop and ask for a re-export.",
+  // HT-25 (operator, 2026-10-30): an out-of-date set is brought up to date, not refused.
+  "A mismatch is a **stale-pair defect**: bring the set up to date yourself — run the command `validate` names, then validate again.",
+  "**The one thing to ask a person for is a Design System Handoff plugin run, named by file.**",
 
   // Step 2 — warnings are decisions, never things to build around.
   "A warning you build *around* is drift.",

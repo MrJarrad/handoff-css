@@ -78,24 +78,46 @@ const validatorFor = (schemaVersion) => {
   return compiledByVersion.get(schema);
 };
 
+const NEWEST = Math.max(...schemasByVersion.keys());
+
+/** The only shape errors a newer-than-checker version can excuse: a field this checker has never seen. */
+export const UNKNOWN_FIELD_KEYWORDS = new Set(["additionalProperties", "unevaluatedProperties"]);
+
 /**
  * Validate a parsed brief JSON document against its published shape. Dispatches
- * on the document's own `schemaVersion` (10–14); an unrecognised version
+ * on the document's own `schemaVersion` (10–14); an unrecognised older version
  * falls back to v10 so it still surfaces as a clear `schemaVersion` const
  * mismatch rather than a thrown error.
  *
+ * HT-25 — a version NEWER than this package knows is the plugin moving ahead of
+ * its checker, not a broken export: it is checked against the newest schema
+ * known, and passes with `SCHEMA_NEWER_THAN_CHECKER` warnings naming each
+ * unknown field; a missing required field or a wrong type is still an error.
+ *
  * @param {object} doc
- * @returns {{ ok: boolean, errors: {path: string, message: string, keyword: string}[] }}
+ * @returns {{ ok: boolean, errors: {path: string, message: string, keyword: string}[], warnings: {code: string, path: string, message: string}[] }}
  */
 export function validateBriefJson(doc) {
   if (doc == null || typeof doc !== "object") {
-    return { ok: false, errors: [{ path: "", message: "brief is not an object", keyword: "type" }] };
+    return { ok: false, errors: [{ path: "", message: "brief is not an object", keyword: "type" }], warnings: [] };
   }
-  const validate = validatorFor(doc.schemaVersion);
-  const ok = validate(doc);
+  const newer = typeof doc.schemaVersion === "number" && doc.schemaVersion > NEWEST;
+  const validate = validatorFor(newer ? NEWEST : doc.schemaVersion);
+  const ok = validate(newer ? { ...doc, schemaVersion: NEWEST } : doc);
+  const errors = ok ? [] : validate.errors.map((e) => ({
+    path: e.instancePath || "/",
+    message: e.params?.additionalProperty ? `${e.message}: \`${e.params.additionalProperty}\`` : e.message,
+    keyword: e.keyword,
+  }));
+  if (!newer) return { ok, errors, warnings: [] };
+  const hard = errors.filter((e) => !UNKNOWN_FIELD_KEYWORDS.has(e.keyword));
   return {
-    ok,
-    errors: ok ? [] : validate.errors.map((e) => ({ path: e.instancePath || "/", message: e.message, keyword: e.keyword })),
+    ok: hard.length === 0,
+    errors: hard,
+    warnings: [
+      { code: "SCHEMA_NEWER_THAN_CHECKER", path: "/schemaVersion", message: `design-handoff v${doc.schemaVersion} is newer than this handoff-css knows (v${NEWEST}); checked against v${NEWEST} — update handoff-css to check it in full` },
+      ...errors.filter((e) => UNKNOWN_FIELD_KEYWORDS.has(e.keyword)).map((e) => ({ code: "SCHEMA_NEWER_THAN_CHECKER", path: e.path, message: `not in v${NEWEST}: ${e.message} (${e.keyword})` })),
+    ],
   };
 }
 
