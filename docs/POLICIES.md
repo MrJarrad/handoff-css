@@ -1101,7 +1101,7 @@ places (Figma stores float32, so raws arrive as `0.10000000149011612`). Same
 inputs → byte-identical output. `--check` writes nothing and exits 1 if any
 committed artifact would change, which is what a consumer's CI runs.
 
-## P25 — Paragraph indent binding (unreleased)
+## P25 — Paragraph indent binding (0.11.0)
 
 A TEXT style's `properties.paragraphIndent` (bound via `boundVariables.paragraphIndent`,
 e.g. `text/paragraph-indent` -> `--text-paragraph-indent`) is absent from the export's
