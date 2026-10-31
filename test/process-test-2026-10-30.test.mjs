@@ -2,7 +2,7 @@
 // reproduced against the committed real exports (HT-29, HT-31, HT-32).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { gunzipSync } from "node:zlib";
@@ -133,4 +133,40 @@ test("HT-32: `vendor` refuses a latest that is a real folder rather than overwri
   assert.equal(code, 1);
   assert.match(stderr.text, /not a symlink/);
   assert.ok(existsSync(root));
+});
+
+// HT-35 — `latest` written as an absolute symlink was joined onto the root,
+// so carry-forward found nothing and the new folder held only the new JSON.
+test("HT-35: `vendor` carries the set forward when latest is an absolute symlink", async () => {
+  const { cwd, root, v25, old, incoming, next } = vendored();
+  unlinkSync(path.join(root, "latest"));
+  symlinkSync(v25, path.join(root, "latest"));
+  const stdout = sink();
+  const code = await dispatch(["vendor", incoming, "--into", "design/handoff"], { cwd, stdout, stderr: sink() });
+  assert.equal(code, 0, stdout.text);
+  const folder = `v26-${next.generatedAt.slice(0, 10)}`;
+  assert.ok(existsSync(path.join(root, folder, "library-design-system-handoff.json")), "the rest of the set carries forward");
+
+  // …and the idempotence check reads through the same link.
+  const same = path.join(cwd, "same.json");
+  writeFileSync(same, JSON.stringify(old));
+  unlinkSync(path.join(root, "latest"));
+  symlinkSync(v25, path.join(root, "latest"));
+  const again = sink();
+  assert.equal(await dispatch(["vendor", same, "--into", "design/handoff"], { cwd, stdout: again, stderr: sink() }), 0);
+  assert.match(again.text, /already/);
+});
+
+// HT-36 — vendoring a .json alone copied the previous export's .md forward
+// beside it, so latest/ described the old export and nothing said so.
+test("HT-36: `vendor <json>` with no .md drops the previous export's .md and says so", async () => {
+  const { cwd, root, v25, old, incoming, next } = vendored();
+  writeFileSync(path.join(v25, `${old.artifactFilename}.md`), "# the v25 description\n");
+  const stdout = sink();
+  const code = await dispatch(["vendor", incoming, "--into", "design/handoff"], { cwd, stdout, stderr: sink() });
+  assert.equal(code, 0, stdout.text);
+  const folder = `v26-${next.generatedAt.slice(0, 10)}`;
+  assert.ok(!existsSync(path.join(root, folder, `${next.artifactFilename}.md`)), "no stale .md in the new folder");
+  assert.ok(existsSync(path.join(v25, `${old.artifactFilename}.md`)), "v25 keeps its own .md");
+  assert.match(stdout.text, new RegExp(`${old.artifactFilename}\\.md`));
 });

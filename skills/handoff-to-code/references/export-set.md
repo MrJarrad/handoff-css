@@ -34,7 +34,8 @@ handoff-css vendor <new>-design-system-handoff.json [<new>.md] --into design/han
 
 It writes `v<N+1>-<date>/` (the current set carried forward, the new export in place of its old
 self, named by `artifactFilename`), repoints `latest`, and prints both; the old version folder is
-never written. The same export twice writes nothing. Copying into `latest/` by hand overwrites
+never written. Given no `.md`, the old one is left behind, not carried beside the new JSON. The
+same export twice writes nothing. Copying into `latest/` by hand overwrites
 the version folder it links to.
 
 ## How the set joins
