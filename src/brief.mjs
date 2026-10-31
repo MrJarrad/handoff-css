@@ -62,12 +62,20 @@ export const briefSchemaV13 = require("../schema/design-handoff.v13.schema.json"
  */
 export const briefSchemaV14 = require("../schema/design-handoff.v14.schema.json");
 
+/**
+ * 0.13.0 — schema v15 is additive over v14, written only when the selection
+ * holds an image or video fill: `media[]`, the media list `handoff-css media`
+ * pairs dropped files to (HT-40).
+ */
+export const briefSchemaV15 = require("../schema/design-handoff.v15.schema.json");
+
 const schemasByVersion = new Map([
   [10, briefSchema],
   [11, briefSchemaV11],
   [12, briefSchemaV12],
   [13, briefSchemaV13],
   [14, briefSchemaV14],
+  [15, briefSchemaV15],
 ]);
 
 const compiledByVersion = new Map();
@@ -79,14 +87,16 @@ const validatorFor = (schemaVersion) => {
   return compiledByVersion.get(schema);
 };
 
-const NEWEST = Math.max(...schemasByVersion.keys());
+/** Every design-handoff schema version this checker validates in full. */
+export const BRIEF_SCHEMA_VERSIONS = [...schemasByVersion.keys()];
+const NEWEST = Math.max(...BRIEF_SCHEMA_VERSIONS);
 
 /** The only shape errors a newer-than-checker version can excuse: a field this checker has never seen. */
 export const UNKNOWN_FIELD_KEYWORDS = new Set(["additionalProperties", "unevaluatedProperties"]);
 
 /**
  * Validate a parsed brief JSON document against its published shape. Dispatches
- * on the document's own `schemaVersion` (10–14); an unrecognised older version
+ * on the document's own `schemaVersion` (10–15); an unrecognised older version
  * falls back to v10 so it still surfaces as a clear `schemaVersion` const
  * mismatch rather than a thrown error.
  *

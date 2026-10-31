@@ -2,6 +2,19 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.13.0 — 2026-10-31
+
+### Added
+
+- **HT-40 — the media list, and `handoff-css media`.** Schema `design-handoff` v15 is v14 plus
+  `media[]`, one entry per visible image or video fill (layer, path, kind, full image hash,
+  scale mode, crop, tile scale, rotation, size on screen). The plugin writes v15 only when the
+  selection holds such a fill. The list has no file bytes and no alt text. `handoff-css media
+  --handoff <json> --dir <folder>` pairs each dropped file to its entries by layer name, and
+  lists missing entries, ambiguous layer names (with each path) and extra files. It exits 1
+  while anything is missing or ambiguous.
+- `BRIEF_SCHEMA_VERSIONS` (from `src/brief.mjs`): every brief version the checker validates in full.
+
 ## 0.12.1 — 2026-10-31
 
 ### Fixed (`vendor` follow-ups from the #41 review)
