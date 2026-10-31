@@ -231,8 +231,6 @@ handoff-css conform --export <json> --handoff <md> --tokens <css>
 handoff-css match --handoff <md> --src <path…> [--rulings <md>] [--json]
 
 handoff-css vendor <export.json> [<export.md>] --into <dir>
-
-handoff-css media --handoff <design-handoff.json> --dir <folder> [--json]
 ```
 
 Flags override `paths.*`. `--check` writes nothing and exits 1 on any
@@ -346,23 +344,6 @@ set `latest` points at, carried forward, with the new export (and its `.md`, if 
 of its old self under its `artifactFilename`. Then `latest` is repointed and the run prints the
 new folder, what was carried forward, and that the old folder was kept. An export `latest`
 already holds (same `contentHash`) writes nothing; a `latest` that is a real folder is refused.
-
-### `media` — pair dropped files to the export's media list
-
-```sh
-handoff-css media --handoff design-handoff-block-overlay.json --dir media
-```
-
-From schema v15 the Design Handoff export lists every image and video fill (`media[]`: layer,
-path, kind, image hash, scale mode, crop, tile scale, rotation, size on screen). It never carries
-the files and has no alt text. Drop the real files into one folder, each named after its Figma
-layer: `Hero Image.jpg`, `hero-image.webp` and `HERO_IMAGE.png` all match the layer "Hero Image"
-(lowercase, every run of other characters read as `-`). Layers that share a name and an image
-are one image, so one file covers them. Layers that share a name but not an image are
-**ambiguous**: each one's path is listed, so one of them can be renamed in Figma. The run lists
-every match, every **missing** entry and every **extra** file (one that names no layer), and
-exits 1 while anything is missing or ambiguous. It only reads the folder. An export older than
-v15 is refused with a note to re-export it.
 
 ### Roadmap — `conform` on a served DOM (spec only, not implemented)
 

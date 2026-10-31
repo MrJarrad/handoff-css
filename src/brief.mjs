@@ -64,8 +64,7 @@ export const briefSchemaV14 = require("../schema/design-handoff.v14.schema.json"
 
 /**
  * 0.13.0 — schema v15 is additive over v14, written only when the selection
- * holds an image or video fill: `media[]`, the media list `handoff-css media`
- * pairs dropped files to (HT-40).
+ * holds an image or video fill: `media[]`, the media list (HT-40).
  */
 export const briefSchemaV15 = require("../schema/design-handoff.v15.schema.json");
 

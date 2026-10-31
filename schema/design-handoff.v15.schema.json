@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://handoff-css/schema/design-handoff.v15.schema.json",
   "title": "Design Handoff brief — JSON companion (schema design-handoff v15)",
-  "description": "0.13.0 — schema v15 is additive over v14, and the plugin writes it only when the selection holds an image or video fill (HT-40): the document carries `media[]`, one entry per visible image or video fill in tree order — { nodeId, layerName, nodePath, kind, hash (the full image hash; null for video, which the REST API gives no reference for), scaleMode, imageTransform (CROP), scalingFactor (TILE), rotation (when not 0), renderedSize }. It lists the media only: no file is fetched and there is no alt text. `handoff-css media` pairs dropped files to it by layer name. None of v14's own fields change meaning. `additionalProperties: false` throughout.",
+  "description": "0.13.0 — schema v15 is additive over v14, and the plugin writes it only when the selection holds an image or video fill (HT-40): the document carries `media[]`, one entry per visible image or video fill in tree order — { nodeId, layerName, nodePath, kind, hash (the full image hash; null for video, which the REST API gives no reference for), scaleMode, imageTransform (CROP), scalingFactor (TILE), rotation (when not 0), renderedSize }. It lists the media only: no file is fetched and there is no alt text. None of v14's own fields change meaning. `additionalProperties: false` throughout.",
   "type": "object",
   "additionalProperties": false,
   "required": [

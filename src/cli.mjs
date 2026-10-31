@@ -13,7 +13,7 @@ import { validateHandoffMarkdown } from "./validate-handoff-md.mjs";
 import { validateBriefJson, validateBriefPair } from "./brief.mjs";
 import { validateSet } from "./set.mjs";
 
-export const SUBCOMMANDS = ["validate", "conform", "match", "vendor", "media"];
+export const SUBCOMMANDS = ["validate", "conform", "match", "vendor"];
 
 const USAGE = `handoff-css — Design Handoff export → CSS custom properties
 
@@ -24,7 +24,6 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
               [--config <mjs>] [--allow-name <name>…] [--json]
   handoff-css match --handoff <md> --src <path…> [--rulings <md>] [--json]
   handoff-css vendor <export.json> [<export.md>] --into <dir>
-  handoff-css media --handoff <design-handoff.json> --dir <folder> [--json]
 `;
 
 /**
@@ -45,10 +44,6 @@ export async function dispatch(argv, { cwd = process.cwd(), stdout = process.std
   if (first === "vendor") {
     const { vendorCommand } = await import("./vendor-cli.mjs");
     return vendorCommand(rest, { cwd, stdout, stderr });
-  }
-  if (first === "media") {
-    const { mediaCommand } = await import("./media-cli.mjs");
-    return mediaCommand(rest, { cwd, stdout, stderr });
   }
   if (first === "--help" || first === "-h") {
     stdout.write(USAGE);
