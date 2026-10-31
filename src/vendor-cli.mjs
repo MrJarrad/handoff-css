@@ -8,7 +8,7 @@
 // current set carried forward, the new export in place of its old self —
 // then repoints `latest` and says what it did. Nothing existing is written.
 import path from "node:path";
-import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, readlinkSync, renameSync, symlinkSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, readlinkSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 
 const VERSION_DIR = /^v(\d+)-/;
 
@@ -41,8 +41,10 @@ export function vendorCommand(args, { cwd = process.cwd(), stdout = process.stdo
     }
     current = readlinkSync(latest);
   }
+  // A link may be relative or absolute; resolve, never join (HT-35).
+  const currentDir = current && path.resolve(root, current);
 
-  const held = current && path.join(root, current, `${base}.json`);
+  const held = currentDir && path.join(currentDir, `${base}.json`);
   if (held && existsSync(held) && doc.contentHash != null && readJson(held)?.contentHash === doc.contentHash) {
     stdout.write(`latest (${current}) already holds ${base}.json at content ${doc.contentHash.slice(0, 12)}… — nothing written\n`);
     return 0;
@@ -56,9 +58,15 @@ export function vendorCommand(args, { cwd = process.cwd(), stdout = process.stdo
   if (existsSync(target)) return fail(`${path.join(into, folder)} already exists`);
 
   const carried = [];
-  if (current && existsSync(path.join(root, current))) {
-    cpSync(path.join(root, current), target, { recursive: true });
+  let dropped = null;
+  if (currentDir && existsSync(currentDir)) {
+    cpSync(currentDir, target, { recursive: true });
     carried.push(...readdirSync(target).filter((f) => f !== `${base}.json` && f !== `${base}.md`));
+    // The old .md describes the old export: never carry it beside a new JSON (HT-36).
+    if (!mdFile && existsSync(path.join(target, `${base}.md`))) {
+      rmSync(path.join(target, `${base}.md`));
+      dropped = `${base}.md`;
+    }
   } else {
     mkdirSync(target);
   }
@@ -77,6 +85,7 @@ export function vendorCommand(args, { cwd = process.cwd(), stdout = process.stdo
 
   stdout.write(`vendored ${written.join(" + ")} → ${path.join(into, folder)}/\n`);
   if (carried.length > 0) stdout.write(`  carried forward from ${current}: ${carried.join(", ")}\n`);
+  if (dropped) stdout.write(`  ${dropped} not carried forward from ${current} — it described the previous export; pass the new .md to include one\n`);
   stdout.write(`  latest → ${folder}${current ? ` (was ${current})` : ""}\n`);
   if (current) stdout.write(`  ${current} kept, unchanged\n`);
   return 0;

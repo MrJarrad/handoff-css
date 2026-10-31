@@ -2,7 +2,18 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
-## Unreleased
+## 0.12.1 — 2026-10-31
+
+### Fixed (`vendor` follow-ups from the #41 review)
+
+- **HT-35 — an absolute `latest` symlink no longer drops the rest of the set.** `vendor` joined
+  the link's target onto the root, so an absolute target named a folder that did not exist:
+  carry-forward was skipped and the new folder held only the new JSON, while the command exited 0.
+  The target is now resolved, relative or absolute; the "already holds this export" check reads
+  through the same path.
+- **HT-36 — `vendor <json>` with no `.md` no longer carries the old `.md` forward.** The previous
+  export's `.md` was copied into the new folder beside the new JSON, unannounced. It is now left
+  in the old version folder, and the command says so.
 
 ### Fixed (30 Oct process test)
 
