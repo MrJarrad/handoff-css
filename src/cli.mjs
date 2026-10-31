@@ -13,7 +13,7 @@ import { validateHandoffMarkdown } from "./validate-handoff-md.mjs";
 import { validateBriefJson, validateBriefPair } from "./brief.mjs";
 import { validateSet } from "./set.mjs";
 
-export const SUBCOMMANDS = ["validate", "conform", "match"];
+export const SUBCOMMANDS = ["validate", "conform", "match", "vendor"];
 
 const USAGE = `handoff-css — Design Handoff export → CSS custom properties
 
@@ -23,6 +23,7 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
   handoff-css conform --export <json> --handoff <md> --tokens <css> --css <file…>
               [--config <mjs>] [--allow-name <name>…] [--json]
   handoff-css match --handoff <md> --src <path…> [--rulings <md>] [--json]
+  handoff-css vendor <export.json> [<export.md>] --into <dir>
 `;
 
 /**
@@ -39,6 +40,10 @@ export async function dispatch(argv, { cwd = process.cwd(), stdout = process.std
   if (first === "match") {
     const { matchCommand } = await import("./match-cli.mjs");
     return matchCommand(rest, { cwd, stdout, stderr });
+  }
+  if (first === "vendor") {
+    const { vendorCommand } = await import("./vendor-cli.mjs");
+    return vendorCommand(rest, { cwd, stdout, stderr });
   }
   if (first === "--help" || first === "-h") {
     stdout.write(USAGE);
@@ -78,7 +83,7 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
   // validates together (schema + identity reconciliation); the markdown's
   // full line grammar is not re-run for a paired brief.
   const briefJson = read.find((r) => r.abs.endsWith(".json") && r.text != null && safeParse(r.text)?.schema === "design-handoff");
-  const briefMd = read.find((r) => r.abs.endsWith(".md"));
+  const briefMd = read.find((r) => r.abs.endsWith(".md") && r.text != null && !isDsMarkdown(r.text));
 
   const results = [];
   if (briefJson && briefMd && briefMd.text != null) {
@@ -88,7 +93,7 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
       if (r === briefJson || r === briefMd) continue;
       results.push(r.text == null
         ? { file: r.file, kind: "unreadable", ok: false, findings: [{ code: "UNREADABLE", severity: "error", line: 0, message: r.error.message }] }
-        : r.abs.endsWith(".md") ? validateMd(r.file, r.text) : validateJson(r.file, r.text));
+        : r.abs.endsWith(".md") ? validateAnyMd(r.file, r.text) : validateJson(r.file, r.text));
     }
     const exports = read
       .map((r) => ({ file: r.file, doc: r.abs.endsWith(".json") && r.text != null ? safeParse(r.text) : null }))
@@ -101,7 +106,7 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
     for (const r of read) {
       results.push(r.text == null
         ? { file: r.file, kind: "unreadable", ok: false, findings: [{ code: "UNREADABLE", severity: "error", line: 0, message: r.error.message }] }
-        : r.abs.endsWith(".md") ? validateMd(r.file, r.text) : validateJson(r.file, r.text));
+        : r.abs.endsWith(".md") ? validateAnyMd(r.file, r.text) : validateJson(r.file, r.text));
     }
   }
 
@@ -112,7 +117,7 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
       const errors = r.findings.filter((f) => f.severity === "error");
       const warnings = r.findings.filter((f) => f.severity === "warning");
       const tail = r.skipped
-        ? " (schema 7 — not validated)"
+        ? ` (${r.skipNote ?? "schema 7 — not validated"})`
         : errors.length === 0
           ? warnings.length === 0 ? "" : `  ${warnings.length} warning${warnings.length === 1 ? "" : "s"}`
           : `  ${errors.length} error${errors.length === 1 ? "" : "s"}`;
@@ -169,6 +174,26 @@ function validateJson(file, text, { brief = false } = {}) {
       ...clampFindings.map((f) => ({ code: f.code, severity: "error", line: 0, path: `/${f.variable}`, message: f.detail })),
       ...warnings.map((w) => ({ code: w.code, severity: "warning", line: 0, path: w.variable ? `/${w.variable}` : "/", message: w.detail ?? "" })),
     ],
+  };
+}
+
+// HT-29 — a Design System Handoff export writes its own human-readable `.md`
+// beside its JSON. It is not a design-handoff brief and has no line grammar
+// here: its contract is the JSON, so the `.md` is named and skipped.
+const DS_MD = /^- Schema: `design-system-handoff` v(\d+)/m;
+const isDsMarkdown = (text) => DS_MD.test(text);
+
+function validateAnyMd(file, text) {
+  const ds = DS_MD.exec(text);
+  if (ds == null) return validateMd(file, text);
+  return {
+    file,
+    kind: "design-system-handoff (md)",
+    ok: true,
+    skipped: true,
+    skipNote: "its JSON is the contract — validate the .json",
+    schemaVersion: Number(ds[1]),
+    findings: [],
   };
 }
 

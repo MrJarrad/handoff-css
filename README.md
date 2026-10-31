@@ -229,6 +229,8 @@ handoff-css conform --export <json> --handoff <md> --tokens <css>
                     --css <file…> [--json]
 
 handoff-css match --handoff <md> --src <path…> [--rulings <md>] [--json]
+
+handoff-css vendor <export.json> [<export.md>] --into <dir>
 ```
 
 Flags override `paths.*`. `--check` writes nothing and exits 1 on any
@@ -247,6 +249,9 @@ standards 1–5, token rows, node rows, the responsive grid tables. One line per
 findings under it, exit 1 on any **error**. A warning never fails the run: it is a decision
 waiting on a human. `--json` prints the same result machine-readably. Table/footnote notes
 accept either the plugin's current `†` sigil or the pre-2026-09-11 `⚠` (0.3.2).
+A Design System Handoff export's own `.md` (`- Schema: \`design-system-handoff\` v<N>`) is
+named and skipped — its JSON is the contract — and never stands in for a brief's `.md`. A brief
+`.md` alone and beside its `.json` reports the same `POLICY_VERSION_MISMATCH`.
 
 **An export set** (0.11.0). Give a brief's `.json` + `.md` with every Design System
 Handoff export it was made from, and `validate` adds a `(set)` result:
@@ -326,6 +331,19 @@ code | note |`, ruling `use`/`new`/`skip`); pass the filled table back with `--r
 next run reuses it, reporting `RULING_STALE` when a `use` names code that has gone. Exit 1 until
 every item is ruled. Rules and shape: `docs/POLICIES.md` P26,
 `skills/handoff-to-code/references/brownfield.md`.
+
+### `vendor` — add a new export without overwriting the old one
+
+```sh
+handoff-css vendor jhd-spec-designsystem-design-system-handoff.json --into design/handoff
+```
+
+For a project that keeps each vendored set in `design/handoff/v<N>-<date>/` with `latest` a
+symlink to the current one. Writes `v<N+1>-<date>/` (date from the export's `generatedAt`): the
+set `latest` points at, carried forward, with the new export (and its `.md`, if given) in place
+of its old self under its `artifactFilename`. Then `latest` is repointed and the run prints the
+new folder, what was carried forward, and that the old folder was kept. An export `latest`
+already holds (same `contentHash`) writes nothing; a `latest` that is a real folder is refused.
 
 ### Roadmap — `conform` on a served DOM (spec only, not implemented)
 
