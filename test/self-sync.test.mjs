@@ -14,7 +14,7 @@ import { gunzipSync } from "node:zlib";
 
 import { dispatch } from "../src/cli.mjs";
 import { VALIDATED_SCHEMA_VERSIONS, validateExport, assertValidExport } from "../src/validate-export.mjs";
-import { validateBriefJson } from "../src/brief.mjs";
+import { BRIEF_SCHEMA_VERSIONS, validateBriefJson } from "../src/brief.mjs";
 
 const fixtures = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "fixtures");
 const fixture = (dir, name) => gunzipSync(readFileSync(path.join(fixtures, dir, `${name}.gz`))).toString("utf8");
@@ -35,7 +35,7 @@ const codes = (r, severity) => r.findings.filter((f) => f.severity === severity)
 /** The overlay brief pair as the plugin would write it one schema version on, with a field this checker has never seen. */
 function newerBrief() {
   const json = JSON.parse(script("overlay.json"));
-  const next = json.schemaVersion + 1;
+  const next = Math.max(...BRIEF_SCHEMA_VERSIONS) + 1;
   const md = script("overlay.md").replace(/^schemaVersion: \d+$/m, `schemaVersion: ${next}`);
   return { json: JSON.stringify({ ...json, schemaVersion: next, fieldFromTheFuture: true }), md, next };
 }
