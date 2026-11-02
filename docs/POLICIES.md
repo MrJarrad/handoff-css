@@ -394,8 +394,7 @@ no reason to know the total mode exists. Putting the exclusion on the total
 mode's own selector keeps the concept contained to the mode that claims it.
 
 A consumer's `dark:`-style custom variant needs the same treatment on its own
-side (`@custom-variant dark (&:is(.dark:not(.bttf, .bttf *) *))` in the JHD
-case), so those utilities go inert under the total theme exactly as the token
+side (for a total theme named `contrast`, `@custom-variant dark (&:is(.dark:not(.contrast, .contrast *) *))`), so those utilities go inert under the total theme exactly as the token
 block does. That edit is in the consumer's stylesheet, not here.
 
 `themes.total` · `src/modes.mjs`
@@ -451,9 +450,8 @@ at every viewport, so the more specific statement wins.
 allowed to change the output. `mode-stepped` and `sample-only` ARE the default
 path, so listing them changes nothing; an empty list pins pre-0.2.0 output
 exactly. This is how a consumer adopts one class at a time instead of taking
-every behavioural change in one release. The house preset (`presets/jhd.config.mjs`)
-honours all four classes that can change output as of 0.4.2 — operator ruling
-2026-09-12 ("Responsive strategy"): *"let's follow what the plugin suggests."*
+every behavioural change in one release. The house preset in `presets/`
+honours all four classes that can change output as of 0.4.2, following what the plugin suggests.
 `fluid-clamp` and `fixed` are no longer held; every rule the plugin writes is
 honoured exactly as published, per `layoutVariant`, and the export's own `css`
 is used verbatim — never recomputed.
@@ -654,8 +652,7 @@ the current `†` and the pre-2026-09-11 `⚠` note form (0.3.2).
 
 ## P15 — Derived viewport fractions round to the input
 
-Operator ruling, 2026-09-11 (memo `2026-09-10-handoff-viewport-tokens-brief`,
-Addendum 2): **the export never states a value that was not input into Figma.**
+The rule: **the export never states a value that was not input into Figma.**
 Every ordinary token already meets it — `244` exports as `244` / `15.25rem`. The
 single exception is a fraction the plugin DERIVES (value ÷ a screen reference),
 where float division turns `244/812` into `0.300493`.
@@ -744,7 +741,7 @@ ragged trailing cell was, and `row.cells` no longer includes it. Tables without 
 keep taking the legacy ragged form.
 
 `design-handoff.v6.grammar.md` §"Front matter"/§"The `Notes` column" · `src/front-matter.mjs`,
-`src/validate-handoff-md.mjs` · fixture `fixtures/jhd-v9c-2026-09-11/`
+`src/validate-handoff-md.mjs` · a real export v9 fixture under `fixtures/`
 
 ---
 
@@ -774,7 +771,7 @@ keyword `linear`; anything else emits `cubic-bezier(x1, y1, x2, y2)` from
 `easingFunctionCubicBezier`, rounded once by `num()`. There is no config key: the
 export states the value and CSS has exactly one syntax for it.
 
-Naming is P1's job, not this policy's. Operator ruling 2026-09-12 row 1 retires the
+Naming is P1's job, not this policy's. A design system can retire
 role-flavoured names (`quad-out-gill`, `power2-out`, `expo-out-card`) in favour of curve
 families — `quad-out`, `cubic-out`, `quart-out`, `expo-out`, `ease-out`, `circ-in-out`,
 `linear` — a rename **in Figma**, which arrived through `codeSyntax.WEB` with export v11
@@ -789,8 +786,7 @@ which unit the house publishes:
 | `"ms"` | `--duration-375: 375ms` |
 | `"s"` | `--duration-375: 0.375s` |
 
-Milliseconds are the house choice because operator ruling 2026-09-12 row 2 names each
-step for its milliseconds. A token named `--duration-375` whose value read `0.375s`
+Milliseconds suit a design system that names each step for its milliseconds. A token named `--duration-375` whose value read `0.375s`
 would be lying about itself in the one place a reader looks.
 
 Float32 noise is rounded off **in seconds, before the scale**. `0.10000000149011612 ×
@@ -908,8 +904,8 @@ does not.
 **shadows** a generated class — the same selector from two files. It is still not an
 unconditional declaration of that selector (`isGlobalScope` already takes this reading of
 `@utility` for custom properties), so it does **not** suppress generation: the report
-lists every shadow so adoption is a deletion checklist rather than a surprise. Sixteen of
-the JHD design system's type utilities are shadows today; ending that duplication is why
+lists every shadow so adoption is a deletion checklist rather than a surprise. In the first real
+design system this ran on, sixteen type utilities were shadows; ending that duplication is why
 0.5.0 exists.
 
 ### P21.2 Two findings about the export, never fixed here
@@ -1014,9 +1010,8 @@ token, the same as every other typographic property — but the export's own
 `cssClass.declarations` states nothing for it (a plugin gap, the paragraph-spacing
 counterpart of the `font-family` gap P21.5 already closes).
 
-Per the spacer-margins mechanism (`handoff-to-code` § Build standards item 7) and
-operator ruling 2026-09-19 ("they were both design system things — the text style should
-carry them"), the gap a paragraph style states is the space **between** paragraphs, never
+Per the spacer-margins mechanism (`handoff-to-code` § Build standards item 7) and the
+design-system decision that a text style carries its own paragraph spacing, the gap a paragraph style states is the space **between** paragraphs, never
 a trailing margin after the last one. The binding is emitted as an adjacent-sibling rule,
 never a declaration inside the class's own block:
 
@@ -1026,8 +1021,8 @@ never a declaration inside the class's own block:
 }
 ```
 
-— the same shape `jhd-design-system` hand-authors on its own `body-style1-N` classes
-(#56, `1e79f3a`), so that hand-authored copy retires once the design system regenerates
+— the shape a design system would otherwise hand-author on its own text classes,
+so that hand-authored copy retires once the design system regenerates
 against this. The substitution is recorded as `STYLE_CLASS_PARAGRAPH_SPACING_BOUND`; the
 class's own declarations are never touched, and nothing is emitted when the style already
 states `margin-block*` itself (the export/hand-authored declaration wins).
@@ -1035,7 +1030,7 @@ states `margin-block*` itself (the export/hand-authored declaration wins).
 **0.8.0 (`ea48aee`) shipped a different, wrong shape**: an unconditional
 `margin-block-end: var(<token>, <raw>px)` appended to every bound style's own
 declarations — a trailing margin on every instance, not a gap between instances. That
-stacks a trailing gap after the last paragraph and, alongside `jhd-design-system`'s
+stacks a trailing gap after the last paragraph and, alongside a design system's
 hand-authored sibling rule, double-counts the gap between paragraphs. 0.8.1 reverts to
 the sibling-rule shape above; there is no migration for a 0.8.0 consumer beyond
 regenerating.
@@ -1054,7 +1049,7 @@ in the design system is one: `startRadius` (the raw px at the axis's start), a `
 export's own `cssClass.declarations`: the plugin's builder reads only
 `effects[0].boundVariables.radius` — the END radius — so every `effect/progressive-blur/N`
 class emitted the identical `backdrop-filter: blur(var(--blur-0, 0px))` (a plugin gap,
-found regenerating `jhd-design-system` on `chore/ds-regen-v19-2026-09-28`, `77aaf57`).
+found regenerating a real design system against a schema 19 export).
 
 CSS has no gradient `backdrop-filter` — one element, one blur radius — so this binds the
 same approximation any hand-authored progressive blur uses:
@@ -1112,9 +1107,8 @@ states `text-indent`. Finding: `STYLE_CLASS_PARAGRAPH_INDENT_BOUND`. Implemented
 
 ## P26 — Brownfield match (0.12.0)
 
-A project that already has code and no Design System Handoff export (HT-21, operator
-2026-10-30: *"does the skill / script do anything to match things that already exist in the
-codebase?"* → no → "Yes" to adding it). `handoff-css match` reads the brief markdown — the
+A project that already has code and no Design System Handoff export (brownfield): it matches what the design names to what the codebase already
+has. `handoff-css match` reads the brief markdown — the
 only half that carries each variable's CSS name and mode values, and the component list —
 and the project's sources, and proposes per Figma item the closest code match. It never
 adopts one: a match is a question for a human until the project's ruling table answers it,
@@ -1128,8 +1122,8 @@ an alias's resolved colour, compared lowercase, `#rrggbb`, px as rem at 16px, ze
 or more of its segments is the floor for a proposal; a value alone is listed as an
 alternative, never proposed — a matching literal is a coincidence until ruled. A name only
 used, never declared, in the scanned code (a design-system package) still matches, and says
-so. Implemented by `matchBrownfield` in `src/match.mjs`; run on jhd-portfolio against the
-29 Oct Navigation and Overlay briefs in the vault's HT-21 evidence.
+so. Implemented by `matchBrownfield` in `src/match.mjs`; proven on a real site against two
+real briefs.
 
 Named gaps: component props are not compared (a name match only); a code value that aliases
 a property declared outside the scanned code is compared as written, not resolved; Tailwind

@@ -10,10 +10,10 @@ import { webName } from "./schema.mjs";
 // Applied wholesale on path identity: hidden state is irrelevant, and
 // reachability never revives an entry (see P7 above).
 //
-//   `.utility/`           durable. Operator ruling 2026-09-06: ".utility ignore
-//                         all together" — a Figma authoring scratch collection.
+//   `.utility/`           durable: a Figma authoring scratch collection, never
+//                         published.
 //   `layout/grid/aspect/` durable as an EXCLUSION, and deliberately READ by P20.
-//                         Operator ruling 2026-09-06: "we didn't bring in aspect
+//                         Design-system decision: "we didn't bring in aspect
 //                         ratio related variables like portrait, tall and
 //                         landscape. They are just figma hacks because i can
 //                         actually add an aspect ratio." Ruling 2026-09-12 row 6

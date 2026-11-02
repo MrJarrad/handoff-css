@@ -4,8 +4,7 @@ This is the delta on top of `design-handoff.v6.grammar.md`, not a replacement fo
 line the v6 grammar defines still applies unless this file states otherwise. `handoff-css
 validate` picks the grammar to check by the file's `schemaVersion` (front matter first, the
 bold `**Artifact:**` line otherwise); a schema-9 brief is checked against v6 plus these deltas.
-The real `fixtures/jhd-v11-2026-09-12/design-handoff-block-navigation.md` (export v11,
-2026-09-12) is the conformance fixture.
+A real export v11 brief (2026-09-12) under `fixtures/` is the conformance fixture.
 
 ## Token rows (export v11, 2026-09-12)
 
@@ -70,8 +69,7 @@ tokens inside a node row's trailing details, same status as v6's `constraints()`
 - `desc("…")` — a designer description note carried for build context
 - `link(url)` — hyperlink destination (v6 legend; restated here as it composes with the above)
 
-The full Design Handoff plugin (per the operator's Figma-agent overview,
-`~/JHD/vault/main/references/assets/figma-handoff-plugins-overview-2026-09-12/`) emits a wider
+The full Design Handoff plugin emits a wider
 per-node vocabulary than any single brief necessarily exercises — `aspect($token)` /
 `aspect(16:9, locked)` / `aspectLocked`, `alignSelf`/`alignContent`, `reverseZ`, masks,
 `smooth(60%)` corner smoothing, gradient/multi fills, per-side stroke weight/align/dash/cap/

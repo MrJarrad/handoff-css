@@ -42,7 +42,7 @@ const CONTENT_HASH = /^\*\*Content hash:\*\* `([^`]*)`/;
 const FINGERPRINT = /^\*\*Fingerprint:\*\* current design-system state `([^`]*)`(.*)$/;
 const COMPANION = /^- Last-known companion `([^`]+)` · `design-system-handoff` v(\d+) · content `([^`]*)` · state `([^`]*)`/;
 const COMPANION_POLICIES = /^- Policies: (.+)$/;
-// HT-21 — the brief's component inventory: `- [Label](link) #id — N instances (…)`.
+// The brief's component inventory: `- [Label](link) #id — N instances (…)`.
 const COMPONENT_ROW = /^- \[([^\]]+)\]\([^)]*\) #(\S+) — (\d+) instances?/;
 const TOKENS_HEADER = /^\*\*Variable tokens \((\d+) unique\):\*\*/;
 const TOKEN_ROW = /^- \$(\S+) ·\s*(.*)$/;
@@ -53,7 +53,7 @@ const WEB_NAME = /(?:^|·)\s*WEB `(--[a-z0-9-]+)`/;
 // to indented continuation lines below the row rather than trailing `·` cells.
 const TOKEN_ROW_V9 = /^- \$(\S+) → CSS `(--[a-z0-9-]+)`/;
 const RESPONSIVE_ROW = /^\s+Responsive behavior: (.+)$/;
-// HT-21 — the values a v9 row states: its `· mode=value` samples, and the
+// The values a v9 row states: its `· mode=value` samples, and the
 // colour literal each alias resolves to on its `(=$alias→#hex @mode / …)` line.
 const MODE_SAMPLE = /·\s*[\w.-]+=(\S+)/g;
 const RESOLVED_ROW = /^\s+\(=(.+)\)$/;
@@ -86,8 +86,7 @@ const CELL = [
   // pair, printed by the plugin in that fixed order, space-separated.
   /^col\(\d+\/\d+ of \d+\)(?: row\(\d+\/\d+\))?(?: justifySelf:\S+ alignSelf:\S+)?$/,
   /^row\(\d+\/\d+\)(?: justifySelf:\S+ alignSelf:\S+)?$/,
-  // The full Design Handoff plugin (per the operator's Figma-agent overview,
-  // 2026-09-12) also samples `aspect(…)` and the self-alignment hints as
+  // The full Design Handoff plugin also samples `aspect(…)` and the self-alignment hints as
   // grid-table cell values on some pages, not only as node-row prose.
   /^aspect\([^()]+\)$/,
   /^(?:justifySelf|alignSelf):\S+$/,
@@ -113,7 +112,7 @@ const policyVersions = (text) => {
  * `POLICY_VERSION_MISMATCH` — a policy version the Fingerprint line and the
  * companion block both state, disagreeing. Shared with the paired path
  * (`validateBriefPair`) so a brief reads the same alone and beside its JSON
- * (HT-31).
+ *
  */
 export function policyMismatches(parsed) {
   const out = [];
@@ -178,7 +177,7 @@ export function parseHandoffMarkdown(text) {
   let inTokens = false;
   let inChangelog = false;
   let table = null;
-  // HT-31 — a node row whose quoted string (copy or a TEXT prop) holds line
+  // A node row whose quoted string (copy or a TEXT prop) holds line
   // breaks continues on unindented lines; its `[→]` link, `⚠ placeholder` and
   // `📝` sit after the closing quote, on the last of them.
   let open = null;

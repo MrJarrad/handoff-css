@@ -3,7 +3,7 @@
 // (schema `design-system-handoff`).
 //
 // Library:  generate(handoffJson, config, { handAuthoredCss })
-//           generateSet([exportJson, …], config, { handAuthoredCss })  — HT-24
+//           generateSet([exportJson, …], config, { handAuthoredCss })
 // CLI:      handoff-css [--config <mjs>] [--input <json|zip>…] [--out <css>]
 //                       [--theme <css>] [--report <md>] [--exclusions <json>]
 //                       [--check]
@@ -61,7 +61,7 @@ export function generate(doc, config, { handAuthoredCss = "" } = {}) {
 }
 
 /**
- * HT-24 — one design system split across Figma files: every file's export,
+ * One design system split across Figma files: every file's export,
  * each checked against the schema, joined by variable key (`merge.mjs`), then
  * generated as one. A single export behaves exactly as `generate`.
  *
@@ -151,7 +151,7 @@ function build(doc, config, { handAuthoredCss }) {
 
 function parseArgs(argv, defaults) {
   const opts = { ...defaults, check: false };
-  // HT-24 — one `--input` per Figma file of a split design system; any given
+  // One `--input` per Figma file of a split design system; any given
   // replace the config's list, never add to it.
   const inputs = [];
   for (let i = 0; i < argv.length; i += 1) {
