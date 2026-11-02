@@ -26,13 +26,17 @@ const statement = (v) => JSON.stringify({ name: v.codeSyntax?.WEB?.value ?? null
 export function mergeExports(docs) {
   if (docs.length === 1) return docs[0];
   const label = (doc) => doc.artifactFilename ?? doc.documentName ?? "export";
+  // #44 r1: an export is the same export when its content is (contentHash), whatever it is named.
+  const identity = (doc) => doc.contentHash ?? JSON.stringify(doc);
   const seen = new Map();
   for (const doc of docs) {
-    if (seen.has(label(doc))) fail(`MERGE_SAME_EXPORT: ${label(doc)} is given twice — give each file's export once`);
-    seen.set(label(doc), doc);
+    const held = seen.get(identity(doc));
+    if (held) fail(`MERGE_SAME_EXPORT: ${label(doc)} is the same export as ${label(held)} (content ${String(doc.contentHash ?? "").slice(0, 12)}…) — give each file's export once`);
+    seen.set(identity(doc), doc);
   }
 
-  // Every variable by key; the first local (non-remote) copy owns the key.
+  // Every variable by key; the first copy given owns the key (an export lists only its own file's
+  // variables, so a later identical copy adds nothing and a differing one is refused below).
   const byKey = new Map();
   const byName = new Map();
   for (const doc of docs) {
