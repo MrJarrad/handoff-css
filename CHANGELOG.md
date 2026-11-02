@@ -2,6 +2,24 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.15.0 — 2026-11-02
+
+### Added
+
+- **Measurements in the brief.** Schema `design-handoff` v16 is v15 plus `layerTree[].measurements[]`:
+  each Dev Mode measurement, listed on the layer it starts from (end layer and name, sides, offset,
+  note). The exporter writes v16 only when a layer has one. `validate` checks it.
+
+### Changed
+
+- **Annotations come from the layer.** The link-run script now reads what belongs to the layer
+  (annotations in full, line caps, measurements, section radius, instance property order) from a
+  live read of it through Figma MCP, never from the Design System Handoff export. `validate` asks
+  for that read with `LIVE_READ_OUT_OF_DATE` when the brief's annotations are behind the layer
+  (link-run `LIVE_READ_STALE`, or the older `ANNOTATION_NEWER_THAN_DS_EXPORT` /
+  `DS_EXPORT_HAS_NO_ANNOTATIONS`), and no longer counts those as a Design System Handoff export out
+  of date. The regenerate command it prints takes `--live`.
+
 ## 0.14.0 — 2026-11-02
 
 ### Added

@@ -14,7 +14,14 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 /** Link-run finding codes that mean this file's Design System Handoff export is behind the file. */
-const BEHIND = new Set(["DS_EXPORT_NOT_LATEST", "STYLE_DIFFERS_FROM_DS_EXPORT", "DS_EXPORT_HAS_NO_ANNOTATIONS", "ANNOTATION_NEWER_THAN_DS_EXPORT"]);
+const BEHIND = new Set(["DS_EXPORT_NOT_LATEST", "STYLE_DIFFERS_FROM_DS_EXPORT"]);
+/**
+ * Link-run finding codes that mean the brief's annotations are behind the layer. Annotations come
+ * from the live read of the layer (`design-handoff --live`), so the fix is a fresh live read and a
+ * regenerated brief. The last two codes are from briefs made before the live read, when annotations
+ * came from the Design System Handoff export.
+ */
+const LIVE_BEHIND = new Set(["LIVE_READ_STALE", "ANNOTATION_NEWER_THAN_DS_EXPORT", "DS_EXPORT_HAS_NO_ANNOTATIONS"]);
 
 /**
  * @param {object} brief    the parsed brief JSON (schema `design-handoff`)
@@ -31,7 +38,7 @@ export function validateSet(brief, exports, { specIndex = null, briefFile = "<br
   // design-handoff-script); an export older than the brief's is replaced by
   // the run the brief names. A plugin-made brief records no file key, so its
   // regenerate also needs the file's link.
-  const regenerate = `regenerate the brief: \`design-handoff --regenerate ${briefFile} ${exports.map((e) => `--ds ${e.file}`).join(" ")}${brief.linkRun ? "" : ' "<figma link to the file>"'}\``;
+  const regenerate = `regenerate the brief: \`design-handoff --regenerate ${briefFile} ${exports.map((e) => `--ds ${e.file}`).join(" ")} --live <live read .json>${brief.linkRun ? "" : ' "<figma link to the file>"'}\``;
   const fix = (given, made, name) => given.doc.generatedAt > made
     ? regenerate
     : `give the ${made} run of \`${name}\``;
@@ -73,6 +80,10 @@ export function validateSet(brief, exports, { specIndex = null, briefFile = "<br
   const file = brief.linkRun?.sources?.find((s) => s.role === "this file")?.name ?? brief.documentName;
   if (behind) add("DS_EXPORT_OUT_OF_DATE", "warning", "/linkRun/findings",
     `run the Design System Handoff plugin on ${file}, then regenerate the brief with its export — variables cannot be read without that plugin`);
+  // Annotations behind the layer: an agent fixes this itself, with no plugin run.
+  const layer = brief.selectedNodes?.[0]?.id ?? "the layer";
+  if ((brief.linkRun?.findings ?? []).some((f) => LIVE_BEHIND.has(f.code))) add("LIVE_READ_OUT_OF_DATE", "warning", "/linkRun/findings",
+    `run live/read.js on ${layer} through Figma MCP use_figma, then regenerate the brief with --live <that read> — the brief's annotations are behind the layer`);
 
   const specs = [];
   const missing = (brief.specs ?? []).map((s, i) => ({ ...s, i })).filter((s) => s.markdown == null);
