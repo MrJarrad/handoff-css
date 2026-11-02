@@ -424,6 +424,11 @@
   --color-palette-cognac-800: #a33001;
   --color-palette-cognac-900: #7f2601;
   --color-palette-cognac-950: #4a1300;
+  --color-palette-cruise-300: #7fc9b4;
+  --color-palette-cruise-400: #5eb59f;
+  --color-palette-cruise-50: #f3faf7;
+  --color-palette-cruise-900: #23433d;
+  --color-palette-cruise-950: #0e2521;
   --color-palette-deep-teal-100: #c9fef1;
   --color-palette-deep-teal-200: #92fde3;
   --color-palette-deep-teal-300: #54f4d4;
@@ -479,6 +484,14 @@
   --color-palette-lavender-gray-800: #5c4f82;
   --color-palette-lavender-gray-900: #483e65;
   --color-palette-lavender-gray-950: #322c49;
+  --color-palette-lightning-yellow-300: #fcd74d;
+  --color-palette-lightning-yellow-50: #fffbeb;
+  --color-palette-lightning-yellow-900: #6a3006;
+  --color-palette-lightning-yellow-950: #451c03;
+  --color-palette-malibu-400: #61b0e5;
+  --color-palette-malibu-50: #f2f8fd;
+  --color-palette-malibu-900: #163f5f;
+  --color-palette-malibu-950: #0f2a42;
   --color-palette-mulberry-wood-100: #f9eaf5;
   --color-palette-mulberry-wood-200: #f5d5ec;
   --color-palette-mulberry-wood-300: #eeb3db;
@@ -501,6 +514,11 @@
   --color-palette-pear-800: #83771b;
   --color-palette-pear-900: #5e5217;
   --color-palette-pear-950: #3b2d0d;
+  --color-palette-punch-300: #feaca3;
+  --color-palette-punch-400: #fc7c6d;
+  --color-palette-punch-50: #fef3f2;
+  --color-palette-punch-900: #82251a;
+  --color-palette-punch-950: #470e08;
   --color-palette-shocking-100: #fce7f2;
   --color-palette-shocking-200: #fbcfe6;
   --color-palette-shocking-300: #f892c5;

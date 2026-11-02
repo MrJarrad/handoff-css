@@ -2,6 +2,18 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## Unreleased
+
+### Changed
+
+- **A hidden variable is no longer dropped (P7).** `hiddenFromPublishing` governs the Figma library
+  only (operator ruling 2026-11-02: "hide from publishing is for figma only"). A variable hidden in
+  Figma that nothing aliases is now emitted like any other token and appears as an ordinary
+  reconciliation row; the HIDDEN class is gone from the summary and the report (`hiddenRows` stays
+  on the result, always empty). PRIVATE (hidden and alias-reachable) and EXCLUDED are unchanged.
+  Output moves for any export that carries hidden, unaliased variables: regenerate and review the
+  added names.
+
 ## 0.15.0 — 2026-11-02
 
 ### Added

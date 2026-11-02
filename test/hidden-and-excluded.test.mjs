@@ -38,28 +38,23 @@ test("(red baseline) the real export already contains 39 EXCLUDE_PATHS aspect va
   );
 });
 
-// `--dimension-1800` is chosen because NOTHING aliases it — so hiding it is a
-// pure "drop it" case. (`--dimension-1400`, the obvious pick, is the alias
-// target of 9 published layout tokens; hiding that one makes it PRIVATE, which
-// is the subject of the reachability tests below.)
-test("a variable marked hiddenFromPublishing, that nothing aliases, is never emitted and is reported as HIDDEN", () => {
+// `--dimension-1800` is chosen because NOTHING aliases it. Operator ruling
+// 2026-11-02 (hide-from-publishing): "the export shouldn't do that, hide from
+// publishing is for figma only" — the flag governs the Figma library, so a
+// hidden, unreachable variable is emitted like any other token.
+test("a variable marked hiddenFromPublishing, that nothing aliases, is emitted like any other token", () => {
   const doc = exportDoc();
   const core = doc.collections.find((c) => c.name === "core");
   const target = core.variables.find((v) => v.codeSyntax.WEB.value === "--dimension-1800");
   assert.ok(target, "--dimension-1800 must exist in the fixture");
   target.hiddenFromPublishing = true;
 
-  const { css, md, hiddenRows, privateRows, rows } = dryRunWithDoc(doc);
+  const { css, hiddenRows, privateRows, rows } = dryRunWithDoc(doc);
 
-  assert.ok(!/--dimension-1800:/.test(css), "a hidden, unreachable variable must not be emitted into the CSS");
-  assert.ok(
-    !rows.some((r) => r.name === "--dimension-1800"),
-    "a hidden variable must not appear in MATCH/VALUE-DRIFT/NAME-ONLY-IN-EXPORT rows",
-  );
-  assert.ok(hiddenRows.some((r) => r.name === "--dimension-1800"), "must be counted in hiddenRows");
+  assert.match(css, /^\s*--dimension-1800:/m, "the hide flag must not drop a variable from the CSS");
+  assert.ok(rows.some((r) => r.name === "--dimension-1800"), "it is a public reconciliation row");
+  assert.equal(hiddenRows.length, 0, "no variable is dropped for being hidden");
   assert.ok(!privateRows.some((r) => r.name === "--dimension-1800"), "nothing aliases it — not PRIVATE");
-  assert.match(md, /## 0\. PRIVATE \(\d+\), HIDDEN \(\d+\) and EXCLUDED/);
-  assert.match(md, /--dimension-1800/);
 });
 
 test("hiding a variable that published tokens DO alias makes it PRIVATE, not HIDDEN", () => {
@@ -75,7 +70,7 @@ test("hiding a variable that published tokens DO alias makes it PRIVATE, not HID
   assert.match(css, /^\s*--dimension-1400:/m, "dropping it would strand 9 published layout declarations");
 });
 
-test("effectivelyHiddenFromPublishing alone is enough to hide a variable", () => {
+test("effectivelyHiddenFromPublishing alone does not drop a variable either", () => {
   const doc = exportDoc();
   const core = doc.collections.find((c) => c.name === "core");
   const target = core.variables.find((v) => v.codeSyntax.WEB.value === "--dimension-1800");
@@ -83,8 +78,8 @@ test("effectivelyHiddenFromPublishing alone is enough to hide a variable", () =>
   target.effectivelyHiddenFromPublishing = true;
 
   const { css, hiddenRows } = dryRunWithDoc(doc);
-  assert.ok(!/--dimension-1800:/.test(css));
-  assert.ok(hiddenRows.some((r) => r.name === "--dimension-1800"));
+  assert.match(css, /^\s*--dimension-1800:/m);
+  assert.equal(hiddenRows.length, 0);
 });
 
 test("EXCLUDE_PATHS aspect-ratio scaffolding is never emitted and is reported as EXCLUDED, not HIDDEN", () => {
@@ -136,7 +131,9 @@ test("(green) removing the EXCLUDE_PATHS entry would re-expose the aspect variab
 //
 // Hidden-but-reachable variables are emitted as PRIVATE (same names, so the
 // aliases resolve, but fenced in a marked block and reported as their own
-// class). Hidden-and-unreachable stay HIDDEN. `.utility` is EXCLUDED wholesale.
+// class). Hidden-and-unreachable used to be dropped as HIDDEN; since the
+// 2026-11-02 ruling (hide flag is Figma-only) they are emitted as public
+// tokens. `.utility` is EXCLUDED wholesale.
 // ---------------------------------------------------------------------------
 
 const declaredNames = (css) =>
@@ -182,16 +179,19 @@ test("a hidden primitive that a published token aliases is emitted as PRIVATE, n
   assert.match(md, /## 0\. PRIVATE \(26\)/);
 });
 
-test("a hidden variable no published token can reach stays HIDDEN and is not emitted", () => {
-  const { css, hiddenRows, privateRows } = dryRunWithDoc(exportDoc());
+test("a hidden variable no published token can reach is emitted, as a public token", () => {
+  const { css, rows, hiddenRows, privateRows } = dryRunWithDoc(exportDoc());
 
-  const name = "--color-palette-cruise-50"; // hidden, and nothing aliases it
-  assert.ok(hiddenRows.some((r) => r.name === name), "unreachable ⇒ HIDDEN");
-  assert.ok(!privateRows.some((r) => r.name === name));
-  assert.ok(!new RegExp(`^\\s*${name}:`, "m").test(css), "HIDDEN is never emitted");
+  const name = "--color-palette-cruise-50"; // hidden in Figma, and nothing aliases it
+  assert.ok(!privateRows.some((r) => r.name === name), "unreachable — not PRIVATE");
+  assert.ok(rows.some((r) => r.name === name), "a public reconciliation row");
+  assert.match(css, new RegExp(`^\\s*${name}:`, "m"), "emitted: the hide flag is for Figma only");
 
-  // 48 hidden = 26 PRIVATE + 18 HIDDEN + 4 `.utility` (EXCLUDED wholesale).
-  assert.equal(hiddenRows.length, 18);
+  // 48 hidden = 26 PRIVATE + 18 formerly dropped + 4 `.utility` (EXCLUDED wholesale).
+  assert.equal(hiddenRows.length, 0, "nothing is dropped for being hidden");
+  for (const n of ["--color-palette-lightning-yellow-300", "--color-palette-punch-300"]) {
+    assert.match(css, new RegExp(`^\\s*${n}:`, "m"), `${n} is emitted`);
+  }
 });
 
 test(".utility is EXCLUDED wholesale — collection policy, not just its 4 hidden members", () => {
@@ -219,7 +219,7 @@ test("exclusions.json carries private[] so the conformance checker can classify"
   const written = JSON.parse(emit(exportDoc()).exclusionsJson);
   assert.equal(written.private.length, 26);
   assert.ok(written.private.includes("--color-palette-cruise-500"));
-  assert.ok(!written.private.includes("--color-palette-cruise-50"), "unreachable stays HIDDEN");
+  assert.ok(!written.private.includes("--color-palette-cruise-50"), "unreachable is not PRIVATE (it is a public token)");
   assert.deepEqual(written.excludePaths, ["layout/grid/aspect/", ".utility/"]);
   assert.equal(written.names.length, 43);
 });

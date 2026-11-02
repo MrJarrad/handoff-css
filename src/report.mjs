@@ -69,19 +69,20 @@ GENERATED FILE — regenerate with \`${cfg.header.regenerateCommand}\`.
 | NAME-ONLY-IN-EXPORT (newly generated) | ${onlyExport.length} |
 | NAME-ONLY-IN-HAND (in ${handFile}, not in export) | see §4 |
 | PRIVATE (hidden, but an alias target of a published token — emitted) | ${privateRows.length} |
-| HIDDEN (hidden and unreachable — not emitted) | ${hiddenRows.length} |
 | EXCLUDED (\`EXCLUDE_PATHS\` policy list — not emitted) | ${excludedRows.length} |
 
 Statuses compare the export's **default mode** against the value declared in
 \`${cfg.paths.handAuthored}\`. Anything with a hand-authored declaration is reported here but
 **not** emitted into \`${cfg.paths.out}\` — hand-authored wins (policy P2).
-PRIVATE, HIDDEN and EXCLUDED variables (policy P7, §0) are never counted in
+PRIVATE and EXCLUDED variables (policy P7, §0) are never counted in
 MATCH/VALUE-DRIFT/NAME-ONLY-IN-EXPORT — they are not public design-system
-tokens. Of the three, **only PRIVATE is emitted**, because published tokens
+tokens. Of the two, **only PRIVATE is emitted**, because published tokens
 alias it and a referenced-but-undeclared custom property is invalid at
-computed-value time.
+computed-value time. The Figma hide flag drops nothing: a hidden variable no
+published token aliases is emitted as an ordinary token (operator ruling
+2026-11-02, "hide from publishing is for figma only").
 
-## 0. PRIVATE (${privateRows.length}), HIDDEN (${hiddenRows.length}) and EXCLUDED (${excludedRows.length})
+## 0. PRIVATE (${privateRows.length}) and EXCLUDED (${excludedRows.length})
 
 Not public tokens, and excluded from every other class in this report (policy P7
 in \`${cfg.report.policyRef}\`). ${note("private")}
@@ -97,16 +98,6 @@ ${privateRows.length
   ? ["| Name | Collection | Value | Aliased by |", "| --- | --- | --- | --- |",
      ...[...privateRows].sort((a, b) => cmp(a.name, b.name)).map(
        (r) => `| \`${r.name}\` | ${r.collection} | \`${r.value}\` | ${r.aliasedBy.map((n) => `\`${n}\``).join(", ") || "—"} |`)].join("\n")
-  : "None."}
-
-**HIDDEN** — marked \`hiddenFromPublishing\` / \`effectivelyHiddenFromPublishing\`
-in the export **and** unreachable by alias from anything emitted. Nothing refers
-to them, so they are safely dropped. This is the durable signal: once Figma marks
-a variable hidden and nothing aliases it, it lands here with no generator change.
-
-${hiddenRows.length
-  ? ["| Name | Collection |", "| --- | --- |",
-     ...[...hiddenRows].sort((a, b) => cmp(a.name, b.name)).map((r) => `| \`${r.name}\` | ${r.collection} |`)].join("\n")
   : "None."}
 
 **EXCLUDED** — matched an \`EXCLUDE_PATHS\` prefix. A policy list applied wholesale

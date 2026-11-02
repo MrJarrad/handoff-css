@@ -8,25 +8,26 @@ GENERATED FILE — regenerate with `pnpm run tokens`.
 | Schema | design-system-handoff v9 |
 | Exported at | 2026-09-12T07:34:48.281Z |
 | designSystemStateHash | `eab3d422694a61d30e30e6961dd690023df3d5db3965ced39a562dcdb98498cc` |
-| Tokens in export | 504 |
+| Tokens in export | 522 |
 | MATCH (hand-authored, same value) | 0 |
 | VALUE-DRIFT (hand-authored, different value) | 14 |
-| NAME-ONLY-IN-EXPORT (newly generated) | 490 |
+| NAME-ONLY-IN-EXPORT (newly generated) | 508 |
 | NAME-ONLY-IN-HAND (in styles.css, not in export) | see §4 |
 | PRIVATE (hidden, but an alias target of a published token — emitted) | 26 |
-| HIDDEN (hidden and unreachable — not emitted) | 18 |
 | EXCLUDED (`EXCLUDE_PATHS` policy list — not emitted) | 43 |
 
 Statuses compare the export's **default mode** against the value declared in
 `src/styles.css`. Anything with a hand-authored declaration is reported here but
 **not** emitted into `src/tokens.generated.css` — hand-authored wins (policy P2).
-PRIVATE, HIDDEN and EXCLUDED variables (policy P7, §0) are never counted in
+PRIVATE and EXCLUDED variables (policy P7, §0) are never counted in
 MATCH/VALUE-DRIFT/NAME-ONLY-IN-EXPORT — they are not public design-system
-tokens. Of the three, **only PRIVATE is emitted**, because published tokens
+tokens. Of the two, **only PRIVATE is emitted**, because published tokens
 alias it and a referenced-but-undeclared custom property is invalid at
-computed-value time.
+computed-value time. The Figma hide flag drops nothing: a hidden variable no
+published token aliases is emitted as an ordinary token (operator ruling
+2026-11-02, "hide from publishing is for figma only").
 
-## 0. PRIVATE (26), HIDDEN (18) and EXCLUDED (43)
+## 0. PRIVATE (26) and EXCLUDED (43)
 
 Not public tokens, and excluded from every other class in this report (policy P7
 in `docs/handoff-css.md`). Operator ruling 2026-09-06: *"i don't publish
@@ -68,32 +69,6 @@ semantic token in the "Aliased by" column, never the private name.
 | `--color-palette-punch-600` | color-primitives | `#e23b28` | `--background-negative-darker`, `--background-negative-light`, `--border-negative-darker`, `--border-negative-light`, `--content-negative-dark`, `--content-negative-darker`, `--content-negative-light` |
 | `--color-palette-punch-700` | color-primitives | `#bd2918` | `--background-negative-dark`, `--border-negative-dark` |
 | `--color-palette-punch-800` | color-primitives | `#9c2518` | `--background-negative-darker`, `--border-negative-darker`, `--content-negative-darker` |
-
-**HIDDEN** — marked `hiddenFromPublishing` / `effectivelyHiddenFromPublishing`
-in the export **and** unreachable by alias from anything emitted. Nothing refers
-to them, so they are safely dropped. This is the durable signal: once Figma marks
-a variable hidden and nothing aliases it, it lands here with no generator change.
-
-| Name | Collection |
-| --- | --- |
-| `--color-palette-cruise-300` | color-primitives |
-| `--color-palette-cruise-400` | color-primitives |
-| `--color-palette-cruise-50` | color-primitives |
-| `--color-palette-cruise-900` | color-primitives |
-| `--color-palette-cruise-950` | color-primitives |
-| `--color-palette-lightning-yellow-300` | color-primitives |
-| `--color-palette-lightning-yellow-50` | color-primitives |
-| `--color-palette-lightning-yellow-900` | color-primitives |
-| `--color-palette-lightning-yellow-950` | color-primitives |
-| `--color-palette-malibu-400` | color-primitives |
-| `--color-palette-malibu-50` | color-primitives |
-| `--color-palette-malibu-900` | color-primitives |
-| `--color-palette-malibu-950` | color-primitives |
-| `--color-palette-punch-300` | color-primitives |
-| `--color-palette-punch-400` | color-primitives |
-| `--color-palette-punch-50` | color-primitives |
-| `--color-palette-punch-900` | color-primitives |
-| `--color-palette-punch-950` | color-primitives |
 
 **EXCLUDED** — matched an `EXCLUDE_PATHS` prefix. A policy list applied wholesale
 on path identity, regardless of hidden state, and never revived by reachability.
@@ -496,7 +471,7 @@ path, so parity can be pinned.
 
 Honoured this run: `viewport-height`, `viewport-width`, `fluid-clamp`, `fixed`.
 
-82 of 516 emitted variables carry a class — fixed (export): 6 · fixed (rule): 1 · fluid-clamp (export): 14 · mode-stepped (export): 52 · viewport-height (description): 8 · viewport-width (description): 1.
+82 of 534 emitted variables carry a class — fixed (export): 6 · fixed (rule): 1 · fluid-clamp (export): 14 · mode-stepped (export): 52 · viewport-height (description): 8 · viewport-width (description): 1.
 Strategy counts: fixed: 7 · fluid-clamp: 14 · mode-stepped: 52 · viewport-height: 8 · viewport-width: 1.
 The other 52 are `mode-stepped` or `sample-only`, which IS the
 per-mode path, so they are not listed individually: their output is unchanged.
