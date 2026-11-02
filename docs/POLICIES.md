@@ -1130,3 +1130,21 @@ Named gaps: component props are not compared (a name match only); a code value t
 a property declared outside the scanned code is compared as written, not resolved; Tailwind
 utilities and inline style objects count as usage only when they spell `var(--name)`.
 
+## P26 — Collection modes carry their dependents
+
+A mode that is neither a theme nor a layout width publishes as `[data-jhd-<collection>-mode="<mode>"]`
+and re-points its own collection's variables. A variable of ANOTHER collection that aliases one of them
+(the layout role tokens that alias `text-primitives` steps) is resolved where it is declared, so it never
+sees a mode set on a descendant. P26 re-declares every such dependent under the mode attribute: the same
+`var()` value, in every media wrapper it is declared in, ordered after the `:root` rule so that on one
+element the later rule wins; under a layout variant's selector the attribute applies on that element or a
+descendant. A dependent is a variable whose alias chain, in any mode, passes through a variable whose value
+differs between the default mode and that mode; a value emitted as a literal (no `var()`) is not mirrored.
+
+**Weights (P22).** A STRING font-style variable's number is per mode: the export states it for one style
+name on the variable (`fontWeightNumeric`), so another mode's name takes the number the export states for
+that name on its own weight variable. No number stated for the name: not emitted for that mode,
+`FONT_WEIGHT_MODE_UNRESOLVED`. **P21.6:** a TEXT style that binds `fontStyle` to such a variable emits
+`font-weight: var(<token>, <number>)` (`STYLE_CLASS_WEIGHT_BOUND`).
+
+`src/modes.mjs`, `src/emit-tokens.mjs`, `src/resolve.mjs`, `src/emit-styles.mjs`

@@ -4,6 +4,21 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ## Unreleased
 
+### Added
+
+- **A collection mode carries its dependents and its weights (P26, P21.6, P22).** For a mode that is
+  neither a theme nor a layout width (Figma's `text-primitives` "outatime"), variables of other
+  collections that alias a variable the mode changes (the layout role tokens, e.g.
+  `--text-title-letter-spacing-200: var(--letter-spacing-400)`) are now re-declared under the mode
+  attribute, in every media wrapper they are declared in, because a `var()` alias is resolved where
+  it is declared and so never saw a mode set on a descendant. A STRING font-style variable resolves
+  to a numeric weight in every mode from the export's own style-name table (a mode holding "Regular"
+  gets the number the export states for "Regular", not the default mode's number repeated); a name no
+  weight variable states a number for is left out of that mode with `FONT_WEIGHT_MODE_UNRESOLVED`. A
+  TEXT style that binds a font-style variable emits `font-weight: var(<token>, <number>)`
+  (`STYLE_CLASS_WEIGHT_BOUND`) instead of the bare number, so the mode can re-point it. Single-mode
+  exports are unchanged except for the weight binding in generated style classes.
+
 ### Changed
 
 - **A hidden variable is no longer dropped (P7).** `hiddenFromPublishing` governs the Figma library

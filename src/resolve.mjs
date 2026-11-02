@@ -359,7 +359,17 @@ export function resolveValue(v, mode, byId, cfg, collection = null) {
       // the export's own `css` verbatim — nothing here maps a style name to a
       // number, which is precisely the guess that would go wrong on the first
       // family whose "Medium" is not 500.
-      if (v.fontWeightNumeric?.css != null) return plain(String(v.fontWeightNumeric.css));
+      if (v.fontWeightNumeric?.css != null) {
+        // P22 — the number the export states belongs to the style name it was
+        // read from. A mode holding a DIFFERENT name ("Regular" where the
+        // default holds "Semi Bold") takes the number the export states for
+        // THAT name on its own weight variable, never the default's repeated.
+        const isDefault = !collection || mode.modeId === collection.defaultModeId;
+        const named = v.fontWeightNumeric.sourceStyleName;
+        if (isDefault || mode.raw === named) return plain(String(v.fontWeightNumeric.css));
+        const css = weightsByStyleName(byId).get(String(mode.raw));
+        return css == null ? { ...plain(String(v.fontWeightNumeric.css)), unresolvedWeight: true } : plain(css);
+      }
       // P20 — a STRING variable the consumer declared a ratio holder is the
       // design system's aspect-ratio primitive, and `aspect-ratio: "3:2"` is
       // not a value CSS accepts. Every other STRING is quoted, as before.
@@ -441,3 +451,17 @@ const plain = (value, note = null) => ({
   unconverted: null,
   untrusted: null,
 });
+
+const weightTables = new WeakMap();
+/** style name ("Regular") -> numeric css ("400"), from the export's own weight variables. */
+function weightsByStyleName(byId) {
+  if (!weightTables.has(byId)) {
+    const table = new Map();
+    for (const v of byId.values()) {
+      const w = v.fontWeightNumeric;
+      if (w?.sourceStyleName != null && w.css != null) table.set(String(w.sourceStyleName), String(w.css));
+    }
+    weightTables.set(byId, table);
+  }
+  return weightTables.get(byId);
+}
