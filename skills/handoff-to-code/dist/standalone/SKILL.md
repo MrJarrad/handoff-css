@@ -38,8 +38,11 @@ Reach for one *inside* step 4 when the pair is silent — not instead of the pai
 
 The Design Handoff export is made by **`design-handoff-script`** from a Figma link (the
 plugin's in-Figma export is superseded); you may run it yourself when you hold a link and a
-token. It joins one Design System Handoff export per source file — this file and each library
-the layer uses, by key. That **set** is the contract: the pair below means the brief plus every
+token. What belongs to the layer and REST cannot read (annotations in full, line caps, measurements,
+a section's radius, instance property order) comes from a **live read** of the layer that you make
+first, through Figma MCP — never from the Design System Handoff export. It joins one Design System
+Handoff export per source file — this file and each library the layer uses, by key, for the
+variables and styles only. That **set** is the contract: the pair below means the brief plus every
 export it names. Command, joins, `linkRun` codes, spec index: `references/export-set.md`.
 
 ## Brownfield — existing code, no Design System Handoff export

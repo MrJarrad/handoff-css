@@ -68,6 +68,12 @@ export const briefSchemaV14 = require("../schema/design-handoff.v14.schema.json"
  */
 export const briefSchemaV15 = require("../schema/design-handoff.v15.schema.json");
 
+/**
+ * 0.15.0 — schema v16 is additive over v15, written only when a layer in the selection has a
+ * Dev Mode measurement: `layerTree[].measurements[]`, the measurements that start from that layer.
+ */
+export const briefSchemaV16 = require("../schema/design-handoff.v16.schema.json");
+
 const schemasByVersion = new Map([
   [10, briefSchema],
   [11, briefSchemaV11],
@@ -75,6 +81,7 @@ const schemasByVersion = new Map([
   [13, briefSchemaV13],
   [14, briefSchemaV14],
   [15, briefSchemaV15],
+  [16, briefSchemaV16],
 ]);
 
 const compiledByVersion = new Map();
@@ -95,7 +102,7 @@ export const UNKNOWN_FIELD_KEYWORDS = new Set(["additionalProperties", "unevalua
 
 /**
  * Validate a parsed brief JSON document against its published shape. Dispatches
- * on the document's own `schemaVersion` (10–15); an unrecognised older version
+ * on the document's own `schemaVersion` (10–16); an unrecognised older version
  * falls back to v10 so it still surfaces as a clear `schemaVersion` const
  * mismatch rather than a thrown error.
  *

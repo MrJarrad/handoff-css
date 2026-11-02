@@ -95,12 +95,33 @@ test("a Design System Handoff export older than the brief's asks for the newer r
 });
 
 test("a Design System Handoff export that is itself behind becomes one ask: that plugin run, named by file", async () => {
-  const json = script("overlay.json");
-  const { code, results } = await validate({ "overlay.json": json, "overlay.md": script("overlay.md"), "ds.json": script("design-system-handoff.json") });
-  const file = JSON.parse(json).linkRun.sources.find((s) => s.role === "this file").name;
+  const brief = JSON.parse(script("overlay.json"));
+  brief.linkRun.findings = [{ code: "DS_EXPORT_NOT_LATEST", message: "the Design System Handoff export given is not the latest run on this file" }];
+  const { code, results } = await validate({ "overlay.json": JSON.stringify(brief), "overlay.md": script("overlay.md"), "ds.json": script("design-system-handoff.json") });
+  const file = brief.linkRun.sources.find((s) => s.role === "this file").name;
   const asks = kind(results, "set").findings.filter((f) => f.code === "DS_EXPORT_OUT_OF_DATE");
   assert.deepEqual(asks.map((f) => [f.severity, f.message]), [["warning", `run the Design System Handoff plugin on ${file}, then regenerate the brief with its export — variables cannot be read without that plugin`]]);
   assert.equal(code, 0);
+});
+
+// Annotations come from the live read of the layer (design-handoff --live), never from the Design
+// System Handoff export: an annotation finding asks for a fresh live read, not that plugin run. The
+// 29 Oct brief predates the live read and says its export carried no annotations.
+test("an annotation finding asks for a fresh live read of the layer and a regenerated brief, not a Design System Handoff run", async () => {
+  const json = script("overlay.json");
+  assert.deepEqual(JSON.parse(json).linkRun.findings.map((f) => f.code), ["DS_EXPORT_HAS_NO_ANNOTATIONS"]);
+  const { results } = await validate({ "overlay.json": json, "overlay.md": script("overlay.md"), "ds.json": script("design-system-handoff.json") });
+  const set = kind(results, "set").findings;
+  assert.deepEqual(set.filter((f) => f.code === "DS_EXPORT_OUT_OF_DATE"), []);
+  const ask = set.filter((f) => f.code === "LIVE_READ_OUT_OF_DATE");
+  assert.equal(ask.length, 1);
+  assert.match(ask[0].message, /live\/read\.js .*Figma MCP .*--live/);
+  for (const code of ["LIVE_READ_STALE", "ANNOTATION_NEWER_THAN_DS_EXPORT"]) {
+    const brief = JSON.parse(json);
+    brief.linkRun.findings = [{ code, layers: ["5363:15275"], message: "x" }];
+    const again = await validate({ "overlay.json": JSON.stringify(brief), "overlay.md": script("overlay.md"), "ds.json": script("design-system-handoff.json") });
+    assert.deepEqual(kind(again.results, "set").findings.filter((f) => f.code.endsWith("_OUT_OF_DATE")).map((f) => f.code), ["LIVE_READ_OUT_OF_DATE"], code);
+  }
 });
 
 test("HT-22: a schema 12+ export with a top-level field its version does not declare fails — a new field needs a new version", async () => {
