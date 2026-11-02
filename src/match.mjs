@@ -1,4 +1,4 @@
-// HT-21 — BROWNFIELD MODE. A project that already has code and no Design System
+// BROWNFIELD MODE. A project that already has code and no Design System
 // Handoff export: the brief still names every Figma variable (with its CSS name
 // and mode values) and every component it uses, and the codebase already has
 // its own custom properties and components. This proposes, per Figma item, the

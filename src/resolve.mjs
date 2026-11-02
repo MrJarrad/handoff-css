@@ -38,8 +38,8 @@ export const color = (hex8, cfg) => {
 
 /**
  * P19 — MOTION. Figma stores a TIMING variable in SECONDS; `motion.timingUnit`
- * states which unit the house publishes. Operator ruling 2026-09-12 row 2 —
- * "should the name reflect the time?" — names the steps by their milliseconds,
+ * states which unit the design system publishes. A system that names its steps
+ * by their milliseconds
  * so the value has to read in the same unit the name states or the token lies
  * about itself (`--duration-375: 0.375s`).
  *
@@ -157,7 +157,7 @@ export function untrustedCells(doc) {
 const terminalNote = (v, mode, terminal, byId, cfg) => {
   if (v.type === "FLOAT" && mode.build?.status === "resolved") return mode.build.css;
   if (v.type === "COLOR" && typeof terminal === "string") return color(terminal, cfg);
-  // P19 — a delay aliasing a duration step (operator ruling row 4) carries the
+  // P19 — a delay aliasing a duration step carries the
   // duration's own terminal; render it in the unit the token publishes.
   if (v.type === "TIMING" && typeof terminal === "number") return timing(terminal, cfg);
   // P9: a COMPOSE_COLOR terminal is the expression object, not a hex string —

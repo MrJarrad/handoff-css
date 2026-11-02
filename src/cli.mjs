@@ -72,7 +72,7 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
   for (const file of files) {
     const abs = path.isAbsolute(file) ? file : path.join(cwd, file);
     try {
-      // HT-24 — a handoff .zip is read as the .json and .md files inside it.
+      // A handoff .zip is read as the .json and .md files inside it.
       if (/\.zip$/i.test(file)) read.push(...zipTextFiles(abs, file));
       else read.push({ file, abs, text: readFileSync(abs, "utf8") });
     } catch (err) {
@@ -180,7 +180,7 @@ function validateJson(file, text, { brief = false } = {}) {
   };
 }
 
-// HT-29 — a Design System Handoff export writes its own human-readable `.md`
+// A Design System Handoff export writes its own human-readable `.md`
 // beside its JSON. It is not a design-handoff brief and has no line grammar
 // here: its contract is the JSON, so the `.md` is named and skipped.
 const DS_MD = /^- Schema: `design-system-handoff` v(\d+)/m;

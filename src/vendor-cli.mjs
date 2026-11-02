@@ -1,4 +1,4 @@
-// `handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>` — HT-32, zip HT-24.
+// `handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>`.
 //
 // A consumer keeps each vendored export set in its own version folder
 // (`design/handoff/v25-2026-10-28/`) with `latest` a symlink to the current
@@ -20,7 +20,7 @@ export function vendorCommand(args, { cwd = process.cwd(), stdout = process.stdo
   if (!into || into.startsWith("--")) return fail("--into needs the folder that holds the version folders and `latest`");
   const files = args.filter((a, i) => !a.startsWith("--") && i !== at + 1);
   const abs = (p) => (path.isAbsolute(p) ? p : path.join(cwd, p));
-  // HT-24 — the plugin's .zip holds the export's .json and .md; read both from it.
+  // The plugin's .zip holds the export's .json and .md; read both from it.
   const zipFile = files.find((f) => /\.zip$/i.test(f));
   let inZip = [], candidates = [];
   if (zipFile) {
@@ -61,7 +61,7 @@ export function vendorCommand(args, { cwd = process.cwd(), stdout = process.stdo
     }
     current = readlinkSync(latest);
   }
-  // A link may be relative or absolute; resolve, never join (HT-35).
+  // A link may be relative or absolute; resolve, never join.
   const currentDir = current && path.resolve(root, current);
 
   const held = currentDir && path.join(currentDir, `${base}.json`);
@@ -82,7 +82,7 @@ export function vendorCommand(args, { cwd = process.cwd(), stdout = process.stdo
   if (currentDir && existsSync(currentDir)) {
     cpSync(currentDir, target, { recursive: true });
     carried.push(...readdirSync(target).filter((f) => f !== `${base}.json` && f !== `${base}.md`));
-    // The old .md describes the old export: never carry it beside a new JSON (HT-36).
+    // The old .md describes the old export: never carry it beside a new JSON.
     if (!mdFile && existsSync(path.join(target, `${base}.md`))) {
       rmSync(path.join(target, `${base}.md`));
       dropped = `${base}.md`;

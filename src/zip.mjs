@@ -1,4 +1,4 @@
-// HT-24 — the Design System Handoff plugin and design-handoff-script save their
+// The Design System Handoff plugin and design-handoff-script save their
 // export as a .zip (the JSON contract, its human-readable .md, and for a brief
 // any screenshots). This reads one with node:zlib only: the central directory
 // lists every entry, and each is stored (method 0) or deflated (method 8).

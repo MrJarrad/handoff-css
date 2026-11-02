@@ -51,9 +51,8 @@ npm i -D handoff-css      # pnpm add -D handoff-css
 1. Export your design system with the Design Handoff Figma plugin and commit the
    JSON. **Vendor it** — the export is the contract, and a generator run should
    be reproducible from the repo alone.
-2. Write a `handoff.config.mjs`. Start from
-   [`presets/jhd.config.mjs`](presets/jhd.config.mjs), a real house config with
-   every key filled in and commented.
+2. Write a `handoff.config.mjs`. Start from a complete config with
+   every key filled in (the Config section below explains each).
 3. Wire two scripts:
 
 ```json
@@ -280,7 +279,7 @@ Handoff export it was made from, and `validate` adds a `(set)` result:
 
 ```sh
 handoff-css validate design-handoff-overlay.json design-handoff-overlay.md \
-                     jhd-spec-designsystem-design-system-handoff.json \
+                     design-system-handoff.json \
                      --spec-index spec-index.md
 ```
 
@@ -357,7 +356,7 @@ every item is ruled. Rules and shape: `docs/POLICIES.md` P26,
 ### `vendor` — add a new export without overwriting the old one
 
 ```sh
-handoff-css vendor jhd-spec-designsystem-design-system-handoff.json --into design/handoff
+handoff-css vendor design-system-handoff.json --into design/handoff
 ```
 
 For a project that keeps each vendored set in `design/handoff/v<N>-<date>/` with `latest` a
@@ -418,7 +417,7 @@ skills/handoff-to-code/SKILL.md      # or copy it into .claude/skills/ / your ag
 
 ## Library use, the validation and conformance entries
 
-The package publishes `.` (plus `./presets/jhd`, `./schema`, `./schema/export`) and
+The package publishes `.` (plus `./schema`, `./schema/export` and a house preset under `./presets/`) and
 nothing else, so everything importable comes from the one entry:
 
 ```js
@@ -461,9 +460,9 @@ node --test 'test/**/*.test.mjs'
 ```
 
 `test/parity.test.mjs` asserts the outputs byte-identical against a real
-committed design system's artifacts — the fixture under `fixtures/jhd-v7b/`,
+committed design system's artifacts, a fixture under `fixtures/`,
 generated with every 0.2.0 class pinned off. That test is the reason a refactor
-here is safe. `fixtures/jhd-v7c/` is a second real export of the same system,
+here is safe. A second fixture is a second real export of the same system,
 re-exported after three variable descriptions were filled in, and is what the
 description convention is tested against.
 

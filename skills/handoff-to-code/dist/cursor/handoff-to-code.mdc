@@ -263,6 +263,5 @@ rewritten selector or an invented `var()` in your branch is a deviation.
 Every generator behaviour this skill leans on is written up with the measurements that
 produced it: `docs/POLICIES.md` — P4 (units), P7 (private/hidden/excluded), P11 (responsive
 classes and `viewport.groups`), P12 (the alias block), P13 (cell trust). `README.md` covers
-install, config keys and the CLI. `presets/jhd.config.mjs` is a real house config with every
-key filled in and commented — read it as a worked example of the policy this skill assumes,
-not as a default; there are no defaults.
+install, config keys and the CLI. A real config with every key filled in and commented is the best worked example of the
+policy this skill assumes; read one as an example, never as a default — there are no defaults.

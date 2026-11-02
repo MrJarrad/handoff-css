@@ -1,7 +1,7 @@
 // Policy P19's one validation lane — DELAY_NOT_ALIASED.
 //
-// Operator ruling 2026-09-12 row 4: every `motion/delay` step is an alias of
-// the `motion/duration` step of the same value, *"so values can never drift"*.
+// The rule it checks: every `motion/delay` step is an alias of the
+// `motion/duration` step of the same value, so the values can never drift.
 // That is a statement about how Figma is AUTHORED, and the generator's job is
 // to notice when it stops being true — not to make it true.
 //

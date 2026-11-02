@@ -2,8 +2,8 @@
 
 The other half of the pair is markdown, so it has no JSON Schema. This file is its contract:
 the lines `handoff-css` reads by shape, the vocabulary their cells may use, and the code each
-violation raises. `src/validate-handoff-md.mjs` implements exactly this document; the real
-`fixtures/jhd-v8b-2026-09-10/design-handoff-block-navigation.md` is the conformance fixture.
+violation raises. `src/validate-handoff-md.mjs` implements exactly this document; a real
+export v8 brief under `fixtures/` is the conformance fixture.
 
 Everything not listed here is prose the validator passes through untouched. The grammar is
 deliberately narrow: it covers the lines a consumer *binds to*, because those are the lines a

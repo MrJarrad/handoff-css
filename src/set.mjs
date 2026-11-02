@@ -26,7 +26,7 @@ export function validateSet(brief, exports, { specIndex = null, briefFile = "<br
   const findings = [];
   const add = (code, severity, path, message) => findings.push({ code, severity, path, message });
   const byName = (name) => exports.find((e) => e.doc.artifactFilename === name);
-  // HT-25 — a stale pair is fixed, not refused: the brief made from an older
+  // A stale pair is fixed, not refused: the brief made from an older
   // run is regenerated against the export given (figma-plugins
   // design-handoff-script); an export older than the brief's is replaced by
   // the run the brief names. A plugin-made brief records no file key, so its
@@ -63,7 +63,7 @@ export function validateSet(brief, exports, { specIndex = null, briefFile = "<br
   // a variable no export covers…) are decisions for a human, never inlined
   // around: each stays visible under the code the script gave it.
   (brief.linkRun?.findings ?? []).forEach((f, i) => add(f.code, "warning", `/linkRun/findings/${i}`, f.message));
-  // HT-25 — the findings that mean this file's Design System Handoff export is
+  // The findings that mean this file's Design System Handoff export is
   // behind the file are one ask: that plugin run, by file name. Figma's REST
   // API reads no variables without the Enterprise-only file_variables:read
   // scope, so no agent can bring that export up to date itself. A variable
