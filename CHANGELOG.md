@@ -2,7 +2,7 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
-## Unreleased
+## 0.16.0 — 2026-11-02
 
 ### Added
 
