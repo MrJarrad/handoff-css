@@ -19,6 +19,15 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 - The generator's summary prints `inputs N (…) — joined by variable key` when more than one
   export is given.
 
+### Fixed (#44 review r1, before the tag)
+
+- A zip saved by macOS Finder reads: `__MACOSX/` and `._*` entries are skipped, and an entry that
+  is not JSON is named (`<zip> › <entry>`) instead of a bare parse error.
+- `vendor <zip>` takes the entry whose schema is `design-system-handoff`, never the first `.json`,
+  and refuses a zip holding more than one, naming each.
+- `MERGE_SAME_EXPORT` compares `contentHash`, so two different exports that share a name are
+  joined, and a renamed copy of one export is still refused.
+
 ## 0.13.0 — 2026-10-31
 
 ### Added

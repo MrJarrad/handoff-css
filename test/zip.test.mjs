@@ -94,3 +94,42 @@ test("vendor takes the .zip and writes the export's .json and .md", async () => 
   assert.equal(readFileSync(path.join(latest, `${base}.json`), "utf8"), json.toString());
   assert.equal(readFileSync(path.join(latest, `${base}.md`), "utf8"), md.toString());
 });
+
+// #44 review r1 ambers.
+import { readExports } from "../src/zip.mjs";
+
+test("a zip saved by macOS Finder reads: __MACOSX/ and ._ entries are skipped", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "handoff-css-zip-finder-"));
+  const json = gz("jhd-v19-2026-10-29", "design-system-handoff.json");
+  const appleDouble = Buffer.from([0, 5, 22, 7, 0, 2, 0, 0, 77, 97, 99, 32, 79, 83, 32, 88]);
+  writeFileSync(path.join(dir, "ds.zip"), zip([["ds.json", json], ["__MACOSX/._ds.json", appleDouble], ["._ds.md", appleDouble]]));
+  const docs = readExports(path.join(dir, "ds.zip"));
+  assert.equal(docs.length, 1);
+  assert.equal(docs[0].schema, "design-system-handoff");
+});
+
+test("an entry that is not JSON is named in the error", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "handoff-css-zip-bad-"));
+  writeFileSync(path.join(dir, "ds.zip"), zip([["broken.json", Buffer.from("{ not json")]]));
+  assert.throws(() => readExports(path.join(dir, "ds.zip")), /ds\.zip › broken\.json/);
+});
+
+test("vendor takes the Design System Handoff export from a zip that also holds a brief", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "handoff-css-zip-vendor-pick-"));
+  const json = gz("jhd-v19-2026-10-29", "design-system-handoff.json");
+  const brief = gz("script-2026-10-29", "overlay.json");
+  writeFileSync(path.join(dir, "mixed.zip"), zip([["brief.json", brief], ["ds.json", json]]));
+  assert.equal(await dispatch(["vendor", "mixed.zip", "--into", "handoff"], { cwd: dir, stdout: sink(), stderr: sink() }), 0);
+  const base = JSON.parse(json).artifactFilename;
+  assert.deepEqual(readdirSync(path.join(dir, "handoff", "latest")), [`${base}.json`]);
+  assert.equal(readFileSync(path.join(dir, "handoff", "latest", `${base}.json`), "utf8"), json.toString());
+});
+
+test("vendor refuses a zip holding two Design System Handoff exports, naming both", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "handoff-css-zip-vendor-two-"));
+  const json = gz("jhd-v19-2026-10-29", "design-system-handoff.json");
+  writeFileSync(path.join(dir, "two.zip"), zip([["a.json", json], ["b.json", json]]));
+  const stderr = sink();
+  assert.equal(await dispatch(["vendor", "two.zip", "--into", "handoff"], { cwd: dir, stdout: sink(), stderr }), 1);
+  assert.match(stderr.text, /two\.zip › a\.json.*two\.zip › b\.json/s);
+});

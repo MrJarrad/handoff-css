@@ -54,9 +54,12 @@ export function readZip(buf, label = "zip") {
  * The text files a handoff zip carries (`.json`, `.md`), each named
  * `<zip> › <entry>` so a finding says where it came from.
  */
+// A zip saved by macOS Finder carries AppleDouble metadata (`__MACOSX/…`, `._name`): never content.
+const appleDouble = (name) => name.startsWith("__MACOSX/") || /(^|\/)\._/.test(name);
+
 export function zipTextFiles(abs, file = abs) {
   return readZip(readFileSync(abs), file)
-    .filter((e) => /\.(json|md)$/i.test(e.name))
+    .filter((e) => /\.(json|md)$/i.test(e.name) && !appleDouble(e.name))
     .map((e) => ({ file: `${file} › ${e.name}`, abs: `${abs}/${e.name}`, name: e.name, text: e.data.toString("utf8") }));
 }
 
@@ -66,8 +69,21 @@ export function zipTextFiles(abs, file = abs) {
  */
 export function readExports(abs) {
   if (!/\.zip$/i.test(abs)) return [JSON.parse(readFileSync(abs, "utf8"))];
-  const docs = zipTextFiles(abs).filter((f) => f.name.endsWith(".json"))
-    .map((f) => JSON.parse(f.text)).filter((d) => d?.schema === "design-system-handoff");
+  const docs = exportsInZip(abs).map((f) => f.doc);
   if (docs.length === 0) fail(`${abs}: no Design System Handoff export (.json, schema design-system-handoff) in the zip`);
   return docs;
+}
+
+/**
+ * The Design System Handoff exports inside a zip, each with its entry, parsed. An entry that is
+ * not JSON is named, never a bare parse error.
+ */
+export function exportsInZip(abs, file = abs) {
+  return zipTextFiles(abs, file).filter((f) => f.name.endsWith(".json")).map((f) => {
+    try {
+      return { ...f, doc: JSON.parse(f.text) };
+    } catch (err) {
+      return fail(`${f.file}: not JSON — ${err.message}`);
+    }
+  }).filter((f) => f.doc?.schema === "design-system-handoff");
 }

@@ -27,11 +27,12 @@ const LIBRARY = new Set(["text-primitives", "core", "color-primitives"]);
 /** Cut the export into a library file and a file that uses it, as Figma would export each. */
 export function split(doc = whole()) {
   const library = { ...doc, collections: doc.collections.filter((c) => LIBRARY.has(c.name)),
-    documentName: "Library", artifactFilename: "library-design-system-handoff" };
+    documentName: "Library", artifactFilename: "library-design-system-handoff", contentHash: "a".repeat(64) };
   // Styles and their sheets are defined in the library; the product file holds none of its own.
+  // Each file's export has its own contentHash, as two real exports do.
   const user = { ...doc, collections: doc.collections.filter((c) => !LIBRARY.has(c.name)),
     styles: Object.fromEntries(Object.keys(doc.styles).map((t) => [t, []])), styleSummaries: [], cssCustomPropertySheets: [],
-    documentName: "Product", artifactFilename: "product-design-system-handoff" };
+    documentName: "Product", artifactFilename: "product-design-system-handoff", contentHash: "c".repeat(64) };
   const keyOf = new Map(library.collections.flatMap((c) => c.variables.map((v) => [v.id, v.key])));
   const remote = (id) => (keyOf.has(id) ? `VariableID:${keyOf.get(id)}/${id.slice("VariableID:".length)}` : id);
   user.collections = JSON.parse(JSON.stringify(user.collections), (k, v) => {
@@ -129,4 +130,15 @@ test("a config may name every file's export as a list", async () => {
     .replace('input: "design/library.json"', 'input: ["design/library.json", "design/product.json"]'));
   assert.equal(await dispatch(["--config", "handoff.config.mjs"], { cwd, stdout: sink(), stderr: sink() }), 0);
   assert.equal(await dispatch(["--config", "handoff.config.mjs", "--check"], { cwd, stdout: sink(), stderr: sink() }), 0);
+});
+
+test("two different exports sharing a name are joined, not refused: the same export means the same contentHash", () => {
+  const { library, user } = split();
+  user.documentName = library.documentName;
+  delete user.artifactFilename; delete library.artifactFilename;
+  user.contentHash = "b".repeat(64);
+  assert.doesNotThrow(() => generateSet([library, user], preset, { handAuthoredCss: "" }));
+  const again = structuredClone(library);
+  again.documentName = "Renamed copy";
+  assert.throws(() => generateSet([library, again], preset), /MERGE_SAME_EXPORT/);
 });
