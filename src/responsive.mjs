@@ -244,7 +244,7 @@ export function classify(v, cfg) {
   if (isViewport) {
     // P13, disagreement check — only the description path can disagree with
     // the rule's own fraction; an explicit `responsive` field is the
-    // operator's deliberate override and is never second-guessed against it.
+    // designer's deliberate override and is never second-guessed against it.
     let warning = null;
     let fractionDisagree = null;
     // A DERIVED fraction that no whole percent is close to (P15). The

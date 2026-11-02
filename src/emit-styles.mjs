@@ -102,15 +102,14 @@ const FONT_FAMILY_DECL = /^font-family:\s*(.+)$/;
  * gives it a token, the same as every other typographic property — but the
  * export's own `cssClass.declarations` states nothing for it (a plugin gap,
  * the paragraph-spacing counterpart of the `font-family` gap `bindFontFamily`
- * already closes). Per operator ruling 2026-09-19 ("they were both design
- * system things — the text style should carry them") and the spacer-margins
+ * already closes). A design-system decision (the text style carries its own
+ * paragraph spacing) and the spacer-margins
  * mechanism (`handoff-to-code` § Build standards item 7 — a paragraph gap is
  * the space BETWEEN paragraphs, never a trailing margin after the last one),
  * the binding is emitted as an adjacent-sibling rule:
  * `<selector> + <selector> { margin-block-start: var(<token>, <raw>px) }` —
- * the same shape jhd-design-system hand-authors on its own `body-style1-N`
- * classes (#56, `1e79f3a`), so that hand-authored copy can retire once this
- * generates it. Never a `margin-block-end` on every instance (0.8.0's
+ * the shape a design system would otherwise hand-author on its own text
+ * classes, so that hand-authored copy can retire once this generates it. Never a `margin-block-end` on every instance (0.8.0's
  * `ea48aee` shape, reverted — see CHANGELOG 0.8.1): that stacks a trailing
  * gap after the last paragraph and, alongside a hand-authored sibling rule,
  * double-counts the gap between paragraphs.

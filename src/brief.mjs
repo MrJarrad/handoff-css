@@ -64,7 +64,7 @@ export const briefSchemaV14 = require("../schema/design-handoff.v14.schema.json"
 
 /**
  * 0.13.0 — schema v15 is additive over v14, written only when the selection
- * holds an image or video fill: `media[]`, the media list (HT-40).
+ * holds an image or video fill: `media[]`, the media list.
  */
 export const briefSchemaV15 = require("../schema/design-handoff.v15.schema.json");
 
@@ -99,7 +99,7 @@ export const UNKNOWN_FIELD_KEYWORDS = new Set(["additionalProperties", "unevalua
  * falls back to v10 so it still surfaces as a clear `schemaVersion` const
  * mismatch rather than a thrown error.
  *
- * HT-25 — a version NEWER than this package knows is the plugin moving ahead of
+ * A version NEWER than this package knows is the plugin moving ahead of
  * its checker, not a broken export: it is checked against the newest schema
  * known, and passes with `SCHEMA_NEWER_THAN_CHECKER` warnings naming each
  * unknown field; a missing required field or a wrong type is still an error.

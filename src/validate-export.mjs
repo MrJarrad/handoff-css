@@ -149,7 +149,7 @@ const validator = (schema) => {
  *   `skipped` is true only for a schema version OLDER than every version this
  *   module validates (legacy, e.g. 7) — an unvalidated document is never
  *   reported as a valid one. A version NEWER than the newest one known is the
- *   plugin ahead of this checker (HT-25): it is checked as the newest known
+ *   plugin ahead of this checker: it is checked as the newest known
  *   version and passes, never silently — `SCHEMA_NEWER_THAN_CHECKER` warnings
  *   name the version and each unknown field; a missing required field or a wrong type is still an error.
  *
@@ -165,7 +165,7 @@ export function validateExport(doc) {
   if (typeof doc.schemaVersion === "number" && doc.schemaVersion < Math.min(...VALIDATED_SCHEMA_VERSIONS)) {
     return { ok: true, skipped: true, errors: [], warnings: [], clampFindings: [] };
   }
-  // HT-25 — a version newer than the newest known is the plugin ahead of its
+  // A version newer than the newest known is the plugin ahead of its
   // checker: checked as the newest known; a field it has never seen is a warning, any other shape error stays an error.
   const newest = Math.max(...VALIDATED_SCHEMA_VERSIONS);
   const newer = typeof doc.schemaVersion === "number" && doc.schemaVersion > newest;

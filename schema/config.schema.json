@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/jhd/handoff-css/schema/config.schema.json",
+  "$id": "https://handoff-css/schema/config.schema.json",
   "title": "handoff-css config",
   "description": "Every house policy handoff-css applies. Nothing in src/ carries a default for these: a consumer states them here, or the generator refuses to run.",
   "type": "object",
@@ -30,7 +30,7 @@
           "type": ["string", "array"],
           "items": { "type": "string" },
           "minItems": 1,
-          "description": "The vendored Design System Handoff export (.json, or the plugin's .zip). A design system split across Figma files lists one export per file; they are joined by variable key (HT-24)."
+          "description": "The vendored Design System Handoff export (.json, or the plugin's .zip). A design system split across Figma files lists one export per file; they are joined by variable key."
         },
         "out": { "type": "string", "description": "The token stylesheet." },
         "theme": { "type": "string", "description": "The Tailwind `@theme` bridge." },
@@ -71,7 +71,7 @@
       "properties": {
         "timingUnit": {
           "enum": ["ms", "s"],
-          "description": "The unit a TIMING variable (`motion/duration/*`, `motion/delay/*`) publishes. Figma stores seconds. `ms` republishes them as milliseconds, so a step the operator named for its milliseconds reads in the unit its name states (ruling 2026-09-12 row 2); `s` is the pre-0.4.0 form."
+          "description": "The unit a TIMING variable (`motion/duration/*`, `motion/delay/*`) publishes. Figma stores seconds. `ms` republishes them as milliseconds, so a step named for its milliseconds reads in the unit its name states; `s` is the pre-0.4.0 form."
         },
         "delayAliasOf": {
           "type": ["object", "null"],
@@ -120,7 +120,7 @@
         "breakpoints": {
           "type": "object",
           "additionalProperties": { "type": "number" },
-          "description": "P6.1 — house MIN-WIDTH THRESHOLD policy, `{ family: px }` keyed by `breakpoints.entries[].family` (e.g. `\"lg\"`). Overrides the emitted `@media (min-width)` threshold and the matching `--breakpoint-<family>` token; a family absent from the map keeps the Figma sample `widthPx` unchanged. Figma `device/width` samples are never rewritten by this key — required (may be `{}`) so a consumer states the policy rather than inheriting a silent default. Lock row 31 (operator, 2026-09-20): `{ md: 768, lg: 1025, xl: 1440 }`, Figma samples stay 375/768/1280/1920."
+          "description": "P6.1 — MIN-WIDTH THRESHOLD policy, `{ family: px }` keyed by `breakpoints.entries[].family` (e.g. `\"lg\"`). Overrides the emitted `@media (min-width)` threshold and the matching `--breakpoint-<family>` token; a family absent from the map keeps the Figma sample `widthPx` unchanged. Figma `device/width` samples are never rewritten by this key — required (may be `{}`) so a consumer states the policy rather than inheriting a silent default. Example: `{ md: 768, lg: 1025, xl: 1440 }` over Figma samples of 375/768/1280/1920."
         }
       }
     },

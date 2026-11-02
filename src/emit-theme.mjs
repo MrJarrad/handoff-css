@@ -59,7 +59,7 @@ export function themeEntries(doc, byId, cfg) {
         const sample = sampleSeen.get(family);
         const note = px === sample
           ? `${num(px)}px — Figma ${family} device width`
-          : `${num(px)}px — jhd policy threshold (Figma ${family} sample ${num(sample)}px)`;
+          : `${num(px)}px — policy threshold (Figma ${family} sample ${num(sample)}px)`;
         rows.push({
           ns: spec.ns,
           key: `--${spec.ns}-${family}`,

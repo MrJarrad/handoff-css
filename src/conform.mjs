@@ -232,7 +232,7 @@ export function conform({ doc, handoff, tokensCss, files, allowNames = [] }) {
 
   for (const { path: file, text: raw } of files) {
     // Comments out once, for every pass over this file: a stylesheet's prose
-    // names the very patterns being looked for (the portfolio's own header
+    // names the very patterns being looked for (a project's own header
     // block explains `--nav-col-unit` in words), and a checker that reports a
     // comment is a checker nobody runs twice.
     const text = stripComments(raw);

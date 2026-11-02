@@ -1,4 +1,4 @@
-// HT-24 / HT-6 (d) — one design system split across Figma files. Each file's
+// One design system split across Figma files. Each file's
 // Design System Handoff export lists only its own variables; a variable used
 // from a library arrives as an alias whose id carries the library's key
 // (`VariableID:<key>/<id>`) and whose chain hop names that key. Given every

@@ -61,7 +61,7 @@ concerns is built as the export states or not at all — never inlined from some
 
 | Code | Your move |
 | --- | --- |
-| `DS_EXPORT_NOT_LATEST` | A newer Design System Handoff run exists. Find it (Drop, vault `references/handoffs/`) and regenerate the brief against it; when you cannot find it, relay `DS_EXPORT_OUT_OF_DATE`. |
+| `DS_EXPORT_NOT_LATEST` | A newer Design System Handoff run exists. Find it (wherever your team keeps exports) and regenerate the brief against it; when you cannot find it, relay `DS_EXPORT_OUT_OF_DATE`. |
 | `STYLE_DIFFERS_FROM_DS_EXPORT` | The file changed after the Design System Handoff export. Relay `DS_EXPORT_OUT_OF_DATE`; build the style as exported meanwhile, one row. |
 | `STYLE_UNPUBLISHED` / `STYLE_CHANGED_SINCE_PUBLISH` | Bind the generated class as exported; row says "publish the style" — a design-file fix, not a code one. |
 | `STYLE_PUBLISH_NOT_CHECKED` | Note row; build as exported. |
