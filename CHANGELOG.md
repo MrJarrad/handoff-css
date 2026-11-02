@@ -4,6 +4,20 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ## Unreleased
 
+### Added
+
+- **The link run's notes can sit beside the brief (HT-55).** Operator ruling 2 Nov 2026: a brief made
+  from a link is exactly the plugin's. `design-handoff-script` now writes its own findings, sources and
+  asks to `<brief>.link-run.json` (schema `design-handoff-link-run` v1, published as
+  `handoff-css/schema/link-run`) and `.link-run.md`. `validate` finds the file beside the brief (or
+  takes it by name), checks its shape, and reads the export set from it exactly as it did from `linkRun`
+  inside the brief: `SET_MEMBER_MISSING`, `STALE_PAIR`, `DS_EXPORT_OUT_OF_DATE`, `LIVE_READ_OUT_OF_DATE`
+  and every finding code are unchanged. The file names its brief by `contentHash`
+  (`LINK_RUN_NOT_FOR_BRIEF`, error), and a brief that also carries `linkRun` is refused
+  (`LINK_RUN_TWICE`, error). A brief with `linkRun` inside (made before this) and a plugin brief with
+  none both validate as before. The `handoff-to-code` skill and its export-set reference say where the
+  notes are.
+
 ### Changed
 
 - **A hidden variable is no longer dropped (P7).** `hiddenFromPublishing` governs the Figma library

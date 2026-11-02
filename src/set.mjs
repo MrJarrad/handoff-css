@@ -29,16 +29,24 @@ const LIVE_BEHIND = new Set(["LIVE_READ_STALE", "ANNOTATION_NEWER_THAN_DS_EXPORT
  * @param {{specIndex?: string|null}} [options]  absolute path of the spec index, when given
  * @returns {{ ok: boolean, specs: {id: string, name: string, path: string}[], findings: {code: string, severity: "error"|"warning", path: string, message: string}[] }}
  */
-export function validateSet(brief, exports, { specIndex = null, briefFile = "<brief .json>" } = {}) {
+export function validateSet(brief, exports, { specIndex = null, briefFile = "<brief .json>", linkRunFile = null } = {}) {
   const findings = [];
   const add = (code, severity, path, message) => findings.push({ code, severity, path, message });
+  // The link run's notes are inside the brief (made before 0.16.0) or in a file beside it, never both:
+  // two sources cannot both be the run the brief came from. A file names its brief by content hash.
+  let linkRun = brief.linkRun;
+  if (linkRunFile) {
+    if (brief.linkRun) add("LINK_RUN_TWICE", "error", "/linkRun", "the brief carries `linkRun` and a link-run file was given too — use one: the brief's own, or the file the script wrote beside it");
+    else if (linkRunFile.brief?.contentHash !== brief.contentHash) add("LINK_RUN_NOT_FOR_BRIEF", "error", "/brief/contentHash", `the link-run file was made for a brief with contentHash \`${linkRunFile.brief?.contentHash}\`; this brief's is \`${brief.contentHash}\` — give the link-run file the script wrote beside this brief`);
+    else linkRun = linkRunFile.linkRun;
+  }
   const byName = (name) => exports.find((e) => e.doc.artifactFilename === name);
   // A stale pair is fixed, not refused: the brief made from an older
   // run is regenerated against the export given (figma-plugins
   // design-handoff-script); an export older than the brief's is replaced by
   // the run the brief names. A plugin-made brief records no file key, so its
   // regenerate also needs the file's link.
-  const regenerate = `regenerate the brief: \`design-handoff --regenerate ${briefFile} ${exports.map((e) => `--ds ${e.file}`).join(" ")} --live <live read .json>${brief.linkRun ? "" : ' "<figma link to the file>"'}\``;
+  const regenerate = `regenerate the brief: \`design-handoff --regenerate ${briefFile} ${exports.map((e) => `--ds ${e.file}`).join(" ")} --live <live read .json>${linkRun ? "" : ' "<figma link to the file>"'}\``;
   const fix = (given, made, name) => given.doc.generatedAt > made
     ? regenerate
     : `give the ${made} run of \`${name}\``;
@@ -54,7 +62,7 @@ export function validateSet(brief, exports, { specIndex = null, briefFile = "<br
     }
   }
 
-  const joined = brief.linkRun?.designSystemExports ?? [];
+  const joined = linkRun?.designSystemExports ?? [];
   joined.forEach((member, i) => {
     const given = byName(member.artifactFilename);
     if (!given) {
@@ -69,25 +77,25 @@ export function validateSet(brief, exports, { specIndex = null, briefFile = "<br
   // The script's own findings (unpublished or changed style, missing library,
   // a variable no export covers…) are decisions for a human, never inlined
   // around: each stays visible under the code the script gave it.
-  (brief.linkRun?.findings ?? []).forEach((f, i) => add(f.code, "warning", `/linkRun/findings/${i}`, f.message));
+  (linkRun?.findings ?? []).forEach((f, i) => add(f.code, "warning", `/linkRun/findings/${i}`, f.message));
   // The findings that mean this file's Design System Handoff export is
   // behind the file are one ask: that plugin run, by file name. Figma's REST
   // API reads no variables without the Enterprise-only file_variables:read
   // scope, so no agent can bring that export up to date itself. A variable
   // from a library (its id carries a key: `VariableID:<key>/…`) is a missing
   // export in the set, not a stale one.
-  const behind = (brief.linkRun?.findings ?? []).some((f) => BEHIND.has(f.code) || (f.code === "VARIABLE_NOT_IN_DS_EXPORTS" && !String(f.variableId).includes("/")));
-  const file = brief.linkRun?.sources?.find((s) => s.role === "this file")?.name ?? brief.documentName;
+  const behind = (linkRun?.findings ?? []).some((f) => BEHIND.has(f.code) || (f.code === "VARIABLE_NOT_IN_DS_EXPORTS" && !String(f.variableId).includes("/")));
+  const file = linkRun?.sources?.find((s) => s.role === "this file")?.name ?? brief.documentName;
   if (behind) add("DS_EXPORT_OUT_OF_DATE", "warning", "/linkRun/findings",
     `run the Design System Handoff plugin on ${file}, then regenerate the brief with its export — variables cannot be read without that plugin`);
   // Annotations behind the layer: an agent fixes this itself, with no plugin run.
   const layer = brief.selectedNodes?.[0]?.id ?? "the layer";
-  if ((brief.linkRun?.findings ?? []).some((f) => LIVE_BEHIND.has(f.code))) add("LIVE_READ_OUT_OF_DATE", "warning", "/linkRun/findings",
+  if ((linkRun?.findings ?? []).some((f) => LIVE_BEHIND.has(f.code))) add("LIVE_READ_OUT_OF_DATE", "warning", "/linkRun/findings",
     `run live/read.js on ${layer} through Figma MCP use_figma, then regenerate the brief with --live <that read> — the brief's annotations are behind the layer`);
 
   const specs = [];
   const missing = (brief.specs ?? []).map((s, i) => ({ ...s, i })).filter((s) => s.markdown == null);
-  const fileKey = brief.linkRun?.sources?.find((s) => s.role === "this file")?.fileKey ?? null;
+  const fileKey = linkRun?.sources?.find((s) => s.role === "this file")?.fileKey ?? null;
   const index = specIndex && missing.length ? readSpecIndex(specIndex) : [];
   for (const spec of missing) {
     const where = `/specs/${spec.i}`;

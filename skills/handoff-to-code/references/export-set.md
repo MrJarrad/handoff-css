@@ -1,7 +1,8 @@
 # The export set — joins, link-run findings, the spec index
 
-Read from `SKILL.md` § The export is a set, whenever the brief carries `linkRun` (every
-export `design-handoff-script` writes).
+Read from `SKILL.md` § The export is a set, whenever a link-run file sits beside the brief
+(`design-handoff-*.link-run.json`, written by `design-handoff-script`) or the brief carries `linkRun`
+(a brief made before 0.16.0).
 
 ## Making it
 
@@ -21,8 +22,11 @@ node handoff/design-handoff-script/bin/design-handoff.mjs "<link to the layer>" 
 
 A live read of another file or layer is refused before anything is read.
 
-It writes `design-handoff-<file>-<page>-<layer>-<date-time>.md` and `.json`: the plugin's
-export, then **Link-run findings** and **Sources** in the brief and `linkRun` in the JSON.
+It writes `design-handoff-<file>-<page>-<layer>-<date-time>.md` and `.json`, exactly the plugin's
+export, and beside them `…link-run.json` and `…link-run.md`: the script's **findings**, **sources** and
+**asks**. `validate` reads the `.link-run.json` next to the brief by itself (or name it); it names its
+brief by the brief's `contentHash`, so one made for another brief is `LINK_RUN_NOT_FOR_BRIEF`, and a
+brief that also carries `linkRun` is `LINK_RUN_TWICE`. Read the `.link-run.md` for the asks.
 
 **Bringing a stale brief up to date** — `STALE_PAIR` prints this; run it yourself:
 
@@ -52,7 +56,7 @@ the version folder it links to.
 | Join | Key | What `validate` does when it fails |
 | --- | --- | --- |
 | Brief → its own file's Design System Handoff export | `companion.artifactFilename`, then `contentHash` + `designSystemStateHash` | `STALE_PAIR` (error) |
-| Brief → each export the script used | `linkRun.designSystemExports[]` `artifactFilename` + `generatedAt` | `SET_MEMBER_MISSING` / `STALE_PAIR` (error) |
+| Brief → each export the script used | `linkRun.designSystemExports[]` (in the link-run file) `artifactFilename` + `generatedAt` | `SET_MEMBER_MISSING` / `STALE_PAIR` (error) |
 | Binding → its variable | the key in the variable id; the brief's **Sources** name the export that covers each library | the script reports `VARIABLE_NOT_IN_DS_EXPORTS` |
 | Instance / style → its library | component, set and style keys | the script reports `LIBRARY_MISSING` / `LIBRARY_NOT_READABLE` |
 | Spec → its text | file key (Sources, `role: this file`) + spec node id → spec index row | `SPEC_TEXT_NOT_IN_EXPORT` (no `--spec-index`), `SPEC_NOT_INDEXED` (warning), `SPEC_INDEX_PATH_MISSING` (error) |
@@ -64,7 +68,7 @@ emitted token, and SKILL.md step 3 already says what that is.
 
 ## Link-run findings — your move
 
-The script appends these after the plugin's sections; `validate` reports each as a warning
+The script writes these in the link-run file beside the brief (a brief made before 0.16.0 has them after the plugin's sections); `validate` reports each as a warning
 under its own code. Each one is a reported item: it gets a deviation row, and the value it
 concerns is built as the export states or not at all — never inlined from somewhere else.
 

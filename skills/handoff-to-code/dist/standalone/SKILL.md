@@ -67,7 +67,7 @@ each variable to its ruled name. Output shape, confidence rules and the table:
 
 | Input | What it is |
 | --- | --- |
-| `design-handoff-*.md` + `.json` | Layer brief: node tree, sizing chains, props, Build standards, changelog, **Link-run findings** (`linkRun`). |
+| `design-handoff-*.md` + `.json` | Layer brief: node tree, sizing chains, props, Build standards, changelog. Made by `design-handoff-script` it is exactly the plugin's; the script's own notes (**findings**, sources, asks) are beside it in `design-handoff-*.link-run.json` and `.md`, which `validate` finds on its own. A brief made before 0.16.0 holds them inside (`linkRun`). |
 | `*-design-system-handoff.json` | Companion, one per source the brief lists: every variable's `codeSyntax`, mode builds, `responsiveBehavior`. |
 | `handoff.config.mjs` | Consumer policy — schema versions, viewport units, aliases, paths. |
 | Generated tokens + theme | The CSS the JSON produced — the only place a value is stated. |

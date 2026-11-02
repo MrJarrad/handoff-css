@@ -287,6 +287,8 @@ handoff-css validate design-handoff-overlay.json design-handoff-overlay.md \
 | --- | --- | --- |
 | `STALE_PAIR` | error | a given export is not the run the brief names (companion hashes, or `linkRun` `generatedAt`); the message names the fix — `design-handoff --regenerate …` when the export is the newer half, the run the brief names when it is the older |
 | `SET_MEMBER_MISSING` | error | `linkRun.designSystemExports` names an export that was not given |
+| `LINK_RUN_NOT_FOR_BRIEF` | error | the link-run file beside the brief (`<brief>.link-run.json`, schema `design-handoff-link-run`) names another brief's `contentHash` |
+| `LINK_RUN_TWICE` | error | the brief carries `linkRun` and a link-run file was given too: one source |
 | `SPEC_INDEX_PATH_MISSING` | error | the spec index lists a file that is not there |
 | `SPEC_TEXT_NOT_IN_EXPORT` | warning | a spec has no text in the export and no `--spec-index` was given |
 | `SPEC_NOT_INDEXED` | warning | a spec has no row in the spec index (matched by file key + node id) |
