@@ -58,8 +58,8 @@ export function privateIds(doc, cfg) {
   // 2026-09-16 export started publishing) are emitted as `var()` references
   // exactly like an alias hop, so they must feed the same reachability
   // closure or a hidden colour/opacity primitive behind a COMPOSE_COLOR
-  // argument would wrongly land as an ordinary public token instead of PRIVATE (fenced)
-  // and the composing token would dangle.
+  // argument would be reported as an ordinary public token instead of PRIVATE
+  // (fenced, "not for direct use"). It is emitted either way.
   const hops = (v) =>
     v.modes
       .filter((m) => m.effective !== false)
