@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://handoff-css/schema/design-handoff-link-run.v1.schema.json",
+  "title": "Design Handoff link run — the script's own notes, beside the brief (schema design-handoff-link-run v1)",
+  "description": "0.16.0 — written by the link-run script (figma-plugins handoff/design-handoff-script) as `<brief>.link-run.json`, beside a brief that is exactly the plugin's. It holds what the script adds to the plugin's export: the Figma file version it read, the Design System Handoff exports it joined, each source file the layer uses, and its findings. It names its brief by the brief's `contentHash`. `handoff-css validate` reads it next to the brief it names, reports every finding as a warning and requires every named export in the set. Briefs made before 0.16.0 carry the same object as `linkRun` inside the brief; both stay readable, never both at once.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "brief",
+    "linkRun"
+  ],
+  "properties": {
+    "schema": {
+      "const": "design-handoff-link-run"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contentHash"
+      ],
+      "properties": {
+        "contentHash": {
+          "type": "string"
+        },
+        "artifactFilename": {
+          "type": "string"
+        }
+      }
+    },
+    "linkRun": {
+      "description": "Appended by the link-run script (figma-plugins handoff/design-handoff-script), never by the plugin: the Figma file version it read, the Design System Handoff exports it joined, each source file the layer uses, and its findings. `handoff-css validate` reports every finding as a warning and requires every named export in the set.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generatedBy",
+        "fileVersion",
+        "designSystemExports",
+        "sources",
+        "findings"
+      ],
+      "properties": {
+        "generatedBy": {
+          "const": "design-handoff-script"
+        },
+        "fileVersion": {
+          "type": "string"
+        },
+        "designSystemExports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "artifactFilename",
+              "documentName",
+              "generatedAt"
+            ],
+            "properties": {
+              "artifactFilename": {
+                "type": "string"
+              },
+              "documentName": {
+                "type": "string"
+              },
+              "generatedAt": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "role",
+              "fileKey"
+            ],
+            "properties": {
+              "role": {
+                "enum": [
+                  "this file",
+                  "library"
+                ]
+              },
+              "fileKey": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label": {
+                "type": "string"
+              },
+              "components": {
+                "type": "array"
+              },
+              "styles": {
+                "type": "array"
+              },
+              "variables": {
+                "type": "integer"
+              },
+              "designSystemExport": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

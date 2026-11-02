@@ -4,7 +4,7 @@
 // byte, because a package that breaks its own invocation while adding a
 // checker has not made anything safer.
 import path from "node:path";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 import { run } from "./index.mjs";
@@ -12,6 +12,7 @@ import { validateExport } from "./validate-export.mjs";
 import { validateHandoffMarkdown } from "./validate-handoff-md.mjs";
 import { validateBriefJson, validateBriefPair } from "./brief.mjs";
 import { validateSet } from "./set.mjs";
+import { validateLinkRunJson } from "./link-run.mjs";
 import { zipTextFiles } from "./zip.mjs";
 
 export const SUBCOMMANDS = ["validate", "conform", "match", "vendor"];
@@ -88,12 +89,19 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
   const briefJson = read.find((r) => r.abs.endsWith(".json") && r.text != null && safeParse(r.text)?.schema === "design-handoff");
   const briefMd = read.find((r) => r.abs.endsWith(".md") && r.text != null && !isDsMarkdown(r.text));
 
+  // 0.16.0 (HT-55) — the link run's notes, as a file beside the brief: named, or found next to the brief.
+  let linkRunJson = read.find((r) => r.abs.endsWith(".json") && r.text != null && safeParse(r.text)?.schema === "design-handoff-link-run");
+  if (!linkRunJson && briefJson) {
+    const beside = briefJson.abs.replace(/\.json$/, ".link-run.json");
+    if (beside !== briefJson.abs && existsSync(beside)) linkRunJson = { file: path.basename(beside), abs: beside, text: readFileSync(beside, "utf8") };
+  }
+
   const results = [];
   if (briefJson && briefMd && briefMd.text != null) {
     results.push(validateJson(briefJson.file, briefJson.text, { brief: true }));
     results.push(validateBriefMd(briefMd.file, briefMd.text, safeParse(briefJson.text)));
     for (const r of read) {
-      if (r === briefJson || r === briefMd) continue;
+      if (r === briefJson || r === briefMd || r === linkRunJson) continue;
       results.push(r.text == null
         ? { file: r.file, kind: "unreadable", ok: false, findings: [{ code: "UNREADABLE", severity: "error", line: 0, message: r.error.message }] }
         : r.abs.endsWith(".md") ? validateAnyMd(r.file, r.text) : validateJson(r.file, r.text));
@@ -101,9 +109,14 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
     const exports = read
       .map((r) => ({ file: r.file, doc: r.abs.endsWith(".json") && r.text != null ? safeParse(r.text) : null }))
       .filter((e) => e.doc?.schema === "design-system-handoff");
+    const linkRunDoc = linkRunJson ? safeParse(linkRunJson.text) : null;
+    const linkRunChecked = linkRunJson ? { file: linkRunJson.file, kind: "link-run", ...validateLinkRunJson(linkRunDoc) } : null;
+    if (linkRunChecked) results.push(linkRunChecked);
     results.push({ file: "(set)", kind: "set", ...validateSet(safeParse(briefJson.text) ?? {}, exports, {
       specIndex: specIndex && (path.isAbsolute(specIndex) ? specIndex : path.join(cwd, specIndex)),
       briefFile: briefJson.file,
+      // A link-run file that fails its own shape is reported on its own line and not trusted for the set.
+      linkRunFile: linkRunChecked?.ok ? linkRunDoc : null,
     }) });
   } else {
     for (const r of read) {
