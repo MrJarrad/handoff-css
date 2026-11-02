@@ -26,20 +26,22 @@ const LIBRARY = new Set(["text-primitives", "core", "color-primitives"]);
 
 /** Cut the export into a library file and a file that uses it, as Figma would export each. */
 export function split(doc = whole()) {
+  // Styles bind variables from both halves, so they are defined in the product file, which can see
+  // the library; the library holds none. Each export has its own contentHash, as two real ones do.
   const library = { ...doc, collections: doc.collections.filter((c) => LIBRARY.has(c.name)),
-    documentName: "Library", artifactFilename: "library-design-system-handoff", contentHash: "a".repeat(64) };
-  // Styles and their sheets are defined in the library; the product file holds none of its own.
-  // Each file's export has its own contentHash, as two real exports do.
-  const user = { ...doc, collections: doc.collections.filter((c) => !LIBRARY.has(c.name)),
     styles: Object.fromEntries(Object.keys(doc.styles).map((t) => [t, []])), styleSummaries: [], cssCustomPropertySheets: [],
+    documentName: "Library", artifactFilename: "library-design-system-handoff", contentHash: "a".repeat(64) };
+  const user = { ...doc, collections: doc.collections.filter((c) => !LIBRARY.has(c.name)),
     documentName: "Product", artifactFilename: "product-design-system-handoff", contentHash: "c".repeat(64) };
   const keyOf = new Map(library.collections.flatMap((c) => c.variables.map((v) => [v.id, v.key])));
   const remote = (id) => (keyOf.has(id) ? `VariableID:${keyOf.get(id)}/${id.slice("VariableID:".length)}` : id);
-  user.collections = JSON.parse(JSON.stringify(user.collections), (k, v) => {
+  const toRemote = (value) => JSON.parse(JSON.stringify(value), (k, v) => {
     if (v && typeof v === "object" && typeof v.variableId === "string" && keyOf.has(v.variableId)) return { ...v, variableId: remote(v.variableId), remote: true };
     if (v && typeof v === "object" && v.type === "VARIABLE_ALIAS" && keyOf.has(v.id)) return { ...v, id: remote(v.id) };
     return v;
   });
+  user.collections = toRemote(user.collections);
+  user.styles = toRemote(user.styles);
   return { library, user };
 }
 
@@ -141,4 +143,28 @@ test("two different exports sharing a name are joined, not refused: the same exp
   const again = structuredClone(library);
   again.documentName = "Renamed copy";
   assert.throws(() => generateSet([library, again], preset), /MERGE_SAME_EXPORT/);
+});
+
+// Figma variable and collection ids are only unique within a file: "VariableID:1:10" in a library
+// and "VariableID:1:10" in the file that uses it are different variables. Renumber each half the
+// way Figma numbers a new file, so the two files share ids, and the join must still tell them apart.
+function renumbered(doc) {
+  const ids = new Map()
+  doc.collections.forEach((c, i) => {
+    ids.set(c.id, `VariableCollectionId:1:${i}`)
+    c.variables.forEach((v, j) => ids.set(v.id, `VariableID:1:${i * 1000 + j}`))
+  })
+  const swap = (value) => JSON.parse(JSON.stringify(value), (k, v) => (typeof v === "string" && ids.has(v) ? ids.get(v) : v))
+  return { ...doc, collections: swap(doc.collections), breakpoints: swap(doc.breakpoints), mode: swap(doc.mode), cssCustomPropertySheets: swap(doc.cssCustomPropertySheets) }
+}
+
+test("two files whose local ids collide still join by key: each alias reaches its own variable", () => {
+  const { library, user } = split();
+  const [a, b] = [renumbered(library), renumbered(user)];
+  const shared = a.collections.flatMap((c) => c.variables.map((v) => v.id)).filter((id) => b.collections.some((c) => c.variables.some((v) => v.id === id)));
+  assert.ok(shared.length > 100, "the fixture really collides: " + shared.length);
+  const expected = generate(whole(), preset, { handAuthoredCss: "" });
+  const merged = generateSet([a, b], preset, { handAuthoredCss: "" });
+  assert.equal(body(merged.tokensCss), body(expected.tokensCss));
+  assert.equal(body(merged.themeCss), body(expected.themeCss));
 });

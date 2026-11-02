@@ -63,3 +63,13 @@ test("the house preset accepts schema 18 and 19, so tokens regenerate from the c
   assert.doesNotThrow(() => assertSchema(fresh(), preset));
   assert.doesNotThrow(() => assertSchema({ ...fresh(), schemaVersion: 18 }, preset));
 });
+
+// A library file of primitives only (every collection a single "default" mode) has no responsive
+// or theme modes, so the plugin writes an empty breakpoints list. That export is valid.
+test("an export whose collections have no responsive or theme modes validates: breakpoints may be empty", () => {
+  const doc = fresh();
+  doc.collections = doc.collections.filter((c) => c.modes.length === 1);
+  doc.breakpoints = { ...doc.breakpoints, entries: [] };
+  assert.ok(doc.collections.length > 0);
+  assert.deepEqual(validateExport(doc).errors, []);
+});

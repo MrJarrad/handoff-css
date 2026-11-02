@@ -35,6 +35,11 @@ export function mergeExports(docs) {
     seen.set(identity(doc), doc);
   }
 
+  // Figma ids are unique only within a file: two files can both hold "VariableID:1:10". Give every
+  // variable and collection an id from its key (unique across files) before anything is joined, and
+  // point that file's own references at the new ids.
+  docs = docs.map(globalIds);
+
   // Every variable by key; the first copy given owns the key (an export lists only its own file's
   // variables, so a later identical copy adds nothing and a differing one is refused below).
   const byKey = new Map();
@@ -85,11 +90,22 @@ export function mergeExports(docs) {
     generatedAt: docs.map((doc) => doc.generatedAt).join(" + "),
     fingerprint: { ...first.fingerprint, designSystemStateHash: docs.map((doc) => doc.fingerprint?.designSystemStateHash).join(" + ") },
     collections,
-    styles: Object.fromEntries(types.map((t) => [t, docs.flatMap((doc) => doc.styles?.[t] ?? [])])),
+    styles: Object.fromEntries(types.map((t) => [t, relink(docs.flatMap((doc) => doc.styles?.[t] ?? []))])),
     styleSummaries: docs.flatMap((doc) => doc.styleSummaries ?? []),
-    cssCustomPropertySheets: docs.flatMap((doc) => doc.cssCustomPropertySheets ?? []),
+    cssCustomPropertySheets: relink(docs.flatMap((doc) => doc.cssCustomPropertySheets ?? [])),
     // A mode is one entry, whichever export lists it.
     breakpoints: { ...first.breakpoints, entries: [...new Map(docs.flatMap((doc) => doc.breakpoints?.entries ?? [])
       .map((e) => [`${e.collectionId ?? e.collectionName}|${e.modeId}`, e])).values()] },
   };
+}
+
+/** One export with every local variable and collection id replaced by one built from its key. */
+function globalIds(doc) {
+  const ids = new Map();
+  for (const c of doc.collections) {
+    if (c.key) ids.set(c.id, `VariableCollectionId:${c.key}`);
+    for (const v of c.variables) if (v.key) ids.set(v.id, `VariableID:${v.key}`);
+  }
+  if (ids.size === 0) return doc;
+  return JSON.parse(JSON.stringify(doc), (k, v) => (typeof v === "string" && ids.has(v) ? ids.get(v) : v));
 }
