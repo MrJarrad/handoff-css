@@ -41,7 +41,7 @@ test("the real schema-17 export states body-style1/100's paragraphSpacing bound 
 test("generated styles.css carries the class's own declarations untouched, followed by an adjacent-sibling margin-block-start rule bound to the paragraph-spacing token", () => {
   const out = generate(doc, consumerConfig042, { handAuthoredCss: consumerCssV13() });
   assert.ok(out.stylesCss.includes(
-    "@utility body-style1-100 {\n  font-size: var(--text-body-font-size-100, 1rem);\n  line-height: var(--text-body-line-height-100, 1.3);\n  letter-spacing: var(--text-body-letter-spacing-100, 0em);\n  font-weight: 600;\n  font-family: var(--family-font-sans, \"Inter Tight\");\n}\n.body-style1-100 + .body-style1-100 {\n  margin-block-start: var(--text-body-paragraph-spacing-100, 16px);\n}",
+    "@utility body-style1-100 {\n  font-size: var(--text-body-font-size-100, 1rem);\n  line-height: var(--text-body-line-height-100, 1.3);\n  letter-spacing: var(--text-body-letter-spacing-100, 0em);\n  font-weight: var(--weight-strong, 600);\n  font-family: var(--family-font-sans, \"Inter Tight\");\n}\n.body-style1-100 + .body-style1-100 {\n  margin-block-start: var(--text-body-paragraph-spacing-100, 16px);\n}",
   ), out.stylesCss.slice(out.stylesCss.indexOf("body-style1-100"), out.stylesCss.indexOf("body-style1-100") + 400));
 });
 
