@@ -18,6 +18,10 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
   export. The join stops on `MERGE_KEY_CONFLICT`, `MERGE_NAME_COLLISION` and `MERGE_SAME_EXPORT`.
 - The generator's summary prints `inputs N (…) — joined by variable key` when more than one
   export is given.
+- **HT-27 slice 2 — the handoff-to-code skill reads the brief's `## Asks` statuses** (step 5b):
+  answered → build the answer; waiting on Figma → build the answer and relay the note; assumed →
+  build the suggestion; open → a reported item, never a guess. New deviation status `assumed-ask`
+  (ruling ref = the ask key). Pairs with figma-plugins `design-handoff-script --answers`.
 
 ## 0.13.0 — 2026-10-31
 

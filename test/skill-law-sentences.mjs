@@ -55,6 +55,10 @@ export const LAW_SENTENCES = [
   "**hand-authored-override**",
   "Ask only when the export binds no token where one is expected, or building\n  the export's value breaks something — never over plain value drift.",
   "An empty `ruling ref` on a non-match row is an unauthorised deviation.",
+
+  // HT-27 slice 2 — the brief's `## Asks`: each line's status says what a build does now.
+  "**An open ask is a reported item, never a guess.**",
+  "**assumed-ask**",
 ];
 
 /** The generator warning codes the skill must keep naming. */
