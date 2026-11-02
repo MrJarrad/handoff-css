@@ -4,7 +4,7 @@ import { aliasBlock } from "./aliases.mjs";
 import { aspectDescriptionFindings } from "./aspect.mjs";
 import { delayAliasFindings } from "./motion.mjs";
 import { aliasedByNames, isExcluded, privateIds } from "./exclude.mjs";
-import { layoutBreakpoints, placementsFor, renderGroups, themeModeIds, variantBase } from "./modes.mjs";
+import { modeDependents, mirrorPlacement, layoutBreakpoints, placementsFor, renderGroups, themeModeIds, variantBase } from "./modes.mjs";
 import { cmp, num, resolveValue, untrustedCells } from "./resolve.mjs";
 import { classify, honours, isViewportClass, VIEWPORT_FRACTION_TOLERANCE } from "./responsive.mjs";
 import { assertSchema, indexById, webName } from "./schema.mjs";
@@ -15,6 +15,8 @@ export function emitTokens(doc, handDeclared, cfg) {
 
   const byId = indexById(doc);
   const ctx = { layout: layoutBreakpoints(doc, cfg), theme: themeModeIds(doc) };
+  // P26 — variables to re-declare under a collection-mode attribute.
+  const modeDeps = modeDependents(doc, ctx, cfg, isExcluded);
   const priv = privateIds(doc, cfg); // P7 — hidden but alias-reachable, so still emitted
 
   const collections = [...doc.collections].sort((a, b) => cmp(a.name, b.name));
@@ -156,10 +158,17 @@ export function emitTokens(doc, handDeclared, cfg) {
       }
 
       const target = isPrivate ? privGroups : groups;
-      const push = (p, decl) => {
+      const add = (p, decl) => {
         const key = `${p.media ?? ""}|${p.selector}`;
         if (!target.has(key)) target.set(key, { ...p, lines: [] });
         target.get(key).lines.push(decl);
+      };
+      // P26 — a declaration that aliases through a variable a collection mode
+      // changes is mirrored under that mode's attribute, in the same wrapper.
+      const push = (p, decl) => {
+        add(p, decl);
+        const attrs = modeDeps.get(v.id);
+        if (attrs && /\bvar\(/.test(decl)) for (const attr of attrs) add(mirrorPlacement(p, attr), decl);
       };
 
       // viewport-* — a fraction of the screen holds at every viewport, so it is
@@ -221,6 +230,18 @@ export function emitTokens(doc, handDeclared, cfg) {
         const mv = v.modes.find((m) => m.modeId === mode.id);
         if (!mv || mv.effective === false) continue;
         const r = mv.modeId === defaultMode.modeId ? defaultResolved : resolveValue(v, mv, byId, cfg, c);
+        if (r.unresolvedWeight) {
+          // P22 — the export states no number for this mode's font-style
+          // string; the mode keeps the default's value rather than a guess.
+          warnings.push({
+            code: "FONT_WEIGHT_MODE_UNRESOLVED",
+            name,
+            collection: c.name,
+            mode: mode.name,
+            detail: `mode \`${mode.name}\` holds the font style \`${mv.raw}\`, which no weight variable in the export states a number for — not emitted for this mode (it keeps the default mode's weight)`,
+          });
+          continue;
+        }
         const decl = `${name}: ${r.value};${r.note ? ` /* ${r.note} */` : ""}`;
 
         // A variant this export publishes no rule for — and any collection

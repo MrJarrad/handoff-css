@@ -193,3 +193,64 @@ export function renderGroups(groups) {
   }
   return out;
 }
+
+/**
+ * P26 — which variables must be re-declared under a collection-mode attribute.
+ *
+ * A custom property whose value contains `var()` is resolved where it is
+ * DECLARED, then inherited as a resolved value. A layout role token such as
+ * `--text-title-letter-spacing-200: var(--letter-spacing-400)` is declared on
+ * `:root`, so a mode attribute set on a descendant that re-points
+ * `--letter-spacing-400` never reaches it: the role keeps the default mode's
+ * number. Re-declaring the alias under the attribute makes it resolve again
+ * where the mode is set.
+ *
+ * For every non-default mode of a collection that is neither a theme nor a
+ * layout width (so its placement is the plain `[attr="mode"]` selector), the
+ * collection's variables whose value differs from the default mode's are the
+ * CHANGED ones; every variable of another collection whose alias chain passes
+ * through one of them (in any of its modes) is a DEPENDENT.
+ *
+ * @returns {Map<string, string[]>} dependent variable id -> mode selectors
+ */
+export function modeDependents(doc, ctx, cfg, isExcluded) {
+  const out = new Map();
+  for (const c of doc.collections) {
+    if (c.modes.length < 2) continue;
+    for (const mode of c.modes) {
+      if (mode.id === c.defaultModeId) continue;
+      const places = placementsFor(c, mode, ctx, cfg);
+      const attr = `[${modeAttribute(c.name, cfg)}="${mode.name}"]`;
+      if (places.length !== 1 || places[0].selector !== attr || places[0].media) continue;
+      const changed = new Set();
+      for (const v of c.variables) {
+        const base = v.modes.find((m) => m.modeId === c.defaultModeId);
+        const alt = v.modes.find((m) => m.modeId === mode.id);
+        if (base && alt && JSON.stringify(base.raw) !== JSON.stringify(alt.raw)) changed.add(v.id);
+      }
+      if (!changed.size) continue;
+      for (const other of doc.collections) {
+        if (other === c) continue;
+        for (const v of other.variables) {
+          if (isExcluded(other, v, cfg)) continue;
+          const hits = v.modes.some((m) => (m.alias?.chain ?? []).some((h) => changed.has(h.variableId)));
+          if (!hits) continue;
+          if (!out.has(v.id)) out.set(v.id, []);
+          if (!out.get(v.id).includes(attr)) out.get(v.id).push(attr);
+        }
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * Where a dependent's declaration is mirrored: the same media wrapper, the mode
+ * attribute in place of `:root` (ordered after it, so on the one element both
+ * match the later rule wins), or — beneath a layout variant's selector — the
+ * attribute on that element or on a descendant of it.
+ */
+export function mirrorPlacement(p, attr) {
+  if (p.selector === ":root") return { ...p, selector: attr };
+  return { ...p, selector: `${p.selector}${attr}, ${p.selector} ${attr}` };
+}

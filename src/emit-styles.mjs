@@ -213,6 +213,40 @@ function bindFontFamily(type, selector, declarations, familyByValue) {
 }
 
 /**
+ * P21.6 — a TEXT style that binds `fontStyle` to a font-style variable
+ * (`weight/600`) states `font-weight` as the bare number in its own
+ * `cssClass.declarations`, so a mode that re-points the variable can never
+ * reach the class. The same plugin gap as the font-family one (P21.5): the
+ * binding is in `properties.boundVariables.fontStyle`, the declaration ignores
+ * it. Emits `font-weight: var(<token>, <number>)`, the number being the
+ * export's own, and only when the literal equals the number the bound variable
+ * states, so nothing is re-derived.
+ */
+function bindFontWeight(type, style, declarations, byId) {
+  if (type !== "TEXT") return { declarations, findings: [] };
+  const id = style.properties?.boundVariables?.fontStyle?.id;
+  const variable = id ? byId.get(id) : null;
+  const states = variable?.fontWeightNumeric?.css;
+  if (states == null) return { declarations, findings: [] };
+  const selector = style.cssClass.selector;
+  const findings = [];
+  const out = declarations.map((decl) => {
+    const m = /^font-weight:\s*(.+)$/.exec(decl);
+    if (!m) return decl;
+    const literal = m[1].trim();
+    if (literal.startsWith("var(")) return decl;
+    if (literal !== String(states)) return decl;
+    findings.push({
+      code: "STYLE_CLASS_WEIGHT_BOUND",
+      name: selector,
+      detail: `\`font-weight\` literal ${literal} bound to \`${webName(variable)}\` (\`${variable.name}\`), the font-style variable this style binds (P21).`,
+    });
+    return `font-weight: var(${webName(variable)}, ${literal})`;
+  });
+  return { declarations: out, findings };
+}
+
+/**
  * P24 — a PROGRESSIVE `BACKGROUND_BLUR` effect (`effects[0].blurType:
  * "PROGRESSIVE"`) fades the blur radius along an axis instead of holding it
  * constant. The export's `cssClass.declarations` states none of that: every
@@ -373,6 +407,9 @@ export function emitStyles(doc, byId, handClasses, handUtils, cfg) {
       const bound = bindFontFamily(type, selector, declarations, familyByValue);
       declarations = bound.declarations;
       warnings.push(...bound.findings);
+      const weight = bindFontWeight(type, style, declarations, byId);
+      declarations = weight.declarations;
+      warnings.push(...weight.findings);
       const spacing = bindParagraphSpacing(type, style, declarations, byId);
       declarations = spacing.declarations;
       warnings.push(...spacing.findings);

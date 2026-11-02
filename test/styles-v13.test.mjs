@@ -35,6 +35,17 @@ const paragraphSpacingSiblingRule = (s) => {
   return `${selector} + ${selector} {\n  margin-block-start: var(${webName(variable)}, ${fallback});\n}`;
 };
 
+
+/** P21.6 — a TEXT style that binds a font-style variable emits `font-weight`
+ * through it: `font-weight: var(<token>, <the export's number>)`. */
+const weightBound = (s, decl) => {
+  const m = /^font-weight:\s*(\S+)$/.exec(decl);
+  const variable = byId.get(s.properties?.boundVariables?.fontStyle?.id);
+  if (!m || !variable?.fontWeightNumeric || String(variable.fontWeightNumeric.css) !== m[1]) return decl;
+  return `font-weight: var(${webName(variable)}, ${m[1]})`;
+};
+const WEIGHT = webName([...byId.values()].find((v) => v.fontWeightNumeric));
+
 for (const [field, file] of [
   ["tokensCss", "tokens.generated.css"],
   ["stylesCss", "styles.generated.css"],
@@ -76,21 +87,21 @@ test("the done-when class is emitted as a Tailwind v4 @utility with its font-fam
   font-size: var(--text-title-font-size-100, 1rem);
   line-height: 1.1;
   letter-spacing: var(--letter-spacing-300, -0.015625em);
-  font-weight: 500;
+  font-weight: var(${WEIGHT}, 500);
   font-family: var(--family-font-sans, "Suisse Intl");
 }`),
     out.stylesCss.slice(0, 1200),
   );
 });
 
-test("every style with declarations is emitted as an @utility, verbatim (font-family bound) and in the export's order", () => {
+test("every style with declarations is emitted as an @utility, verbatim (font-family and font-weight bound) and in the export's order", () => {
   for (const type of ["TEXT", "EFFECT", "GRID", "PAINT"]) {
     for (const s of doc.styles[type]) {
       if (!s.cssClass?.declarations?.length) continue;
       let decls = s.cssClass.declarations.map((d) =>
         type === "TEXT" && d === 'font-family: "Suisse Intl"'
           ? 'font-family: var(--family-font-sans, "Suisse Intl")'
-          : d);
+          : type === "TEXT" ? weightBound(s, d) : d);
       let block = `@utility ${s.cssClass.selector.slice(1)} {\n${decls.map((d) => `  ${d};`).join("\n")}\n}`;
       if (type === "TEXT") {
         const siblingRule = paragraphSpacingSiblingRule(s);
@@ -101,7 +112,7 @@ test("every style with declarations is emitted as an @utility, verbatim (font-fa
   }
 });
 
-test("the emitted rule reproduces the export's own `cssClass.css` for every property but `font-family`, as an @utility", () => {
+test("the emitted rule reproduces the export's own `cssClass.css` for every property but `font-family` and `font-weight`, as an @utility", () => {
   // Two independent statements of the same class in the export. If this
   // generator ever recomposed a declaration other than the one documented
   // substitution, these would drift.
@@ -112,10 +123,9 @@ test("the emitted rule reproduces the export's own `cssClass.css` for every prop
     }
   }
   for (const s of doc.styles.TEXT) {
-    let rebound = asUtility(s, s.cssClass.css).replace(
-      'font-family: "Suisse Intl";',
-      'font-family: var(--family-font-sans, "Suisse Intl");',
-    );
+    let rebound = asUtility(s, s.cssClass.css)
+      .replace('font-family: "Suisse Intl";', 'font-family: var(--family-font-sans, "Suisse Intl");')
+      .replace(/font-weight: (\S+);/, (whole, n) => `${weightBound(s, `font-weight: ${n}`)};`);
     const siblingRule = paragraphSpacingSiblingRule(s);
     if (siblingRule) rebound = `${rebound}\n${siblingRule}`;
     assert.ok(out.stylesCss.includes(rebound), `${s.cssClass.selector} does not match cssClass.css modulo font-family binding/paragraph-spacing sibling rule`);
@@ -157,7 +167,7 @@ test("`styles.emit: \"class\"` opts back into a bare, unlayered class — 0.5.0 
   font-size: var(--text-title-font-size-100, 1rem);
   line-height: 1.1;
   letter-spacing: var(--letter-spacing-300, -0.015625em);
-  font-weight: 500;
+  font-weight: var(${WEIGHT}, 500);
   font-family: var(--family-font-sans, "Suisse Intl");
 }`));
   assert.ok(!mine.stylesCss.includes("@utility"));
