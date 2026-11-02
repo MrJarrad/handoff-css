@@ -25,6 +25,14 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Fixed (#44 review r1, before the tag)
 
+- Two files' exports whose local ids collide (Figma numbers each file's variables and collections
+  from scratch, so a library and the file using it can both hold `VariableID:1:10`) now join
+  correctly: every variable and collection takes an id from its key before the join, and library
+  aliases inside styles and sheets are relinked too. Before, an alias could resolve to the other
+  file's variable of the same id.
+- An export whose collections have no responsive or theme modes (a primitives-only library) has an
+  empty `breakpoints.entries`; the schema now accepts it.
+
 - A zip saved by macOS Finder reads: `__MACOSX/` and `._*` entries are skipped, and an entry that
   is not JSON is named (`<zip> › <entry>`) instead of a bare parse error.
 - `vendor <zip>` takes the entry whose schema is `design-system-handoff`, never the first `.json`,

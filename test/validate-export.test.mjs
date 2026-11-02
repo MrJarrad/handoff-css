@@ -157,14 +157,6 @@ test("a truncated contentHash fails at /contentHash", () => {
   assert.equal(hit.keyword, "pattern");
 });
 
-test("an empty breakpoints.entries fails at /breakpoints/entries", () => {
-  const doc = docV8b();
-  doc.breakpoints.entries = [];
-  const hit = validateExport(doc).errors.find((e) => e.path === "/breakpoints/entries");
-  assert.ok(hit);
-  assert.equal(hit.keyword, "minItems");
-});
-
 test("a wrong `schema` string fails — a design-handoff markdown companion is not an export", () => {
   const doc = docV8b();
   doc.schema = "design-handoff";
