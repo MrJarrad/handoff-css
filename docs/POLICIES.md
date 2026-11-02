@@ -144,7 +144,7 @@ closure, not the published set:
 emit = published ∪ { reachable by alias from an emitted variable }
 ```
 
-Three classes, reported separately:
+Two classes, reported separately:
 
 - **PRIVATE** — hidden, but reachable by alias from an emitted variable (walk
   `alias.chain[0]` transitively across every effective mode; light and dark
@@ -152,16 +152,17 @@ Three classes, reported separately:
   because the aliases have to resolve — fenced in a marked block so the file
   states the intent the publish flag was carrying: these exist to be aliased, not
   used directly. Never a public row, never MISSING or EXTRA downstream.
-- **HIDDEN** — hidden **and** unreachable. Nothing refers to it, so dropping it
-  breaks nothing. Never emitted. This is the export's own signal and the durable
-  fix: once Figma marks a variable hidden, it lands here with no config change.
+- **Hidden and unreachable** — *not a class any more.* The Figma hide flag governs the Figma
+  library only (operator ruling 2026-11-02: "hide from publishing is for figma only"), so a
+  hidden variable nothing aliases is emitted like any other token. (Until then it was dropped
+  as HIDDEN.)
 - **EXCLUDED** — the variable's `"<collection>/<name>"` path starts with an entry
   in `exclude.paths`. A **policy** list, applied wholesale on path identity
   regardless of hidden state, and **never revived by reachability** — if product
   code must not consume it, an alias to it is a design-file bug worth surfacing,
   not papering over.
 
-All three are excluded from the reconciliation rows, so MATCH / VALUE-DRIFT /
+Both are excluded from the reconciliation rows, so MATCH / VALUE-DRIFT /
 NAME-ONLY-IN-EXPORT never reflect them. Only PRIVATE is emitted.
 
 `exclude.paths` · `src/exclude.mjs`

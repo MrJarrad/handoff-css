@@ -3,7 +3,7 @@
 import { aliasBlock } from "./aliases.mjs";
 import { aspectDescriptionFindings } from "./aspect.mjs";
 import { delayAliasFindings } from "./motion.mjs";
-import { aliasedByNames, isExcluded, isHidden, privateIds } from "./exclude.mjs";
+import { aliasedByNames, isExcluded, privateIds } from "./exclude.mjs";
 import { layoutBreakpoints, placementsFor, renderGroups, themeModeIds, variantBase } from "./modes.mjs";
 import { cmp, num, resolveValue, untrustedCells } from "./resolve.mjs";
 import { classify, honours, isViewportClass, VIEWPORT_FRACTION_TOLERANCE } from "./responsive.mjs";
@@ -58,11 +58,10 @@ export function emitTokens(doc, handDeclared, cfg) {
         excludedRows.push({ collection: c.name, name, reason: `EXCLUDE_PATHS (${c.name})` });
         continue;
       }
-      // P7 — hidden AND unreachable: nothing refers to it, dropping is safe.
-      if (isHidden(v) && !priv.has(v.id)) {
-        hiddenRows.push({ collection: c.name, name });
-        continue;
-      }
+      // The Figma hide flag governs the Figma library only (operator ruling
+      // 2026-11-02: "hide from publishing is for figma only"): a hidden variable
+      // nothing aliases is emitted like any other token. `hiddenRows` stays in the
+      // result, always empty, so consumers reading the field keep working.
       // P7 — hidden but alias-reachable (PRIVATE). Emitted under the same name
       // so the referring semantic tokens resolve, but never a public row.
       const isPrivate = priv.has(v.id);

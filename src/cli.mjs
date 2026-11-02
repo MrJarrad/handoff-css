@@ -253,7 +253,6 @@ async function generateCommand(argv, { cwd, stdout, stderr }) {
       `  VALUE-DRIFT             ${count("VALUE-DRIFT")}`,
       `  NAME-ONLY-IN-EXPORT     ${count("NAME-ONLY-IN-EXPORT")}`,
       `  PRIVATE                 ${privateRows.length}  (hidden, alias-reachable — emitted)`,
-      `  HIDDEN                  ${hiddenRows.length}  (hidden, unreachable — dropped)`,
       `  EXCLUDED                ${excludedRows.length}`,
       `  responsive classes      ${honoured} honoured (${config.responsive.honourClasses.join(", ") || "none"})`,
       `  aliases                 ${aliasRows.length}`,
