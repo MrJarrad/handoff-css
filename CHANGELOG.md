@@ -2,6 +2,23 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## 0.14.0 — 2026-11-02
+
+### Added
+
+- **HT-24 — the plugin's `.zip` is read directly.** `validate`, the generator's `--input` and
+  `vendor` take the `.zip` the Design System Handoff plugin and `design-handoff-script` save,
+  in place of the `.json` and `.md` inside it (`src/zip.mjs`, `node:zlib` only, stored and
+  deflated entries; ZIP64 and encrypted zips refused by name).
+- **HT-24 / HT-6 (d) — one design system split across Figma files generates as one.** `--input`
+  may be given once per file, or `paths.input` may be a list. The exports are joined by variable
+  key (`src/merge.mjs`, `generateSet` in the library), so an alias to a library variable is
+  `var(--its-name)` rather than an inlined value. Proof: the 29 Oct export cut into a library file
+  and a product file generates byte-identical tokens, theme and style classes to the uncut
+  export. The join stops on `MERGE_KEY_CONFLICT`, `MERGE_NAME_COLLISION` and `MERGE_SAME_EXPORT`.
+- The generator's summary prints `inputs N (…) — joined by variable key` when more than one
+  export is given.
+
 ## 0.13.0 — 2026-10-31
 
 ### Added

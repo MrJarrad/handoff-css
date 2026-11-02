@@ -107,7 +107,12 @@ config declares, and every listed spec's file is read.
 ### 2. Regenerate, then read every warning
 
 `handoff-css --config handoff.config.mjs --check` exits 1 on drift — red means stale tokens,
-regenerate and commit first. Read the responsive/aliases report, one warning per row:
+regenerate and commit first. A design system split across Figma files generates as one:
+`paths.input` lists every file's Design System Handoff export (or pass `--input` once per file),
+joined by variable key, so a library alias stays `var()`. A `MERGE_*` error names the two files
+that disagree — re-export them from one state; never drop one to get green. Every command takes
+the plugin's `.zip` in place of the `.json` and `.md` inside it. Read the responsive/aliases
+report, one warning per row:
 
 | Code | Your move |
 | --- | --- |

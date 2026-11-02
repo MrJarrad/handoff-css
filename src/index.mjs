@@ -3,7 +3,8 @@
 // (schema `design-system-handoff`).
 //
 // Library:  generate(handoffJson, config, { handAuthoredCss })
-// CLI:      handoff-css [--config <mjs>] [--input <json>] [--out <css>]
+//           generateSet([exportJson, …], config, { handAuthoredCss })  — HT-24
+// CLI:      handoff-css [--config <mjs>] [--input <json|zip>…] [--out <css>]
 //                       [--theme <css>] [--report <md>] [--exclusions <json>]
 //                       [--check]
 //
@@ -27,6 +28,8 @@ import { sheetFindings } from "./sheets.mjs";
 import { cmp, fail } from "./resolve.mjs";
 import { indexById } from "./schema.mjs";
 import { assertValidExport } from "./validate-export.mjs";
+import { mergeExports } from "./merge.mjs";
+import { readExports } from "./zip.mjs";
 
 export { validateConfig, configSchema } from "./config.mjs";
 // P16 — the consumer conformance check, callable as a library. The package's
@@ -48,12 +51,31 @@ export { validateExport, assertValidExport, exportSchema, VALIDATED_SCHEMA_VERSI
  *                        properties win the cascade and suppress emission (P2)
  */
 export function generate(doc, config, { handAuthoredCss = "" } = {}) {
-  const cfg = assertConfig(config);
   // P14 — the export is checked against the published schema BEFORE a line of
   // CSS exists. A schema-7 export skips the check (legacy, see
   // `validate-export.mjs`); anything the config declares but the schema does
   // not know stops here rather than half-generating.
+  assertConfig(config);
   assertValidExport(doc);
+  return build(doc, config, { handAuthoredCss });
+}
+
+/**
+ * HT-24 — one design system split across Figma files: every file's export,
+ * each checked against the schema, joined by variable key (`merge.mjs`), then
+ * generated as one. A single export behaves exactly as `generate`.
+ *
+ * @param docs  the parsed exports, one per Figma file
+ */
+export function generateSet(docs, config, { handAuthoredCss = "" } = {}) {
+  assertConfig(config);
+  if (docs.length === 0) fail("no export given");
+  for (const doc of docs) assertValidExport(doc);
+  return build(mergeExports(docs), config, { handAuthoredCss });
+}
+
+function build(doc, config, { handAuthoredCss }) {
+  const cfg = assertConfig(config);
   const { declared: handDeclared, scoped: handScoped, classes: handClasses,
           utilities: handUtilities } = readHandAuthored(handAuthoredCss);
   const { css, rows, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings,
@@ -129,16 +151,22 @@ export function generate(doc, config, { handAuthoredCss = "" } = {}) {
 
 function parseArgs(argv, defaults) {
   const opts = { ...defaults, check: false };
+  // HT-24 — one `--input` per Figma file of a split design system; any given
+  // replace the config's list, never add to it.
+  const inputs = [];
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
     if (a === "--check") opts.check = true;
     else if (a === "--config") i += 1; // resolved by the CLI before `run`
+    else if (a === "--input") inputs.push(argv[++i] ?? fail(`${a} needs a value`));
     else if (a.startsWith("--")) {
       const key = a.slice(2);
       if (!(key in defaults)) fail(`unknown flag ${a}`);
       opts[key] = argv[++i] ?? fail(`${a} needs a value`);
     } else fail(`unexpected argument ${a}`);
   }
+  if (inputs.length > 0) opts.input = inputs;
+  opts.input = [opts.input].flat();
   return opts;
 }
 
@@ -151,9 +179,10 @@ export function run(argv = [], { cwd = process.cwd(), config } = {}) {
   const opts = parseArgs(argv, assertConfig(config).paths);
   const abs = (p) => (path.isAbsolute(p) ? p : path.join(cwd, p));
 
-  const doc = JSON.parse(readFileSync(abs(opts.input), "utf8"));
+  const docs = opts.input.flatMap((p) => readExports(abs(p)));
   const handAuthoredCss = readFileSync(abs(opts.handAuthored), "utf8");
-  const out = generate(doc, config, { handAuthoredCss });
+  const out = generateSet(docs, config, { handAuthoredCss });
+  out.inputs = docs.map((d) => d.artifactFilename ?? d.documentName ?? "export");
 
   const write = (p, contents) => {
     const target = abs(p);
