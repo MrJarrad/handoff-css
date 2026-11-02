@@ -8,7 +8,7 @@
 // current set carried forward, the new export in place of its old self —
 // then repoints `latest` and says what it did. Nothing existing is written.
 import path from "node:path";
-import { zipTextFiles } from "./zip.mjs";
+import { exportsInZip, zipTextFiles } from "./zip.mjs";
 import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, readlinkSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 
 const VERSION_DIR = /^v(\d+)-/;
@@ -22,16 +22,22 @@ export function vendorCommand(args, { cwd = process.cwd(), stdout = process.stdo
   const abs = (p) => (path.isAbsolute(p) ? p : path.join(cwd, p));
   // HT-24 — the plugin's .zip holds the export's .json and .md; read both from it.
   const zipFile = files.find((f) => /\.zip$/i.test(f));
-  let inZip = [];
+  let inZip = [], candidates = [];
   if (zipFile) {
     try {
       inZip = zipTextFiles(abs(zipFile), zipFile);
+      candidates = exportsInZip(abs(zipFile), zipFile);
     } catch (err) {
       return fail(`cannot read ${zipFile}: ${err.message}`);
     }
+    // #44 r1: the export is the entry whose schema says so, never the first .json in the zip.
+    if (candidates.length === 0) return fail(`${zipFile} holds no Design System Handoff export (.json, schema design-system-handoff)`);
+    if (candidates.length > 1) return fail(`${zipFile} holds ${candidates.length} Design System Handoff exports (${candidates.map((c) => c.file).join(", ")}) — vendor one at a time`);
   }
-  const zipJson = inZip.find((f) => f.name.endsWith(".json"));
-  const zipMd = inZip.find((f) => f.name.endsWith(".md"));
+  const zipJson = candidates[0];
+  // Its .md is the one beside it by name, else the zip's only .md.
+  const mds = inZip.filter((f) => f.name.endsWith(".md"));
+  const zipMd = zipJson && (mds.find((f) => f.name === zipJson.name.replace(/\.json$/i, ".md")) ?? (mds.length === 1 ? mds[0] : undefined));
   const jsonFile = zipJson?.file ?? files.find((f) => f.endsWith(".json"));
   const mdFile = zipMd?.file ?? files.find((f) => f.endsWith(".md"));
   if (!jsonFile) return fail(zipFile ? `${zipFile} holds no .json export` : "name the export's .json (and optionally its .md), or its .zip");
