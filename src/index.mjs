@@ -107,9 +107,9 @@ function build(doc, config, { handAuthoredCss }) {
   //             one as EXTRA (they are in the CSS) — and a checker reading the
   //             CSS alone would report them as public MATCHes. They are neither.
   //
-  // Plain HIDDEN names are absent on purpose: a checker can read
-  // `hiddenFromPublishing` / `effectivelyHiddenFromPublishing` straight off the
-  // same export it already consumes.
+  // A hidden variable nothing aliases is neither listed here nor dropped: the
+  // Figma hide flag drops nothing (ruling 2026-11-02), so it is emitted as an
+  // ordinary public token.
   const exclusionsJson = `${JSON.stringify(
     {
       generatedAt: doc.generatedAt,

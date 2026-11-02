@@ -1,8 +1,9 @@
-// Policy P7 — PRIVATE / HIDDEN / EXCLUDED. Figma-only scaffolding must never
-// become a public token, but hidden-in-Figma does NOT mean absent-from-CSS: a
-// custom property that is referenced and not declared is invalid at
-// computed-value time. The emit set is therefore the alias closure, not the
-// published set. See docs/POLICIES.md.
+// Policy P7 — PRIVATE / EXCLUDED. A variable hidden in Figma but aliased by an
+// emitted token is PRIVATE (emitted, fenced): a custom property that is
+// referenced and not declared is invalid at computed-value time. The Figma hide
+// flag drops nothing (operator ruling 2026-11-02, "hide from publishing is for
+// figma only"), so a hidden variable nothing aliases is emitted as an ordinary
+// token; only EXCLUDED paths are never emitted. See docs/POLICIES.md.
 import { cmp, composeColorAliasPair } from "./resolve.mjs";
 import { webName } from "./schema.mjs";
 
@@ -57,7 +58,7 @@ export function privateIds(doc, cfg) {
   // 2026-09-16 export started publishing) are emitted as `var()` references
   // exactly like an alias hop, so they must feed the same reachability
   // closure or a hidden colour/opacity primitive behind a COMPOSE_COLOR
-  // argument would wrongly land HIDDEN (dropped) instead of PRIVATE (emitted)
+  // argument would wrongly land as an ordinary public token instead of PRIVATE (fenced)
   // and the composing token would dangle.
   const hops = (v) =>
     v.modes

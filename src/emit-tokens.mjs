@@ -20,7 +20,7 @@ export function emitTokens(doc, handDeclared, cfg) {
   const collections = [...doc.collections].sort((a, b) => cmp(a.name, b.name));
   const rows = []; // reconciliation rows, one per (collection, variable)
   const privateRows = []; // P7 — hidden but alias-reachable: emitted, fenced, not public
-  const hiddenRows = []; // P7 — hidden AND unreachable: never emitted
+  const hiddenRows = []; // always empty: the hide flag drops nothing (ruling 2026-11-02); kept so the result shape holds
   const excludedRows = []; // P7 — EXCLUDE_PATHS policy list
   const responsiveRows = []; // P11 — one row per emitted variable: class, source, effect
   // P13 — every self-contradicting build cell in the export, scanned once and
