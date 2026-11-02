@@ -90,10 +90,12 @@ npm i -D handoff-css      # pnpm add -D handoff-css
 ## Library use
 
 ```js
-import { generate } from "handoff-css";
+import { generate, generateSet } from "handoff-css";
 import config from "./handoff.config.mjs";
 
 const out = generate(JSON.parse(exportJson), config, { handAuthoredCss });
+// one design system split across files (0.14.0): every file's export, joined by key
+const set = generateSet([primitives, product], config, { handAuthoredCss });
 // out.tokensCss, out.themeCss, out.report, out.exclusionsJson
 // out.rows, out.themeRows, out.privateRows, out.hiddenRows, out.excludedRows
 // out.aliasRows, out.warnings
@@ -219,22 +221,42 @@ still get the whole report; it just carries no commentary.
 
 ```
 handoff-css [--config <mjs>]        default: ./handoff.config.mjs
-            [--input <json>] [--out <css>] [--theme <css>]
+            [--input <json|zip>…] [--out <css>] [--theme <css>]
             [--report <md>] [--exclusions <json>]
             [--check]
 
-handoff-css validate <file…> [--spec-index <md>] [--json]
+handoff-css validate <file|zip…> [--spec-index <md>] [--json]
 
 handoff-css conform --export <json> --handoff <md> --tokens <css>
                     --css <file…> [--json]
 
 handoff-css match --handoff <md> --src <path…> [--rulings <md>] [--json]
 
-handoff-css vendor <export.json> [<export.md>] --into <dir>
+handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 ```
 
 Flags override `paths.*`. `--check` writes nothing and exits 1 on any
 difference.
+
+**The plugin's `.zip`** (0.14.0). Every command takes the `.zip` the Design System Handoff
+plugin and `design-handoff-script` save, in place of the `.json` and `.md` inside it. `validate`
+names each file as `<zip> › <file>`; anything else in the zip (screenshots) is ignored.
+Stored and deflated entries are read with `node:zlib`; ZIP64 and encrypted zips are refused.
+
+**A design system split across Figma files** (0.14.0). Each file's Design System Handoff
+export lists only its own variables; a variable used from a library arrives as an alias carrying
+the library's key. Give every file's export — `--input` once per file, or a list in
+`paths.input` — and they are joined by variable key into one token file, library aliases kept
+as `var()`:
+
+```sh
+handoff-css --input design/handoff/latest/primitives.json --input design/handoff/latest/product.json
+```
+
+The join never guesses. It stops, naming both files, when one key is stated two different ways
+(`MERGE_KEY_CONFLICT`), two variables claim one CSS name (`MERGE_NAME_COLLISION`), or one export
+is given twice (`MERGE_SAME_EXPORT`). An alias whose library export was not given is inlined and
+reported, as it is for a single export.
 
 ### `validate` — is the pair itself well-formed?
 

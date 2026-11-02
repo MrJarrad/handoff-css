@@ -12,18 +12,19 @@ import { validateExport } from "./validate-export.mjs";
 import { validateHandoffMarkdown } from "./validate-handoff-md.mjs";
 import { validateBriefJson, validateBriefPair } from "./brief.mjs";
 import { validateSet } from "./set.mjs";
+import { zipTextFiles } from "./zip.mjs";
 
 export const SUBCOMMANDS = ["validate", "conform", "match", "vendor"];
 
 const USAGE = `handoff-css — Design Handoff export → CSS custom properties
 
-  handoff-css [--config <mjs>] [--input <json>] [--out <css>] [--theme <css>]
+  handoff-css [--config <mjs>] [--input <json|zip>…] [--out <css>] [--theme <css>]
               [--report <md>] [--exclusions <json>] [--check]
-  handoff-css validate <file…> [--spec-index <md>] [--json]
+  handoff-css validate <file|zip…> [--spec-index <md>] [--json]
   handoff-css conform --export <json> --handoff <md> --tokens <css> --css <file…>
               [--config <mjs>] [--allow-name <name>…] [--json]
   handoff-css match --handoff <md> --src <path…> [--rulings <md>] [--json]
-  handoff-css vendor <export.json> [<export.md>] --into <dir>
+  handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 `;
 
 /**
@@ -63,7 +64,7 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
   }
   const files = args.filter((a, i) => !a.startsWith("--") && (at === -1 || i !== at + 1));
   if (files.length === 0) {
-    stderr.write("handoff-css validate: name at least one .json export or .md handoff\n");
+    stderr.write("handoff-css validate: name at least one .json export, .md handoff or .zip of them\n");
     return 1;
   }
 
@@ -71,7 +72,9 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
   for (const file of files) {
     const abs = path.isAbsolute(file) ? file : path.join(cwd, file);
     try {
-      read.push({ file, abs, text: readFileSync(abs, "utf8") });
+      // HT-24 — a handoff .zip is read as the .json and .md files inside it.
+      if (/\.zip$/i.test(file)) read.push(...zipTextFiles(abs, file));
+      else read.push({ file, abs, text: readFileSync(abs, "utf8") });
     } catch (err) {
       read.push({ file, abs, text: null, error: err });
     }
@@ -237,13 +240,14 @@ async function generateCommand(argv, { cwd, stdout, stderr }) {
     return 1;
   }
 
-  const { rows, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings, opts } =
+  const { rows, privateRows, hiddenRows, excludedRows, responsiveRows, aliasRows, warnings, opts, inputs } =
     run(argv, { cwd, config });
   const honoured = responsiveRows.filter((r) => r.honoured).length;
   const count = (s) => rows.filter((r) => r.status === s).length;
   stdout.write(
     [
       `handoff-css (${opts.check ? "check" : "write"})`,
+      ...(inputs.length > 1 ? [`  inputs                  ${inputs.length} (${inputs.join(", ")}) — joined by variable key`] : []),
       `  tokens in export        ${rows.length}`,
       `  MATCH                   ${count("MATCH")}`,
       `  VALUE-DRIFT             ${count("VALUE-DRIFT")}`,

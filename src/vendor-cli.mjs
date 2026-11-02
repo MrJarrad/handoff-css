@@ -1,4 +1,4 @@
-// `handoff-css vendor <export.json> [<export.md>] --into <dir>` — HT-32.
+// `handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>` — HT-32, zip HT-24.
 //
 // A consumer keeps each vendored export set in its own version folder
 // (`design/handoff/v25-2026-10-28/`) with `latest` a symlink to the current
@@ -8,6 +8,7 @@
 // current set carried forward, the new export in place of its old self —
 // then repoints `latest` and says what it did. Nothing existing is written.
 import path from "node:path";
+import { zipTextFiles } from "./zip.mjs";
 import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, readlinkSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 
 const VERSION_DIR = /^v(\d+)-/;
@@ -18,18 +19,31 @@ export function vendorCommand(args, { cwd = process.cwd(), stdout = process.stdo
   const into = at === -1 ? null : args[at + 1];
   if (!into || into.startsWith("--")) return fail("--into needs the folder that holds the version folders and `latest`");
   const files = args.filter((a, i) => !a.startsWith("--") && i !== at + 1);
-  const jsonFile = files.find((f) => f.endsWith(".json"));
-  const mdFile = files.find((f) => f.endsWith(".md"));
-  if (!jsonFile) return fail("name the export's .json (and optionally its .md)");
-
   const abs = (p) => (path.isAbsolute(p) ? p : path.join(cwd, p));
+  // HT-24 — the plugin's .zip holds the export's .json and .md; read both from it.
+  const zipFile = files.find((f) => /\.zip$/i.test(f));
+  let inZip = [];
+  if (zipFile) {
+    try {
+      inZip = zipTextFiles(abs(zipFile), zipFile);
+    } catch (err) {
+      return fail(`cannot read ${zipFile}: ${err.message}`);
+    }
+  }
+  const zipJson = inZip.find((f) => f.name.endsWith(".json"));
+  const zipMd = inZip.find((f) => f.name.endsWith(".md"));
+  const jsonFile = zipJson?.file ?? files.find((f) => f.endsWith(".json"));
+  const mdFile = zipMd?.file ?? files.find((f) => f.endsWith(".md"));
+  if (!jsonFile) return fail(zipFile ? `${zipFile} holds no .json export` : "name the export's .json (and optionally its .md), or its .zip");
+  const bytes = (file) => (file === zipJson?.file ? Buffer.from(zipJson.text) : file === zipMd?.file ? Buffer.from(zipMd.text) : readFileSync(abs(file)));
+
   let doc;
   try {
-    doc = JSON.parse(readFileSync(abs(jsonFile), "utf8"));
+    doc = JSON.parse(bytes(jsonFile).toString("utf8"));
   } catch (err) {
     return fail(`cannot read ${jsonFile}: ${err.message}`);
   }
-  const base = doc.artifactFilename ?? path.basename(jsonFile, ".json");
+  const base = doc.artifactFilename ?? path.basename(zipJson?.name ?? jsonFile, ".json");
   const root = abs(into);
   const latest = path.join(root, "latest");
 
@@ -71,9 +85,9 @@ export function vendorCommand(args, { cwd = process.cwd(), stdout = process.stdo
     mkdirSync(target);
   }
   const written = [`${base}.json`];
-  writeFileSync(path.join(target, `${base}.json`), readFileSync(abs(jsonFile)));
+  writeFileSync(path.join(target, `${base}.json`), bytes(jsonFile));
   if (mdFile) {
-    writeFileSync(path.join(target, `${base}.md`), readFileSync(abs(mdFile)));
+    writeFileSync(path.join(target, `${base}.md`), bytes(mdFile));
     written.push(`${base}.md`);
   }
 
