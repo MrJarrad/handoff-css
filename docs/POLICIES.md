@@ -153,7 +153,7 @@ Two classes, reported separately:
   states the intent the publish flag was carrying: these exist to be aliased, not
   used directly. Never a public row, never MISSING or EXTRA downstream.
 - **Hidden and unreachable** — *not a class any more.* The Figma hide flag governs the Figma
-  library only (operator ruling 2026-11-02: "hide from publishing is for figma only"), so a
+  library only (ruling 2026-11-02: "hide from publishing is for figma only"), so a
   hidden variable nothing aliases is emitted like any other token. (Until then it was dropped
   as HIDDEN.)
 - **EXCLUDED** — the variable's `"<collection>/<name>"` path starts with an entry
@@ -1132,8 +1132,8 @@ utilities and inline style objects count as usage only when they spell `var(--na
 
 ## P26 — Collection modes carry their dependents
 
-A mode that is neither a theme nor a layout width publishes as `[data-jhd-<collection>-mode="<mode>"]`
-and re-points its own collection's variables. A variable of ANOTHER collection that aliases one of them
+A mode that is neither a theme nor a layout width publishes under the attribute selector `modes.collectionModeAttribute` names
+(`{collection}` is the collection's slug), `[<attribute>="<mode>"]`, and re-points its own collection's variables. A variable of ANOTHER collection that aliases one of them
 (the layout role tokens that alias `text-primitives` steps) is resolved where it is declared, so it never
 sees a mode set on a descendant. P26 re-declares every such dependent under the mode attribute: the same
 `var()` value, in every media wrapper it is declared in, ordered after the `:root` rule so that on one

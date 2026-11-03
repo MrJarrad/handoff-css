@@ -60,7 +60,7 @@ export function emitTokens(doc, handDeclared, cfg) {
         excludedRows.push({ collection: c.name, name, reason: `EXCLUDE_PATHS (${c.name})` });
         continue;
       }
-      // The Figma hide flag governs the Figma library only (operator ruling
+      // The Figma hide flag governs the Figma library only (ruling
       // 2026-11-02: "hide from publishing is for figma only"): a hidden variable
       // nothing aliases is emitted like any other token. `hiddenRows` stays in the
       // result, always empty, so consumers reading the field keep working.

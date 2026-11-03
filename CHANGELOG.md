@@ -2,6 +2,13 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## Unreleased
+
+### Changed
+
+- Comment and documentation wording only: tracker ids and internal names removed from `src/cli.mjs`,
+  `src/emit-tokens.mjs`, `src/exclude.mjs`, `src/report.mjs` and `docs/POLICIES.md`. No behaviour change.
+
 ## 0.16.0 — 2026-11-02
 
 ### Added

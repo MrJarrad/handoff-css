@@ -89,7 +89,7 @@ export function validateCommand(args, { cwd = process.cwd(), stdout = process.st
   const briefJson = read.find((r) => r.abs.endsWith(".json") && r.text != null && safeParse(r.text)?.schema === "design-handoff");
   const briefMd = read.find((r) => r.abs.endsWith(".md") && r.text != null && !isDsMarkdown(r.text));
 
-  // 0.16.0 (HT-55) — the link run's notes, as a file beside the brief: named, or found next to the brief.
+  // 0.16.0 — the link run's notes, as a file beside the brief: named, or found next to the brief.
   let linkRunJson = read.find((r) => r.abs.endsWith(".json") && r.text != null && safeParse(r.text)?.schema === "design-handoff-link-run");
   if (!linkRunJson && briefJson) {
     const beside = briefJson.abs.replace(/\.json$/, ".link-run.json");

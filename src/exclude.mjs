@@ -1,7 +1,7 @@
 // Policy P7 — PRIVATE / EXCLUDED. A variable hidden in Figma but aliased by an
 // emitted token is PRIVATE (emitted, fenced): a custom property that is
 // referenced and not declared is invalid at computed-value time. The Figma hide
-// flag drops nothing (operator ruling 2026-11-02, "hide from publishing is for
+// flag drops nothing (ruling 2026-11-02, "hide from publishing is for
 // figma only"), so a hidden variable nothing aliases is emitted as an ordinary
 // token; only EXCLUDED paths are never emitted. See docs/POLICIES.md.
 import { cmp, composeColorAliasPair } from "./resolve.mjs";
