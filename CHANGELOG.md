@@ -6,8 +6,10 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Changed
 
-- Comment and documentation wording only: tracker ids and internal names removed from `src/cli.mjs`,
-  `src/emit-tokens.mjs`, `src/exclude.mjs`, `src/report.mjs` and `docs/POLICIES.md`. No behaviour change.
+- Comment and documentation wording: tracker ids and internal names removed from `src/cli.mjs`,
+  `src/link-run.mjs`, `src/emit-tokens.mjs`, `src/exclude.mjs` and `docs/POLICIES.md`. No behaviour change.
+- One word of generated output: the report's note on hidden variables now reads "(ruling 2026-11-02, …)"
+  where it read "(operator ruling 2026-11-02, …)". The eight expected report fixtures are updated to match.
 
 ## 0.16.0 — 2026-11-02
 
