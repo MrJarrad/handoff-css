@@ -24,7 +24,7 @@ MATCH/VALUE-DRIFT/NAME-ONLY-IN-EXPORT — they are not public design-system
 tokens. Of the two, **only PRIVATE is emitted**, because published tokens
 alias it and a referenced-but-undeclared custom property is invalid at
 computed-value time. The Figma hide flag drops nothing: a hidden variable no
-published token aliases is emitted as an ordinary token (operator ruling
+published token aliases is emitted as an ordinary token (ruling
 2026-11-02, "hide from publishing is for figma only").
 
 ## 0. PRIVATE (26) and EXCLUDED (43)
