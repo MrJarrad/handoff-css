@@ -13,8 +13,8 @@ are building has keyframes, or the person says it is animated, read them from Fi
    springs. Only a node with no snippet is built from its keyframe tracks and summary.
 3. **Merge by node id.** The structure of the build comes from the brief; the motion values come from
    `get_motion_context`. Put each snippet on the element for the same node id, wrapping or converting the
-   element where the snippet needs it. Where motion and design disagree on timing or easing, motion wins.
-4. **A layer with no motion data stays static.** Do not borrow a duration or an easing from another layer
+   element where the snippet needs it. Where motion and design disagree on timing or easing, motion's value is built, and each disagreement is a deviation row naming both values.
+4. **A layer with no keyframes has no keyframe animation.** No keyframes means no keyframe animation; its prototype transition from the brief still applies. Do not borrow a duration or an easing from another layer
    or animate it because its neighbours move.
 5. **Honour `prefers-reduced-motion`.** Under it, render the resting state or cut the duration to nearly
    nothing.
