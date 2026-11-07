@@ -186,6 +186,9 @@ relay the note the line gives for the person to add in Figma. **assumed** — bu
 it and ask; build nothing in its place. Every waiting, assumed or open ask is one row in the
 deviation table. Ledger shape and statuses: the script's README.
 
+When the person agrees to have the note put in the file, the agent writes it, and reads it back:
+`references/write-back.md`.
+
 #### 6. Check the built CSS back against the pair
 
 Before running it, enumerate every rendering of the export's nodes — grep for the style
