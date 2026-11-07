@@ -169,6 +169,9 @@ wrong mechanism is a defect.
    concepts (parallax, per-asset settings) are notes, never a requested Figma property.
 10. A locked `aspectRatio` builds the ratio, never the fixed height — `schema-v9-hints.md` § Aspect lock.
 
+**Keyframes.** A brief made from a link has the layer's prototype transitions but not its keyframe
+timelines. For a layer that has keyframes, read them from Figma's motion reader: `references/motion.md`.
+
 **Done when** every node in scope is built and each standard applied or deviation-noted.
 
 ### 5. Copy is a lane, not a detail
