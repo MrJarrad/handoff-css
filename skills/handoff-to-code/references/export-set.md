@@ -84,7 +84,7 @@ concerns is built as the export states or not at all — never inlined from some
 | `LIVE_READ_STALE` (or, on a brief made before the live read, `ANNOTATION_NEWER_THAN_DS_EXPORT` / `DS_EXPORT_HAS_NO_ANNOTATIONS`) | Those annotations arrive as the label only. `validate` asks `LIVE_READ_OUT_OF_DATE`: make a fresh live read and regenerate the brief yourself. Until then build nothing beyond what the label states, one row per layer named. |
 | `VARIABLE_NOT_IN_DS_EXPORTS` | The binding cannot be mapped (step 3). A library variable (`VariableID:<key>/…`): add that library's export with another `--ds` and regenerate. One of this file's own: relay `DS_EXPORT_OUT_OF_DATE`. |
 | `DS_EXPORT_OUT_OF_DATE` | `validate`'s one ask for every row above that means this file's export is behind: relay it as written — the Design System Handoff plugin run on the named file — then regenerate the brief with the new export and validate again. |
-| `LIVE_READ_OUT_OF_DATE` | `validate`'s ask when the brief's annotations are behind the layer: run `live/read.js` on the layer through Figma MCP and regenerate with `--live`. No person is needed. |
+| `LIVE_READ_OUT_OF_DATE` | `validate`'s ask when the brief's annotations are behind the layer: run `live/read.js` on the layer through Figma MCP (every chunk, `__CHUNK__` 0, 1, 2, …) and regenerate with `--live` once for each chunk. No person is needed. |
 | `LIBRARY_MISSING` / `LIBRARY_NOT_READABLE` | The component or style has no source the export can read (often layers pasted from another file). Stop for a ruling on those nodes; never build the instance's values as if they were local. |
 
 ## The spec index
