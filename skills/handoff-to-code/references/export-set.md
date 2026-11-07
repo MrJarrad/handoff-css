@@ -10,14 +10,17 @@ From the plugins repo, with a Figma token (its README covers setup) and Figma's 
 
 1. **Read the layer live.** Pass `handoff/design-handoff-script/live/read.js` to Figma MCP
    `use_figma` as the code, with `__NODE_ID__` replaced by the layer's node id (`node-id=4227-16274`
-   in the link is `4227:16274`), and save what it returns as a `.json` file. It reads annotations,
-   line caps, measurements, section radii and instance property order, and changes nothing.
+   in the link is `4227:16274`) and `__CHUNK__` by `0`, and save what it returns as a `.json` file.
+   It reads annotations, line caps, measurements, section radii and instance property order, and
+   changes nothing. `use_figma` returns at most about 48,000 bytes, so a big layer comes in chunks:
+   chunk 0 says how many (`chunk.count`); run it again with `__CHUNK__` 1, 2, … and save each as its
+   own file. Give `--live` once for each.
 2. **Export.**
 
 ```sh
 node handoff/design-handoff-script/bin/design-handoff.mjs "<link to the layer>" \
   --ds <this file's Design System Handoff export> --ds <each library's export> \
-  --live <the live read .json> --out <dir>
+  --live <the live read .json> [--live <next chunk>] --out <dir>
 ```
 
 A live read of another file or layer is refused before anything is read.
