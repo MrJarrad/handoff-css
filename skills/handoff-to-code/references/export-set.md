@@ -35,7 +35,7 @@ brief that also carries `linkRun` is `LINK_RUN_TWICE`. Read the `.link-run.md` f
 
 ```sh
 node handoff/design-handoff-script/bin/design-handoff.mjs --regenerate <stale brief .json> \
-  --ds <each export> --live <a fresh live read of its layer> --out <dir>
+  --ds <each export> --live <a fresh live read of its layer> [--live <next chunk>] --out <dir>
 ```
 
 It re-exports the brief's own layer against the exports given, and writes nothing when the brief

@@ -46,7 +46,7 @@ export function validateSet(brief, exports, { specIndex = null, briefFile = "<br
   // design-handoff-script); an export older than the brief's is replaced by
   // the run the brief names. A plugin-made brief records no file key, so its
   // regenerate also needs the file's link.
-  const regenerate = `regenerate the brief: \`design-handoff --regenerate ${briefFile} ${exports.map((e) => `--ds ${e.file}`).join(" ")} --live <live read .json>${linkRun ? "" : ' "<figma link to the file>"'}\``;
+  const regenerate = `regenerate the brief: \`design-handoff --regenerate ${briefFile} ${exports.map((e) => `--ds ${e.file}`).join(" ")} --live <live read .json> [--live <next chunk>]${linkRun ? "" : ' "<figma link to the file>"'}\``;
   const fix = (given, made, name) => given.doc.generatedAt > made
     ? regenerate
     : `give the ${made} run of \`${name}\``;
@@ -91,7 +91,7 @@ export function validateSet(brief, exports, { specIndex = null, briefFile = "<br
   // Annotations behind the layer: an agent fixes this itself, with no plugin run.
   const layer = brief.selectedNodes?.[0]?.id ?? "the layer";
   if ((linkRun?.findings ?? []).some((f) => LIVE_BEHIND.has(f.code))) add("LIVE_READ_OUT_OF_DATE", "warning", "/linkRun/findings",
-    `run live/read.js on ${layer} through Figma MCP use_figma, then regenerate the brief with --live <that read> — the brief's annotations are behind the layer`);
+    `run live/read.js on ${layer} through Figma MCP use_figma (__CHUNK__ 0, then 1, 2, … for each further chunk it reports), then regenerate the brief with --live <that read>, once for each chunk — the brief's annotations are behind the layer`);
 
   const specs = [];
   const missing = (brief.specs ?? []).map((s, i) => ({ ...s, i })).filter((s) => s.markdown == null);

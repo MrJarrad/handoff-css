@@ -81,6 +81,8 @@ test("a brief made from an older Design System Handoff run names the command tha
   const stale = kind(results, "set").findings.filter((f) => f.code === "STALE_PAIR");
   assert.ok(stale.length > 0);
   for (const f of stale) assert.match(f.message, /design-handoff --regenerate navigation\.json --ds ds\.json/);
+  // A live read of a big layer comes in chunks; the command says --live is given once for each.
+  for (const f of stale) assert.match(f.message, /--live <live read \.json>(?: \[--live <next chunk>\])/);
   assert.equal(code, 1, "the set is still not one state until the brief is regenerated");
 });
 
@@ -116,6 +118,7 @@ test("an annotation finding asks for a fresh live read of the layer and a regene
   const ask = set.filter((f) => f.code === "LIVE_READ_OUT_OF_DATE");
   assert.equal(ask.length, 1);
   assert.match(ask[0].message, /live\/read\.js .*Figma MCP .*--live/);
+  assert.match(ask[0].message, /__CHUNK__|chunk/);
   for (const code of ["LIVE_READ_STALE", "ANNOTATION_NEWER_THAN_DS_EXPORT"]) {
     const brief = JSON.parse(json);
     brief.linkRun.findings = [{ code, layers: ["5363:15275"], message: "x" }];
