@@ -191,6 +191,16 @@ wrong mechanism is a defect.
     **Follows to CMS** columns are proposals, never rulings: build on them, and every row marked
     `(open)` is an ask (`PROPERTY_CLASS_OPEN`) answered in chat — one question per property, with the
     proposal as its recommendation, never a reason to stop.
+12. **A placed instance's settings are ledger rows, and what it changes is layout config the build carries.**
+    A schema-18 brief adds **Placed Instances** to the Design Summary (and `placedInstances[]` in the JSON):
+    every setting of every instance placed in the layout, at any depth, with the value here and the value the
+    component ships at the same place. A setting not listed in the brief uses the component's own, so build the
+    component's default for it and nothing more. Each listed row — a setting the layout changed — is a ledger
+    row keyed by instance node id and property, built as the value here; a changed row with no ledger row is red,
+    and `validate` refuses a JSON that leaves out a setting a placed instance has (`PLACED_ROW_MISSING`). The
+    compare is against what the component ships, not the nested component's own default, so a value the
+    component itself ships is not a change. `swappedHere` means a different component sits there: build it.
+    A setting marked as not comparable (a library component) is a reported item, never a guess.
 
 **Keyframes.** A brief made from a link has the layer's prototype transitions but not its keyframe
 timelines. For a layer that has keyframes, read them from Figma's motion reader: `references/motion.md`.

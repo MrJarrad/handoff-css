@@ -6,6 +6,18 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Added
 
+- Schema v18 (HT-80): `placedInstances[]` — every setting of every instance placed outside a component definition,
+  at any depth, with the value here, the value the component ships at the same place (the outermost placed instance's
+  main component; the component's own default for the outermost instance), `blockKnown`, `swappedHere`, `changedHere` —
+  and `placements[]`, one per outermost placed instance. `./schema/brief/v18` export.
+- `validate`: a setting of a placed instance with no row is `PLACED_ROW_MISSING`, a row with no setting behind it
+  `PLACED_ROW_DANGLING`; for a v18 pair the markdown `### Placed Instances` section must list exactly the settings
+  changed here and the same unchanged-placement lines (`PAIR_PLACED_ROW_MISMATCH`, `PAIR_PLACED_TABLE_MISMATCH`).
+- handoff-to-code, step 4 rule 12: the listed rows are ledger rows (layout config the build carries), a setting not
+  listed uses the component's own, a changed row with no ledger row is red. Three law sentences; adapters regenerated.
+
+### Added
+
 - Schema v17 (HT-75, HT-76): `componentProperties[]` — every property the Figma properties panel shows,
   a component's own then each exposed nested instance's, one typed row each (value, the nested component's
   default, options, `own` / `exposed`, a proposed Props-by-default build class and CMS follow-through, `open`
