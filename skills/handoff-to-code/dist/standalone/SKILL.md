@@ -179,6 +179,17 @@ wrong mechanism is a defect.
    a note that lists a property's options or states its value is a defect, and code-only
    concepts (parallax, per-asset settings) are notes, never a requested Figma property.
 10. A locked `aspectRatio` builds the ratio, never the fixed height — `schema-v9-hints.md` § Aspect lock.
+11. **Every property the Figma panel shows is a ledger row, nested exposed ones included.** A schema-17
+    brief opens its Design Summary with **Component Properties** (and `componentProperties[]` in the
+    JSON): the component's own properties, then those of each instance it exposes, each with its value,
+    the nested component's own default and its options. Every row is a property the Figma panel shows:
+    being in the table, with its `source` (`own`, or `exposed` from a nested instance), is what says so —
+    there is no separate "shown in the panel" column. One row of the table is one row of the return,
+    keyed by node id and property; a table row with no return row is red, and `validate` refuses a table
+    that leaves out a property the tree has (`PROPERTY_ROW_MISSING`). The table's **Build class** and
+    **Follows to CMS** columns are proposals, never rulings: build on them, and every row marked
+    `(open)` is an ask (`PROPERTY_CLASS_OPEN`) answered in chat — one question per property, with the
+    proposal as its recommendation, never a reason to stop.
 
 **Keyframes.** A brief made from a link has the layer's prototype transitions but not its keyframe
 timelines. For a layer that has keyframes, read them from Figma's motion reader: `references/motion.md`.

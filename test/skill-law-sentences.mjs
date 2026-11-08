@@ -23,6 +23,11 @@ export const LAW_SENTENCES = [
   // Step 2 — warnings are decisions, never things to build around.
   "A warning you build *around* is drift.",
 
+  // Step 4, rule 11 (HT-75, HT-76): the property table is the ledger's rows, and its open rows are asks that never block.
+  "**Every property the Figma panel shows is a ledger row, nested exposed ones included.**",
+  "a table row with no return row is red",
+  "never a reason to stop",
+
   // Step 1 — the export set (0.11.0): findings are reported, specs come from the index.
   "**A link-run finding is a reported item, never a reason to inline a value.**",
   "**Spec text comes from the live read when it carries it, else from the spec index.**",

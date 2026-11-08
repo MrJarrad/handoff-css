@@ -74,6 +74,15 @@ export const briefSchemaV15 = require("../schema/design-handoff.v15.schema.json"
  */
 export const briefSchemaV16 = require("../schema/design-handoff.v16.schema.json");
 
+/**
+ * 0.17.0 — schema v17 is additive over v16, written whenever the selection holds a component or
+ * component set with properties: `componentProperties[]`, every property the Figma properties panel
+ * shows (own, then each exposed nested instance's), and `component.exposed` / `exposedInstances` on
+ * each instance. `validateBriefJson` also requires a row for every such property (PROPERTY_ROW_MISSING)
+ * and refuses a row with no property behind it (PROPERTY_ROW_DANGLING).
+ */
+export const briefSchemaV17 = require("../schema/design-handoff.v17.schema.json");
+
 const schemasByVersion = new Map([
   [10, briefSchema],
   [11, briefSchemaV11],
@@ -82,6 +91,7 @@ const schemasByVersion = new Map([
   [14, briefSchemaV14],
   [15, briefSchemaV15],
   [16, briefSchemaV16],
+  [17, briefSchemaV17],
 ]);
 
 const compiledByVersion = new Map();
@@ -100,9 +110,62 @@ const NEWEST = Math.max(...BRIEF_SCHEMA_VERSIONS);
 /** The only shape errors a newer-than-checker version can excuse: a field this checker has never seen. */
 export const UNKNOWN_FIELD_KEYWORDS = new Set(["additionalProperties", "unevaluatedProperties"]);
 
+const cleanKey = (key) => key.replace(/#\d+:\d+$/, "");
+
+/**
+ * The panel, rebuilt from the layer tree: a component set (or a component with definitions) lists its
+ * own properties; the first variant's chain of exposed instances lists theirs. An instance that is not
+ * exposed is not in the panel, so nothing inside it is expected. Each of these needs a row.
+ */
+function expectedPropertyRows(layerTree) {
+  const expected = [];
+  const exposedInside = (node, owner) => {
+    for (const child of node.children ?? []) {
+      if (child.component) {
+        if (!child.component.exposed) continue;
+        for (const key of Object.keys(child.component.props ?? {})) expected.push({ nodeId: child.id, property: cleanKey(key), where: `${owner} › ${child.name}` });
+        exposedInside(child, owner);
+      } else exposedInside(child, owner);
+    }
+  };
+  const walk = (node) => {
+    if (node.type === "COMPONENT_SET" || (node.type === "COMPONENT" && node.componentPropertyDefinitions)) {
+      for (const key of Object.keys(node.componentPropertyDefinitions ?? {})) expected.push({ nodeId: node.id, property: cleanKey(key), where: node.name });
+      const holder = node.type === "COMPONENT_SET" ? (node.children ?? [])[0] : node;
+      if (holder) exposedInside(holder, node.name);
+      return;
+    }
+    for (const child of node.children ?? []) walk(child);
+  };
+  (layerTree ?? []).forEach(walk);
+  return expected;
+}
+
+/** Schema 17 and later: the property table matches the tree, both ways. */
+function checkComponentProperties(doc) {
+  const errors = [];
+  const rows = doc.componentProperties ?? [];
+  const byId = new Map();
+  (function index(node) { byId.set(node.id, node); (node.children ?? []).forEach(index); })({ id: "", children: doc.layerTree ?? [] });
+  const have = new Set(rows.map((row) => `${row.nodeId}\u0000${row.property}`));
+  for (const want of expectedPropertyRows(doc.layerTree)) {
+    if (!have.has(`${want.nodeId}\u0000${want.property}`)) {
+      errors.push({ code: "PROPERTY_ROW_MISSING", keyword: "componentProperties", path: "/componentProperties", message: `${want.where} \`${want.property}\` (node ${want.nodeId}) is a property the Figma panel shows and has no row in componentProperties[]` });
+    }
+  }
+  rows.forEach((row, index) => {
+    const node = byId.get(row.nodeId);
+    const keys = !node ? null : row.source === "own" ? Object.keys(node.componentPropertyDefinitions ?? {}) : Object.keys(node.component?.props ?? {});
+    if (!keys || !keys.map(cleanKey).includes(row.property)) {
+      errors.push({ code: "PROPERTY_ROW_DANGLING", keyword: "componentProperties", path: `/componentProperties/${index}`, message: !node ? `row ${row.key}: node ${row.nodeId} is not in the layer tree` : `row ${row.key}: node ${row.nodeId} has no property \`${row.property}\`` });
+    }
+  });
+  return errors;
+}
+
 /**
  * Validate a parsed brief JSON document against its published shape. Dispatches
- * on the document's own `schemaVersion` (10–16); an unrecognised older version
+ * on the document's own `schemaVersion` (10–17); an unrecognised older version
  * falls back to v10 so it still surfaces as a clear `schemaVersion` const
  * mismatch rather than a thrown error.
  *
@@ -126,7 +189,11 @@ export function validateBriefJson(doc) {
     message: e.params?.additionalProperty ? `${e.message}: \`${e.params.additionalProperty}\`` : e.message,
     keyword: e.keyword,
   }));
-  if (!newer) return { ok, errors, warnings: [] };
+  // A version newer than this checker is judged on shape only (its tables may mean more than v17's).
+  if (!newer && typeof doc.schemaVersion === "number" && doc.schemaVersion >= 17 && Array.isArray(doc.layerTree)) {
+    errors.push(...checkComponentProperties(doc));
+  }
+  if (!newer) return { ok: ok && errors.length === 0, errors, warnings: [] };
   const hard = errors.filter((e) => !UNKNOWN_FIELD_KEYWORDS.has(e.keyword));
   return {
     ok: hard.length === 0,
@@ -140,6 +207,57 @@ export function validateBriefJson(doc) {
 
 const CONTENT_HASH = /^\*\*Content hash:\*\* `([^`]*)`/m;
 const LEGEND = /^\*\*Legend:\*\*/m;
+
+const PROPERTY_COLUMNS = ["Owner", "Node", "Property", "Type", "Value", "Component default", "Options", "Source", "Build class", "Follows to CMS"];
+
+/** The markdown cell for a value, as the exporter prints it. */
+const propertyCell = (value) => (value === undefined ? "—" : typeof value === "string" ? `\`${value.replace(/\|/g, "\\|")}\`` : String(value));
+
+/** One componentProperties[] row as the ten cells of its markdown table line. */
+function propertyRowCells(row) {
+  return [
+    row.ownerPath, `#${row.nodeId}`, row.property, row.type, propertyCell(row.value), propertyCell(row.componentDefault),
+    row.options ? row.options.map((option) => `\`${option}\``).join(", ") : "—", row.source,
+    row.buildClass.proposed + (row.open ? " (open)" : ""), row.cms.proposed + (row.open ? " (open)" : ""),
+  ];
+}
+
+/** The `### Component Properties` table of a markdown brief as rows of trimmed cells, or null when there is no such section. */
+function markdownPropertyRows(body) {
+  const at = body.indexOf("\n### Component Properties\n");
+  if (at === -1) return null;
+  const rest = body.slice(at + 1);
+  const end = rest.slice(1).search(/\n#{2,3} /);
+  const section = end === -1 ? rest : rest.slice(0, end + 1);
+  return section.split("\n").filter((line) => line.startsWith("|")).slice(2)
+    .map((line) => line.slice(1, -1).split(/(?<!\\)\|/).map((cell) => cell.trim()));
+}
+
+/** Schema 17: the brief's markdown table and its JSON rows are one list, row by row and column by column. */
+function propertyTableFindings(doc, body) {
+  const rows = doc.componentProperties ?? [];
+  const table = markdownPropertyRows(body);
+  if (table == null) {
+    return rows.length === 0 ? [] : [{ code: "PAIR_PROPERTY_TABLE_MISSING", severity: "error", message: `componentProperties[] holds ${rows.length} rows and the markdown has no \`### Component Properties\` section` }];
+  }
+  const findings = [];
+  const mismatch = (message) => findings.push({ code: "PAIR_PROPERTY_ROW_MISMATCH", severity: "error", message });
+  if (table.length !== rows.length) mismatch(`the markdown table has ${table.length} rows and componentProperties[] has ${rows.length}`);
+  for (let i = 0; i < Math.max(table.length, rows.length); i += 1) {
+    const row = rows[i];
+    const cells = table[i];
+    if (!row || !cells) {
+      const extra = row ? `${row.ownerPath} \`${row.property}\` (node ${row.nodeId}) is in the JSON and not in the markdown table` : `${cells[0]} \`${cells[2]}\` (${cells[1]}) is in the markdown table and not in the JSON`;
+      mismatch(`row ${i + 1}: ${extra}`);
+      continue;
+    }
+    const want = propertyRowCells(row);
+    PROPERTY_COLUMNS.forEach((column, c) => {
+      if (cells[c] !== want[c]) mismatch(`row ${i + 1} (${row.ownerPath} \`${row.property}\`, node ${row.nodeId}): ${column} is \`${cells[c]}\` in the markdown and \`${want[c]}\` in the JSON`);
+    });
+  }
+  return findings;
+}
 
 /**
  * The light structural pass a markdown brief gets once its JSON companion is
@@ -182,6 +300,9 @@ export function validateBriefPair(doc, mdText) {
   check("companion.contentHash", doc.companion?.contentHash, fm.companion?.contentHash);
   check("companion.designSystemStateHash", doc.companion?.designSystemStateHash, fm.companion?.designSystemStateHash);
   for (const f of policyMismatches(parseHandoffMarkdown(mdText))) add(f.code, f.severity, f.message);
+  if (typeof doc.schemaVersion === "number" && doc.schemaVersion >= 17) {
+    for (const f of propertyTableFindings(doc, body)) add(f.code, f.severity, f.message);
+  }
 
   return { ok: findings.every((f) => f.severity !== "error"), findings };
 }

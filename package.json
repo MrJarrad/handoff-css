@@ -20,6 +20,7 @@
     "./schema/brief/v14": "./schema/design-handoff.v14.schema.json",
     "./schema/brief/v15": "./schema/design-handoff.v15.schema.json",
     "./schema/brief/v16": "./schema/design-handoff.v16.schema.json",
+    "./schema/brief/v17": "./schema/design-handoff.v17.schema.json",
     "./schema/link-run": "./schema/design-handoff-link-run.v1.schema.json"
   },
   "files": [

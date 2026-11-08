@@ -4,6 +4,23 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ## Unreleased
 
+### Added
+
+- Schema v17 (HT-75, HT-76): `componentProperties[]` — every property the Figma properties panel shows,
+  a component's own then each exposed nested instance's, one typed row each (value, the nested component's
+  default, options, `own` / `exposed`, a proposed Props-by-default build class and CMS follow-through, `open`
+  when the export cannot tell). On each instance, `component.exposed`, `component.exposedInstances[]`, and
+  `default` / `options` on each prop. `./schema/brief/v17` export.
+- `validate` checks the table against the layer tree for a v17 brief: a property the panel shows with no row
+  is `PROPERTY_ROW_MISSING` (an error), a row with no property behind it is `PROPERTY_ROW_DANGLING`.
+- handoff-to-code, step 4 rule 11: a table row is a ledger row (node id + property), a missing row is red;
+  the proposal columns are built on and each `(open)` row is a `PROPERTY_CLASS_OPEN` ask that never blocks.
+  Three law sentences added to the shared list; skill adapters regenerated.
+- `validate` reads a v17 brief's markdown `### Component Properties` table against `componentProperties[]` row by row and
+  column by column: a difference is `PAIR_PROPERTY_ROW_MISMATCH`, JSON rows with no section `PAIR_PROPERTY_TABLE_MISSING` (errors).
+- `validateBriefJson` and `BRIEF_SCHEMA_VERSIONS` are reachable from the package entry, so the exporter's tests run
+  the full brief check (schema and property rows), not the schema alone.
+
 ### Changed
 
 - Comment and documentation wording: tracker ids and internal names removed from `src/cli.mjs`,
