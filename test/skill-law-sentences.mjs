@@ -28,6 +28,11 @@ export const LAW_SENTENCES = [
   "a table row with no return row is red",
   "never a reason to stop",
 
+  // Step 4, rule 12 (HT-80): a placement's changed settings are layout config, listed rows are ledger rows.
+  "**A placed instance's settings are ledger rows, and what it changes is layout config the build carries.**",
+  "A setting not listed in the brief uses the component's own, so build the component's default for it and nothing more.",
+  "a changed row with no ledger row is red",
+
   // Step 1 — the export set (0.11.0): findings are reported, specs come from the index.
   "**A link-run finding is a reported item, never a reason to inline a value.**",
   "**Spec text comes from the live read when it carries it, else from the spec index.**",

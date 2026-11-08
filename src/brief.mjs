@@ -83,6 +83,15 @@ export const briefSchemaV16 = require("../schema/design-handoff.v16.schema.json"
  */
 export const briefSchemaV17 = require("../schema/design-handoff.v17.schema.json");
 
+/**
+ * 0.18.0 — schema v18 is additive over v17, written whenever an instance is placed outside a component
+ * definition: `placedInstances[]` (every setting of every placed instance, compared with what the component
+ * ships at the same place) and `placements[]`. `validateBriefJson` requires a row for every such setting
+ * (PLACED_ROW_MISSING) and refuses a row with no setting behind it (PLACED_ROW_DANGLING); `validateBriefPair`
+ * reads the markdown section against the JSON.
+ */
+export const briefSchemaV18 = require("../schema/design-handoff.v18.schema.json");
+
 const schemasByVersion = new Map([
   [10, briefSchema],
   [11, briefSchemaV11],
@@ -92,6 +101,7 @@ const schemasByVersion = new Map([
   [15, briefSchemaV15],
   [16, briefSchemaV16],
   [17, briefSchemaV17],
+  [18, briefSchemaV18],
 ]);
 
 const compiledByVersion = new Map();
@@ -163,9 +173,96 @@ function checkComponentProperties(doc) {
   return errors;
 }
 
+/** Every setting the tree has on an instance placed outside a component definition, as the rows `placedInstances[]` must hold. */
+function expectedPlacedRows(layerTree) {
+  const expected = [];
+  const visit = (node, path, inPlacement) => {
+    if (node.type === "COMPONENT" || node.type === "COMPONENT_SET") return;
+    let next = path;
+    if (node.component) {
+      next = inPlacement ? [...path, node.name] : [node.name];
+      for (const key of Object.keys(node.component.props ?? {})) expected.push({ nodeId: node.id, property: cleanKey(key), where: next.join(" › ") });
+    }
+    for (const child of node.children ?? []) visit(child, next, inPlacement || Boolean(node.component));
+  };
+  (layerTree ?? []).forEach((root) => visit(root, [], false));
+  return expected;
+}
+
+/** Schema 18: the placed-instance rows match the tree, both ways. */
+function checkPlacedInstances(doc) {
+  const errors = [];
+  const rows = doc.placedInstances ?? [];
+  const expected = expectedPlacedRows(doc.layerTree);
+  const wanted = new Set(expected.map((e) => `${e.nodeId}\u0000${e.property}`));
+  const have = new Set(rows.map((row) => `${row.nodeId}\u0000${row.property}`));
+  for (const want of expected) {
+    if (!have.has(`${want.nodeId}\u0000${want.property}`)) {
+      errors.push({ code: "PLACED_ROW_MISSING", keyword: "placedInstances", path: "/placedInstances", message: `${want.where} \`${want.property}\` (node ${want.nodeId}) is a setting of a placed instance and has no row in placedInstances[]` });
+    }
+  }
+  rows.forEach((row, index) => {
+    if (!wanted.has(`${row.nodeId}\u0000${row.property}`)) {
+      errors.push({ code: "PLACED_ROW_DANGLING", keyword: "placedInstances", path: `/placedInstances/${index}`, message: `row ${row.key}: node ${row.nodeId} has no setting \`${row.property}\` on an instance placed outside a component definition` });
+    }
+  });
+  errors.push(...placedFlagErrors(rows), ...placedCountErrors(doc, rows));
+  return errors;
+}
+
+/** The exporter's decision about each row, re-derived from the row's own values: what is changed here follows from what the component ships. */
+function placedFlagErrors(rows) {
+  const errors = [];
+  rows.forEach((row, index) => {
+    const at = `/placedInstances/${index}`;
+    const bad = (message) => errors.push({ code: "PLACED_FLAG_MISMATCH", keyword: "placedInstances", path: at, message: `row ${row.key} (${row.instancePath} \`${row.property}\`): ${message}` });
+    if (!row.blockKnown) {
+      if (row.changedHere || row.swappedHere) bad(`blockKnown is false, so nothing can be said to have changed: changedHere and swappedHere must be false`);
+    } else if (row.swappedHere) {
+      if (!row.changedHere) bad(`swappedHere is true (another component is in this place), so changedHere must be true`);
+    } else {
+      const differs = String(row.value) !== String(row.blockValue);
+      if (row.changedHere !== differs) bad(`changedHere is ${row.changedHere} and the value here (${JSON.stringify(row.value)}) ${differs ? "differs from" : "equals"} the value the component ships (${JSON.stringify(row.blockValue)}): changedHere must be ${differs}`);
+    }
+  });
+  return errors;
+}
+
+/** The outermost instances placed outside a component definition: the placements the exporter must have listed. */
+function outermostPlacedIds(layerTree) {
+  const ids = [];
+  const visit = (node, inPlacement) => {
+    if (node.type === "COMPONENT" || node.type === "COMPONENT_SET") return;
+    if (node.component && !inPlacement) ids.push(node.id);
+    for (const child of node.children ?? []) visit(child, inPlacement || Boolean(node.component));
+  };
+  (layerTree ?? []).forEach((root) => visit(root, false));
+  return ids;
+}
+
+/** placements[] is the rows counted: one entry per outermost placed instance, with how many of its rows changed here and how many could not be compared. */
+function placedCountErrors(doc, rows) {
+  const errors = [];
+  const bad = (message) => errors.push({ code: "PLACED_COUNT_MISMATCH", keyword: "placements", path: "/placements", message });
+  const placements = doc.placements ?? [];
+  const listed = new Map(placements.map((placement) => [placement.nodeId, placement]));
+  for (const id of outermostPlacedIds(doc.layerTree)) if (!listed.has(id)) bad(`the instance ${id} is placed in the layout and has no entry in placements[]`);
+  const inTree = new Set(outermostPlacedIds(doc.layerTree));
+  for (const placement of placements) {
+    if (!inTree.has(placement.nodeId)) { bad(`placements[] names ${placement.nodeId}, which is not an instance placed in the layout`); continue; }
+    const mine = rows.filter((row) => row.placementId === placement.nodeId);
+    const changed = mine.filter((row) => row.changedHere).length;
+    const unknown = mine.filter((row) => !row.blockKnown).length;
+    if (placement.changed !== changed) bad(`placement ${placement.nodeId} (${placement.name}): placements[] says ${placement.changed} changed and its rows say ${changed}`);
+    if (placement.unknown !== unknown) bad(`placement ${placement.nodeId} (${placement.name}): placements[] says ${placement.unknown} unknown and its rows say ${unknown}`);
+  }
+  for (const row of rows) if (!listed.has(row.placementId)) { bad(`row ${row.key} belongs to placement ${row.placementId}, which has no entry in placements[]`); break; }
+  return errors;
+}
+
 /**
  * Validate a parsed brief JSON document against its published shape. Dispatches
- * on the document's own `schemaVersion` (10–17); an unrecognised older version
+ * on the document's own `schemaVersion` (10–18); an unrecognised older version
  * falls back to v10 so it still surfaces as a clear `schemaVersion` const
  * mismatch rather than a thrown error.
  *
@@ -192,6 +289,9 @@ export function validateBriefJson(doc) {
   // A version newer than this checker is judged on shape only (its tables may mean more than v17's).
   if (!newer && typeof doc.schemaVersion === "number" && doc.schemaVersion >= 17 && Array.isArray(doc.layerTree)) {
     errors.push(...checkComponentProperties(doc));
+  }
+  if (!newer && typeof doc.schemaVersion === "number" && doc.schemaVersion >= 18 && Array.isArray(doc.layerTree)) {
+    errors.push(...checkPlacedInstances(doc));
   }
   if (!newer) return { ok: ok && errors.length === 0, errors, warnings: [] };
   const hard = errors.filter((e) => !UNKNOWN_FIELD_KEYWORDS.has(e.keyword));
@@ -259,6 +359,67 @@ function propertyTableFindings(doc, body) {
   return findings;
 }
 
+/** What the section must say, so a setting that is not listed is read as the component's own and not as missing. */
+const PLACED_SENTENCE = "every setting not listed here uses the component's own";
+const PLACED_COLUMNS = ["Placement", "Node", "Property", "Type", "Value here", "Component value", "Source"];
+
+/** The `### Placed Instances` section of a markdown brief: its table rows (trimmed cells) and its `- ` lines, or null when there is no such section. */
+function markdownPlacedSection(body) {
+  const at = body.indexOf("\n### Placed Instances\n");
+  if (at === -1) return null;
+  const rest = body.slice(at + 1);
+  const end = rest.slice(1).search(/\n#{2,3} /);
+  const section = (end === -1 ? rest : rest.slice(0, end + 1)).split("\n");
+  const rows = section.filter((line) => line.startsWith("|")).slice(2).map((line) => line.slice(1, -1).split(/(?<!\\)\|/).map((cell) => cell.trim()));
+  return { rows, lines: section.filter((line) => line.startsWith("- ")), text: section.join("\n") };
+}
+
+/** The lines the exporter writes under the table: unchanged placements per component, and settings that could not be compared. */
+function expectedPlacedLines(placements) {
+  const byComponent = new Map();
+  for (const placement of placements) {
+    const entry = byComponent.get(placement.component) ?? { unchanged: 0, unknown: 0 };
+    if (placement.changed === 0) entry.unchanged += 1;
+    entry.unknown += placement.unknown;
+    byComponent.set(placement.component, entry);
+  }
+  const lines = [];
+  for (const [component, entry] of byComponent) {
+    if (entry.unchanged > 0) lines.push(`- ${component}: ${entry.unchanged}${entry.unchanged === 1 ? " placement uses" : " placements use"} the component's settings unchanged.`);
+    if (entry.unknown > 0) lines.push(`- ${component}: ${entry.unknown}${entry.unknown === 1 ? " setting" : " settings"} could not be compared with the component's own (the component, or the one it sits in, is in a library this export cannot read).`);
+  }
+  return lines;
+}
+
+/** Schema 18: the brief's markdown lists exactly the settings the JSON says changed here, and the same unchanged-placement lines. */
+function placedSectionFindings(doc, body) {
+  const rows = doc.placedInstances ?? [];
+  const placements = doc.placements ?? [];
+  const section = markdownPlacedSection(body);
+  if (rows.length === 0 && placements.length === 0) return [];
+  if (section == null) return [{ code: "PAIR_PLACED_TABLE_MISMATCH", severity: "error", message: `placedInstances[] holds ${rows.length} rows and the markdown has no \`### Placed Instances\` section` }];
+  const findings = [];
+  const add = (code, message) => findings.push({ code, severity: "error", message });
+  if (!section.text.includes(PLACED_SENTENCE)) add("PAIR_PLACED_SENTENCE_MISSING", `the Placed Instances section does not say "${PLACED_SENTENCE}": a reader must be told that a setting not listed is the component's own`);
+  const changed = rows.filter((row) => row.changedHere);
+  if (section.rows.length !== changed.length) add("PAIR_PLACED_ROW_MISMATCH", `the markdown table has ${section.rows.length} rows and ${changed.length} settings changed here in the JSON`);
+  for (let i = 0; i < Math.max(section.rows.length, changed.length); i += 1) {
+    const row = changed[i];
+    const cells = section.rows[i];
+    if (!row || !cells) {
+      add("PAIR_PLACED_ROW_MISMATCH", row ? `row ${i + 1}: ${row.instancePath} \`${row.property}\` (node ${row.nodeId}) changed here in the JSON and is not in the markdown table` : `row ${i + 1}: ${cells[0]} \`${cells[2]}\` (${cells[1]}) is in the markdown table and not changed here in the JSON`);
+      continue;
+    }
+    const want = [row.instancePath, `#${row.nodeId}`, row.property, row.type, propertyCell(row.value), row.swappedHere ? "(swapped here)" : propertyCell(row.blockValue), row.source];
+    PLACED_COLUMNS.forEach((column, c) => {
+      if (cells[c] !== want[c]) add("PAIR_PLACED_ROW_MISMATCH", `row ${i + 1} (${row.instancePath} \`${row.property}\`, node ${row.nodeId}): ${column} is \`${cells[c]}\` in the markdown and \`${want[c]}\` in the JSON`);
+    });
+  }
+  const wantLines = expectedPlacedLines(placements);
+  if (wantLines.join("\n") !== section.lines.join("\n")) add("PAIR_PLACED_TABLE_MISMATCH", `the unchanged-placement lines differ: the JSON gives ${JSON.stringify(wantLines)} and the markdown has ${JSON.stringify(section.lines)}`);
+  return findings;
+}
+
 /**
  * The light structural pass a markdown brief gets once its JSON companion is
  * the contract: front matter present, the legend line present, and the
@@ -302,6 +463,9 @@ export function validateBriefPair(doc, mdText) {
   for (const f of policyMismatches(parseHandoffMarkdown(mdText))) add(f.code, f.severity, f.message);
   if (typeof doc.schemaVersion === "number" && doc.schemaVersion >= 17) {
     for (const f of propertyTableFindings(doc, body)) add(f.code, f.severity, f.message);
+  }
+  if (typeof doc.schemaVersion === "number" && doc.schemaVersion >= 18) {
+    for (const f of placedSectionFindings(doc, body)) add(f.code, f.severity, f.message);
   }
 
   return { ok: findings.every((f) => f.severity !== "error"), findings };
