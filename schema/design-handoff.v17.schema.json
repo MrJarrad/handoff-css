@@ -1,0 +1,1264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://handoff-css/schema/design-handoff.v17.schema.json",
+  "title": "Design Handoff brief — JSON companion (schema design-handoff v17)",
+  "description": "0.17.0 — schema v17 is additive over v16, and the exporter writes it whenever the selection holds a component or component set with properties (HT-75, HT-76): `componentProperties[]` lists every property the Figma properties panel shows — the component's own, then each exposed nested instance's — one row each with its value as the block ships, the nested component's own default, the options of a variant, whether it is `own` or `exposed`, and a proposed Props-by-default build class and CMS follow-through (`open` when the export cannot read them from the property alone). On each instance, `component.exposed` and `component.exposedInstances[]` say what the panel exposes, and each `component.props` entry gains `default` and `options`. None of v16's own fields change meaning. `additionalProperties: false` throughout.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "contract",
+    "generatedAt",
+    "exportVersion",
+    "documentName",
+    "pageName",
+    "contentHash",
+    "designSystemStateHash",
+    "companion",
+    "breakpoints",
+    "selectedNodes"
+  ],
+  "$defs": {
+    "selfAlignment": {
+      "enum": [
+        "auto",
+        "start",
+        "end",
+        "center",
+        "stretch",
+        "baseline",
+        "self-start",
+        "self-end"
+      ]
+    },
+    "contentAlignment": {
+      "enum": [
+        "start",
+        "end",
+        "center",
+        "stretch",
+        "baseline",
+        "normal",
+        "space-between",
+        "space-around",
+        "space-evenly",
+        "flex-start",
+        "flex-end"
+      ]
+    },
+    "layerNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "type",
+        "depth",
+        "visible"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "depth": {
+          "type": "integer"
+        },
+        "visible": {
+          "type": "boolean"
+        },
+        "link": {
+          "type": "string"
+        },
+        "parentId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "absolute": {
+          "type": "boolean"
+        },
+        "absoluteBounds": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            },
+            "width": {
+              "type": "number"
+            },
+            "height": {
+              "type": "number"
+            }
+          }
+        },
+        "dimensions": {
+          "type": "object",
+          "properties": {
+            "width": {
+              "type": "number"
+            },
+            "height": {
+              "type": "number"
+            },
+            "widthToken": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "heightToken": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "hSizing": {
+              "type": "string"
+            },
+            "vSizing": {
+              "type": "string"
+            },
+            "minWidth": {
+              "type": "number"
+            },
+            "minWidthToken": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "maxWidth": {
+              "type": "number"
+            },
+            "maxWidthToken": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "minHeight": {
+              "type": "number"
+            },
+            "minHeightToken": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "maxHeight": {
+              "type": "number"
+            },
+            "maxHeightToken": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "cornerRadius": {
+          "type": "object",
+          "properties": {
+            "topLeft": {
+              "type": "number"
+            },
+            "topRight": {
+              "type": "number"
+            },
+            "bottomLeft": {
+              "type": "number"
+            },
+            "bottomRight": {
+              "type": "number"
+            },
+            "uniform": {
+              "type": "boolean"
+            },
+            "tokens": {
+              "type": "object"
+            }
+          }
+        },
+        "fills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "color": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "strokes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "color": {
+                "type": "string"
+              },
+              "weight": {
+                "type": "number"
+              },
+              "align": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "semantic": {
+          "type": "string"
+        },
+        "gridPlacement": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "colStart": {
+              "type": "number"
+            },
+            "colSpan": {
+              "type": "number"
+            },
+            "colCount": {
+              "type": "number"
+            },
+            "rowStart": {
+              "type": "number"
+            },
+            "rowSpan": {
+              "type": "number"
+            },
+            "justifySelf": {
+              "$ref": "#/$defs/selfAlignment"
+            },
+            "alignSelf": {
+              "$ref": "#/$defs/selfAlignment"
+            }
+          }
+        },
+        "layout": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "type": "string"
+            },
+            "gap": {
+              "type": "object"
+            },
+            "counterAxisGap": {
+              "type": "object"
+            },
+            "padding": {
+              "type": "object"
+            },
+            "justify": {
+              "type": "string"
+            },
+            "align": {
+              "type": "string"
+            },
+            "justifyContent": {
+              "$ref": "#/$defs/contentAlignment"
+            },
+            "alignItems": {
+              "$ref": "#/$defs/contentAlignment"
+            }
+          }
+        },
+        "component": {
+          "type": "object",
+          "properties": {
+            "sourceId": {
+              "type": "string"
+            },
+            "sourceName": {
+              "type": "string"
+            },
+            "sourceLink": {
+              "type": "string"
+            },
+            "setName": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "props": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "overridden"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "value": {},
+                  "overridden": {
+                    "type": "boolean"
+                  },
+                  "default": {},
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "exposed": {
+              "type": "boolean"
+            },
+            "exposedInstances": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "modes": {
+          "type": "object"
+        },
+        "clip": {
+          "type": "boolean"
+        },
+        "interactive": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aspectRatio": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "token": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "locked": {
+              "type": "boolean"
+            }
+          }
+        },
+        "annotations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "labelMarkdown": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "categoryId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "category": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "properties": {
+                "type": "array"
+              }
+            }
+          }
+        },
+        "constraints": {
+          "type": "object",
+          "properties": {
+            "horizontal": {
+              "type": "string"
+            },
+            "vertical": {
+              "type": "string"
+            }
+          }
+        },
+        "text": {
+          "type": "object",
+          "properties": {
+            "characters": {
+              "type": "string"
+            },
+            "verticalAlign": {
+              "type": "string"
+            },
+            "textWrap": {
+              "type": "string"
+            }
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/layerNode"
+          }
+        },
+        "componentPropertyDefinitions": {
+          "type": "object"
+        },
+        "description": {
+          "type": "string"
+        },
+        "descriptionHints": {
+          "type": "object"
+        },
+        "opacity": {
+          "type": "number"
+        },
+        "rotation": {
+          "type": "number"
+        },
+        "semanticRejected": {
+          "type": "object",
+          "properties": {
+            "tag": {
+              "type": "string"
+            },
+            "source": {
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            }
+          }
+        },
+        "semanticSource": {
+          "type": "string"
+        },
+        "siblingIndex": {
+          "type": "integer"
+        },
+        "styleBindings": {
+          "type": "object"
+        },
+        "tokenBindings": {
+          "type": "object"
+        },
+        "variableBindings": {
+          "type": "object"
+        },
+        "variantStates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mediaFill": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "scaleMode": {
+              "type": "string"
+            }
+          }
+        },
+        "spacer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "marker"
+          ],
+          "properties": {
+            "marker": {
+              "enum": [
+                "edge:start",
+                "edge:end",
+                "edge:both",
+                "mid"
+              ]
+            },
+            "spacingToken": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "spacingBinding": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          }
+        },
+        "measurements": {
+          "type": "array",
+          "description": "Dev Mode measurements that start from this layer (v16).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "start",
+              "end",
+              "offset",
+              "freeText"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "start": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "nodeId",
+                  "side"
+                ],
+                "properties": {
+                  "nodeId": {
+                    "type": "string"
+                  },
+                  "side": {
+                    "enum": [
+                      "TOP",
+                      "RIGHT",
+                      "BOTTOM",
+                      "LEFT"
+                    ]
+                  }
+                }
+              },
+              "end": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "nodeId",
+                  "name",
+                  "side"
+                ],
+                "properties": {
+                  "nodeId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "side": {
+                    "enum": [
+                      "TOP",
+                      "RIGHT",
+                      "BOTTOM",
+                      "LEFT"
+                    ]
+                  }
+                }
+              },
+              "offset": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "relative"
+                    ],
+                    "properties": {
+                      "type": {
+                        "const": "INNER"
+                      },
+                      "relative": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "fixed"
+                    ],
+                    "properties": {
+                      "type": {
+                        "const": "OUTER"
+                      },
+                      "fixed": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                ]
+              },
+              "freeText": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "selectedNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "componentIndexEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "count"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer"
+        },
+        "perFrame": {
+          "type": "object"
+        }
+      }
+    },
+    "variableTokenEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "count"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "aliasId": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer"
+        }
+      }
+    },
+    "prototypeFlowEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceName",
+        "sourceId",
+        "trigger",
+        "action"
+      ],
+      "properties": {
+        "sourceName": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "string"
+        },
+        "trigger": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "destination": {
+          "type": "string"
+        },
+        "destinationId": {
+          "type": "string"
+        },
+        "transition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "motionTransitionTokenEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value",
+        "kind"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        }
+      }
+    },
+    "linkRun": {
+      "description": "Appended by the link-run script (figma-plugins handoff/design-handoff-script), never by the plugin: the Figma file version it read, the Design System Handoff exports it joined, each source file the layer uses, and its findings. `handoff-css validate` reports every finding as a warning and requires every named export in the set.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generatedBy",
+        "fileVersion",
+        "designSystemExports",
+        "sources",
+        "findings"
+      ],
+      "properties": {
+        "generatedBy": {
+          "const": "design-handoff-script"
+        },
+        "fileVersion": {
+          "type": "string"
+        },
+        "designSystemExports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "artifactFilename",
+              "documentName",
+              "generatedAt"
+            ],
+            "properties": {
+              "artifactFilename": {
+                "type": "string"
+              },
+              "documentName": {
+                "type": "string"
+              },
+              "generatedAt": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "role",
+              "fileKey"
+            ],
+            "properties": {
+              "role": {
+                "enum": [
+                  "this file",
+                  "library"
+                ]
+              },
+              "fileKey": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label": {
+                "type": "string"
+              },
+              "components": {
+                "type": "array"
+              },
+              "styles": {
+                "type": "array"
+              },
+              "variables": {
+                "type": "integer"
+              },
+              "designSystemExport": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema": {
+      "const": "design-handoff"
+    },
+    "schemaVersion": {
+      "const": 17
+    },
+    "contract": {
+      "type": "string"
+    },
+    "lane": {
+      "type": "string"
+    },
+    "generatedAt": {
+      "type": "string"
+    },
+    "exportVersion": {
+      "type": "integer"
+    },
+    "documentName": {
+      "type": "string"
+    },
+    "pageName": {
+      "type": "string"
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "designSystemStateHash": {
+      "type": "string"
+    },
+    "fingerprintPolicyVersion": {
+      "type": [
+        "string",
+        "integer"
+      ]
+    },
+    "figma": {
+      "type": "object"
+    },
+    "companion": {
+      "type": "object",
+      "required": [
+        "schema",
+        "schemaVersion",
+        "contentHash",
+        "designSystemStateHash"
+      ],
+      "properties": {
+        "schema": {
+          "const": "design-system-handoff"
+        },
+        "schemaVersion": {
+          "type": "integer"
+        },
+        "artifactFilename": {
+          "type": "string"
+        },
+        "contentHash": {
+          "type": "string"
+        },
+        "designSystemStateHash": {
+          "type": "string"
+        },
+        "stale": {
+          "type": "boolean"
+        }
+      }
+    },
+    "breakpoints": {
+      "type": "object"
+    },
+    "selectedNodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/selectedNode"
+      }
+    },
+    "options": {
+      "type": "object"
+    },
+    "policies": {
+      "type": "object"
+    },
+    "changes": {
+      "type": "object"
+    },
+    "layerTree": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/layerNode"
+      }
+    },
+    "componentIndex": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/componentIndexEntry"
+      }
+    },
+    "variableTokens": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/variableTokenEntry"
+      }
+    },
+    "prototypeFlows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/prototypeFlowEntry"
+      }
+    },
+    "motionEntries": {
+      "type": "array"
+    },
+    "zIndexScale": {
+      "type": "array"
+    },
+    "motionTransitionTokens": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/motionTransitionTokenEntry"
+      }
+    },
+    "schemaNote": {
+      "type": "string"
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "findings": {
+          "type": "array"
+        }
+      }
+    },
+    "screenshots": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "exported": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "nodeId",
+              "scale"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "nodeId": {
+                "type": "string"
+              },
+              "scale": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "failed": {
+          "type": "array"
+        }
+      }
+    },
+    "linkRun": {
+      "$ref": "#/$defs/linkRun"
+    },
+    "specs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "markdown"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "markdown": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "markdownUnavailable": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "builtReference": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "media": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "nodeId",
+          "layerName",
+          "nodePath",
+          "kind",
+          "hash",
+          "scaleMode",
+          "renderedSize"
+        ],
+        "properties": {
+          "nodeId": {
+            "type": "string"
+          },
+          "layerName": {
+            "type": "string"
+          },
+          "nodePath": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "image",
+              "video"
+            ]
+          },
+          "hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scaleMode": {
+            "enum": [
+              "FILL",
+              "FIT",
+              "CROP",
+              "TILE"
+            ]
+          },
+          "imageTransform": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "scalingFactor": {
+            "type": "number"
+          },
+          "rotation": {
+            "type": "number"
+          },
+          "renderedSize": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "width",
+              "height"
+            ],
+            "properties": {
+              "width": {
+                "type": "number"
+              },
+              "height": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "componentProperties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "owner",
+          "ownerPath",
+          "nodeId",
+          "property",
+          "type",
+          "value",
+          "componentDefault",
+          "source",
+          "buildClass",
+          "cms",
+          "open"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "ownerPath": {
+            "type": "string"
+          },
+          "nodeId": {
+            "type": "string"
+          },
+          "property": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "value": {},
+          "componentDefault": {},
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "enum": [
+              "own",
+              "exposed"
+            ]
+          },
+          "buildClass": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "proposed",
+              "basis"
+            ],
+            "properties": {
+              "proposed": {
+                "enum": [
+                  "build prop",
+                  "state",
+                  "responsive",
+                  "Figma-only"
+                ]
+              },
+              "basis": {
+                "type": "string"
+              }
+            }
+          },
+          "cms": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "proposed",
+              "basis"
+            ],
+            "properties": {
+              "proposed": {
+                "enum": [
+                  "yes",
+                  "no"
+                ]
+              },
+              "basis": {
+                "type": "string"
+              }
+            }
+          },
+          "open": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

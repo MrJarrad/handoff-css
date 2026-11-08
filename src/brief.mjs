@@ -74,6 +74,15 @@ export const briefSchemaV15 = require("../schema/design-handoff.v15.schema.json"
  */
 export const briefSchemaV16 = require("../schema/design-handoff.v16.schema.json");
 
+/**
+ * 0.17.0 — schema v17 is additive over v16, written whenever the selection holds a component or
+ * component set with properties: `componentProperties[]`, every property the Figma properties panel
+ * shows (own, then each exposed nested instance's), and `component.exposed` / `exposedInstances` on
+ * each instance. `validateBriefJson` also requires a row for every such property (PROPERTY_ROW_MISSING)
+ * and refuses a row with no property behind it (PROPERTY_ROW_DANGLING).
+ */
+export const briefSchemaV17 = require("../schema/design-handoff.v17.schema.json");
+
 const schemasByVersion = new Map([
   [10, briefSchema],
   [11, briefSchemaV11],
@@ -82,6 +91,7 @@ const schemasByVersion = new Map([
   [14, briefSchemaV14],
   [15, briefSchemaV15],
   [16, briefSchemaV16],
+  [17, briefSchemaV17],
 ]);
 
 const compiledByVersion = new Map();
@@ -100,9 +110,62 @@ const NEWEST = Math.max(...BRIEF_SCHEMA_VERSIONS);
 /** The only shape errors a newer-than-checker version can excuse: a field this checker has never seen. */
 export const UNKNOWN_FIELD_KEYWORDS = new Set(["additionalProperties", "unevaluatedProperties"]);
 
+const cleanKey = (key) => key.replace(/#\d+:\d+$/, "");
+
+/**
+ * The panel, rebuilt from the layer tree: a component set (or a component with definitions) lists its
+ * own properties; the first variant's chain of exposed instances lists theirs. An instance that is not
+ * exposed is not in the panel, so nothing inside it is expected. Each of these needs a row.
+ */
+function expectedPropertyRows(layerTree) {
+  const expected = [];
+  const exposedInside = (node, owner) => {
+    for (const child of node.children ?? []) {
+      if (child.component) {
+        if (!child.component.exposed) continue;
+        for (const key of Object.keys(child.component.props ?? {})) expected.push({ nodeId: child.id, property: cleanKey(key), where: `${owner} › ${child.name}` });
+        exposedInside(child, owner);
+      } else exposedInside(child, owner);
+    }
+  };
+  const walk = (node) => {
+    if (node.type === "COMPONENT_SET" || (node.type === "COMPONENT" && node.componentPropertyDefinitions)) {
+      for (const key of Object.keys(node.componentPropertyDefinitions ?? {})) expected.push({ nodeId: node.id, property: cleanKey(key), where: node.name });
+      const holder = node.type === "COMPONENT_SET" ? (node.children ?? [])[0] : node;
+      if (holder) exposedInside(holder, node.name);
+      return;
+    }
+    for (const child of node.children ?? []) walk(child);
+  };
+  (layerTree ?? []).forEach(walk);
+  return expected;
+}
+
+/** Schema 17 and later: the property table matches the tree, both ways. */
+function checkComponentProperties(doc) {
+  const errors = [];
+  const rows = doc.componentProperties ?? [];
+  const byId = new Map();
+  (function index(node) { byId.set(node.id, node); (node.children ?? []).forEach(index); })({ id: "", children: doc.layerTree ?? [] });
+  const have = new Set(rows.map((row) => `${row.nodeId}\u0000${row.property}`));
+  for (const want of expectedPropertyRows(doc.layerTree)) {
+    if (!have.has(`${want.nodeId}\u0000${want.property}`)) {
+      errors.push({ code: "PROPERTY_ROW_MISSING", keyword: "componentProperties", path: "/componentProperties", message: `${want.where} \`${want.property}\` (node ${want.nodeId}) is a property the Figma panel shows and has no row in componentProperties[]` });
+    }
+  }
+  rows.forEach((row, index) => {
+    const node = byId.get(row.nodeId);
+    const keys = !node ? null : row.source === "own" ? Object.keys(node.componentPropertyDefinitions ?? {}) : Object.keys(node.component?.props ?? {});
+    if (!keys || !keys.map(cleanKey).includes(row.property)) {
+      errors.push({ code: "PROPERTY_ROW_DANGLING", keyword: "componentProperties", path: `/componentProperties/${index}`, message: !node ? `row ${row.key}: node ${row.nodeId} is not in the layer tree` : `row ${row.key}: node ${row.nodeId} has no property \`${row.property}\`` });
+    }
+  });
+  return errors;
+}
+
 /**
  * Validate a parsed brief JSON document against its published shape. Dispatches
- * on the document's own `schemaVersion` (10–16); an unrecognised older version
+ * on the document's own `schemaVersion` (10–17); an unrecognised older version
  * falls back to v10 so it still surfaces as a clear `schemaVersion` const
  * mismatch rather than a thrown error.
  *
@@ -126,7 +189,11 @@ export function validateBriefJson(doc) {
     message: e.params?.additionalProperty ? `${e.message}: \`${e.params.additionalProperty}\`` : e.message,
     keyword: e.keyword,
   }));
-  if (!newer) return { ok, errors, warnings: [] };
+  // A version newer than this checker is judged on shape only (its tables may mean more than v17's).
+  if (!newer && typeof doc.schemaVersion === "number" && doc.schemaVersion >= 17 && Array.isArray(doc.layerTree)) {
+    errors.push(...checkComponentProperties(doc));
+  }
+  if (!newer) return { ok: ok && errors.length === 0, errors, warnings: [] };
   const hard = errors.filter((e) => !UNKNOWN_FIELD_KEYWORDS.has(e.keyword));
   return {
     ok: hard.length === 0,
