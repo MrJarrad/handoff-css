@@ -84,8 +84,9 @@ version. **The one thing to ask a person for is a Design System Handoff plugin r
 `references/export-set.md`. **A link-run finding is a reported item, never a reason to inline
 a value.**
 
-**Specs are read from the spec index, never from the design tool.** The export lists each spec
-without its text; `validate --spec-index` prints the file that holds it — read it as part of the
+**Spec text comes from the live read when it carries it, else from the spec index.** A version 3
+live read carries each spec's text and the brief prints it; otherwise the export lists each spec
+without its text, and `validate --spec-index` prints the file that holds it — read it as part of the
 pair. `SPEC_NOT_INDEXED` is a finding: name the spec and ask; never build from a guess of it.
 
 **Done when** all three hashes reconcile for every set member, `schemaVersion` is one the

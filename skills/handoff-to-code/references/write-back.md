@@ -6,7 +6,7 @@ the design does not have, such as behaviour no property can say. This step write
 in Figma through Figma's MCP, and reads it back. Nothing else in the skill writes to the file.
 
 1. **Write only when the person has said to.** The note text is the person's to add; an agent adds it
-   only when they have agreed, once per session is enough. Without that, hand over the text and stop.
+   only when they have agreed — once per note, or once for a list of notes the person has seen. Without that, hand over the text and stop.
 2. **Load Figma's own `figma-use` skill first**, then write with `use_figma`. Annotations are the
    `annotations` array of a layer; the file's categories come from `figma.annotations`.
 3. **Write on the outermost instance, not an inner part.** A note written from the text a person is

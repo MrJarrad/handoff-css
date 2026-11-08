@@ -38,6 +38,8 @@ node handoff/design-handoff-script/bin/design-handoff.mjs --regenerate <stale br
   --ds <each export> --live <a fresh live read of its layer> [--live <next chunk>] --out <dir>
 ```
 
+Give one `--live` for each chunk of the live read.
+
 It re-exports the brief's own layer against the exports given, and writes nothing when the brief
 already matches them. A plugin-made brief records no file key: add the file's link.
 

@@ -31,3 +31,16 @@ for (const [rule, pattern] of [
 ]) {
   test("write-back: " + rule, () => assert.match(steps, pattern));
 }
+
+test("permission to write is per note, or per list the person has seen, never one agreement for the session (HT-70)", () => {
+  assert.doesNotMatch(steps, /once per session/i);
+  assert.match(steps, /once per note, or once for a list of notes the person has seen/i);
+});
+
+test("the skill says spec text can arrive in the live read, with the spec index as the fallback (HT-70)", () => {
+  const from = main.indexOf("**Spec text comes from");
+  const specs = main.slice(from, main.indexOf("**Done when**", from));
+  assert.match(specs, /live read/i);
+  assert.match(specs, /spec index/i);
+  assert.doesNotMatch(specs, /never from the design tool/i);
+});
