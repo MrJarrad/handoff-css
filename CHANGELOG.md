@@ -16,6 +16,8 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 - handoff-to-code, step 4 rule 11: a table row is a ledger row (node id + property), a missing row is red;
   the proposal columns are built on and each `(open)` row is a `PROPERTY_CLASS_OPEN` ask that never blocks.
   Three law sentences added to the shared list; skill adapters regenerated.
+- `validateBriefJson` and `BRIEF_SCHEMA_VERSIONS` are reachable from the package entry, so the exporter's tests run
+  the full brief check (schema and property rows), not the schema alone.
 
 ### Changed
 

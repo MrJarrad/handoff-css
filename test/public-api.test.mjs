@@ -24,6 +24,7 @@ for (const name of [
   "validateExport", "assertValidExport", "exportSchema", "VALIDATED_SCHEMA_VERSIONS",
   "conform", "FINDINGS", "renderConformMarkdown", "renderConformJson",
   "parseHandoffMarkdown", "validateHandoffMarkdown",
+  "validateBriefJson", "BRIEF_SCHEMA_VERSIONS",
 ]) {
   test(`${name} is reachable from the package entry`, () => {
     assert.notEqual(api[name], undefined);
