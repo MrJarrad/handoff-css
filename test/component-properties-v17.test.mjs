@@ -97,3 +97,40 @@ test("a brief below v17 is judged as it always was: no property rows required", 
   const { errors } = validateBriefJson(doc);
   assert.ok(!errors.some((e) => e.code === "PROPERTY_ROW_MISSING"));
 });
+
+// The brief's markdown table and the JSON rows are one list: `validate` reads them against each other.
+import { validateBriefPair } from "../src/brief.mjs";
+const loadMd = () => gunzipSync(readFileSync(fileURLToPath(new URL("design-handoff-media-block.md.gz", dir)))).toString("utf8");
+const pair = (doc, md) => validateBriefPair(doc, md).findings.filter((f) => /^PAIR_PROPERTY/.test(f.code));
+
+test("the real Media brief's markdown table and its componentProperties[] agree, row by row", () => {
+  assert.deepEqual(pair(load(), loadMd()), []);
+});
+
+test("a markdown table cell that differs from its JSON row is PAIR_PROPERTY_ROW_MISMATCH, naming the row and the column", () => {
+  const md = loadMd().replace(/(\| has-audio \| BOOLEAN \| )true( \|)/, "$1false$2");
+  assert.notEqual(md, loadMd());
+  const found = pair(load(), md);
+  assert.equal(found.length, 1, JSON.stringify(found));
+  assert.equal(found[0].code, "PAIR_PROPERTY_ROW_MISMATCH");
+  assert.equal(found[0].severity, "error");
+  assert.match(found[0].message, /has-audio/);
+  assert.match(found[0].message, /Value/);
+});
+
+test("a row dropped from the markdown table, or a row the JSON does not have, is a mismatch too", () => {
+  const dropped = loadMd().split("\n").filter((line) => !/^\| Media › Media › \.ControlMedia \| #\S+ \| has-video \|/.test(line)).join("\n");
+  assert.ok(pair(load(), dropped).some((f) => f.code === "PAIR_PROPERTY_ROW_MISMATCH" && /has-video/.test(f.message)));
+  const doc = load();
+  doc.componentProperties.pop();
+  assert.ok(pair(doc, loadMd()).some((f) => f.code === "PAIR_PROPERTY_ROW_MISMATCH"));
+});
+
+test("JSON rows with no Component Properties section in the markdown is PAIR_PROPERTY_TABLE_MISSING; no rows and no section is fine", () => {
+  const md = loadMd().replace(/### Component Properties[\s\S]*?(?=\n### )/, "");
+  assert.ok(!md.includes("### Component Properties"));
+  assert.ok(pair(load(), md).some((f) => f.code === "PAIR_PROPERTY_TABLE_MISSING"));
+  const doc = load();
+  delete doc.componentProperties;
+  assert.deepEqual(pair(doc, md), []);
+});

@@ -208,6 +208,57 @@ export function validateBriefJson(doc) {
 const CONTENT_HASH = /^\*\*Content hash:\*\* `([^`]*)`/m;
 const LEGEND = /^\*\*Legend:\*\*/m;
 
+const PROPERTY_COLUMNS = ["Owner", "Node", "Property", "Type", "Value", "Component default", "Options", "Source", "Build class", "Follows to CMS"];
+
+/** The markdown cell for a value, as the exporter prints it. */
+const propertyCell = (value) => (value === undefined ? "—" : typeof value === "string" ? `\`${value.replace(/\|/g, "\\|")}\`` : String(value));
+
+/** One componentProperties[] row as the ten cells of its markdown table line. */
+function propertyRowCells(row) {
+  return [
+    row.ownerPath, `#${row.nodeId}`, row.property, row.type, propertyCell(row.value), propertyCell(row.componentDefault),
+    row.options ? row.options.map((option) => `\`${option}\``).join(", ") : "—", row.source,
+    row.buildClass.proposed + (row.open ? " (open)" : ""), row.cms.proposed + (row.open ? " (open)" : ""),
+  ];
+}
+
+/** The `### Component Properties` table of a markdown brief as rows of trimmed cells, or null when there is no such section. */
+function markdownPropertyRows(body) {
+  const at = body.indexOf("\n### Component Properties\n");
+  if (at === -1) return null;
+  const rest = body.slice(at + 1);
+  const end = rest.slice(1).search(/\n#{2,3} /);
+  const section = end === -1 ? rest : rest.slice(0, end + 1);
+  return section.split("\n").filter((line) => line.startsWith("|")).slice(2)
+    .map((line) => line.slice(1, -1).split(/(?<!\\)\|/).map((cell) => cell.trim()));
+}
+
+/** Schema 17: the brief's markdown table and its JSON rows are one list, row by row and column by column. */
+function propertyTableFindings(doc, body) {
+  const rows = doc.componentProperties ?? [];
+  const table = markdownPropertyRows(body);
+  if (table == null) {
+    return rows.length === 0 ? [] : [{ code: "PAIR_PROPERTY_TABLE_MISSING", severity: "error", message: `componentProperties[] holds ${rows.length} rows and the markdown has no \`### Component Properties\` section` }];
+  }
+  const findings = [];
+  const mismatch = (message) => findings.push({ code: "PAIR_PROPERTY_ROW_MISMATCH", severity: "error", message });
+  if (table.length !== rows.length) mismatch(`the markdown table has ${table.length} rows and componentProperties[] has ${rows.length}`);
+  for (let i = 0; i < Math.max(table.length, rows.length); i += 1) {
+    const row = rows[i];
+    const cells = table[i];
+    if (!row || !cells) {
+      const extra = row ? `${row.ownerPath} \`${row.property}\` (node ${row.nodeId}) is in the JSON and not in the markdown table` : `${cells[0]} \`${cells[2]}\` (${cells[1]}) is in the markdown table and not in the JSON`;
+      mismatch(`row ${i + 1}: ${extra}`);
+      continue;
+    }
+    const want = propertyRowCells(row);
+    PROPERTY_COLUMNS.forEach((column, c) => {
+      if (cells[c] !== want[c]) mismatch(`row ${i + 1} (${row.ownerPath} \`${row.property}\`, node ${row.nodeId}): ${column} is \`${cells[c]}\` in the markdown and \`${want[c]}\` in the JSON`);
+    });
+  }
+  return findings;
+}
+
 /**
  * The light structural pass a markdown brief gets once its JSON companion is
  * the contract: front matter present, the legend line present, and the
@@ -249,6 +300,9 @@ export function validateBriefPair(doc, mdText) {
   check("companion.contentHash", doc.companion?.contentHash, fm.companion?.contentHash);
   check("companion.designSystemStateHash", doc.companion?.designSystemStateHash, fm.companion?.designSystemStateHash);
   for (const f of policyMismatches(parseHandoffMarkdown(mdText))) add(f.code, f.severity, f.message);
+  if (typeof doc.schemaVersion === "number" && doc.schemaVersion >= 17) {
+    for (const f of propertyTableFindings(doc, body)) add(f.code, f.severity, f.message);
+  }
 
   return { ok: findings.every((f) => f.severity !== "error"), findings };
 }

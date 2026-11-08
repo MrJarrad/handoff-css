@@ -172,7 +172,9 @@ wrong mechanism is a defect.
 11. **Every property the Figma panel shows is a ledger row, nested exposed ones included.** A schema-17
     brief opens its Design Summary with **Component Properties** (and `componentProperties[]` in the
     JSON): the component's own properties, then those of each instance it exposes, each with its value,
-    the nested component's own default and its options. One row of the table is one row of the return,
+    the nested component's own default and its options. Every row is a property the Figma panel shows:
+    being in the table, with its `source` (`own`, or `exposed` from a nested instance), is what says so —
+    there is no separate "shown in the panel" column. One row of the table is one row of the return,
     keyed by node id and property; a table row with no return row is red, and `validate` refuses a table
     that leaves out a property the tree has (`PROPERTY_ROW_MISSING`). The table's **Build class** and
     **Follows to CMS** columns are proposals, never rulings: build on them, and every row marked
