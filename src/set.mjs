@@ -17,7 +17,7 @@ import path from "node:path";
 const BEHIND = new Set(["DS_EXPORT_NOT_LATEST", "STYLE_DIFFERS_FROM_DS_EXPORT"]);
 /**
  * Link-run finding codes that mean the brief's annotations are behind the layer. Annotations come
- * from the live read of the layer (`design-handoff --live`), so the fix is a fresh live read and a
+ * from the live read of the layer (`design-handoff`, one `--live` for each chunk), so the fix is a fresh live read and a
  * regenerated brief. The last two codes are from briefs made before the live read, when annotations
  * came from the Design System Handoff export.
  */

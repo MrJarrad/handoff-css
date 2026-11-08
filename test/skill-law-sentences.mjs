@@ -25,7 +25,7 @@ export const LAW_SENTENCES = [
 
   // Step 1 — the export set (0.11.0): findings are reported, specs come from the index.
   "**A link-run finding is a reported item, never a reason to inline a value.**",
-  "**Specs are read from the spec index, never from the design tool.**",
+  "**Spec text comes from the live read when it carries it, else from the spec index.**",
 
   // Brownfield (HT-21) — a match is proposed, never adopted.
   "**A proposal is a question, never a binding.**",
