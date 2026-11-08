@@ -113,3 +113,66 @@ test("a v17 brief is judged as it always was: no placed rows required", () => {
   doc.schemaVersion = 17; delete doc.placedInstances; delete doc.placements; doc.componentProperties = [];
   assert.ok(!validateBriefJson(doc).errors.some((e) => /^PLACED/.test(e.code ?? "")));
 });
+
+// "Bulletproof": the checker re-derives what the exporter decided, so a JSON edited by hand cannot disagree with itself.
+test("changedHere must follow from the values: a known, unswapped row changed exactly when value differs from blockValue", () => {
+  const lie = loadRow();
+  const same = lie.placedInstances.find((r) => r.blockKnown && !r.swappedHere && !r.changedHere && r.property === "ratio");
+  same.changedHere = true;
+  const found = validateBriefJson(lie).errors.filter((e) => e.code === "PLACED_FLAG_MISMATCH");
+  assert.equal(found.length, 1, JSON.stringify(found));
+  assert.match(found[0].message, /ratio/);
+  assert.match(found[0].message, /changedHere/);
+  const hidden = loadRow();
+  const changed = hidden.placedInstances.find((r) => r.changedHere && r.property === "isDescription");
+  changed.changedHere = false;
+  assert.ok(validateBriefJson(hidden).errors.some((e) => e.code === "PLACED_FLAG_MISMATCH" && /isDescription/.test(e.message)));
+  const value = loadRow();
+  const row = value.placedInstances.find((r) => r.blockKnown && !r.swappedHere && r.property === "title");
+  row.value = "Another title";
+  assert.ok(validateBriefJson(value).errors.some((e) => e.code === "PLACED_FLAG_MISMATCH" && /title/.test(e.message)), "a value edited without its flag");
+});
+
+test("a swapped row is changed with no block value; an unknown block is never changed", () => {
+  const swapped = loadRow();
+  const a = swapped.placedInstances.find((r) => r.blockKnown && !r.swappedHere && r.property === "ratio");
+  a.swappedHere = true; a.blockValue = null; a.changedHere = false;
+  assert.ok(validateBriefJson(swapped).errors.some((e) => e.code === "PLACED_FLAG_MISMATCH" && /swappedHere/.test(e.message)));
+  const unknown = loadRow();
+  const b = unknown.placedInstances.find((r) => r.property === "ratio");
+  b.blockKnown = false; b.blockValue = null; b.changedHere = true;
+  assert.ok(validateBriefJson(unknown).errors.some((e) => e.code === "PLACED_FLAG_MISMATCH" && /blockKnown/.test(e.message)));
+});
+
+test("placements[] counts must equal the rows: changed, unknown, and which placements exist", () => {
+  const counts = loadRow();
+  counts.placements[0].changed = 0;
+  const e1 = validateBriefJson(counts).errors.filter((e) => e.code === "PLACED_COUNT_MISMATCH");
+  assert.equal(e1.length, 1, JSON.stringify(e1));
+  assert.match(e1[0].message, /changed/);
+  const unknown = loadRow();
+  unknown.placements[0].unknown = 2;
+  assert.ok(validateBriefJson(unknown).errors.some((e) => e.code === "PLACED_COUNT_MISMATCH" && /unknown/.test(e.message)));
+  const gone = loadRow();
+  gone.placements = [];
+  assert.ok(validateBriefJson(gone).errors.some((e) => e.code === "PLACED_COUNT_MISMATCH" && /placement/.test(e.message)));
+  const extra = loadRow();
+  extra.placements.push({ nodeId: "9:9", name: "Ghost", component: "Ghost", changed: 0, unknown: 0 });
+  assert.ok(validateBriefJson(extra).errors.some((e) => e.code === "PLACED_COUNT_MISMATCH" && /9:9/.test(e.message)));
+});
+
+test("the real briefs pass the re-derivation", () => {
+  assert.deepEqual(validateBriefJson(loadRow()).errors.filter((e) => /^PLACED/.test(e.code)), []);
+  assert.deepEqual(validateBriefJson(loadBlock()).errors.filter((e) => /^PLACED/.test(e.code)), []);
+});
+
+test("the markdown section must say that every setting not listed uses the component's own", () => {
+  const md = blockMd();
+  assert.deepEqual(pair(loadBlock(), md), []);
+  const stripped = md.replace(/Where a component is placed in this layout[^\n]*\n/, "Placed instances.\n");
+  assert.notEqual(stripped, md);
+  const found = pair(loadBlock(), stripped);
+  assert.equal(found.length, 1, JSON.stringify(found));
+  assert.equal(found[0].code, "PAIR_PLACED_SENTENCE_MISSING");
+  assert.ok(pair(loadRow(), rowMd().replace("every setting not listed here uses the component's own", "everything else is as designed")).some((f) => f.code === "PAIR_PLACED_SENTENCE_MISSING"));
+});

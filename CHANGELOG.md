@@ -13,6 +13,11 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 - `validate`: a setting of a placed instance with no row is `PLACED_ROW_MISSING`, a row with no setting behind it
   `PLACED_ROW_DANGLING`; for a v18 pair the markdown `### Placed Instances` section must list exactly the settings
   changed here and the same unchanged-placement lines (`PAIR_PLACED_ROW_MISMATCH`, `PAIR_PLACED_TABLE_MISMATCH`).
+- `validate` re-derives what the exporter decided for a v18 brief: `changedHere` must follow from the values (a known, unswapped
+  row is changed exactly when the value here differs from what the component ships; a swapped row is changed; an unknown
+  block is never) — `PLACED_FLAG_MISMATCH`; `placements[]` must be the rows counted and the placed instances in the tree —
+  `PLACED_COUNT_MISMATCH`; and the markdown section must say that every setting not listed uses the component's own —
+  `PAIR_PLACED_SENTENCE_MISSING`.
 - handoff-to-code, step 4 rule 12: the listed rows are ledger rows (layout config the build carries), a setting not
   listed uses the component's own, a changed row with no ledger row is red. Three law sentences; adapters regenerated.
 

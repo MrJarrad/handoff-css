@@ -206,6 +206,57 @@ function checkPlacedInstances(doc) {
       errors.push({ code: "PLACED_ROW_DANGLING", keyword: "placedInstances", path: `/placedInstances/${index}`, message: `row ${row.key}: node ${row.nodeId} has no setting \`${row.property}\` on an instance placed outside a component definition` });
     }
   });
+  errors.push(...placedFlagErrors(rows), ...placedCountErrors(doc, rows));
+  return errors;
+}
+
+/** The exporter's decision about each row, re-derived from the row's own values: what is changed here follows from what the component ships. */
+function placedFlagErrors(rows) {
+  const errors = [];
+  rows.forEach((row, index) => {
+    const at = `/placedInstances/${index}`;
+    const bad = (message) => errors.push({ code: "PLACED_FLAG_MISMATCH", keyword: "placedInstances", path: at, message: `row ${row.key} (${row.instancePath} \`${row.property}\`): ${message}` });
+    if (!row.blockKnown) {
+      if (row.changedHere || row.swappedHere) bad(`blockKnown is false, so nothing can be said to have changed: changedHere and swappedHere must be false`);
+    } else if (row.swappedHere) {
+      if (!row.changedHere) bad(`swappedHere is true (another component is in this place), so changedHere must be true`);
+    } else {
+      const differs = String(row.value) !== String(row.blockValue);
+      if (row.changedHere !== differs) bad(`changedHere is ${row.changedHere} and the value here (${JSON.stringify(row.value)}) ${differs ? "differs from" : "equals"} the value the component ships (${JSON.stringify(row.blockValue)}): changedHere must be ${differs}`);
+    }
+  });
+  return errors;
+}
+
+/** The outermost instances placed outside a component definition: the placements the exporter must have listed. */
+function outermostPlacedIds(layerTree) {
+  const ids = [];
+  const visit = (node, inPlacement) => {
+    if (node.type === "COMPONENT" || node.type === "COMPONENT_SET") return;
+    if (node.component && !inPlacement) ids.push(node.id);
+    for (const child of node.children ?? []) visit(child, inPlacement || Boolean(node.component));
+  };
+  (layerTree ?? []).forEach((root) => visit(root, false));
+  return ids;
+}
+
+/** placements[] is the rows counted: one entry per outermost placed instance, with how many of its rows changed here and how many could not be compared. */
+function placedCountErrors(doc, rows) {
+  const errors = [];
+  const bad = (message) => errors.push({ code: "PLACED_COUNT_MISMATCH", keyword: "placements", path: "/placements", message });
+  const placements = doc.placements ?? [];
+  const listed = new Map(placements.map((placement) => [placement.nodeId, placement]));
+  for (const id of outermostPlacedIds(doc.layerTree)) if (!listed.has(id)) bad(`the instance ${id} is placed in the layout and has no entry in placements[]`);
+  const inTree = new Set(outermostPlacedIds(doc.layerTree));
+  for (const placement of placements) {
+    if (!inTree.has(placement.nodeId)) { bad(`placements[] names ${placement.nodeId}, which is not an instance placed in the layout`); continue; }
+    const mine = rows.filter((row) => row.placementId === placement.nodeId);
+    const changed = mine.filter((row) => row.changedHere).length;
+    const unknown = mine.filter((row) => !row.blockKnown).length;
+    if (placement.changed !== changed) bad(`placement ${placement.nodeId} (${placement.name}): placements[] says ${placement.changed} changed and its rows say ${changed}`);
+    if (placement.unknown !== unknown) bad(`placement ${placement.nodeId} (${placement.name}): placements[] says ${placement.unknown} unknown and its rows say ${unknown}`);
+  }
+  for (const row of rows) if (!listed.has(row.placementId)) { bad(`row ${row.key} belongs to placement ${row.placementId}, which has no entry in placements[]`); break; }
   return errors;
 }
 
@@ -308,6 +359,8 @@ function propertyTableFindings(doc, body) {
   return findings;
 }
 
+/** What the section must say, so a setting that is not listed is read as the component's own and not as missing. */
+const PLACED_SENTENCE = "every setting not listed here uses the component's own";
 const PLACED_COLUMNS = ["Placement", "Node", "Property", "Type", "Value here", "Component value", "Source"];
 
 /** The `### Placed Instances` section of a markdown brief: its table rows (trimmed cells) and its `- ` lines, or null when there is no such section. */
@@ -318,7 +371,7 @@ function markdownPlacedSection(body) {
   const end = rest.slice(1).search(/\n#{2,3} /);
   const section = (end === -1 ? rest : rest.slice(0, end + 1)).split("\n");
   const rows = section.filter((line) => line.startsWith("|")).slice(2).map((line) => line.slice(1, -1).split(/(?<!\\)\|/).map((cell) => cell.trim()));
-  return { rows, lines: section.filter((line) => line.startsWith("- ")) };
+  return { rows, lines: section.filter((line) => line.startsWith("- ")), text: section.join("\n") };
 }
 
 /** The lines the exporter writes under the table: unchanged placements per component, and settings that could not be compared. */
@@ -347,6 +400,7 @@ function placedSectionFindings(doc, body) {
   if (section == null) return [{ code: "PAIR_PLACED_TABLE_MISMATCH", severity: "error", message: `placedInstances[] holds ${rows.length} rows and the markdown has no \`### Placed Instances\` section` }];
   const findings = [];
   const add = (code, message) => findings.push({ code, severity: "error", message });
+  if (!section.text.includes(PLACED_SENTENCE)) add("PAIR_PLACED_SENTENCE_MISSING", `the Placed Instances section does not say "${PLACED_SENTENCE}": a reader must be told that a setting not listed is the component's own`);
   const changed = rows.filter((row) => row.changedHere);
   if (section.rows.length !== changed.length) add("PAIR_PLACED_ROW_MISMATCH", `the markdown table has ${section.rows.length} rows and ${changed.length} settings changed here in the JSON`);
   for (let i = 0; i < Math.max(section.rows.length, changed.length); i += 1) {
