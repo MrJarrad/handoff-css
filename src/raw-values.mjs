@@ -5,10 +5,10 @@
 // Unlike the Figma-variable pass in match.mjs, where a value alone is never a proposal (a variable has
 // a name to match), a raw value has nothing but its value, so here the value is the evidence:
 //   - colour: the same only when the two can't be told apart (CIEDE2000 ΔE < 1, alpha within 1/255);
-//     ΔE < 5 is slightly off and goes to the operator with the token suggested;
+//     ΔE < 5 is slightly off and is listed with the token suggested;
 //   - spacing, size, radius, border, type: the same within half a pixel (px against rem at 16px);
 //     between two steps the exact number stays and is listed with both neighbours.
-// A clear match is built with the token and listed so the operator can overrule it. A listed
+// A clear match is built with the token and listed so a person can overrule it. A listed
 // value is built raw, with a deviation row, until it is ruled; it never stops a build.
 //
 // Pure: rows and texts in, result out. `src/match-cli.mjs` is the filesystem boundary.
@@ -192,7 +192,7 @@ export function matchRawValues({ rows, files, rulings = null }) {
   return { items, findings, counts };
 }
 
-/** The operator's view: what was built with a token (overrule with `keep`), then what needs their call. */
+/** The report: what was built with a token (overrule with `keep`), then what needs their call. */
 export function renderRawValues({ items, findings, counts }) {
   const cell = (s) => String(s ?? "").replace(/\|/g, "\\|");
   const layers = (i) => `${i.layers.length} layer${i.layers.length === 1 ? "" : "s"}`;
