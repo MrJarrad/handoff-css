@@ -1,0 +1,159 @@
+{
+  "schema": "design-handoff-link-run",
+  "schemaVersion": 1,
+  "brief": {
+    "contentHash": "8c828900da237560abf5fd4eac8b3a6973a3babcc91fe1b4719a3fc35688cb44"
+  },
+  "linkRun": {
+    "generatedBy": "design-handoff-script",
+    "fileVersion": "1",
+    "designSystemExports": [],
+    "sources": [
+      {
+        "role": "this file",
+        "fileKey": "F",
+        "name": "Example",
+        "components": [],
+        "styles": [],
+        "variables": 0,
+        "designSystemExport": null
+      }
+    ],
+    "findings": []
+  },
+  "unboundValues": [
+    {
+      "nodeId": "20:1",
+      "node": "Card",
+      "kind": "size",
+      "property": "width",
+      "value": 320
+    },
+    {
+      "nodeId": "20:1",
+      "node": "Card",
+      "kind": "size",
+      "property": "height",
+      "value": 200
+    },
+    {
+      "nodeId": "20:1",
+      "node": "Card",
+      "kind": "spacing",
+      "property": "gap",
+      "value": 12
+    },
+    {
+      "nodeId": "20:1",
+      "node": "Card",
+      "kind": "spacing",
+      "property": "paddingTop",
+      "value": 16
+    },
+    {
+      "nodeId": "20:1",
+      "node": "Card",
+      "kind": "spacing",
+      "property": "paddingRight",
+      "value": 16
+    },
+    {
+      "nodeId": "20:1",
+      "node": "Card",
+      "kind": "spacing",
+      "property": "paddingBottom",
+      "value": 16
+    },
+    {
+      "nodeId": "20:1",
+      "node": "Card",
+      "kind": "spacing",
+      "property": "paddingLeft",
+      "value": 16
+    },
+    {
+      "nodeId": "20:1",
+      "node": "Card",
+      "kind": "radius",
+      "property": "cornerRadius",
+      "value": 8
+    },
+    {
+      "nodeId": "20:1",
+      "node": "Card",
+      "kind": "colour",
+      "property": "fill",
+      "value": "#1A1A1AFF"
+    },
+    {
+      "nodeId": "20:3",
+      "node": "title",
+      "kind": "colour",
+      "property": "fill",
+      "value": "#1A1A1AFF"
+    },
+    {
+      "nodeId": "20:2",
+      "node": "Note",
+      "kind": "spacing",
+      "property": "paddingTop",
+      "value": 8
+    },
+    {
+      "nodeId": "20:2",
+      "node": "Note",
+      "kind": "spacing",
+      "property": "paddingRight",
+      "value": 8
+    },
+    {
+      "nodeId": "20:2",
+      "node": "Note",
+      "kind": "spacing",
+      "property": "paddingBottom",
+      "value": 8
+    },
+    {
+      "nodeId": "20:2",
+      "node": "Note",
+      "kind": "spacing",
+      "property": "paddingLeft",
+      "value": 8
+    },
+    {
+      "nodeId": "20:2",
+      "node": "Note",
+      "kind": "radius",
+      "property": "cornerRadius",
+      "value": 8
+    },
+    {
+      "nodeId": "20:2",
+      "node": "Note",
+      "kind": "colour",
+      "property": "fill",
+      "value": "#2F2F2FFF"
+    },
+    {
+      "nodeId": "20:3",
+      "node": "title",
+      "kind": "type",
+      "property": "fontSize",
+      "value": 15
+    },
+    {
+      "nodeId": "20:3",
+      "node": "title",
+      "kind": "type",
+      "property": "lineHeight",
+      "value": 22
+    },
+    {
+      "nodeId": "20:3",
+      "node": "title",
+      "kind": "type",
+      "property": "fontWeight",
+      "value": 500
+    }
+  ]
+}

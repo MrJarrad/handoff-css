@@ -900,7 +900,8 @@
       "type": "object"
     },
     "companion": {
-      "type": "object",
+      "description": "null when no Design System Handoff export is joined: a layer that binds no variables, run from its link (HT-107).",
+      "type": ["object", "null"],
       "required": [
         "schema",
         "schemaVersion",

@@ -24,7 +24,7 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
   handoff-css validate <file|zip…> [--spec-index <md>] [--json]
   handoff-css conform --export <json> --handoff <md> --tokens <css> --css <file…>
               [--config <mjs>] [--allow-name <name>…] [--json]
-  handoff-css match --handoff <md> --src <path…> [--rulings <md>] [--json]
+  handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--json]
   handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 `;
 

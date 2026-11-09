@@ -1,0 +1,15 @@
+/* A small coded design system: the project's own custom properties (HT-102 worked example). */
+:root {
+  --color-ink: #1a1a1a;
+  --color-ink-soft: #3a3a3a;
+  --color-paper: #ffffff;
+  --space-2: 0.5rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --radius-md: 0.5rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --line-height-md: 1.5rem;
+  --font-weight-medium: 500;
+  --size-card: 20rem;
+}
