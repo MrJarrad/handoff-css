@@ -6,6 +6,8 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Added
 
+- `HAND_AUTHORED_MISSING` (HT-85): a missing hand-authored stylesheet (e.g. `src/styles.css`) is read as empty and reported, instead of
+  crashing `run()` with ENOENT. The file is not created.
 - Schema v18 (HT-80): `placedInstances[]` — every setting of every instance placed outside a component definition,
   at any depth, with the value here, the value the component ships at the same place (the outermost placed instance's
   main component; the component's own default for the outermost instance), `blockKnown`, `swappedHere`, `changedHere` —

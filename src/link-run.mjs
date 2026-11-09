@@ -1,5 +1,5 @@
 // 0.16.0 — the link run's own notes as a file beside the brief. The link-run script
-// (figma-plugins `handoff/design-handoff-script`) used to append them to the brief, in the JSON as
+// (the toolkit `handoff/design-handoff-script`) used to append them to the brief, in the JSON as
 // `linkRun`; the brief is now exactly the plugin's and they sit in `<brief>.link-run.json`. The file
 // names its brief by the brief's `contentHash`, so a note made for another brief is refused.
 import { createRequire } from "node:module";

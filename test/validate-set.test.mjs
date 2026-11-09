@@ -1,4 +1,4 @@
-// `handoff-css validate` over what the link-run script writes (figma-plugins
+// `handoff-css validate` over what the link-run script writes (the toolkit
 // `handoff/design-handoff-script`, the Design Handoff export path since HT-19):
 // the brief pair plus every Design System Handoff export it was made from — a
 // set, joined by the names the brief's `companion` and `linkRun` carry.
