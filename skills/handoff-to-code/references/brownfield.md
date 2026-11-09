@@ -88,11 +88,13 @@ file has no `unboundValues` is refused, naming the script run that writes it.
 
 **Tokens read:** every `--name: value` in a `.css` file (Tailwind v4 `@theme` included); an alias
 (`var(--x)`) is not a second token. A token's kind comes from its value (a colour) or its name's
-`-` segments: `font`+`size`/`text`/`fs` → font size, `leading`/`line`+`height` → line height,
-`tracking`/`letter` → letter spacing, `weight` (unitless) → font weight, `radius`/`rounded` → radius,
+`-` segments, in this order: `leading`/`line`+`height` → line height, `tracking`/`letter` → letter
+spacing (so Tailwind v4's `--text-sm--line-height` is a line height), `font`+`size`/`text`/`fs` → font size, `weight` (unitless) → font weight, `radius`/`rounded` → radius,
 `border`/`stroke` → border, `space`/`spacing`/`gap`/`padding`/`inset`/`margin` → spacing,
 `size`/`width`/`height`/`container` → size. A length whose name says none of these is not matched.
-Not read: Tailwind v3 config, DTCG JSON, SCSS, JS theme objects.
+Colours read: hex, `rgb()`, `hsl()`, `oklch()`. A colour in another form (`lab()`, `lch()`, `oklab()`,
+`hwb()`, `color()`, `color-mix()`) is named under **Not read** in the report, never dropped. Not read:
+Tailwind v3 config, DTCG JSON, SCSS, JS theme objects.
 
 | Kind | The same (built with the token) | Listed |
 | --- | --- | --- |

@@ -22,7 +22,7 @@ const ROOT_PX = 16;
 
 // ── colour ──────────────────────────────────────────────────────────────────
 
-/** `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()`/`rgba()` (comma or space syntax) → [r, g, b, a] in 0–1; else null. */
+/** `#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, `rgb()`/`rgba()`, `hsl()`/`hsla()`, `oklch()` (comma or space syntax) → [r, g, b, a] in 0–1, clamped to sRGB; else null. */
 export function parseColour(raw) {
   const v = String(raw).trim().toLowerCase();
   let hex = /^#([0-9a-f]{3,8})$/.exec(v)?.[1];
@@ -32,13 +32,38 @@ export function parseColour(raw) {
     if (hex.length !== 8) return null;
     return [0, 2, 4, 6].map((i) => Number.parseInt(hex.slice(i, i + 2), 16) / 255);
   }
-  const fn = /^rgba?\(([^)]*)\)$/.exec(v)?.[1];
-  if (!fn) return null;
-  const parts = fn.split(/[\s,/]+/).filter(Boolean);
+  const m = /^(rgba?|hsla?|oklch)\(([^)]*)\)$/.exec(v);
+  if (!m) return null;
+  const parts = m[2].split(/[\s,/]+/).filter(Boolean);
   if (parts.length < 3 || parts.length > 4) return null;
-  const channel = (p, max) => (p.endsWith("%") ? Number.parseFloat(p) / 100 : Number.parseFloat(p) / max);
-  const out = [channel(parts[0], 255), channel(parts[1], 255), channel(parts[2], 255), parts[3] == null ? 1 : channel(parts[3], 1)];
+  const num = (p, max) => (p.endsWith("%") ? Number.parseFloat(p) / 100 : Number.parseFloat(p) / max);
+  const alpha = parts[3] == null ? 1 : num(parts[3], 1);
+  let rgb;
+  if (m[1].startsWith("rgb")) rgb = [num(parts[0], 255), num(parts[1], 255), num(parts[2], 255)];
+  else if (m[1].startsWith("hsl")) rgb = hslToRgb(Number.parseFloat(parts[0]), num(parts[1], 100), num(parts[2], 100));
+  else rgb = oklchToRgb(num(parts[0], 1), parts[1].endsWith("%") ? Number.parseFloat(parts[1]) / 100 * 0.4 : Number.parseFloat(parts[1]), Number.parseFloat(parts[2]));
+  const out = [...rgb.map((c) => Math.min(1, Math.max(0, c))), alpha];
   return out.every(Number.isFinite) ? out : null;
+}
+
+// CSS Color 4: hsl() hue in degrees, saturation and lightness 0–1.
+function hslToRgb(h, s, l) {
+  const f = (n) => { const k = (n + h / 30) % 12; return l - s * Math.min(l, 1 - l) * Math.max(-1, Math.min(k - 3, 9 - k, 1)); };
+  return [f(0), f(8), f(4)];
+}
+
+// CSS Color 4: oklch() → OKLab → linear sRGB → sRGB (Björn Ottosson's matrices).
+function oklchToRgb(L, C, H) {
+  const a = C * Math.cos((H * Math.PI) / 180), b = C * Math.sin((H * Math.PI) / 180);
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  const linear = [
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+  ];
+  return linear.map((c) => (c <= 0.0031308 ? 12.92 * c : 1.055 * Math.sign(c) * Math.abs(c) ** (1 / 2.4) - 0.055));
 }
 
 /** sRGB (0–1) → CIELAB, D65. */
@@ -93,10 +118,11 @@ const px = (raw) => {
 function lengthKind(name, unitless) {
   const s = new Set(name.replace(/^--/, "").split("-"));
   const has = (...w) => w.some((x) => s.has(x));
-  if (unitless) return has("weight", "fw") ? "type:fontWeight" : null;
-  if ((has("font") && has("size")) || has("text", "fs")) return "type:fontSize";
+  if (unitless) return has("weight", "fw") && !has("line", "leading") ? "type:fontWeight" : null;
+  // Line height and tracking first: Tailwind v4 pairs each text size with its own (`--text-sm--line-height`).
   if (has("leading", "lh") || (has("line") && has("height"))) return "type:lineHeight";
   if (has("tracking", "letter")) return "type:letterSpacing";
+  if ((has("font") && has("size")) || has("text", "fs")) return "type:fontSize";
   if (has("radius", "rounded", "round", "corner")) return "radius";
   if (has("border", "stroke")) return "border";
   if (has("space", "spacing", "spacer", "gap", "gutter", "padding", "inset", "margin")) return "spacing";
@@ -105,19 +131,24 @@ function lengthKind(name, unitless) {
 }
 
 /** Every custom property the CSS declares, its alias chain followed, as `{ name, value, kind, colour?, px? }`; aliases dropped. */
+// A colour function this pass does not convert (lab(), lch(), oklab(), hwb(), color(), color-mix()…): named, never dropped.
+const COLOUR_FUNCTION = /^(?:lab|lch|oklab|oklch|hwb|hsla?|rgba?|color|color-mix|light-dark)\(/i;
+
 function tokens(files) {
   const code = inventory(files.filter((f) => f.path.endsWith(".css")));
   const out = [];
+  const unreadable = [];
   for (const { name, values } of code.tokens.values()) {
     if (!values.length || /^var\(/.test(values[0].trim())) continue;
     const value = values[0].trim();
     const colour = parseColour(value);
     if (colour) { out.push({ name, value, kind: "colour", colour, lab: lab(colour) }); continue; }
+    if (COLOUR_FUNCTION.test(value)) { unreadable.push(name); continue; }
     const n = px(value);
     const kind = n == null ? null : lengthKind(name, /^-?\d*\.?\d+$/.test(value));
     if (kind) out.push({ name, value, kind, px: n });
   }
-  return out.sort((a, b) => a.name.localeCompare(b.name));
+  return { all: out.sort((a, b) => a.name.localeCompare(b.name)), unreadable: unreadable.sort() };
 }
 
 // ── matching ────────────────────────────────────────────────────────────────
@@ -126,7 +157,7 @@ const wanted = (row) => (row.kind === "type" ? `type:${row.property}` : row.kind
 const unit = (row) => (row.kind === "type" && row.property === "fontWeight" ? "" : "px");
 const keyOf = (row) => (row.kind === "colour" ? String(row.value).toUpperCase() : `${row.kind === "type" ? `${row.property} ` : ""}${row.value}${unit(row)}`);
 
-function matchColour(value, candidates) {
+function matchColour(value, candidates, unreadable) {
   const rgba = parseColour(value);
   if (!rgba) return { status: "listed", reason: "no-match", token: null, why: `not a colour: ${value}`, suggestions: [] };
   const here = lab(rgba);
@@ -135,7 +166,7 @@ function matchColour(value, candidates) {
   const same = ranked.filter((r) => r.d < SAME_COLOUR && r.da <= 1 / 255);
   if (same.length === 1) return { status: "built", reason: "same", token: same[0].t.name, why: `can't tell apart: ΔE ${same[0].d.toFixed(1)}`, suggestions: [] };
   if (same.length > 1) return { status: "listed", reason: "tie", token: null, why: `${same.length} tokens can't be told apart from it`, suggestions: same.map(suggest) };
-  if (!ranked.length) return { status: "listed", reason: "no-tokens", token: null, why: "the code declares no colour token", suggestions: [] };
+  if (!ranked.length) return { status: "listed", reason: "no-tokens", token: null, why: unreadable.length ? `the code declares no colour token this pass reads (could not read ${unreadable.length} colour tokens: ${unreadable.join(", ")})` : "the code declares no colour token", suggestions: [] };
   if (ranked[0].d < SLIGHTLY_OFF) return { status: "listed", reason: "slightly-off", token: null, why: `slightly off: ${suggest(ranked[0]).distance}`, suggestions: [suggest(ranked[0])] };
   return { status: "listed", reason: "no-match", token: null, why: `no close match: nearest ${suggest(ranked[0]).distance}`, suggestions: ranked.slice(0, 2).map(suggest) };
 }
@@ -162,7 +193,7 @@ function matchLength(row, candidates) {
  * @returns {{ items: object[], findings: object[], counts: object }}
  */
 export function matchRawValues({ rows, files, rulings = null }) {
-  const all = tokens(files);
+  const { all, unreadable } = tokens(files);
   const names = new Set(all.map((t) => t.name));
   const ruled = rulings ? readRulings(rulings) : [];
   const groups = new Map();
@@ -175,7 +206,7 @@ export function matchRawValues({ rows, files, rulings = null }) {
   const items = [...groups.values()].map(({ row, layers }) => {
     const candidates = all.filter((t) => t.kind === wanted(row));
     const value = row.kind === "colour" ? String(row.value).toUpperCase() : Number(row.value);
-    const match = row.kind === "colour" ? matchColour(value, candidates) : matchLength(row, candidates);
+    const match = row.kind === "colour" ? matchColour(value, candidates, unreadable) : matchLength(row, candidates);
     const item = { kind: row.kind, property: row.kind === "type" ? row.property : null, value, figma: keyOf(row), layers, ...match };
     const r = ruled.find((x) => x.kind === `raw-${row.kind}` && x.figma.toUpperCase() === item.figma.toUpperCase());
     if (!r) return item;
@@ -189,16 +220,17 @@ export function matchRawValues({ rows, files, rulings = null }) {
   });
   const counts = { values: items.length, built: 0, listed: 0, ruled: 0 };
   for (const i of items) counts[i.status] += 1;
-  return { items, findings, counts };
+  return { items, findings, counts, unreadable };
 }
 
 /** The report: what was built with a token (overrule with `keep`), then what needs their call. */
-export function renderRawValues({ items, findings, counts }) {
+export function renderRawValues({ items, findings, counts, unreadable = [] }) {
   const cell = (s) => String(s ?? "").replace(/\|/g, "\\|");
   const layers = (i) => `${i.layers.length} layer${i.layers.length === 1 ? "" : "s"}`;
   const lines = ["## Raw values", "", `${counts.values} values not bound to a Figma variable · ${counts.built} built with a token · ${counts.listed} need your call · ${counts.ruled} ruled`, ""];
   for (const f of findings) lines.push(`- ${f.code} ${f.kind} ${f.figma} — ${f.message}`);
   if (findings.length) lines.push("");
+  if (unreadable.length) lines.push(`Not read: ${unreadable.join(", ")} — colour tokens in a form this pass does not convert (lab(), lch(), oklab(), hwb(), color(), color-mix()); a value they hold is not matched.`, "");
   const built = items.filter((i) => i.status === "built");
   if (built.length) {
     lines.push("### Built with a token", "", "Each is built with the token. To keep the raw value instead, add a `keep` row to the ruling table.", "",

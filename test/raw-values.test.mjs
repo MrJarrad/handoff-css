@@ -8,7 +8,7 @@ import { readFileSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { deltaE2000, matchRawValues } from "../src/raw-values.mjs";
+import { deltaE2000, matchRawValues, parseColour, renderRawValues } from "../src/raw-values.mjs";
 import { matchCommand } from "../src/match-cli.mjs";
 
 const css = (text) => [{ path: "tokens.css", text }];
@@ -198,4 +198,33 @@ test("a brief made with no Design System Handoff export validates as a set (comp
   const dir = new URL("../fixtures/ht102-raw-values/", import.meta.url).pathname;
   const run = spawnSync(process.execPath, [new URL("../bin/handoff-css.mjs", import.meta.url).pathname, "validate", "card.json", "card.md"], { cwd: dir, encoding: "utf8" });
   assert.equal(run.status, 0, run.stdout + run.stderr);
+});
+
+// Review round 1 (red): Tailwind v4 pairs each text size with its own line height, `--text-sm--line-height`.
+test("Tailwind v4's --text-*--line-height is a line height, not a font size", () => {
+  const files = css("@theme {\n  --text-sm: 0.875rem;\n  --text-sm--line-height: 1.25rem;\n  --text-base: 1rem;\n  --text-base--line-height: 1.5rem;\n  --text-sm--letter-spacing: 0.01rem;\n}");
+  const items = one([row("type", "fontSize", 20), row("type", "lineHeight", 20), row("type", "fontSize", 14), row("type", "letterSpacing", 0.16)], files);
+  const by = (p, v) => items.find((i) => i.property === p && i.value === v);
+  assert.ok(by("fontSize", 20).suggestions.every((s) => !s.token.includes("line-height")), JSON.stringify(by("fontSize", 20)));
+  assert.notEqual(by("fontSize", 20).token, "--text-sm--line-height");
+  assert.deepEqual([by("lineHeight", 20).status, by("lineHeight", 20).token], ["built", "--text-sm--line-height"]);
+  assert.equal(by("fontSize", 14).token, "--text-sm");
+  assert.equal(by("letterSpacing", 0.16).token, "--text-sm--letter-spacing");
+});
+
+// Review round 1 (amber): hsl() and oklch() colours are read; a colour the pass cannot read is named, never dropped.
+test("hsl() and oklch() colour tokens are read", () => {
+  assert.deepEqual(parseColour("hsl(0 0% 10.2%)").map((c) => Math.round(c * 255)), [26, 26, 26, 255]);
+  assert.deepEqual(parseColour("hsla(210, 100%, 50%, 0.5)").map((c) => Math.round(c * 255)), [0, 128, 255, 128]);
+  assert.deepEqual(parseColour("oklch(62.8% 0.2577 29.23)").slice(0, 3).map((c) => Math.round(c * 255)), [255, 0, 0]);
+  const [item] = one([row("colour", "fill", "#1A1A1AFF")], css(":root { --ink: oklch(0.2178 0 0); }"));
+  assert.deepEqual([item.status, item.token], ["built", "--ink"]);
+});
+
+test("a colour token the pass cannot read is named in the report, not reported as no colour token", () => {
+  const result = matchRawValues({ rows: [row("colour", "fill", "#1A1A1AFF")], files: css(":root { --ink: color-mix(in srgb, black 90%, white); --paper: lab(100 0 0); }") });
+  assert.notEqual(result.items[0].why, "the code declares no colour token");
+  assert.match(result.items[0].why, /could not read 2 colour tokens/);
+  assert.deepEqual(result.unreadable, ["--ink", "--paper"]);
+  assert.match(renderRawValues(result), /Not read: --ink, --paper/);
 });
