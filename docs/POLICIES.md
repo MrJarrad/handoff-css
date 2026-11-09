@@ -1149,7 +1149,7 @@ that name on its own weight variable. No number stated for the name: not emitted
 
 `src/modes.mjs`, `src/emit-tokens.mjs`, `src/resolve.mjs`, `src/emit-styles.mjs`
 
-## P27 — A missing hand-authored stylesheet (HT-85)
+## P27 — A missing hand-authored stylesheet
 
 `paths.handAuthored` names the consumer's own stylesheet, whose declarations win the cascade. If
 the file does not exist (a new consumer with no `src/styles.css` yet), the generator reads it as empty
