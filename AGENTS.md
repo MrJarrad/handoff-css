@@ -47,6 +47,25 @@ each variable to its ruled name. Output shape, confidence rules and the table:
 
 **Done when** `match` exits 0: every item ruled, none stale.
 
+**Raw values — a layer with no variables, or values not bound to one.** A design link run through
+`design-handoff-script` needs no Design System Handoff export when the layer binds no variables
+(link, live read and the project's code are enough), and its link-run file lists every value not
+bound to a variable (`unboundValues`). `handoff-css match --export <design-handoff>.json --src <code paths…>
+--rulings <ruling table>.md` matches each to the project's own token of the same kind, by value:
+
+- **Built with a token** — a colour you can't tell apart from the token (ΔE < 1, alpha equal), or a
+  number within half a pixel of one. Build the token; the row is listed so the person can overrule
+  it with a `keep` row.
+- **Needs your call** — a slightly-off colour (token suggested), a number between two steps (both
+  neighbours named), beyond the scale, a tie, or no token of its kind. **Build the exact value and
+  write a deviation row (`assumed-ask`, `ruling ref` the raw row's `figma`) — never stop, never round
+  it to a neighbour.** Ask once, as one table, with the suggestions as the recommendation; a `use` or
+  `keep` row in the ruling table settles it on the next run.
+
+Listed raw values never fail `match` (exit 0): a listed value is a deviation row, not a stop. The
+Figma-variable rule above stays: for a variable, a value alone is never a proposal. Tolerances,
+output and rows: `references/brownfield.md` § Raw values.
+
 ### Inputs — four required, one optional
 
 | Input | What it is |

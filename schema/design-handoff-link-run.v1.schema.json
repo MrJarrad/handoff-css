@@ -12,6 +12,22 @@
     "linkRun"
   ],
   "properties": {
+    "unboundValues": {
+      "description": "Every value the layer states as a plain number, not bound to a Figma variable, one row per layer and property. `handoff-css match --export <brief>.json` matches each to the closest of the project's own coded tokens. Spacing, size, radius, border and colour come from the plugin's own unbound-value warnings; type from each text layer's own style.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["nodeId", "node", "kind", "property", "value"],
+        "properties": {
+          "nodeId": { "type": "string" },
+          "node": { "type": "string" },
+          "kind": { "enum": ["colour", "spacing", "size", "radius", "border", "type"] },
+          "property": { "type": "string" },
+          "value": { "description": "`#RRGGBBAA` for colour (paint opacity folded into the alpha); a number in px otherwise (font weight unitless).", "type": ["string", "number"] }
+        }
+      }
+    },
     "schema": {
       "const": "design-handoff-link-run"
     },

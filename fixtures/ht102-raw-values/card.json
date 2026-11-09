@@ -1,0 +1,357 @@
+{
+  "schema": "design-handoff",
+  "schemaVersion": 13,
+  "schemaNote": "Schema v13 additive fields: dimensions.minWidth/minWidthToken/maxWidth/maxWidthToken/minHeight/minHeightToken/maxHeight/maxHeightToken (min/max size variable bindings).",
+  "contract": "layer-brief/1",
+  "lane": "selection/design",
+  "generatedAt": "2026-11-09T13:56:40.731Z",
+  "exportVersion": 1,
+  "contentHash": "8c828900da237560abf5fd4eac8b3a6973a3babcc91fe1b4719a3fc35688cb44",
+  "documentName": "Example",
+  "pageName": "Checkout",
+  "figma": {
+    "pageCount": 1
+  },
+  "breakpoints": {
+    "entries": [],
+    "base": {},
+    "variants": {}
+  },
+  "selectedNodes": [
+    {
+      "id": "20:1",
+      "name": "Card"
+    }
+  ],
+  "options": {
+    "useVariables": true
+  },
+  "designSystemStateHash": "aff249166cab0a29d7a5b31b937225fe09aec79f12eb39ab3b9e232bb91b91a1",
+  "fingerprintPolicyVersion": "1",
+  "policies": {
+    "fingerprint": {
+      "version": "1",
+      "hashAlgorithm": "SHA-256",
+      "encoding": "UTF-8",
+      "fieldsInScope": {
+        "variables": [
+          "identity(key, fallback id)",
+          "id",
+          "key",
+          "name",
+          "collection identity/name",
+          "type",
+          "scopes",
+          "manual codeSyntax",
+          "ordered mode IDs/names/parent IDs/raw values; aliases represented by target variable IDs"
+        ],
+        "styles": [
+          "identity(key, fallback id)",
+          "id",
+          "key",
+          "type",
+          "name",
+          "properties including variable alias target IDs"
+        ]
+      },
+      "volatileExclusions": [
+        "generatedAt",
+        "usage",
+        "diff/changes",
+        "publish status",
+        "descriptions",
+        "derived naming",
+        "unit hints",
+        "responsive behavior",
+        "contextual typography",
+        "consumer data",
+        "contentHash"
+      ],
+      "objectKeys": "Recursively sorted lexicographically.",
+      "numbers": "Finite numbers use decimal form rounded to at most 12 fractional places with trailing zeroes removed; negative zero is 0.",
+      "identityAndSorting": "Identity and primary sort use key, falling back to id only when key is absent; id and key remain fingerprint values.",
+      "arrays": "Collection modes retain Figma order; scopes and top-level variable/style state records are sorted lexicographically; all other arrays retain semantic source order."
+    },
+    "naming": {
+      "version": "3",
+      "input": "Full slash-delimited variable name plus its collection family/name.",
+      "transformations": [
+        "Split on slash.",
+        "Trim segments.",
+        "Split camelCase and acronym boundaries.",
+        "Replace non-alphanumeric runs with separators.",
+        "Lowercase all words.",
+        "Drop one leading segment when its normalized value is core.",
+        "After normalization, drop a leading variable path segment when it equals the normalized collection family/name.",
+        "Collapse an immediately preceding normalized segment when the next segment is identical or begins with the preceding segment plus a hyphen."
+      ],
+      "manualPrecedence": "A non-empty variable.codeSyntax value is emitted unchanged with source manual; otherwise the derived value is emitted.",
+      "examples": [
+        {
+          "collection": "color",
+          "input": "color/background/default/primary",
+          "WEB": "--background-default-primary",
+          "ANDROID": "background_default_primary",
+          "iOS": "backgroundDefaultPrimary"
+        }
+      ]
+    },
+    "units": {
+      "version": "5",
+      "statement": "Figma stores numeric values, not responsive CSS or platform units. storedUnit/sourceUnit describe the raw design value; buildUnit is a recommendation.",
+      "rootFontSizePx": 16,
+      "rules": [
+        "Opacity and explicit percentage semantics infer one scale per collection/group cohort.",
+        "Classified FLOAT modes carry deterministic build cells.",
+        "Effect blur radii remain px and integral grid column counts remain unitless.",
+        "Aliases inherit terminal type, scope, name, collection, and cohort semantics.",
+        "Contextual pixel line height and letter spacing convert using the known font size."
+      ]
+    },
+    "typeRamp": {
+      "version": "1",
+      "statement": "Typography preserves exact Figma values and binding provenance while exposing contextual developer-ready values."
+    },
+    "mode": {
+      "version": "3"
+    },
+    "responsive": {
+      "version": "1",
+      "rootFontSizePx": 16,
+      "fitToleranceRem": 0.125,
+      "statement": "Figma mode values remain source samples; endpoint clamps are recommendations only when every sample fits."
+    },
+    "contentHash": {
+      "version": "1",
+      "hashAlgorithm": "SHA-256",
+      "encoding": "UTF-8",
+      "serialization": "The same canonical serializer as fingerprint.policy.",
+      "stablePayload": "Schema/contract/lane, document and page identity, selected node IDs/names, options, current design-system state hash, policy metadata, companion identity excluding generation time, and the structured selected layer tree.",
+      "exclusions": [
+        "Every object property named contentHash.",
+        "Every object property named generatedAt.",
+        "Every object property named changes.",
+        "Changelog Markdown and time-derived export filenames."
+      ]
+    }
+  },
+  "companion": null,
+  "screenshots": {
+    "exported": [
+      {
+        "name": "Card",
+        "nodeId": "20:1",
+        "scale": 1
+      }
+    ],
+    "failed": []
+  },
+  "validation": {
+    "findings": []
+  },
+  "changes": {
+    "baseline": {
+      "available": false,
+      "generatedAt": null,
+      "contentHash": null
+    },
+    "frames": {
+      "added": [],
+      "removed": [],
+      "renamed": [],
+      "contentChanged": []
+    },
+    "nodes": {
+      "available": false,
+      "added": [],
+      "removed": [],
+      "renamed": [],
+      "moved": [],
+      "reordered": [],
+      "changed": []
+    },
+    "policyChanges": [],
+    "summary": {
+      "added": 0,
+      "removed": 0,
+      "renamed": 0,
+      "moved": 0,
+      "reordered": 0,
+      "geometryChanged": 0,
+      "layoutChanged": 0,
+      "bindingChanged": 0,
+      "annotationChanged": 0,
+      "descriptionChanged": 0,
+      "textChanged": 0,
+      "componentChanged": 0,
+      "contentChanged": 0,
+      "policyChanged": 0
+    }
+  },
+  "layerTree": [
+    {
+      "id": "20:1",
+      "name": "Card",
+      "type": "FRAME",
+      "depth": -1,
+      "link": "https://figma.com/design/F?node-id=20-1",
+      "parentId": null,
+      "siblingIndex": 0,
+      "visible": true,
+      "absolute": false,
+      "absoluteBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 200
+      },
+      "dimensions": {
+        "width": 320,
+        "height": 200,
+        "widthToken": null,
+        "heightToken": null,
+        "hSizing": "FIXED",
+        "vSizing": "FIXED"
+      },
+      "layout": {
+        "mode": "column",
+        "gap": {
+          "value": 12,
+          "token": null
+        },
+        "padding": {
+          "top": 16,
+          "right": 16,
+          "bottom": 16,
+          "left": 16,
+          "topToken": null,
+          "rightToken": null,
+          "bottomToken": null,
+          "leftToken": null
+        },
+        "justifyContent": "start",
+        "alignItems": "start"
+      },
+      "cornerRadius": {
+        "topLeft": 8,
+        "topRight": 8,
+        "bottomLeft": 8,
+        "bottomRight": 8,
+        "uniform": true,
+        "tokens": {
+          "topLeft": null,
+          "topRight": null,
+          "bottomLeft": null,
+          "bottomRight": null
+        }
+      },
+      "fills": [
+        {
+          "type": "SOLID",
+          "color": "#1A1A1AFF"
+        }
+      ],
+      "children": [
+        {
+          "id": "20:3",
+          "name": "title",
+          "type": "TEXT",
+          "depth": 0,
+          "link": "https://figma.com/design/F?node-id=20-3",
+          "parentId": "20:1",
+          "siblingIndex": 0,
+          "visible": true,
+          "absolute": false,
+          "absoluteBounds": {
+            "x": 16,
+            "y": 16,
+            "width": 200,
+            "height": 22
+          },
+          "fills": [
+            {
+              "type": "SOLID",
+              "color": "#1A1A1AFF"
+            }
+          ],
+          "semantic": "h2",
+          "semanticSource": "inferred",
+          "text": {
+            "characters": "Order summary",
+            "autoResize": "fixed"
+          }
+        },
+        {
+          "id": "20:2",
+          "name": "Note",
+          "type": "FRAME",
+          "depth": 0,
+          "link": "https://figma.com/design/F?node-id=20-2",
+          "parentId": "20:1",
+          "siblingIndex": 1,
+          "visible": true,
+          "absolute": false,
+          "absoluteBounds": {
+            "x": 16,
+            "y": 50,
+            "width": 288,
+            "height": 40
+          },
+          "dimensions": {
+            "width": 288,
+            "height": 40,
+            "widthToken": null,
+            "heightToken": null,
+            "hSizing": "FIXED",
+            "vSizing": "FIXED"
+          },
+          "layout": {
+            "mode": "row",
+            "gap": {
+              "value": 0,
+              "token": null
+            },
+            "padding": {
+              "top": 8,
+              "right": 8,
+              "bottom": 8,
+              "left": 8,
+              "topToken": null,
+              "rightToken": null,
+              "bottomToken": null,
+              "leftToken": null
+            },
+            "justifyContent": "start",
+            "alignItems": "start"
+          },
+          "cornerRadius": {
+            "topLeft": 8,
+            "topRight": 8,
+            "bottomLeft": 8,
+            "bottomRight": 8,
+            "uniform": true,
+            "tokens": {
+              "topLeft": null,
+              "topRight": null,
+              "bottomLeft": null,
+              "bottomRight": null
+            }
+          },
+          "fills": [
+            {
+              "type": "SOLID",
+              "color": "#2F2F2FFF"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "componentIndex": [],
+  "variableTokens": [],
+  "prototypeFlows": [],
+  "motionEntries": [],
+  "zIndexScale": [],
+  "motionTransitionTokens": []
+}

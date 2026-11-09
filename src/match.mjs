@@ -48,12 +48,14 @@ export function matchBrownfield({ handoff, files, rulings = null }) {
 }
 
 const RULINGS = ["use", "new", "skip"];
+const RAW_RULINGS = ["use", "keep"];
 
 /**
  * The ruling table: `| kind | figma | ruling | code | note |`, one row per
  * decided item, ruling one of `use` (bind this code name or component), `new`
  * (add the brief's own name to the code) or `skip` (not built). A row with no
- * ruling is still waiting, so it is not read as one.
+ * ruling is still waiting, so it is not read as one. Raw values (`raw-<kind>` rows,
+ * src/raw-values.mjs) are ruled `use` (with a code name) or `keep` (the exact value stays).
  */
 export function readRulings(text) {
   const rows = text.split("\n").filter((l) => l.trim().startsWith("|"))
@@ -63,11 +65,11 @@ export function readRulings(text) {
   const col = Object.fromEntries(rows[header].map((c, i) => [c, i]));
   return rows.slice(header + 1)
     .map((r) => ({ kind: r[col.kind], figma: r[col.figma], ruling: r[col.ruling], code: r[col.code] ?? "", note: r[col.note] ?? "" }))
-    .filter((r) => RULINGS.includes(r.ruling));
+    .filter((r) => (String(r.kind).startsWith("raw-") ? RAW_RULINGS : RULINGS).includes(r.ruling));
 }
 
 /** Every custom property the code declares or uses, with where and how often. */
-function inventory(files) {
+export function inventory(files) {
   const tokens = new Map();
   const components = new Map();
   const entry = (name) => tokens.get(name) ?? tokens.set(name, { name, values: [], declaredAt: [], uses: 0 }).get(name);
@@ -94,6 +96,8 @@ function inventory(files) {
   return { tokens, components };
 }
 
+// Figma variables only (the raw-value pass keeps this rule to them): a raw value has no name, so
+// src/raw-values.mjs matches raw values by value, under its own tolerances.
 // Name evidence is the CSS name's `-` segments: identical, or the share of
 // segments the two names have in common. Half or more is a proposal; less is
 // not, whatever the value says — a matching literal is a coincidence until a

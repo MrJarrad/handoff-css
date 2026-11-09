@@ -6,6 +6,17 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Added
 
+- `match --export <brief .json>` (HT-102): values not bound to a Figma variable, from the link-run file's new
+  `unboundValues` list, matched by value to the project's CSS custom properties of the same kind (colour, spacing,
+  size, radius, border, type). Built with the token when it is the same (colour: CIEDE2000 ΔE < 1 and alpha equal;
+  numbers: within 0.5px, px against rem at 16px); otherwise listed — `slightly-off` (ΔE < 5, token suggested),
+  `between` (both neighbours), `outside`, `tie`, `no-tokens`, `no-match`. Ruling rows `raw-<kind>`, `use` or `keep`.
+  Listed raw values never set the exit code. `src/raw-values.mjs`; worked example `fixtures/ht102-raw-values/`.
+- Link-run schema v1: optional `unboundValues[]`. Brief schemas v10–v18: `companion` may be `null` — a layer that
+  binds no variables, run from its link with no Design System Handoff export (HT-107).
+- handoff-to-code § Brownfield: the raw-values step — build the token, or build the exact value with a deviation
+  row; a listed value never stops a build. Adapters regenerated.
+
 - `HAND_AUTHORED_MISSING` (HT-85): a missing hand-authored stylesheet (e.g. `src/styles.css`) is read as empty and reported, instead of
   crashing `run()` with ENOENT. The file is not created.
 - Schema v18 (HT-80): `placedInstances[]` — every setting of every instance placed outside a component definition,

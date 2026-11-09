@@ -229,7 +229,7 @@ handoff-css validate <file|zip…> [--spec-index <md>] [--json]
 handoff-css conform --export <json> --handoff <md> --tokens <css>
                     --css <file…> [--json]
 
-handoff-css match --handoff <md> --src <path…> [--rulings <md>] [--json]
+handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--json]
 
 handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 ```
@@ -354,6 +354,16 @@ code | note |`, ruling `use`/`new`/`skip`); pass the filled table back with `--r
 next run reuses it, reporting `RULING_STALE` when a `use` names code that has gone. Exit 1 until
 every item is ruled. Rules and shape: `docs/POLICIES.md` P26,
 `skills/handoff-to-code/references/brownfield.md`.
+
+**Raw values.** A value the layer states as a plain number, not bound to a Figma variable,
+is listed by `design-handoff-script` in the link-run file beside the brief (`unboundValues`; a layer
+that binds no variables needs no Design System Handoff export). `--export <brief .json>` matches each,
+by value, to the project's token of the same kind: a colour you can't tell apart (CIEDE2000 ΔE < 1,
+alpha equal) or a number within half a pixel is **built with the token** and listed; a slightly-off
+colour (ΔE < 5, token suggested), a number between two steps (both neighbours), beyond the scale, a
+tie or no token of its kind **needs a call** — built with the exact value and a deviation row until
+ruled `use` or `keep` (`raw-<kind>` rows). Listed raw values never fail the run. Worked example:
+`fixtures/ht102-raw-values/`.
 
 ### `vendor` — add a new export without overwriting the old one
 
