@@ -127,6 +127,7 @@ before it is rendered, so you can build your own checks on them.
 | `modes.collectionModeAttribute` | Selector template for a multi-mode collection with no width or theme semantics. `{collection}` is substituted. |
 | `themes.collection` | Fallback gate if an export ever stops publishing `isTheme`. |
 | `themes.total` | Theme modes that replace their siblings entirely (see P10). |
+| `themes.variants` | Optional. Per total theme, `{ sibling: variantMode }`: the variant mode takes `.total .sibling` / `.total.sibling` instead of the total theme (see P10b). |
 | `tailwind.namespaces` | Which Tailwind namespaces you populate, and which name segment each claims. |
 | `tailwind.held` | Namespaces deliberately **not** reset, each with its blocker stated. |
 | `tailwind.rootFontSizePx` | px→rem divisor; `null` reads the export's own `units.policy.rootFontSizePx`. |

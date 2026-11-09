@@ -6,6 +6,9 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Added
 
+- `themes.variants` (P10b): a total theme can hand one sibling to a variant theme, e.g. `{ bttf: { dark: "bttf-dark" } }` emits
+  `.bttf-dark, .bttf .dark, .bttf.dark` and `bttf` stops claiming `dark`. Optional; output without it is byte-identical.
+  `test/theme-variants.test.mjs`.
 - `match --export <brief .json>` (HT-102): values not bound to a Figma variable, from the link-run file's new
   `unboundValues` list, matched by value to the project's CSS custom properties of the same kind (colour, spacing,
   size, radius, border, type). Built with the token when it is the same (colour: CIEDE2000 ΔE < 1 and alpha equal;

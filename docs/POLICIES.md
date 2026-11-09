@@ -398,7 +398,18 @@ A consumer's `dark:`-style custom variant needs the same treatment on its own
 side (for a total theme named `contrast`, `@custom-variant dark (&:is(.dark:not(.contrast, .contrast *) *))`), so those utilities go inert under the total theme exactly as the token
 block does. That edit is in the consumer's stylesheet, not here.
 
-`themes.total` · `src/modes.mjs`
+**P10b — variants.** `themes.variants: { total: { sibling: variant } }` hands one
+sibling over to a variant theme while the total theme is on. With
+`{ bttf: { dark: "bttf-dark" } }` the `bttf-dark` block is selected by
+`.bttf-dark, .bttf .dark, .bttf.dark` and `.bttf` no longer claims `dark` (nor
+`bttf-dark`), so `.bttf` alone keeps its own palette while a dark surface under
+it takes the variant's. Specificity is unchanged from P10 (0,2,0 against the
+sibling's 0,1,0). The key is optional; without it output is byte-identical. Every
+name must be a mode of the collection and each total theme must be in
+`themes.total`, else generation fails. The consumer's `dark:` variant is
+unaffected by this key.
+
+`themes.total` · `themes.variants` · `src/modes.mjs`
 
 ---
 
