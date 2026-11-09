@@ -1,14 +1,14 @@
-// HT-102 — values a layer states as plain numbers, not bound to a Figma variable, matched to the
+// RAW VALUES — values a layer states as plain numbers, not bound to a Figma variable, matched to the
 // project's own coded tokens (CSS custom properties). The design-handoff script lists them in the
 // link-run file (`unboundValues`); this matches each to the closest token of its own kind.
 //
 // Unlike the Figma-variable pass in match.mjs, where a value alone is never a proposal (a variable has
 // a name to match), a raw value has nothing but its value, so here the value is the evidence:
 //   - colour: the same only when the two can't be told apart (CIEDE2000 ΔE < 1, alpha within 1/255);
-//     ΔE < 5 is slightly off and goes to the operator with the token suggested (HT-105);
+//     ΔE < 5 is slightly off and goes to the operator with the token suggested;
 //   - spacing, size, radius, border, type: the same within half a pixel (px against rem at 16px);
-//     between two steps the exact number stays and is listed with both neighbours (HT-106).
-// A clear match is built with the token and listed so the operator can overrule it (HT-104). A listed
+//     between two steps the exact number stays and is listed with both neighbours.
+// A clear match is built with the token and listed so the operator can overrule it. A listed
 // value is built raw, with a deviation row, until it is ruled; it never stops a build.
 //
 // Pure: rows and texts in, result out. `src/match-cli.mjs` is the filesystem boundary.

@@ -72,7 +72,7 @@ ruled item.
 A row with an empty `ruling` is still waiting and is not read. Keep the table in the project,
 beside its other rulings, so every later brief reuses it.
 
-## Raw values (HT-102)
+## Raw values
 
 A value the layer states as a plain number — no Figma variable — has no name to match, so it is
 matched by value to the project's tokens of the same kind. The design-handoff script lists them in

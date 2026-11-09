@@ -96,7 +96,7 @@ export function inventory(files) {
   return { tokens, components };
 }
 
-// Figma variables only (HT-102 keeps this rule to them): a raw value has no name, so
+// Figma variables only (the raw-value pass keeps this rule to them): a raw value has no name, so
 // src/raw-values.mjs matches raw values by value, under its own tolerances.
 // Name evidence is the CSS name's `-` segments: identical, or the share of
 // segments the two names have in common. Half or more is a proposal; less is

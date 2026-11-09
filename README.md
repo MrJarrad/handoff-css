@@ -355,7 +355,7 @@ next run reuses it, reporting `RULING_STALE` when a `use` names code that has go
 every item is ruled. Rules and shape: `docs/POLICIES.md` P26,
 `skills/handoff-to-code/references/brownfield.md`.
 
-**Raw values (HT-102).** A value the layer states as a plain number, not bound to a Figma variable,
+**Raw values.** A value the layer states as a plain number, not bound to a Figma variable,
 is listed by `design-handoff-script` in the link-run file beside the brief (`unboundValues`; a layer
 that binds no variables needs no Design System Handoff export). `--export <brief .json>` matches each,
 by value, to the project's token of the same kind: a colour you can't tell apart (CIEDE2000 ΔE < 1,

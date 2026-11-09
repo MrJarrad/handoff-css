@@ -7,7 +7,7 @@ import { matchRawValues, renderRawValues } from "./raw-values.mjs";
 
 const USAGE = `handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--json]\n`;
 
-/** HT-102: the link-run file's list of values not bound to a variable, beside the brief and made for it. */
+/** The link-run file's list of values not bound to a variable, beside the brief and made for it. */
 function unboundValues(briefPath) {
   const brief = JSON.parse(readFileSync(briefPath, "utf8"));
   const beside = briefPath.replace(/\.json$/, ".link-run.json");
@@ -67,6 +67,6 @@ export function matchCommand(args, { cwd = process.cwd(), stdout = process.stdou
   if (args.includes("--json")) stdout.write(`${JSON.stringify({ ...(result ?? {}), ...(raw ? { raw } : {}) }, null, 2)}\n`);
   else stdout.write([result && renderMarkdown(result), raw && renderRawValues(raw)].filter(Boolean).join("\n"));
   // A Figma-variable proposal is not adopted until a human rules it: open items fail the run.
-  // A raw value never does (HT-106): unruled, it is built exact with a deviation row, so it is listed, not a stop.
+  // A raw value never does: unruled, it is built exact with a deviation row, so it is listed, not a stop.
   return !result || result.items.every((i) => i.status === "ruled") ? 0 : 1;
 }
