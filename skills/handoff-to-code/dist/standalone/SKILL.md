@@ -267,11 +267,16 @@ One row per node whose value did not come straight from the pair, plus one per l
   rather than overwrote it.
 - **assumed-ask** — built from an ask's suggestion, or from an answer still waiting on Figma;
   `ruling ref` is the ask's key. An open ask is the same row with nothing built.
+- **not-built** — the pair names the item and the build could not make it (an asset the export
+  does not carry, geometry it does not state); nothing built, the cause in `value`.
+
+Every unbuilt item is a row here: a "could not complete" list beside an empty table is a
+missing table.
 
 `ruling ref` cites the entry in the ruling list that authorised a non-match. An empty `ruling ref`
 on a non-match row is an unauthorised deviation.
 
-An empty table means you built the pair exactly — the expected outcome, not a suspicious one.
+An empty table means every item was built exactly — the expected outcome, not a suspicious one.
 
 ## Schema v9 node hints (export v11, 2026-09-12)
 
