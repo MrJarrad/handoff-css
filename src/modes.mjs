@@ -1,7 +1,7 @@
 // Policies P3, P6, P9.1, P10 — where a mode's declarations land: `:root`, a
 // theme class, a `@media (min-width)` block, or a data-attribute selector.
 // See docs/POLICIES.md.
-import { cmp, num } from "./resolve.mjs";
+import { cmp, fail, num } from "./resolve.mjs";
 
 /**
  * Layout breakpoints, read from the export's own `breakpoints.entries` (one
@@ -162,14 +162,39 @@ export const modeAttribute = (collectionName, cfg) =>
  */
 export function themeSelector(collection, mode, isDefault, ctx, cfg) {
   if (isDefault) return ":root";
-  if (!cfg.themes.total.includes(mode.name)) return `.${mode.name}`;
+  const variants = cfg.themes.variants ?? {};
+  checkVariants(collection, cfg, variants);
+  // P10b — a variant mode claims the sibling a total theme handed over.
+  const claimed = Object.entries(variants).flatMap(([total, pairs]) =>
+    Object.entries(pairs)
+      .filter(([, variant]) => variant === mode.name)
+      .flatMap(([sibling]) => [`.${total} .${sibling}`, `.${total}.${sibling}`]),
+  );
+  if (!cfg.themes.total.includes(mode.name)) return [`.${mode.name}`, ...claimed].join(", ");
+  const pairs = variants[mode.name] ?? {};
+  const handed = new Set([...Object.keys(pairs), ...Object.values(pairs)]);
   const siblings = collection.modes.filter(
-    (m) => m.id !== mode.id && m.id !== collection.defaultModeId && ctx.theme.has(m.id),
+    (m) =>
+      m.id !== mode.id && m.id !== collection.defaultModeId && ctx.theme.has(m.id) && !handed.has(m.name),
   );
   return [
     `.${mode.name}`,
     ...siblings.flatMap((s) => [`.${mode.name} .${s.name}`, `.${mode.name}.${s.name}`]),
+    ...claimed,
   ].join(", ");
+}
+
+/** P10b — every name in `themes.variants` must be a total theme or a mode of the collection. */
+function checkVariants(collection, cfg, variants) {
+  const names = new Set(collection.modes.map((m) => m.name));
+  for (const [total, pairs] of Object.entries(variants)) {
+    if (!cfg.themes.total.includes(total)) fail(`themes.variants: \`${total}\` is not in themes.total`);
+    for (const [sibling, variant] of Object.entries(pairs)) {
+      for (const name of [sibling, variant]) {
+        if (!names.has(name)) fail(`themes.variants.${total}: no mode named \`${name}\` in collection \`${collection.name}\``);
+      }
+    }
+  }
 }
 
 // --- generation ------------------------------------------------------------
