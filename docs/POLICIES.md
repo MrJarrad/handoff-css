@@ -1148,3 +1148,12 @@ that name on its own weight variable. No number stated for the name: not emitted
 `font-weight: var(<token>, <number>)` (`STYLE_CLASS_WEIGHT_BOUND`).
 
 `src/modes.mjs`, `src/emit-tokens.mjs`, `src/resolve.mjs`, `src/emit-styles.mjs`
+
+## P27 — A missing hand-authored stylesheet (HT-85)
+
+`paths.handAuthored` names the consumer's own stylesheet, whose declarations win the cascade. If
+the file does not exist (a new consumer with no `src/styles.css` yet), the generator reads it as empty
+— no hand declarations — and raises `HAND_AUTHORED_MISSING` in the report's Warnings table, rather than
+crashing with ENOENT. It never creates the file: that would add one the consumer did not ask for.
+Move: file absent, built with no hand declarations; add the file if you want hand overrides. Any
+other read error still throws.
