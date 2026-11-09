@@ -51,14 +51,14 @@ export { validateExport, assertValidExport, exportSchema, VALIDATED_SCHEMA_VERSI
  * @param handAuthoredCss the consumer's own stylesheet, whose GLOBAL custom
  *                        properties win the cascade and suppress emission (P2)
  */
-export function generate(doc, config, { handAuthoredCss = "" } = {}) {
+export function generate(doc, config, { handAuthoredCss = "", handAuthoredMissing = false } = {}) {
   // P14 — the export is checked against the published schema BEFORE a line of
   // CSS exists. A schema-7 export skips the check (legacy, see
   // `validate-export.mjs`); anything the config declares but the schema does
   // not know stops here rather than half-generating.
   assertConfig(config);
   assertValidExport(doc);
-  return build(doc, config, { handAuthoredCss });
+  return build(doc, config, { handAuthoredCss, handAuthoredMissing });
 }
 
 /**
@@ -68,14 +68,14 @@ export function generate(doc, config, { handAuthoredCss = "" } = {}) {
  *
  * @param docs  the parsed exports, one per Figma file
  */
-export function generateSet(docs, config, { handAuthoredCss = "" } = {}) {
+export function generateSet(docs, config, { handAuthoredCss = "", handAuthoredMissing = false } = {}) {
   assertConfig(config);
   if (docs.length === 0) fail("no export given");
   for (const doc of docs) assertValidExport(doc);
-  return build(mergeExports(docs), config, { handAuthoredCss });
+  return build(mergeExports(docs), config, { handAuthoredCss, handAuthoredMissing });
 }
 
-function build(doc, config, { handAuthoredCss }) {
+function build(doc, config, { handAuthoredCss, handAuthoredMissing = false }) {
   const cfg = assertConfig(config);
   const { declared: handDeclared, scoped: handScoped, classes: handClasses,
           utilities: handUtilities } = readHandAuthored(handAuthoredCss);
@@ -88,6 +88,13 @@ function build(doc, config, { handAuthoredCss }) {
   // null and nothing about an 8-11 consumer's output changes.
   const styles = emitStyles(doc, byId, handClasses, handUtilities, cfg);
   warnings.push(...styles.warnings);
+  if (handAuthoredMissing) {
+    warnings.push({
+      code: "HAND_AUTHORED_MISSING",
+      name: cfg.paths.handAuthored,
+      detail: "the hand-authored stylesheet does not exist; read as empty (no hand declarations), and not created",
+    });
+  }
   // Schema 12's own `:root` sheets, cross-checked and never emitted.
   const sheetRows = sheetFindings(doc, byId, cfg);
   const themeRows = themeEntries(doc, byId, cfg);
@@ -181,8 +188,17 @@ export function run(argv = [], { cwd = process.cwd(), config } = {}) {
   const abs = (p) => (path.isAbsolute(p) ? p : path.join(cwd, p));
 
   const docs = opts.input.flatMap((p) => readExports(abs(p)));
-  const handAuthoredCss = readFileSync(abs(opts.handAuthored), "utf8");
-  const out = generateSet(docs, config, { handAuthoredCss });
+  // A missing hand-authored stylesheet means no hand declarations: read it as
+  // empty and report it. Creating the file would add one the consumer never asked for.
+  let handAuthoredCss = "";
+  let handAuthoredMissing = false;
+  try {
+    handAuthoredCss = readFileSync(abs(opts.handAuthored), "utf8");
+  } catch (e) {
+    if (e?.code !== "ENOENT") throw e;
+    handAuthoredMissing = true;
+  }
+  const out = generateSet(docs, config, { handAuthoredCss, handAuthoredMissing });
   out.inputs = docs.map((d) => d.artifactFilename ?? d.documentName ?? "export");
 
   const write = (p, contents) => {

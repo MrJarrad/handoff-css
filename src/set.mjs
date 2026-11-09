@@ -1,5 +1,5 @@
 // 0.11.0 — the export SET. A Design Handoff brief made by the link-run script
-// (figma-plugins `handoff/design-handoff-script`) is built from one Design
+// (the toolkit `handoff/design-handoff-script`) is built from one Design
 // System Handoff export per source file: its own file's (named by the brief's
 // `companion`) and each library's (named in `linkRun.designSystemExports`).
 // The set is valid only as one design-system state, so every member the brief
@@ -42,7 +42,7 @@ export function validateSet(brief, exports, { specIndex = null, briefFile = "<br
   }
   const byName = (name) => exports.find((e) => e.doc.artifactFilename === name);
   // A stale pair is fixed, not refused: the brief made from an older
-  // run is regenerated against the export given (figma-plugins
+  // run is regenerated against the export given (the toolkit
   // design-handoff-script); an export older than the brief's is replaced by
   // the run the brief names. A plugin-made brief records no file key, so its
   // regenerate also needs the file's link.

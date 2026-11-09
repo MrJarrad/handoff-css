@@ -751,7 +751,7 @@
       }
     },
     "linkRun": {
-      "description": "Appended by the link-run script (figma-plugins handoff/design-handoff-script), never by the plugin: the Figma file version it read, the Design System Handoff exports it joined, each source file the layer uses, and its findings. `handoff-css validate` reports every finding as a warning and requires every named export in the set.",
+      "description": "Appended by the link-run script (the toolkit handoff/design-handoff-script), never by the plugin: the Figma file version it read, the Design System Handoff exports it joined, each source file the layer uses, and its findings. `handoff-css validate` reports every finding as a warning and requires every named export in the set.",
       "type": "object",
       "additionalProperties": false,
       "required": [
