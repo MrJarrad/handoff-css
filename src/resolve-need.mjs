@@ -227,7 +227,7 @@ function resolveOne(need, ctx) {
       for (const [mode, want] of Object.entries(wants)) {
         const near = index
           .filter((x) => x.type === type)
-          .map((x) => ({ x, d: distance(type, want, valueFor(x, mode === "*" ? [...x.modes.keys()][0] : mode) ?? { forms: [] }) }))
+          .map((x) => ({ x, d: measure(x, { [mode]: want }, type).distance })) // `*` holds only if every mode of x does
           .filter((r) => r.d <= NEAR)
           .sort((a, b) => (b.x.layer === "primitive") - (a.x.layer === "primitive") || a.d - b.d || byText(a.x.name, b.x.name))[0];
         if (near) reach[mode] = { name: near.x.name, collection: near.x.collection, distance: near.d };
