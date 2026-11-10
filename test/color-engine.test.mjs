@@ -212,3 +212,29 @@ test("a system of neutrals only still fits, from all its ramps", () => {
 test("fit refuses an empty system: use the defaults instead", () => {
   assert.throws(() => fitToSystem([]), /no ramps/);
 });
+
+// ── nameColor ───────────────────────────────────────────────────────────────────────────────────────
+const { nameColor } = engine;
+
+test("a colour on the name list takes its own name", () => {
+  assert.deepEqual(nameColor("#9F381D"), { name: "Cognac", slug: "cognac", hex: "#9f381d", distance: 0, exact: true });
+  assert.equal(nameColor("#0b0b0b").slug, "cod-gray");
+});
+
+test("any other colour takes the nearest name on the list", () => {
+  assert.deepEqual(nameColor("#14d7fb"), { name: "Bright Turquoise", slug: "bright-turquoise", hex: "#08e8de", distance: nameColor("#14d7fb").distance, exact: false });
+  assert.equal(nameColor("#2b67b9").name, "Cerulean Blue");
+  assert.equal(nameColor("#abc").name, nameColor("#aabbcc").name);
+});
+
+test("names already in the system are passed over for the next nearest", () => {
+  const first = nameColor("#14d7fb");
+  const second = nameColor("#14d7fb", { exclude: ["Bright Turquoise"] });
+  assert.notEqual(second.slug, first.slug);
+  assert.ok(second.distance >= first.distance);
+  assert.equal(nameColor("#14d7fb", { exclude: ["bright-turquoise"] }).slug, second.slug);
+});
+
+test("nameColor refuses what is not a colour", () => {
+  assert.throws(() => nameColor("blue"), /not a colour/);
+});

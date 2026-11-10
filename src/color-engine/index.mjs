@@ -4,4 +4,5 @@
 export { ramp, DEFAULTS } from "./build.mjs";
 export { mergeVerdict } from "./merge.mjs";
 export { fitToSystem } from "./fit.mjs";
+export { nameColor } from "./name.mjs";
 export { auditRamp } from "./ramp.mjs";
