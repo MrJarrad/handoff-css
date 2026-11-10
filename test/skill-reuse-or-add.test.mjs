@@ -100,3 +100,13 @@ test("exit 2 is named by command in 3b: resolve for an open need, ramp for a col
   assert.match(addStep, /`resolve`\s+exits 2 when a need is open/);
   assert.match(addStep, /`ramp`\s+exits 2 when a semantic colour has no passing step/);
 });
+
+test("each rule lives once: 3b states the name question, the stop for a yes, exit 2 and the re-run; the reference holds detail", () => {
+  assert.match(addStep, /generated name, or your own\?/);
+  assert.match(addStep, /\*\*Stop for a yes\*\*/);
+  assert.match(addStep, /run `resolve` again/);
+  assert.doesNotMatch(ref, /or your own\?/, "the name question is in 3b only");
+  assert.doesNotMatch(ref, /\bstop\b/i, "the stop for a yes is in 3b only");
+  assert.doesNotMatch(ref, /exit(?:s)? `?2/i, "exit 2 is in 3b only");
+  assert.doesNotMatch(ref, /run `resolve` again|take a new export/i, "the re-run is in 3b only");
+});
