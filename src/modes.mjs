@@ -184,14 +184,17 @@ export function themeSelector(collection, mode, isDefault, ctx, cfg) {
   ].join(", ");
 }
 
-/** P10b — every name in `themes.variants` must be a total theme or a mode of the collection. */
+/** P10b — every `themes.variants` key must be a total theme; every sibling and variant a non-default mode of the collection. */
 function checkVariants(collection, cfg, variants) {
   const names = new Set(collection.modes.map((m) => m.name));
+  const base = collection.modes.find((m) => m.id === collection.defaultModeId)?.name;
   for (const [total, pairs] of Object.entries(variants)) {
     if (!cfg.themes.total.includes(total)) fail(`themes.variants: \`${total}\` is not in themes.total`);
     for (const [sibling, variant] of Object.entries(pairs)) {
       for (const name of [sibling, variant]) {
         if (!names.has(name)) fail(`themes.variants.${total}: no mode named \`${name}\` in collection \`${collection.name}\``);
+        // The default mode is `:root`: it never claims a sibling, and no total theme claims it.
+        if (name === base) fail(`themes.variants.${total}: \`${name}\` is the default mode of \`${collection.name}\`; a pairing must name two non-default modes`);
       }
     }
   }
