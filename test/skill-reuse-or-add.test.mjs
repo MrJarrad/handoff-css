@@ -95,3 +95,8 @@ test("every host carries the new steps", () => {
     assert.ok(carries(body, "handoff-css ramp --export"), "ramp missing");
   }
 });
+
+test("exit 2 is named by command in 3b: resolve for an open need, ramp for a colour with no passing step", () => {
+  assert.match(addStep, /`resolve`\s+exits 2 when a need is open/);
+  assert.match(addStep, /`ramp`\s+exits 2 when a semantic colour has no passing step/);
+});

@@ -208,7 +208,9 @@ Verdicts, ranking, rulings and exit codes: `references/reuse-or-add.md`.
   `REUSE` and ranks the new name; bind only then. `RULED` instead means a row is still standing: remove it.
 - Until a need is ruled, build the raw value as an `assumed-ask` row.
 
-Exit code 2 means a need is open and the report is written; it is a question, not a failure. With no
+`resolve` exits 2 when a need is open: the report is written, and it is a question, not a failure. `ramp`
+exits 2 when a semantic colour has no passing step: the report names it, so put that to the designer
+rather than choosing. With no
 Design System Handoff export (brownfield), `match` above is the path.
 
 **Done when** every need is `REUSE` or `RULED`, or is one open question with its fallback row.
