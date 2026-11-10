@@ -17,6 +17,12 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Added
 
+- `handoff-css/color-engine`: full primitive colour ramps for a system that has none that fit. `ramp` (one seed or several
+  anchors merged, any step scale, anchors kept exact), `fitToSystem` (the system's scale, its ramps' median ends, its
+  widest evenness and hue drift), `mergeVerdict` (lightness, evenness and hue drift decide; the pairing rule is a
+  reason, not a veto), `nameColor` (Name that Color list, CC BY 2.5, opt-in), `auditRamp`, `DEFAULTS`. Ramp generation is
+  a port checked string for string against 10,411 recorded cases (`test/color-engine-parity.test.mjs`). New dependency:
+  culori 4.0.2 (MIT), pinned exactly.
 - HT-111 (A-S2): `handoff-css resolve --export … --need <needs.json> [--rulings <md>] [--out <dir>] [--json]` turns
   a need (a name and/or a group, with the raw value wanted per mode) into ranked candidates with evidence and a verdict
   (`REUSE`, `SIBLING`, `MISMATCH`, `NEW_NAME`, `NEW_RAMP`, `RULED`, `RULING_STALE`), writes `resolve-report.json` and

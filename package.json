@@ -9,6 +9,7 @@
   },
   "exports": {
     ".": "./src/index.mjs",
+    "./color-engine": "./src/color-engine/index.mjs",
     "./presets/jhd": "./presets/jhd.config.mjs",
     "./schema": "./schema/config.schema.json",
     "./schema/export": "./schema/design-system-handoff.schema.json",
@@ -24,7 +25,6 @@
     "./schema/brief/v18": "./schema/design-handoff.v18.schema.json",
     "./schema/profile": "./schema/system-profile.v1.schema.json",
     "./schema/link-run": "./schema/design-handoff-link-run.v1.schema.json",
-    "./schema/profile": "./schema/system-profile.v1.schema.json",
     "./schema/resolve-need": "./schema/resolve-need.v1.schema.json",
     "./schema/resolve-report": "./schema/resolve-report.v1.schema.json"
   },
@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "ajv": "^8.20.0",
-    "ajv-formats": "^3.0.1"
+    "ajv-formats": "^3.0.1",
+    "culori": "4.0.2"
   }
 }
