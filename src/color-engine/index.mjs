@@ -3,4 +3,5 @@
 // Pure functions; no file or network access.
 export { ramp, DEFAULTS } from "./build.mjs";
 export { mergeVerdict } from "./merge.mjs";
+export { fitToSystem } from "./fit.mjs";
 export { auditRamp } from "./ramp.mjs";

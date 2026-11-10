@@ -3,8 +3,6 @@ import { formatHex } from "culori";
 import { hexToOklch } from "./color.mjs";
 import { generateRamp, generateRampMulti, nearestStep, auditRamp, DEFAULT_LIGHT_MIN } from "./ramp.mjs";
 
-
-
 /** A from-scratch system: steps 100–900, darkest step at L 0.30, lightest step as light as the hue's
  *  gamut allows (`max` undefined). */
 export const DEFAULTS = Object.freeze({

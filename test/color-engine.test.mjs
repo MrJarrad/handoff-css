@@ -164,3 +164,51 @@ test("from scratch, the evenness bar is the widest spread the default ramps make
 test("mergeVerdict needs two anchors", () => {
   assert.throws(() => mergeVerdict({ anchors: [{ hex: "#14d7fb" }] }), /two or more anchors/);
 });
+
+// ── fitToSystem ─────────────────────────────────────────────────────────────────────────────────────
+const { fitToSystem } = engine;
+const asRamp = (name, r) => ({ name, steps: r.steps.map(({ step, hex }) => ({ step, hex })) });
+const median = (xs) => {
+  const s = [...xs].sort((a, b) => a - b);
+  return s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2;
+};
+const systemRamps = () => [
+  asRamp("sky", ramp({ anchors: [{ hex: "#14d7fb", step: 300 }], steps: FIFTY, lightness: { min: 0.24, max: 0.98 } })),
+  asRamp("ember", ramp({ anchors: [{ hex: "#a33001", step: 700 }], steps: FIFTY, lightness: { min: 0.27, max: 0.97 } })),
+  asRamp("moss", ramp({ anchors: [{ hex: "#4d7a2a", step: 600 }], steps: FIFTY, lightness: { min: 0.31, max: 0.985 } })),
+  asRamp("stone", ramp({ anchors: [{ hex: "#8a8580", step: 500 }], steps: FIFTY, lightness: { min: 0.15, max: 0.97 } })),
+  asRamp("legacy", ramp({ anchors: [{ hex: "#2b67b9", step: 600 }], steps: HUND })),
+];
+
+test("fit takes the system's step scale and the median ends of its colour ramps", () => {
+  const ramps = systemRamps();
+  const fit = fitToSystem(ramps);
+  assert.deepEqual(fit.steps, FIFTY);
+  const chromatic = ramps.slice(0, 3);
+  const L = (hex) => hexToOklch(hex).l;
+  assert.equal(fit.lightness.min, median(chromatic.map((r) => L(r.steps.at(-1).hex))));
+  assert.equal(fit.lightness.max, median(chromatic.map((r) => L(r.steps[0].hex))));
+  assert.deepEqual(fit.basis.skipped, ["legacy"]);
+  assert.equal(fit.basis.ramps, 4);
+  assert.equal(fit.basis.chromatic, 3);
+  const audits = ramps.slice(0, 4).map((r) => auditRamp(r.steps));
+  assert.equal(fit.evenness.max, Math.max(...audits.map((a) => a.evenness)));
+  assert.equal(fit.hueDrift.max, Math.max(...audits.map((a) => a.hueDrift)));
+});
+
+test("a ramp built with the fit lands on the system's ends", () => {
+  const fit = fitToSystem(systemRamps());
+  const r = ramp({ anchors: [{ hex: "#7a3fd1" }], steps: fit.steps, lightness: fit.lightness });
+  assert.ok(Math.abs(hexToOklch(r.steps.at(-1).hex).l - fit.lightness.min) < 0.005);
+  assert.ok(Math.abs(hexToOklch(r.steps[0].hex).l - fit.lightness.max) < 0.005);
+});
+
+test("a system of neutrals only still fits, from all its ramps", () => {
+  const fit = fitToSystem([systemRamps()[3]]);
+  assert.equal(fit.basis.chromatic, 0);
+  assert.equal(fit.lightness.min, hexToOklch(systemRamps()[3].steps.at(-1).hex).l);
+});
+
+test("fit refuses an empty system: use the defaults instead", () => {
+  assert.throws(() => fitToSystem([]), /no ramps/);
+});
