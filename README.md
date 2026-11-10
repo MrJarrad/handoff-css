@@ -360,9 +360,10 @@ every item is ruled. Rules and shape: `docs/POLICIES.md` P26,
 is listed by `design-handoff-script` in the link-run file beside the brief (`unboundValues`; a layer
 that binds no variables needs no Design System Handoff export). `--export <brief .json>` matches each,
 by value, to the project's token of the same kind: a colour you can't tell apart (CIEDE2000 ΔE < 1,
-alpha equal) or a number within half a pixel is **built with the token** and listed; a slightly-off
-colour (ΔE < 5, token suggested), a number between two steps (both neighbours), beyond the scale, a
-tie or no token of its kind **needs a call** — built with the exact value and a deviation row until
+alpha equal) or a number within half a pixel is **built with the token** and listed (when several tokens qualify, the closest, then the
+lowest name, is built as `tie-picked` and the others are named); a slightly-off
+colour (ΔE < 5, token suggested), a number between two steps (both neighbours), beyond the scale, or
+no token of its kind **needs a call** — built with the exact value and a deviation row until
 ruled `use` or `keep` (`raw-<kind>` rows). Listed raw values never fail the run. Worked example:
 `fixtures/ht102-raw-values/`.
 

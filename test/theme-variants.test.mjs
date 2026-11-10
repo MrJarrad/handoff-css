@@ -59,3 +59,11 @@ test("a variants entry for a theme that is not total is rejected", () => {
 test("the generator rejects a variant that names an unknown mode", () => {
   assert.throws(() => run(doc, { bttf: { dark: "no-such-mode" } }), /no-such-mode/);
 });
+
+test("a variant that names the default mode is rejected (the sibling would be claimed by nothing)", () => {
+  assert.throws(() => run(doc, { bttf: { dark: "light" } }), /themes\.variants\.bttf.*default mode of `color`/);
+});
+
+test("a sibling that names the default mode is rejected", () => {
+  assert.throws(() => run(doc, { bttf: { light: "bttf-dark" } }), /themes\.variants\.bttf.*default mode of `color`/);
+});
