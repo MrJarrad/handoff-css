@@ -33,7 +33,7 @@ Rulings use the table `match` reads, `| kind | figma | ruling | code | note |`, 
 `handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch]
 [--for <semantic variable>[@step]… --on <surface variable>… [--use text|large-text|ui] [--keep-anchor]]
 [--out <dir>] [--json]` writes `ramp-proposal.json` (a patch) and `ramp-proposal.md`, and writes nothing into
-the design file. Take `--for` and `--on` from names in the profile; none is inferred. Exit `2` means a
+the design file. `--for` and `--on` each name a variable the export has, in full (the full names are in `system-profile.json`); none is inferred, and a name the export lacks exits 1. Exit `2` means a
 semantic colour has no passing step; the report names it, so put that to the designer rather than choosing.
 
 **The name.** The ramp's name is the designer's (`--name`) or generated. Ask one question: "generated name

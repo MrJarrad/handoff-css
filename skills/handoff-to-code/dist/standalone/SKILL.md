@@ -190,7 +190,8 @@ Verdicts, ranking, rulings and exit codes: `references/reuse-or-add.md`.
 
 - `REUSE` and `RULED` close the need: build that name.
 - `SIBLING`, `MISMATCH`, `NEW_NAME`, `RULING_STALE` are **one question** to the designer, with a
-  recommendation. A new name is never yours to pick.
+  recommendation. A new name is never yours to pick. A designer who declines the nearest name and wants
+  the colour added has ruled `new`: that goes to `ramp` too.
 - `NEW_RAMP` means no colour in the system is near: add a **whole ramp**, never a single raw colour.
   `handoff-css ramp --export <design-system-handoff>.json --anchor <#hex> --for <semantic variable>
   --on <surface variable>` proposes the ramp in the system's own steps and the step each semantic colour
