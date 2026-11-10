@@ -14,7 +14,8 @@ import { hexToOklch } from "./color-engine/color.mjs";
 export const RAMP_VERSION = 1;
 const MODE_GAP = 0.15; // a mode whose surface is this much darker (OKLCH L) than the default mode's is mapped by mirroring
 
-const hex6 = (s) => (/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(s ?? "") ? s.slice(0, 7).toLowerCase() : null);
+// A colour only when opaque: an 8-digit literal with alpha below ff is a shadow or a tint, not a step of a colour ramp.
+const hex6 = (s) => (/^#[0-9a-f]{6}(ff)?$/i.test(s ?? "") ? s.slice(0, 7).toLowerCase() : null);
 const cellHex = (cell) => hex6(cell?.build?.literal ?? cell?.alias?.terminalValue);
 const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 

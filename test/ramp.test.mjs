@@ -286,3 +286,11 @@ test("a name is one path segment and clashes with no group or ramp anywhere in t
   assert.throws(() => ok("aspect"), /already a group/); // a group of another collection
   assert.equal(ok("glow").ramps[0].name, "glow");
 });
+
+test("alpha literals are not colours: an alpha scale is no colour ramp, so a system with only that gets the defaults (amber 3)", () => {
+  const doc = jhd();
+  doc.collections = doc.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !v.name.startsWith("color/palette/")) }));
+  const p = proposeRamp({ doc, anchors: [{ hex: "#14d7fb" }], name: "cyan" });
+  assert.equal(p.basis.kind, "defaults", p.basis.reason);
+  assert.deepEqual(p.basis.steps, [100, 200, 300, 400, 500, 600, 700, 800, 900]);
+});
