@@ -136,6 +136,18 @@ generated, naming it in your deviation table — is correct.
 
 **Done when** every warning code is irrelevant to your nodes or carries a deviation row.
 
+#### 2b. Write down how the system is built, before you touch it
+
+Design systems are not all built alike: collections, name shapes, ramps and what a mode means are
+each system's own. Read them from the system, never from a habit.
+
+`handoff-css profile --export <design-system-handoff>.json --out <dir>` writes `system-profile.md` and
+`system-profile.json`: collection roles, how names are put together, ramps with their own steps, mode
+meaning, and every existing name. Keep both beside the work, and read the `.md` before judging anything
+missing. `profile --check` exits 1 when the export has moved on; run `profile` again.
+
+**Done when** `system-profile.md` sits beside the work and is read.
+
 #### 3. Map every binding to `codeSyntax.WEB` — an unmapped binding is a defect
 
 Walk every `$variable` per node, find it in the set member that owns it (the brief's Sources
@@ -149,9 +161,37 @@ write `var(<name>)`.
   consumed.
 - **No emitted token is a defect, not a guess.** If a binding maps to no custom property, stop
   and say which binding, which node, and why. Do not inline the value the export happens to
-  show, and do not invent a token name for it.
+  show, and do not invent a token name for it. A name comes to exist only through 3b.
 
 **Done when** every `$variable` has a `codeSyntax.WEB` name, or a deviation row saying why not.
+
+#### 3b. A need with no name — reuse, then add
+
+A binding with no name (step 3), or a value the pair does not bind (step 4), is a need. **Reuse first;
+add only when nothing fits.** Write the needs as a list (`schema/resolve-need.v1.schema.json`) and run
+`handoff-css resolve --export <design-system-handoff>.json --need <needs.json> [--rulings <md>]`.
+Verdicts, ranking, rulings and exit codes: `references/reuse-or-add.md`.
+
+- `REUSE` and `RULED` close the need: build that name.
+- `SIBLING`, `MISMATCH`, `NEW_NAME`, `RULING_STALE` are **one question** to the designer, with a
+  recommendation. A new name is never yours to pick.
+- `NEW_RAMP` means no colour in the system is near: add a **whole ramp**, never a single raw colour.
+  `handoff-css ramp --export <design-system-handoff>.json --anchor <#hex> --for <semantic variable>
+  --on <surface variable>` proposes the ramp in the system's own steps and the step each semantic colour
+  uses per mode, with its contrast. You are fitting to existing ramps when `system-profile.md` lists
+  colour ramps; with none, or when building a colour system from a brand palette, add `--from-scratch`.
+- **Ask the name as one question:** generated name, or your own? Recommend keeping the generated one;
+  `nameSource` says which was used.
+- **Stop for a yes** on `ramp-proposal.md` (the name, the ramp, the step mapping) before any write.
+  After the yes, write the patch into the file with the host's Figma write tool, following that tool's
+  own instructions (worked case: `references/reuse-or-add.md`), read it back, then take a new export,
+  `vendor` it, regenerate and run `resolve` again; bind only when it says `REUSE`.
+- Until a need is ruled, build the raw value as an `assumed-ask` row.
+
+Exit code 2 means a need is open and the report is written; it is a question, not a failure. With no
+Design System Handoff export (brownfield), `match` above is the path.
+
+**Done when** every need is `REUSE` or `RULED`, or is one open question with its fallback row.
 
 #### 4. Implement against tokens only, with the Build standards as the mechanism rules
 
@@ -270,7 +310,7 @@ One row per node whose value did not come straight from the pair, plus one per l
 - **hand-authored-override** — the stylesheet declares the property, the generator reported
   rather than overwrote it.
 - **assumed-ask** — built from an ask's suggestion, or from an answer still waiting on Figma;
-  `ruling ref` is the ask's key. An open ask is the same row with nothing built.
+  `ruling ref` is the ask's key (a need still open in 3b: its need id). An open ask is the same row with nothing built.
 - **not-built** — the pair names the item and the build could not make it (an asset the export
   does not carry, geometry it does not state); nothing built, the cause in `value`.
 
