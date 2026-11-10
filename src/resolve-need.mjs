@@ -255,7 +255,9 @@ function resolveOne(need, ctx) {
       report.verdict = "RULING_STALE";
       report.ruling = row;
     } else {
-      report.verdict = "RULED";
+      // A `new` row that names a variable the export now has is the name written and exported: reuse it.
+      const written = ruled.ruling === "new" && ruled.code && names.has(ruled.code);
+      report.verdict = written ? "REUSE" : "RULED";
       report.open = false;
       report.ruling = row;
       report.findings = [];

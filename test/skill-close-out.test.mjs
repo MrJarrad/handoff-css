@@ -62,6 +62,6 @@ test("a ramp need: what resolve prints in each state of the loop", () => {
 test("3b gives the close-out the commands can give: no new row, REUSE after the write, RULED means a row stands", () => {
   assert.match(addStep, /no `new` row for a need that goes to `ramp`/i);
   assert.match(addStep, /`RULED` instead means a row is still standing/);
-  assert.match(addStep, /a `new` or `skip` row carries no name/);
+  assert.match(addStep, /a `skip` row carries no name, and a `new` row carries the approved name when it has one/);
   assert.doesNotMatch(addStep, /has ruled `new`/);
 });
