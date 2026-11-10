@@ -172,10 +172,12 @@ add only when nothing fits.** Write the needs as a list (`schema/resolve-need.v1
 `handoff-css resolve --export <design-system-handoff>.json --need <needs.json> [--rulings <md>]`.
 Verdicts, ranking, rulings and exit codes: `references/reuse-or-add.md`.
 
-- `REUSE` and `RULED` close the need: build that name.
+- `REUSE` closes the need: build that name. `RULED` closes it too: build the name in the ruling's `code`
+  (a `use` row); a `new` or `skip` row carries no name.
 - `SIBLING`, `MISMATCH`, `NEW_NAME`, `RULING_STALE` are **one question** to the designer, with a
   recommendation. A new name is never yours to pick. A designer who declines the nearest name and wants
-  the colour added has ruled `new`: that goes to `ramp` too.
+  the colour added goes to `ramp` too. Record no `new` row for a need that goes to `ramp`: a standing row
+  makes `resolve` answer `RULED`, with no name, before and after the write, and it would never say `REUSE`.
 - `NEW_RAMP` means no colour in the system is near: add a **whole ramp**, never a single raw colour.
   `handoff-css ramp --export <design-system-handoff>.json --anchor <#hex> --for <semantic variable>
   --on <surface variable>` proposes the ramp in the system's own steps and the step each semantic colour
@@ -186,7 +188,8 @@ Verdicts, ranking, rulings and exit codes: `references/reuse-or-add.md`.
 - **Stop for a yes** on `ramp-proposal.md` (the name, the ramp, the step mapping) before any write.
   After the yes, write the patch into the file with the host's Figma write tool, following that tool's
   own instructions (worked case: `references/reuse-or-add.md`), read it back, then take a new export,
-  `vendor` it, regenerate and run `resolve` again; bind only when it says `REUSE`.
+  `vendor` it, regenerate and run `resolve` again. With no `new` row standing for the need it now says
+  `REUSE` and ranks the new name; bind only then. `RULED` instead means a row is still standing: remove it.
 - Until a need is ruled, build the raw value as an `assumed-ask` row.
 
 Exit code 2 means a need is open and the report is written; it is a question, not a failure. With no
