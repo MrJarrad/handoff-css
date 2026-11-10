@@ -15,7 +15,7 @@ import { validateSet } from "./set.mjs";
 import { validateLinkRunJson } from "./link-run.mjs";
 import { zipTextFiles } from "./zip.mjs";
 
-export const SUBCOMMANDS = ["validate", "conform", "match", "profile", "resolve", "vendor"];
+export const SUBCOMMANDS = ["validate", "conform", "match", "profile", "resolve", "ramp", "vendor"];
 
 const USAGE = `handoff-css — Design Handoff export → CSS custom properties
 
@@ -27,6 +27,8 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
   handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--json]
   handoff-css profile --export <json|json.gz|zip> [--out <dir>] [--check]
   handoff-css resolve --export <json|json.gz|zip> --need <needs.json> [--rulings <md>] [--out <dir>] [--json]
+  handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch]
+                   [--for <semantic>[@step]… --on <surface>… [--use text|large-text|ui] [--keep-anchor]] [--out <dir>] [--json]
   handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 `;
 
@@ -48,6 +50,10 @@ export async function dispatch(argv, { cwd = process.cwd(), stdout = process.std
   if (first === "profile") {
     const { profileCommand } = await import("./profile-cli.mjs");
     return profileCommand(rest, { cwd, stdout, stderr });
+  }
+  if (first === "ramp") {
+    const { rampCommand } = await import("./ramp-cli.mjs");
+    return rampCommand(rest, { cwd, stdout, stderr });
   }
   if (first === "resolve") {
     const { resolveCommand } = await import("./resolve-cli.mjs");

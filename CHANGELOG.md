@@ -18,6 +18,12 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Added
 
+- `handoff-css ramp` (HT-112): for a colour nothing in the system holds, proposes a whole primitive ramp in the system's own
+  steps and naming (fitted to its ramps, or the engine's defaults), with a generated or caller-given name, and the step each
+  named semantic colour uses in each mode and why. Writes `ramp-proposal.json` (patch, `schema/ramp-proposal.v1.schema.json`)
+  and `ramp-proposal.md`; nothing is written into Figma. Exit `2` when a mapping has no passing step.
+- Color engine (HT-119): `contrast`/`grade` (WCAG 2.x, AA text 4.5, large text and UI 3), `nearestPassingStep`, `mirrorStep`,
+  `pullBack`. `test/color-engine-map.test.mjs`, `test/ramp.test.mjs`.
 - `handoff-css/color-engine`: full primitive colour ramps for a system that has none that fit. `ramp` (one seed or several
   anchors merged, any step scale, anchors kept exact), `fitToSystem` (the system's scale, its ramps' median ends, its
   widest evenness and hue drift), `mergeVerdict` (lightness, evenness and hue drift decide; the pairing rule is a
