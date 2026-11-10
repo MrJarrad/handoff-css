@@ -6,6 +6,7 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Fixed
 
+- `system-profile.v1.schema.json` is closed (`additionalProperties: false`) with types on `source`, `ends`, `detectedBy`; the no-house-names test covers every file in `src/`; the synthetic test export passes `assertValidExport`.
 - HT-109: `hsl()`/`oklch()` hues written in `turn`, `rad` or `grad` were read as degrees (a wrong colour, not reported
   unreadable). They are converted; an unknown hue unit drops the colour. `test/raw-values.test.mjs`.
 - HT-110: two tokens of one kind with the same value are no longer left unbuilt. The closest token (then lowest name by
@@ -22,6 +23,21 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
   reason, not a veto), `nameColor` (Name that Color list, CC BY 2.5, opt-in), `auditRamp`, `DEFAULTS`. Ramp generation is
   a port checked string for string against 10,411 recorded cases (`test/color-engine-parity.test.mjs`). New dependency:
   culori 4.0.2 (MIT), pinned exactly.
+- HT-111 (A-S2): `handoff-css resolve --export … --need <needs.json> [--rulings <md>] [--out <dir>] [--json]` turns
+  a need (a name and/or a group, with the raw value wanted per mode) into ranked candidates with evidence and a verdict
+  (`REUSE`, `SIBLING`, `MISMATCH`, `NEW_NAME`, `NEW_RAMP`, `RULED`, `RULING_STALE`), writes `resolve-report.json` and
+  `.md`, reads rulings from the existing ruling table (kind `resolve-need`), and exits 2 while any need is open. It
+  never invents a name; an open need carries the raw value as `assumed-ask`. Schemas `schema/resolve-need` and
+  `schema/resolve-report`. `test/resolve.test.mjs`.
+- `profile`: `siblingObservations` states a difference between two sibling groups as a fact (two groups cannot outvote
+  each other, so it is never a gap); the sibling thresholds (3 groups, 50% overlap, strict majority) are in the README
+  and the `.md` header. `schema/profile` is now an export (`handoff-css/schema/profile`).
+- HT-111 (A-S1): `handoff-css profile --export <json|json.gz|zip> [--out <dir>] [--check]` writes `system-profile.json`
+  and `system-profile.md`: the system's layers (from the alias graph), naming, groups, ramps (each with its own
+  steps), sibling gaps (a leaf one group lacks that most of its family has, stated as a fact), what each mode means and
+  how that was detected, scope and description coverage, and every existing variable name. Nothing is read from a house
+  config; `--check` exits 1 naming the file that would change. Schema: `handoff-css/schema/profile`.
+  `test/profile.test.mjs` (JHD v19 and a synthetic non-JHD export).
 - `themes.variants` (P10b): a total theme can hand one sibling to a variant theme, e.g. `{ bttf: { dark: "bttf-dark" } }` emits
   `.bttf-dark, .bttf .dark, .bttf.dark` and `bttf` stops claiming `dark`. Optional; output without it is byte-identical.
   `test/theme-variants.test.mjs`.

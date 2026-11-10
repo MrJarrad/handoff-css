@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://handoff-css/schema/system-profile.v1.schema.json",
+  "title": "System profile",
+  "description": "How a design system is built, derived from its Design System Handoff export. Facts only: a gap is never a verdict. Closed: a field the generator does not write is an error.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profileVersion", "source", "layers", "naming", "groups", "ramps", "rampStepSets", "siblingGaps", "siblingObservations", "modes", "coverage", "names"],
+  "$defs": {
+    "counts": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+    "strings": { "type": "array", "items": { "type": "string" } },
+    "end": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["step", "literal"],
+      "properties": {
+        "step": { "type": "string" },
+        "literal": { "type": ["string", "null"] },
+        "oklchL": { "type": ["number", "null"] }
+      }
+    }
+  },
+  "properties": {
+    "profileVersion": { "const": 1 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["documentName", "schemaVersion", "exportVersion", "contentHash"],
+      "properties": {
+        "documentName": { "type": ["string", "null"] },
+        "schemaVersion": { "type": ["integer", "string", "null"] },
+        "exportVersion": { "type": ["integer", "string", "null"] },
+        "contentHash": { "type": ["string", "null"] }
+      }
+    },
+    "layers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["collection", "role", "variables", "modes", "hidden", "evidence"],
+        "properties": {
+          "collection": { "type": "string" },
+          "role": { "enum": ["primitive", "semantic", "mixed", "standalone"] },
+          "variables": { "type": "integer", "minimum": 0 },
+          "modes": { "type": "integer", "minimum": 0 },
+          "hidden": { "type": "boolean" },
+          "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["literalCells", "aliasCells", "selfAliasCells", "aliasesInto", "aliasedFromOtherCollections"],
+            "properties": {
+              "literalCells": { "type": "integer", "minimum": 0 },
+              "aliasCells": { "type": "integer", "minimum": 0 },
+              "selfAliasCells": { "type": "integer", "minimum": 0 },
+              "aliasesInto": { "$ref": "#/$defs/counts" },
+              "aliasedFromOtherCollections": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "naming": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["collection", "separator", "segmentDepth", "leafCase", "webName"],
+        "properties": {
+          "collection": { "type": "string" },
+          "separator": { "type": ["string", "null"] },
+          "segmentDepth": { "$ref": "#/$defs/counts" },
+          "leafCase": { "$ref": "#/$defs/counts" },
+          "webName": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["prefix", "rule"],
+            "properties": { "prefix": { "$ref": "#/$defs/strings" }, "rule": { "$ref": "#/$defs/counts" } }
+          }
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["collection", "path", "leaves"],
+        "properties": { "collection": { "type": "string" }, "path": { "type": "string" }, "leaves": { "$ref": "#/$defs/strings" } }
+      }
+    },
+    "ramps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["collection", "path", "type", "steps", "stepGaps", "ends"],
+        "properties": {
+          "collection": { "type": "string" },
+          "path": { "type": "string" },
+          "type": { "type": "string" },
+          "steps": { "$ref": "#/$defs/strings" },
+          "stepGaps": { "type": "array", "items": { "type": "number" } },
+          "ends": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["low", "high"],
+            "properties": { "low": { "$ref": "#/$defs/end" }, "high": { "$ref": "#/$defs/end" } }
+          }
+        }
+      }
+    },
+    "rampStepSets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["steps", "ramps"],
+        "properties": { "steps": { "$ref": "#/$defs/strings" }, "ramps": { "$ref": "#/$defs/strings" } }
+      }
+    },
+    "siblingGaps": {
+      "type": "array",
+      "description": "A leaf present in a strict majority of a family of at least 3 groups and absent from one. A fact, never a verdict.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["collection", "group", "lacks", "presentIn", "family"],
+        "properties": {
+          "collection": { "type": "string" },
+          "group": { "type": "string" },
+          "lacks": { "type": "string" },
+          "presentIn": { "$ref": "#/$defs/strings" },
+          "family": { "type": "string" }
+        }
+      }
+    },
+    "siblingObservations": {
+      "type": "array",
+      "description": "A family of exactly 2 groups whose leaves differ. Two groups cannot outvote each other, so this is stated as a fact and never ranked as a gap.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["collection", "family", "groups", "onlyIn"],
+        "properties": {
+          "collection": { "type": "string" },
+          "family": { "type": "string" },
+          "groups": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } },
+          "onlyIn": { "type": "object", "additionalProperties": { "$ref": "#/$defs/strings" } }
+        }
+      }
+    },
+    "modes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["collection", "defaultMode", "modes"],
+        "properties": {
+          "collection": { "type": "string" },
+          "defaultMode": { "type": ["string", "null"] },
+          "modes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "meaning", "detectedBy"],
+              "properties": {
+                "name": { "type": "string" },
+                "meaning": { "enum": ["single", "theme", "responsive-layout", "unclassified"] },
+                "theme": { "type": "string" },
+                "layoutVariant": { "type": "string" },
+                "widthPx": { "type": "number" },
+                "detectedBy": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["source", "confidence"],
+                  "properties": {
+                    "source": { "type": "string" },
+                    "confidence": { "type": "string" },
+                    "note": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["collection", "variables", "withDescription", "scopes"],
+        "properties": {
+          "collection": { "type": "string" },
+          "variables": { "type": "integer", "minimum": 0 },
+          "withDescription": { "type": "integer", "minimum": 0 },
+          "scopes": { "$ref": "#/$defs/counts" }
+        }
+      }
+    },
+    "names": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["collection", "names"],
+        "properties": {
+          "collection": { "type": "string" },
+          "names": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "type"],
+              "properties": { "name": { "type": "string" }, "type": { "type": "string" } }
+            }
+          }
+        }
+      }
+    }
+  }
+}
