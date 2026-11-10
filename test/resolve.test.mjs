@@ -181,11 +181,11 @@ function editedFile(edit) {
   writeFileSync(file, JSON.stringify(doc));
   return file;
 }
-const dropTeal20 = (doc) => { doc.collections[0].variables = doc.collections[0].variables.filter((v) => v.name !== "Hue/Teal/20"); };
+const dropHues = (doc) => { doc.collections[0].variables = doc.collections[0].variables.filter((v) => !v.name.startsWith("Hue/")); };
 
 test("`*` wants the value in every mode of a candidate: a name that holds it in one mode only is no bind target", async () => {
-  // Day holds #002828 in Surface/main, Night does not. With the primitive gone nothing holds it in both.
-  const file = editedFile(dropTeal20);
+  // Day holds #002828 in Surface/main, Night does not. With the hue primitives gone nothing holds it, or sits near it, in both.
+  const file = editedFile(dropHues);
   const named = await resolve(file, [{ id: "n", name: "Ink/danger", wants: { "*": "#002828FF" } }]);
   assert.equal(named.rep.needs[0].verdict, "NEW_RAMP");
   assert.equal(named.rep.needs[0].bindTo, undefined);
