@@ -245,3 +245,31 @@ test("CLI: a mapping no step can satisfy exits 2 and says which", async () => {
   assert.equal(code, 2);
   assert.match(err.join(""), /2 mapping\(s\) have no passing step/);
 });
+
+// --- r1 ambers -------------------------------------------------------------------------------------------
+
+test("CLI (amber 1): a value flag with no value, an empty value or a stray positional exits 1 and writes nothing", async () => {
+  const A = ["--anchor", "#14d7fb"];
+  const cases = {
+    "--name then a flag": [...A, "--name", "--from-scratch"],
+    "--name last": [...A, "--name"],
+    "--name empty": [...A, "--name", ""],
+    "--anchor without value": [...A, "--anchor"],
+    "--anchor empty": [...A, "--anchor", ""],
+    "--out without value": [...A, "--out", "--json"],
+    "--use without value": [...A, "--use"],
+    "stray positional": [...A, "stray"],
+  };
+  for (const [what, args] of Object.entries(cases)) {
+    const r = await run(args);
+    assert.equal(r.code, 1, `${what}: exit ${r.code}`);
+    assert.deepEqual(readdirSync(r.dir), [], `${what}: wrote files`);
+    assert.match(r.err, /ramp:/, what);
+  }
+});
+
+test("CLI (amber 1): the strict parse leaves a good run alone, flags in any order", async () => {
+  const r = await run(["--name", "cyan", "--from-scratch", "--anchor", "#14d7fb", "--json"]);
+  assert.equal(r.code, 0, r.err);
+  assert.equal(JSON.parse(r.out).ramps[0].name, "cyan");
+});
