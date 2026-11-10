@@ -5,7 +5,7 @@
   "description": "How a design system builds its components and blocks, observed in the layer export(s) that use them. Facts only: a tier or a gap is never a verdict, and the count is of components seen, never of the library. Closed: a field the generator does not write is an error.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["componentProfileVersion", "source", "coverage", "naming", "propertyModel", "composition", "tokenBinding", "components"],
+  "required": ["componentProfileVersion", "source", "coverage", "naming", "propertyModel", "composition", "tokenBinding", "components", "warnings"],
   "$defs": {
     "counts": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } }
   },
@@ -97,6 +97,7 @@
       "required": ["byCollection"],
       "properties": { "byCollection": { "$ref": "#/$defs/counts" } }
     },
+    "warnings": { "type": "array", "items": { "type": "string" } },
     "components": {
       "type": "array",
       "items": {

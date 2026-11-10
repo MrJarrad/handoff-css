@@ -35,6 +35,7 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
       }
     });
     const profile = buildComponentProfile(docs);
+    for (const w of profile.warnings) stderr.write(`handoff-css (components): warning: ${w}\n`);
     const outDir = abs(one("--out") ?? ".");
     const needPath = one("--need");
 

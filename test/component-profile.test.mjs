@@ -84,6 +84,20 @@ test("a layer export without a layer tree is refused", () => {
   assert.throws(() => buildComponentProfile({ schema: "design-system-handoff" }), /not a Design Handoff layer export/);
 });
 
+test("the same component name defined in two exports is warned about, never merged silently", () => {
+  const a = flatSystem();
+  const b = flatSystem();
+  b.documentName = "second-library";
+  const p = buildComponentProfile([a, b]);
+  assert.equal(validate(p), true, JSON.stringify(validate.errors));
+  assert.equal(p.coverage.seen, 3);
+  assert.equal(p.warnings.length, 3);
+  assert.match(p.warnings[0], /Button is defined in 2 exports \(flat-system, second-library\)/);
+  assert.match(renderComponentProfileMarkdown(p), /> Warning: Button is defined in 2 exports/);
+  assert.deepEqual(buildComponentProfile(flatSystem()).warnings, []);
+  assert.deepEqual(buildComponentProfile([flatSystem(), tieredSystem()]).warnings, []);
+});
+
 // ---- resolve: flat system ---------------------------------------------------------------------
 test("flat system: reuse first, set a property before forking, ask before adding", () => {
   const p = buildComponentProfile(flatSystem());

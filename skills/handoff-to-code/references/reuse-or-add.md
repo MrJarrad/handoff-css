@@ -56,10 +56,6 @@ values, then the semantic aliases. Add; never rewrite or remove a variable the d
 
 **After.** Each written ramp is a row in the deviation table, "written, read back".
 
-## Later: components and blocks
-
-Reuse-before-add for components and blocks is not covered here yet.
-
 ## Components
 
 Step 3c is the same rule for components and blocks. `handoff-css components --export <layer export .json|.json.gz>…

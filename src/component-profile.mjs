@@ -1,4 +1,4 @@
-// `handoff-css profile --components` — how a design system builds its components and blocks, read from
+// `handoff-css components` — how a design system builds its components and blocks, read from
 // the layer export(s) (schema `design-handoff`) that use them.
 //
 // Pure: exports in, profile out. Nothing here knows a house's component names, separators, tiers or
@@ -47,11 +47,11 @@ export function buildComponentProfile(docs) {
 
   const comps = new Map(); // name -> record
   const rec = (name) => {
-    if (!comps.has(name)) comps.set(name, { name, defined: false, kind: null, ids: new Set(), properties: new Map(), observed: new Map(), nests: new Map(), bindings: new Map(), placed: 0, files: new Set() });
+    if (!comps.has(name)) comps.set(name, { name, defined: false, kind: null, ids: new Set(), definedIn: new Set(), properties: new Map(), observed: new Map(), nests: new Map(), bindings: new Map(), placed: 0, files: new Set() });
     return comps.get(name);
   };
 
-  for (const doc of list) {
+  for (const [docIndex, doc] of list.entries()) {
     const file = doc.documentName ?? "(unnamed)";
     for (const root of roots(doc)) {
       // Definitions first: a COMPONENT_SET, or a COMPONENT that is not a variant of a set.
@@ -61,6 +61,7 @@ export function buildComponentProfile(docs) {
         if (!isSet && !isLoose) return;
         const r = rec(node.name);
         r.defined = true;
+        r.definedIn.add(`${docIndex}\u0000${file}`);
         r.kind = isSet ? "set" : "component";
         r.ids.add(node.id);
         r.files.add(file);
@@ -98,6 +99,13 @@ export function buildComponentProfile(docs) {
       });
     }
   }
+
+  // The same component name defined in two exports is one record here (properties from the later export win).
+  // Two libraries can reuse a name for different components, so say it rather than merge silently.
+  const warnings = [...comps.values()]
+    .filter((r) => r.definedIn.size > 1)
+    .sort((a, b) => byText(a.name, b.name))
+    .map((r) => `${r.name} is defined in ${r.definedIn.size} exports (${[...r.definedIn].map((x) => x.split("\u0000")[1]).join(", ")}); they are read as one component and the later export's properties win. Check they are the same component.`);
 
   const rows = [...comps.values()].sort((a, b) => byText(a.name, b.name));
 
@@ -202,6 +210,7 @@ export function buildComponentProfile(docs) {
     },
     tokenBinding: { byCollection: sortedObject(bindingTotals) },
     components,
+    warnings,
   };
 }
 
@@ -212,6 +221,7 @@ export function renderComponentProfileMarkdown(p) {
   const out = ["# Component profile", ""];
   out.push(`${p.coverage.seen} components seen (${p.coverage.defined} defined in these exports, ${p.coverage.instanceOnly} only placed), of an unknown total. ${p.coverage.note}`, "");
   out.push("Facts only: a gap or a tier is observed, never a verdict.", "");
+  for (const w of p.warnings) out.push(`> Warning: ${w}`, "");
   out.push("## Naming", "", ...table(["Separator", "Depths", "Leaf case", "Flat", "Private (leading . or _)"],
     [[p.naming.separator ?? "none", JSON.stringify(p.naming.depths), JSON.stringify(p.naming.leafCase), p.naming.flat, p.naming.private]]));
   if (Object.keys(p.naming.categoryPrefixes).length) out.push(...table(["Category prefix", "Components"], Object.entries(p.naming.categoryPrefixes)));
