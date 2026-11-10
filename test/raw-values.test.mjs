@@ -99,10 +99,29 @@ test("type matches per property: font size against font-size tokens, weight exac
   assert.equal(by("fontWeight", 600).status, "listed");
 });
 
-test("two tokens with the same value are a tie: listed with both, never picked", () => {
-  const [item] = one([row("spacing", "gap", 16)], css(":root { --space-4: 1rem; --space-md: 16px; }"));
-  assert.equal(item.reason, "tie");
-  assert.deepEqual(item.suggestions.map((s) => s.token).sort(), ["--space-4", "--space-md"]);
+test("HT-110: two tokens with the same value are a tie: built with the name-order pick, losers listed", () => {
+  const [item] = one([row("spacing", "gap", 16)], css(":root { --space-md: 16px; --space-4: 1rem; }"));
+  assert.deepEqual([item.status, item.reason, item.token], ["built", "tie-picked", "--space-4"]);
+  assert.match(item.why, /2 tokens state 16px; picked --space-4 \(closest, then name order; also --space-md\)/);
+  assert.deepEqual(item.suggestions.map((s) => s.token), ["--space-md"]);
+});
+
+test("HT-110: the closer token wins a near-tie before name order is consulted", () => {
+  const [item] = one([row("spacing", "gap", 16)], css(":root { --space-a: 16.4px; --space-b: 16px; }"));
+  assert.deepEqual([item.token, item.reason], ["--space-b", "tie-picked"]);
+  assert.deepEqual(item.suggestions.map((s) => s.token), ["--space-a"]);
+});
+
+test("HT-110: colours that can't be told apart tie the same way", () => {
+  const [item] = one([row("colour", "fill", "#112233")], css(":root { --color-z: #112233; --color-b: #112233; }"));
+  assert.deepEqual([item.status, item.reason, item.token], ["built", "tie-picked", "--color-b"]);
+  assert.deepEqual(item.suggestions.map((s) => s.token), ["--color-z"]);
+});
+
+test("HT-110: a ruling still overrides the pick", () => {
+  const rulings = "| kind | figma | ruling | code | note |\n|---|---|---|---|---|\n| raw-spacing | 16px | use | --space-md | n |";
+  const [item] = one([row("spacing", "gap", 16)], css(":root { --space-4: 1rem; --space-md: 16px; }"), rulings);
+  assert.equal(item.token, "--space-md");
 });
 
 test("an alias is not a second token: --gap-default resolves to --space-4 and is not a tie", () => {
@@ -227,4 +246,26 @@ test("a colour token the pass cannot read is named in the report, not reported a
   assert.match(result.items[0].why, /could not read 2 colour tokens/);
   assert.deepEqual(result.unreadable, ["--ink", "--paper"]);
   assert.match(renderRawValues(result), /Not read: --ink, --paper/);
+});
+
+// HT-109: hue units.
+const near = (a, b) => a.every((x, i) => Math.abs(x - b[i]) < 1e-3);
+test("HT-109: hsl() hues in turn, rad and grad read as the same colour as degrees", () => {
+  const cyan = parseColour("hsl(180deg 100% 50%)");
+  for (const h of ["0.5turn", "3.14159265rad", "200grad", "180", "-180deg", "540deg"]) {
+    assert.ok(near(parseColour(`hsl(${h} 100% 50%)`), cyan), h);
+  }
+  assert.ok(near(parseColour("hsla(0.5turn, 100%, 50%, 0.5)").slice(0, 3), cyan.slice(0, 3)));
+});
+
+test("HT-109: oklch() hues in turn, rad and grad read as the same colour as degrees", () => {
+  const ref = parseColour("oklch(0.7 0.15 90deg)");
+  for (const h of ["0.25turn", "1.5707963rad", "100grad", "90"]) {
+    assert.ok(near(parseColour(`oklch(0.7 0.15 ${h})`), ref), h);
+  }
+});
+
+test("HT-109: a turn hue is matched to its token end to end", () => {
+  const [item] = one([row("colour", "fill", "#00FFFF")], css(":root { --color-c: hsl(0.5turn 100% 50%); }"));
+  assert.deepEqual([item.status, item.token], ["built", "--color-c"]);
 });

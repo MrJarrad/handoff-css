@@ -4,6 +4,16 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ## Unreleased
 
+### Fixed
+
+- HT-109: `hsl()`/`oklch()` hues written in `turn`, `rad` or `grad` were read as degrees (a wrong colour, not reported
+  unreadable). They are converted; an unknown hue unit drops the colour. `test/raw-values.test.mjs`.
+- HT-110: two tokens of one kind with the same value are no longer left unbuilt. The closest token (then lowest name by
+  `localeCompare`) is built with reason `tie-picked`; the report says which was picked and names the others, and a
+  `use`/`keep` ruling still overrides. `tie` is no longer emitted.
+- `themes.variants` now refuses a pairing that names the theme collection's default mode, as sibling or variant; it
+  used to generate with that sibling claimed by nothing. `test/theme-variants.test.mjs`.
+
 ### Added
 
 - `themes.variants` (P10b): a total theme can hand one sibling to a variant theme, e.g. `{ bttf: { dark: "bttf-dark" } }` emits

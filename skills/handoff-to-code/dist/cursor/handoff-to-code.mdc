@@ -60,10 +60,11 @@ bound to a variable (`unboundValues`). `handoff-css match --export <design-hando
 --rulings <ruling table>.md` matches each to the project's own token of the same kind, by value:
 
 - **Built with a token** — a colour you can't tell apart from the token (ΔE < 1, alpha equal), or a
-  number within half a pixel of one. Build the token; the row is listed so the person can overrule
+  number within half a pixel of one. If several tokens qualify, the closest (then lowest name) is built and
+  the report names the others (`tie-picked`). Build the token; the row is listed so the person can overrule
   it with a `keep` row.
 - **Needs your call** — a slightly-off colour (token suggested), a number between two steps (both
-  neighbours named), beyond the scale, a tie, or no token of its kind. **Build the exact value and
+  neighbours named), beyond the scale, or no token of its kind. **Build the exact value and
   write a deviation row (`assumed-ask`, `ruling ref` the raw row's `figma`) — never stop, never round
   it to a neighbour.** Ask once, as one table, with the suggestions as the recommendation; a `use` or
   `keep` row in the ruling table settles it on the next run.
