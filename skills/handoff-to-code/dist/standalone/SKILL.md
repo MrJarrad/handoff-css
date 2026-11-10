@@ -188,24 +188,32 @@ add only when nothing fits.** Write the needs as a list (`schema/resolve-need.v1
 `handoff-css resolve --export <design-system-handoff>.json --need <needs.json> [--rulings <md>]`.
 Verdicts, ranking, rulings and exit codes: `references/reuse-or-add.md`.
 
-- `REUSE` and `RULED` close the need: build that name.
+- `REUSE` closes the need: build that name. `RULED` closes it too: build the name in the ruling's `code`
+  (a `use` row); a `new` or `skip` row carries no name.
 - `SIBLING`, `MISMATCH`, `NEW_NAME`, `RULING_STALE` are **one question** to the designer, with a
   recommendation. A new name is never yours to pick. A designer who declines the nearest name and wants
-  the colour added has ruled `new`: that goes to `ramp` too.
+  the colour added goes to `ramp` too. Record no `new` row for a need that goes to `ramp`: a standing row
+  makes `resolve` answer `RULED`, with no name, before and after the write, and it would never say `REUSE`.
 - `NEW_RAMP` means no colour in the system is near: add a **whole ramp**, never a single raw colour.
   `handoff-css ramp --export <design-system-handoff>.json --anchor <#hex> --for <semantic variable>
   --on <surface variable>` proposes the ramp in the system's own steps and the step each semantic colour
   uses per mode, with its contrast. You are fitting to existing ramps when `system-profile.md` lists
   colour ramps; with none, or when building a colour system from a brand palette, add `--from-scratch`.
+  `--for` takes a semantic variable the export already has. When none takes the colour, that is a new
+  name: it goes to the designer as one question with a recommendation, and meanwhile `ramp` runs without
+  `--for` and proposes the primitive ramp alone.
 - **Ask the name as one question:** generated name, or your own? Recommend keeping the generated one;
   `nameSource` says which was used.
 - **Stop for a yes** on `ramp-proposal.md` (the name, the ramp, the step mapping) before any write.
   After the yes, write the patch into the file with the host's Figma write tool, following that tool's
   own instructions (worked case: `references/reuse-or-add.md`), read it back, then take a new export,
-  `vendor` it, regenerate and run `resolve` again; bind only when it says `REUSE`.
+  `vendor` it, regenerate and run `resolve` again. With no `new` row standing for the need it now says
+  `REUSE` and ranks the new name; bind only then. `RULED` instead means a row is still standing: remove it.
 - Until a need is ruled, build the raw value as an `assumed-ask` row.
 
-Exit code 2 means a need is open and the report is written; it is a question, not a failure. With no
+`resolve` exits 2 when a need is open: the report is written, and it is a question, not a failure. `ramp`
+exits 2 when a semantic colour has no passing step: the report names it, so put that to the designer
+rather than choosing. With no
 Design System Handoff export (brownfield), `match` above is the path.
 
 **Done when** every need is `REUSE` or `RULED`, or is one open question with its fallback row.
