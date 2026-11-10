@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://handoff-css/schema/resolve-report.v1.schema.json",
+  "title": "Resolve report",
+  "description": "Ranked candidates and a verdict per need. Open needs carry the raw-value fallback marked assumed-ask until a ruling settles them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["resolveVersion", "source", "needs", "counts", "open"],
+  "properties": {
+    "resolveVersion": { "const": 1 },
+    "source": { "type": "object" },
+    "counts": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 1 } },
+    "open": { "type": "integer", "minimum": 0 },
+    "needs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "ask", "verdict", "open", "candidates", "findings"],
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "type": "string" },
+          "ask": { "type": "object" },
+          "verdict": { "enum": ["REUSE", "SIBLING", "MISMATCH", "NEW_NAME", "NEW_RAMP", "RULED", "RULING_STALE"] },
+          "open": { "type": "boolean" },
+          "candidates": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["rank", "name", "collection", "webName", "type", "layer", "values", "distance", "evidence"],
+              "properties": {
+                "rank": { "type": "integer", "minimum": 1 },
+                "name": { "type": "string" },
+                "collection": { "type": "string" },
+                "webName": { "type": ["string", "null"] },
+                "type": { "type": "string" },
+                "layer": { "enum": ["primitive", "semantic", "mixed", "standalone"] },
+                "values": { "type": "object", "additionalProperties": { "type": ["string", "null"] } },
+                "distance": { "type": ["number", "null"] },
+                "evidence": {
+                  "type": "array",
+                  "items": { "type": "object", "additionalProperties": false, "required": ["fact", "from"], "properties": { "fact": { "type": "string" }, "from": { "type": "string" } } }
+                }
+              }
+            }
+          },
+          "findings": {
+            "type": "array",
+            "items": { "type": "object", "additionalProperties": false, "required": ["code", "message"], "properties": { "code": { "enum": ["NEW_NAME", "NEW_RAMP", "SIBLING", "MISMATCH", "RULING_STALE"] }, "message": { "type": "string" } } }
+          },
+          "bindTo": { "type": "object", "additionalProperties": { "type": "object", "additionalProperties": false, "required": ["name", "collection", "distance"], "properties": { "name": { "type": "string" }, "collection": { "type": "string" }, "distance": { "type": "number" } } } },
+          "ruling": { "type": "object", "additionalProperties": false, "required": ["ruling", "code", "note"], "properties": { "ruling": { "type": "string" }, "code": { "type": "string" }, "note": { "type": "string" } } },
+          "fallback": { "type": "object", "additionalProperties": false, "required": ["kind", "status"], "properties": { "kind": { "const": "raw-value" }, "status": { "const": "assumed-ask" }, "values": { "type": "object" } } }
+        }
+      }
+    }
+  }
+}

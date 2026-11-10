@@ -376,6 +376,45 @@ end colours, sibling gaps, mode meaning with how it was detected (the export's o
 scope and description coverage, and the list of existing names. A gap is a fact, not a verdict. `--check` writes
 nothing and exits 1 naming the file that has drifted.
 
+What counts as a sibling gap, stated so it can be checked: sibling groups are groups of one collection whose paths
+differ at exactly one segment (`color/*/action`). A group takes part only if it shares at least 50% of its leaves with
+the family (shared leaves over the family's distinct leaves). A **gap** needs a family of **at least 3** such groups and
+a leaf held by a **strict majority** of them (exactly half is not a gap). A family of exactly **2** cannot outvote
+itself, so a difference there is listed under `siblingObservations` as a fact (which leaves each group alone has),
+never as a gap. A group under the 50% overlap is left out of both lists. The same thresholds head `system-profile.md`.
+
+### `resolve` — what in the system covers this need?
+
+`handoff-css resolve --export <json|json.gz|zip> --need <needs.json> [--rulings <md>] [--out <dir>] [--json]` reads one
+export and a list of needs, and writes `resolve-report.json` and `resolve-report.md`. It never invents a name.
+
+A need (`schema/resolve-need.v1.schema.json`): `{ "id", "name"?, "group"?, "collection"?, "wants"? }`, at least one of
+`name`, `group`, `wants`. `wants` maps a mode name (or `*` for every mode) to the raw value the build holds
+(`"#00000078"`, `12`, `"16px"`). Per need the report gives up to five ranked candidates, each with its values per
+mode, a `distance` from the wanted value (0 is the same; colour distance is OKLab ΔE ×100 plus alpha, numbers are a
+percentage difference) and `evidence` naming the profile fact it came from, then one verdict:
+
+| Verdict | Means | Open |
+| --- | --- | --- |
+| `REUSE` | the name exists and holds the wanted value, or (no name asked) a name holds it exactly | no |
+| `SIBLING` | no name asked; the nearest name is within tolerance but not the same value — ask once | yes |
+| `MISMATCH` | the name exists but holds another value | yes |
+| `NEW_NAME` | the name is not in the system; `bindTo` shows the existing value each mode could point at | yes |
+| `NEW_RAMP` | nothing in the system holds the wanted value in every mode asked — the designer decides (HT-112) | yes |
+| `RULED` | a ruling row settles it | no |
+| `RULING_STALE` | a `use` ruling names something the export does not have | yes |
+
+Ranking, in order: the exact name; a sibling in the asked group (a name in a `siblingGaps` family is cited as
+evidence); the smaller distance (worst mode, then sum); semantic before primitive; name text. Every open need carries
+`fallback: raw-value, assumed-ask`: build the raw value and say so until it is ruled. `siblingObservations` appear in a
+candidate's evidence and never change a verdict.
+
+Rulings are the same table `match` reads: `| kind | figma | ruling | code | note |` with kind `resolve-need`, `figma`
+the need id, ruling `use` (with the existing name in `code`), `new` (the designer approved the new name) or `skip`.
+Exit codes: `0` every need is `REUSE` or `RULED`; `2` at least one need is open (the report is still written);
+`1` a usage or input error (nothing written). The report is a function of the export, the needs and the rulings, so a
+rerun is byte-identical (`test/resolve.test.mjs`).
+
 ### `vendor` — add a new export without overwriting the old one
 
 ```sh

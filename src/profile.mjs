@@ -227,6 +227,7 @@ export function buildProfile(doc) {
     }
   }
   const gaps = new Map();
+  const observations = new Map();
   for (const f of families.values()) {
     if (f.members.length < 2) continue;
     const union = new Set(f.members.flatMap((g) => g.leaves));
@@ -236,6 +237,22 @@ export function buildProfile(doc) {
       return shared / new Set([...own, ...union]).size >= 0.5;
     });
     if (members.length < 2) continue;
+    // Two groups cannot outvote each other, so a difference there is no gap: it is stated as an observation.
+    if (members.length === 2) {
+      const [a, b] = members;
+      const onlyA = a.leaves.filter((l) => !b.leaves.includes(l)).sort(byText);
+      const onlyB = b.leaves.filter((l) => !a.leaves.includes(l)).sort(byText);
+      const key = `${f.collection}\u0000${f.pattern}\u0000${a.path.join("/")}\u0000${b.path.join("/")}`;
+      if ((onlyA.length || onlyB.length) && !observations.has(key)) {
+        observations.set(key, {
+          collection: f.collection,
+          family: f.pattern,
+          groups: [a.path.join("/"), b.path.join("/")].sort(byText),
+          onlyIn: { [a.path.join("/")]: onlyA, [b.path.join("/")]: onlyB },
+        });
+      }
+      continue;
+    }
     for (const leaf of new Set(members.flatMap((g) => g.leaves))) {
       const has = members.filter((g) => g.leaves.includes(leaf));
       const lacks = members.filter((g) => !g.leaves.includes(leaf));
@@ -254,6 +271,8 @@ export function buildProfile(doc) {
     }
   }
   const siblingGaps = [...gaps.values()].sort((a, b) => byText(`${a.collection}/${a.group}/${a.lacks}`, `${b.collection}/${b.group}/${b.lacks}`));
+
+  const siblingObservations = [...observations.values()].sort((a, b) => byText(`${a.collection}/${a.family}/${a.groups}`, `${b.collection}/${b.family}/${b.groups}`));
 
   // Modes ---------------------------------------------------------------------------------------
   const hasModeClassification = Array.isArray(doc.mode?.collections);
@@ -321,6 +340,7 @@ export function buildProfile(doc) {
     ramps,
     rampStepSets: [...stepSets.values()],
     siblingGaps,
+    siblingObservations,
     modes,
     coverage,
     names,
@@ -340,6 +360,7 @@ export function renderProfileMarkdown(p) {
     `Export schema ${p.source.schemaVersion}, export version ${p.source.exportVersion}, content hash ${code(p.source.contentHash ?? "none")}.`,
     "",
     "This file states how the system is built. Gaps are facts, not verdicts; a new name or ramp is the designer's call.",
+    "A sibling gap needs a family of at least 3 groups (groups whose paths differ at one segment, each sharing at least half its leaves with the family) and a leaf in a strict majority of them. A family of exactly 2 is listed under sibling observations instead; a group sharing under half its leaves with the family is left out of both.",
     "",
   );
   out.push("## Layers", "", table(["Collection", "Role", "Variables", "Modes", "Aliases into", "Evidence"],
@@ -365,6 +386,14 @@ export function renderProfileMarkdown(p) {
   else {
     for (const g of p.siblingGaps) {
       out.push(`- ${code(`${g.collection}:${g.group}`)} has no ${code(g.lacks)}; ${g.presentIn.map(code).join(", ")} ${g.presentIn.length === 1 ? "has" : "have"} it (family ${code(g.family)}).`);
+    }
+    out.push("");
+  }
+  out.push("## Sibling observations", "");
+  if (p.siblingObservations.length === 0) out.push("None found.", "");
+  else {
+    for (const o of p.siblingObservations) {
+      out.push(`- ${code(`${o.collection}:${o.family}`)}: two groups, ${o.groups.map((g) => `${code(g)} only has ${o.onlyIn[g].map(code).join(", ") || "nothing extra"}`).join("; ")}. Two groups cannot outvote each other, so this is a fact, not a gap.`);
     }
     out.push("");
   }
