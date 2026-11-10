@@ -110,3 +110,9 @@ test("each rule lives once: 3b states the name question, the stop for a yes, exi
   assert.doesNotMatch(ref, /exit(?:s)? `?2/i, "exit 2 is in 3b only");
   assert.doesNotMatch(ref, /run `resolve` again|take a new export/i, "the re-run is in 3b only");
 });
+
+test("no existing semantic variable for --for is a new name: one question with a recommendation, primitive ramp meanwhile", () => {
+  assert.match(addStep, /When none takes the colour, that is a new\s+name/);
+  assert.match(addStep, /one question with a recommendation/);
+  assert.match(addStep, /without\s+`--for`/);
+});

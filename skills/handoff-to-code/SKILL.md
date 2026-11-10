@@ -189,6 +189,9 @@ Verdicts, ranking, rulings and exit codes: `references/reuse-or-add.md`.
   --on <surface variable>` proposes the ramp in the system's own steps and the step each semantic colour
   uses per mode, with its contrast. You are fitting to existing ramps when `system-profile.md` lists
   colour ramps; with none, or when building a colour system from a brand palette, add `--from-scratch`.
+  `--for` takes a semantic variable the export already has. When none takes the colour, that is a new
+  name: it goes to the designer as one question with a recommendation, and meanwhile `ramp` runs without
+  `--for` and proposes the primitive ramp alone.
 - **Ask the name as one question:** generated name, or your own? Recommend keeping the generated one;
   `nameSource` says which was used.
 - **Stop for a yes** on `ramp-proposal.md` (the name, the ramp, the step mapping) before any write.
