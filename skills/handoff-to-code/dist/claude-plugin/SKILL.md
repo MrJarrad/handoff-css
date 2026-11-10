@@ -190,11 +190,17 @@ add only when nothing fits.** Write the needs as a list (`schema/resolve-need.v1
 Verdicts, ranking, rulings and exit codes: `references/reuse-or-add.md`.
 
 - `REUSE` closes the need: build that name. `RULED` closes it too: build the name in the ruling's `code`
-  (a `use` row); a `new` or `skip` row carries no name.
+  (a `use` row); a `skip` row carries no name, and a `new` row carries the approved name when it has one (below).
 - `SIBLING`, `MISMATCH`, `NEW_NAME`, `RULING_STALE` are **one question** to the designer, with a
-  recommendation. A new name is never yours to pick. A designer who declines the nearest name and wants
-  the colour added goes to `ramp` too. Record no `new` row for a need that goes to `ramp`: a standing row
-  makes `resolve` answer `RULED`, with no name, before and after the write, and it would never say `REUSE`.
+  recommendation. A new name is never yours to pick. A need that is only a name (no colour wanted) ends
+  there: on the designer's yes, record a `new` row with the name in `code`. `resolve` then says `RULED`
+  and the build keeps the raw value until the name exists. Once the designer has written the name into the
+  file, take a new export, `vendor` it and run `resolve` again: it says `REUSE`, and you bind only then.
+  `ramp` does not make a semantic name, so a name-only need never goes to it.
+  A designer who declines the nearest name and wants a colour the system lacks goes to `ramp` too, and
+  you ask for the anchor colour then. Record no `new` row for a need that goes to `ramp` alone: a standing
+  row makes `resolve` answer `RULED`, with no name, before and after the write, and it would never say
+  `REUSE`.
 - `NEW_RAMP` means no colour in the system is near: add a **whole ramp**, never a single raw colour.
   `handoff-css ramp --export <design-system-handoff>.json --anchor <#hex> --for <semantic variable>
   --on <surface variable>` proposes the ramp in the system's own steps and the step each semantic colour
@@ -210,6 +216,7 @@ Verdicts, ranking, rulings and exit codes: `references/reuse-or-add.md`.
   own instructions (worked case: `references/reuse-or-add.md`), read it back, then take a new export,
   `vendor` it, regenerate and run `resolve` again. With no `new` row standing for the need it now says
   `REUSE` and ranks the new name; bind only then. `RULED` instead means a row is still standing: remove it.
+  (A `new` row that names the variable is the exception: see above.)
 - Until a need is ruled, build the raw value as an `assumed-ask` row.
 
 `resolve` exits 2 when a need is open: the report is written, and it is a question, not a failure. `ramp`

@@ -14,7 +14,7 @@ the build holds. It never invents a name.
 | Verdict | Means | Your move |
 | --- | --- | --- |
 | `REUSE` | the name exists and holds the wanted value, or a name holds it exactly | build that name |
-| `RULED` | a ruling row settles it | build what the ruling says |
+| `RULED` | a ruling row settles it | build what the ruling says (a `new` row naming a variable the export has reads `REUSE`) |
 | `SIBLING` | no name asked; the nearest name is close but not the same | one question, the nearest as the recommendation |
 | `MISMATCH` | the name exists but holds another value | one question: use it, or change the value |
 | `NEW_NAME` | the name is not in the system; `bindTo` shows the existing value each mode could point at | one question, `bindTo` as the recommendation |
@@ -26,6 +26,11 @@ Every open need carries `fallback: raw-value, assumed-ask`. Exit `0`: all `REUSE
 Rulings use the table `match` reads, `| kind | figma | ruling | code | note |`, with kind `resolve-need`,
 `figma` the need id, and ruling `use` (existing name in `code`), `new` (the designer approved the name) or
 `skip`. Record the designer's answer to a name question there, and the next run reads it.
+
+A `new` row for a name-only need carries the approved name in `code`. While the export lacks that name the
+verdict is `RULED` (approved, not yet written; build the raw value as `assumed-ask`). When the export has it,
+the verdict is `REUSE`, the report keeps the `ruling`, and the name is bound. A `new` row with an empty
+`code` stays `RULED`. A colour need that goes to `ramp` gets no `new` row.
 
 ## Ramp
 

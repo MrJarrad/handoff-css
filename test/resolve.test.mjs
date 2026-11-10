@@ -259,3 +259,42 @@ test("colour tolerance: the same two lines hold in OKLab delta E x 100", async (
   assert.equal(far.verdict, "SIBLING");
   assert.equal((await d("C0")).verdict, "NEW_RAMP");
 });
+
+// ---- a name-only need closes: ask, record the name, write it, export again, REUSE ----------------------
+test("a name-only need: NEW_NAME, then RULED once the designer's name is recorded, then REUSE once the export has it", async () => {
+  const name = "Ink/danger";
+  const need = [{ id: "danger-ink", name }];
+  const row = table(`| resolve-need | danger-ink | new | ${name} | designer approved |`);
+  const before = await resolve(syntheticFile(), need);
+  assert.equal(before.code, 2, before.err);
+  assert.equal(before.rep.needs[0].verdict, "NEW_NAME");
+
+  // The designer's yes is recorded with the name; the file does not have it yet, so the build keeps the raw value.
+  const approved = await resolve(syntheticFile(), need, row);
+  assert.equal(approved.code, 0, approved.err);
+  assert.equal(approved.rep.needs[0].verdict, "RULED");
+
+  // A ramp adds primitives and a mapping for names the export has; it never makes this name.
+  const dir = mkdtempSync(path.join(tmpdir(), "ramp-"));
+  const ramped = await run(["ramp", "--export", syntheticFile(), "--anchor", "#14d7fb", "--name", "Sky", "--for", "Ink/main", "--on", "Surface/main", "--out", dir], dir);
+  assert.notEqual(ramped.code, 1, ramped.err);
+  const stillRuled = await resolve(syntheticFile(), need, row);
+  assert.equal(stillRuled.rep.needs[0].verdict, "RULED");
+
+  // The designer writes the name; a new export has it. The need is now REUSE, with the ruling kept, and closed.
+  const written = editedFile((doc) => {
+    const ink = doc.collections[1].variables.find((v) => v.name === "Ink/main");
+    doc.collections[1].variables.push({ ...structuredClone(ink), id: "added-danger", name });
+  });
+  const after = await resolve(written, need, row);
+  assert.equal(after.code, 0, after.err);
+  assert.equal(after.rep.needs[0].verdict, "REUSE");
+  assert.equal(after.rep.needs[0].open, false);
+  assert.equal(after.rep.needs[0].ruling.code, name);
+  assert.equal(after.rep.needs[0].fallback, undefined);
+  assert.equal(report(after.rep), true, JSON.stringify(report.errors));
+
+  // An empty code stays RULED: nothing to look for in the export.
+  const bare = await resolve(written, need, table("| resolve-need | danger-ink | new |  | designer approved |"));
+  assert.equal(bare.rep.needs[0].verdict, "RULED");
+});

@@ -116,3 +116,13 @@ test("no existing semantic variable for --for is a new name: one question with a
   assert.match(addStep, /one question with a recommendation/);
   assert.match(addStep, /without\s+`--for`/);
 });
+
+test("a name-only need has one way to close, and the text and the reference say the same", () => {
+  assert.match(addStep, /only a name/i);
+  assert.match(addStep, /`new` row with the name in `code`/);
+  assert.match(addStep, /`ramp` does not make a semantic name/);
+  assert.match(addStep, /ask for the anchor colour/i);
+  assert.match(addStep, /Record no `new` row for a need that goes to `ramp` alone/);
+  assert.match(ref, /carries the approved name in `code`/);
+  assert.doesNotMatch(addStep + ref, /`new` or `skip` row carries no name/);
+});
