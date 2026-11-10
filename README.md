@@ -431,7 +431,7 @@ skills/handoff-to-code/SKILL.md      # or copy it into .claude/skills/ / your ag
 
 ## Library use, the validation and conformance entries
 
-The package publishes `.` (plus `./schema`, `./schema/export` and a house preset under `./presets/`) and
+The package publishes `.` (plus `./schema`, `./schema/export`, `./color-engine` and a house preset under `./presets/`) and
 nothing else, so everything importable comes from the one entry:
 
 ```js
@@ -446,6 +446,42 @@ import schema from "handoff-css/schema/export" with { type: "json" };
 ```
 
 Every one of them is pure: text or parsed documents in, findings out.
+
+## Color engine
+
+`handoff-css/color-engine` builds full primitive colour ramps when nothing in a design system fits. It
+is pure (colours in, ramps out) and works in OKLCH.
+
+```js
+import { ramp, mergeVerdict, fitToSystem, nameColor, auditRamp, DEFAULTS } from "handoff-css/color-engine";
+
+// An existing system: take its step scale, its ramps' ends and its own limits.
+const system = fitToSystem([{ name: "sky", steps: [{ step: 50, hex: "#e9faff" }, /* … */] }, /* … */]);
+
+// One seed, or several anchors merged into one ramp. An anchor with no step is placed for you.
+const r = ramp({ anchors: [{ hex: "#14d7fb", step: 300 }, { hex: "#2b67b9", step: 700 }], steps: system.steps, lightness: system.lightness });
+// r.steps: [{ step, hex }, …], each anchor marked anchor: true
+// r.placement: where each anchor sits; r.audit: lightness per step, evenness, hue drift
+
+// Does merging make sense? merge is true only when the ramp gets darker at every step and is no less
+// even and no more hue-drifting than the system's own ramps; reasons[] says what passed and failed.
+const { merge, reasons } = mergeVerdict({ anchors: [{ hex: "#14d7fb" }, { hex: "#2b67b9" }], system });
+
+// A name, only when asked for one; names the system already uses can be passed over.
+nameColor("#14d7fb", { exclude: ["Bright Turquoise"] }); // { name, slug, hex, distance, exact }
+```
+
+| Entry | What it does |
+| --- | --- |
+| `ramp({ anchors, steps?, lightness? })` | A ramp through one anchor or several, on any step scale (100–900, 50–950, 1–12). Each anchor's hex is kept exactly at its step. `lightness: { min, max }` sets the OKLCH lightness of the darkest and lightest step. |
+| `fitToSystem(ramps)` | The step scale most of the system's ramps use, the median lightness of their darkest and lightest steps, and the widest evenness and hue drift among them. |
+| `mergeVerdict({ anchors, steps?, system? })` | `{ merge, reasons, ramp }`. Lightness, evenness and hue drift decide; the pairing rule (one hue within 10°, at least two steps apart, neutrals only with neutrals of the same temperature) is reported but does not decide. |
+| `nameColor(hex, { exclude? })` | The nearest name on the Name that Color list. |
+| `auditRamp(steps)` | Lightness drop per step, evenness (spread of those drops, 0 = even) and hue drift (smallest arc of the wheel holding every hue with chroma above 0.05). |
+| `DEFAULTS` | A new system with nothing to fit: steps 100–900, darkest step at L 0.30, lightest step as light as the hue allows. With no system, `mergeVerdict` allows evenness up to 0.0319 (the widest the default ramps make) and hue drift up to 50°. |
+
+The colour names are Name that Color by Chirag Mehta, under Creative Commons Attribution 2.5; see
+`src/color-engine/THIRD-PARTY-NOTICES.md`. Everything else is MIT.
 
 ## Guarantees
 

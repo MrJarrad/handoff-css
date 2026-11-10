@@ -16,6 +16,12 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Added
 
+- `handoff-css/color-engine`: full primitive colour ramps for a system that has none that fit. `ramp` (one seed or several
+  anchors merged, any step scale, anchors kept exact), `fitToSystem` (the system's scale, its ramps' median ends, its
+  widest evenness and hue drift), `mergeVerdict` (lightness, evenness and hue drift decide; the pairing rule is a
+  reason, not a veto), `nameColor` (Name that Color list, CC BY 2.5, opt-in), `auditRamp`, `DEFAULTS`. Ramp generation is
+  a port checked string for string against 10,411 recorded cases (`test/color-engine-parity.test.mjs`). New dependency:
+  culori 4.0.2 (MIT), pinned exactly.
 - `themes.variants` (P10b): a total theme can hand one sibling to a variant theme, e.g. `{ bttf: { dark: "bttf-dark" } }` emits
   `.bttf-dark, .bttf .dark, .bttf.dark` and `bttf` stops claiming `dark`. Optional; output without it is byte-identical.
   `test/theme-variants.test.mjs`.
