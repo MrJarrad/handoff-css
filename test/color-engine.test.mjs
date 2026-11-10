@@ -90,3 +90,77 @@ test("hue drift is measured round the wheel, so reds either side of 0° are clos
   assert.equal(a.hueDrift, 24.5);
   assert.equal(engine.auditRamp, auditRamp);
 });
+
+// ── mergeVerdict ────────────────────────────────────────────────────────────────────────────────────
+const { mergeVerdict } = engine;
+const byCheck = (v) => Object.fromEntries(v.reasons.map((r) => [r.check, r]));
+// A system whose own ramps reach evenness 0.0445 and a hue spread of 49.6°.
+const SYSTEM = { steps: FIFTY, lightness: { min: 0.282, max: 0.979 }, evenness: { max: 0.0445 }, hueDrift: { max: 49.6 } };
+
+test("the approved cyan + blue ramp is a merge, in the system and from scratch", () => {
+  const anchors = [{ hex: "#14d7fb", step: 300 }, { hex: "#2b67b9", step: 700 }];
+  for (const v of [mergeVerdict({ anchors, steps: FIFTY }), mergeVerdict({ anchors, system: SYSTEM })]) {
+    assert.equal(v.merge, true);
+    const c = byCheck(v);
+    assert.equal(c.lightness.pass, true);
+    assert.equal(c.evenness.pass, true);
+    assert.equal(c["hue drift"].pass, true);
+    // The pairing rule (hues within 10°) fails and is reported, but does not decide.
+    assert.equal(c.pairing.pass, false);
+    assert.equal(c.pairing.veto, false);
+    assert.match(c.pairing.text, /41\.3° apart/);
+  }
+});
+
+test("the system's own limits set the bar", () => {
+  const anchors = [{ hex: "#14d7fb", step: 300 }, { hex: "#2b67b9", step: 700 }];
+  const tight = mergeVerdict({ anchors, system: { ...SYSTEM, hueDrift: { max: 30 } } });
+  assert.equal(tight.merge, false);
+  assert.equal(byCheck(tight)["hue drift"].pass, false);
+  assert.match(byCheck(tight)["hue drift"].text, /> 30°/);
+  const uneven = mergeVerdict({ anchors, system: { ...SYSTEM, evenness: { max: 0.01 } } });
+  assert.equal(uneven.merge, false);
+  assert.equal(byCheck(uneven).evenness.pass, false);
+});
+
+test("two unrelated hues are not one ramp", () => {
+  const v = mergeVerdict({ anchors: [{ hex: "#14d7fb" }, { hex: "#a33001" }], steps: FIFTY });
+  assert.equal(v.merge, false);
+  assert.equal(byCheck(v)["hue drift"].pass, false);
+});
+
+test("one hue, light and dark, is one ramp and passes the pairing rule too", () => {
+  const v = mergeVerdict({ anchors: [{ hex: "#aecdf9" }, { hex: "#2b67b9" }], steps: FIFTY });
+  assert.equal(v.merge, true);
+  assert.equal(byCheck(v).pairing.pass, true);
+});
+
+test("the pairing rule's other reasons are named: steps too close, neutral with a colour, warm with cool", () => {
+  const close = mergeVerdict({ anchors: [{ hex: "#2b67b9", step: 600 }, { hex: "#1f5aa8", step: 700 }], steps: HUND });
+  assert.match(byCheck(close).pairing.text, /1 step apart/);
+  const mixed = mergeVerdict({ anchors: [{ hex: "#efefef", step: 100 }, { hex: "#2b67b9", step: 700 }], steps: HUND });
+  assert.match(byCheck(mixed).pairing.text, /near-neutral with a colour/);
+  const temp = mergeVerdict({ anchors: [{ hex: "#efece6", step: 100 }, { hex: "#4a4f57", step: 700 }], steps: HUND });
+  assert.match(byCheck(temp).pairing.text, /warm and cool/);
+});
+
+test("a ramp that does not get darker step by step is never a merge", () => {
+  const v = mergeVerdict({ anchors: [{ hex: "#2b67b9", step: 200 }, { hex: "#aecdf9", step: 700 }], steps: HUND });
+  assert.equal(v.merge, false);
+  assert.equal(byCheck(v).lightness.pass, false);
+  assert.equal(byCheck(v).lightness.veto, true);
+});
+
+test("from scratch, the evenness bar is the widest spread the default ramps make", async () => {
+  const { DEFAULT_EVENNESS_MAX } = await import("../src/color-engine/merge.mjs");
+  const { oklchToHex, maxChroma } = await import("../src/color-engine/color.mjs");
+  let max = 0;
+  for (let h = 0; h < 360; h += 30) for (const l of [0.3, 0.45, 0.6, 0.75, 0.9]) for (const c of [0.02, 0.06, 0.12, 0.2]) {
+    max = Math.max(max, ramp({ anchors: [{ hex: oklchToHex({ l, c: Math.min(c, maxChroma(l, h)), h }) }] }).audit.evenness);
+  }
+  assert.equal(DEFAULT_EVENNESS_MAX, max);
+});
+
+test("mergeVerdict needs two anchors", () => {
+  assert.throws(() => mergeVerdict({ anchors: [{ hex: "#14d7fb" }] }), /two or more anchors/);
+});
