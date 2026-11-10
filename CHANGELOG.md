@@ -18,6 +18,7 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Added
 
+- HT-111 components/blocks: `handoff-css components` reads how a system builds its components (names, shared properties, nesting depth, token collections bound) from layer exports into `component-profile.json/.md` (`schema/component-profile.v1.schema.json`), counting components "seen of an unknown total", and `components --need` resolves a component or block need to `REUSE`, `REUSE_WITH_PROP`, `PROP_GAP`, `SIBLING`, `COMPOSE`, `NEW_COMPONENT` or a ruling (`schema/resolve-component-need.v1.schema.json`, rulings kind `resolve-component`). Skill step 3c and `references/reuse-or-add.md` § Components. `test/component-profile.test.mjs` over a flat and a tiered synthetic system and the JHD export.
 - `handoff-css ramp` (HT-112): for a colour nothing in the system holds, proposes a whole primitive ramp in the system's own
   steps and naming (fitted to its ramps, or the engine's defaults), with a generated or caller-given name, and the step each
   named semantic colour uses in each mode and why. Writes `ramp-proposal.json` (patch, `schema/ramp-proposal.v1.schema.json`)

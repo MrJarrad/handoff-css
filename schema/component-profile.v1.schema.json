@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://handoff-css/schema/component-profile.v1.schema.json",
+  "title": "Component profile",
+  "description": "How a design system builds its components and blocks, observed in the layer export(s) that use them. Facts only: a tier or a gap is never a verdict, and the count is of components seen, never of the library. Closed: a field the generator does not write is an error.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["componentProfileVersion", "source", "coverage", "naming", "propertyModel", "composition", "tokenBinding", "components"],
+  "$defs": {
+    "counts": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } }
+  },
+  "properties": {
+    "componentProfileVersion": { "const": 1 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["documents"],
+      "properties": {
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["documentName", "contentHash"],
+            "properties": { "documentName": { "type": ["string", "null"] }, "contentHash": { "type": ["string", "null"] } }
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seen", "defined", "instanceOnly", "total", "note"],
+      "properties": {
+        "seen": { "type": "integer", "minimum": 0 },
+        "defined": { "type": "integer", "minimum": 0 },
+        "instanceOnly": { "type": "integer", "minimum": 0 },
+        "total": { "const": "unknown" },
+        "note": { "type": "string" }
+      }
+    },
+    "naming": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["private", "separator", "depths", "leafCase", "categoryPrefixes", "flat"],
+      "properties": {
+        "private": { "type": "integer", "minimum": 0 },
+        "separator": { "type": ["string", "null"] },
+        "depths": { "$ref": "#/$defs/counts" },
+        "leafCase": { "$ref": "#/$defs/counts" },
+        "categoryPrefixes": { "$ref": "#/$defs/counts" },
+        "flat": { "type": "boolean" }
+      }
+    },
+    "propertyModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["byType", "axes"],
+      "properties": {
+        "byType": { "$ref": "#/$defs/counts" },
+        "axes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "components", "types", "values"],
+            "properties": {
+              "name": { "type": "string" },
+              "components": { "type": "integer", "minimum": 1 },
+              "types": { "$ref": "#/$defs/counts" },
+              "values": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tiers", "note"],
+      "properties": {
+        "tiers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["tier", "components"],
+            "properties": { "tier": { "type": "integer", "minimum": 0 }, "components": { "type": "array", "items": { "type": "string" } } }
+          }
+        },
+        "note": { "type": "string" }
+      }
+    },
+    "tokenBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["byCollection"],
+      "properties": { "byCollection": { "$ref": "#/$defs/counts" } }
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "kind", "defined", "files", "placed", "properties", "nests", "usedInsideOtherComponents", "tier", "tokenGroups"],
+        "properties": {
+          "name": { "type": "string" },
+          "kind": { "enum": ["set", "component", "instance-only"] },
+          "defined": { "type": "boolean" },
+          "files": { "type": "array", "items": { "type": "string" } },
+          "placed": { "type": "integer", "minimum": 0 },
+          "properties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "type", "default", "options", "from"],
+              "properties": {
+                "name": { "type": "string" },
+                "type": { "type": "string" },
+                "default": {},
+                "options": { "type": ["array", "null"], "items": {} },
+                "from": { "enum": ["definition", "instances"] }
+              }
+            }
+          },
+          "nests": { "$ref": "#/$defs/counts" },
+          "usedInsideOtherComponents": { "type": "integer", "minimum": 0 },
+          "tier": { "type": "integer", "minimum": 0 },
+          "tokenGroups": { "$ref": "#/$defs/counts" }
+        }
+      }
+    }
+  }
+}

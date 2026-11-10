@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://handoff-css/schema/resolve-component-need.v1.schema.json",
+  "title": "Component need",
+  "description": "What a build needs from the system's components and blocks. At least one of name or wants. wants.props maps a property name to the value the build sets; wants.children lists the component names a composition is made of. Closed.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id"],
+    "anyOf": [{ "required": ["name"] }, { "required": ["wants"] }],
+    "properties": {
+      "id": { "type": "string", "minLength": 1 },
+      "name": { "type": "string", "minLength": 1 },
+      "wants": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "props": { "type": "object", "additionalProperties": { "type": ["string", "number", "boolean"] } },
+          "children": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+        }
+      }
+    }
+  }
+}

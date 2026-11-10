@@ -15,7 +15,7 @@ const main = readFileSync(path.join(skill, "SKILL.md"), "utf8");
 const ref = readFileSync(path.join(skill, "references", "reuse-or-add.md"), "utf8");
 const section = (from, to) => main.slice(main.indexOf(from), main.indexOf(to));
 const profileStep = section("### 2b.", "### 3.");
-const addStep = section("### 3b.", "### 4.");
+const addStep = section("### 3b.", "### 3c.");
 const resolveSrc = readFileSync(path.join(root, "src", "resolve-need.mjs"), "utf8");
 
 test("1: the system is profiled first and the profile is kept beside the work", () => {
@@ -125,4 +125,18 @@ test("a name-only need has one way to close, and the text and the reference say 
   assert.match(addStep, /Record no `new` row for a need that goes to `ramp` alone/);
   assert.match(ref, /carries the approved name in `code`/);
   assert.doesNotMatch(addStep + ref, /`new` or `skip` row carries no name/);
+});
+
+test("components: the skill reuses a component first, asks before adding one, and states the inventory limit", () => {
+  const step = section("### 3c.", "### 4.");
+  assert.match(step, /handoff-css components --export/);
+  assert.match(step, /--need/);
+  assert.match(step, /unknown\s+total/);
+  assert.match(step, /Reuse first; add only when nothing fits/);
+  assert.match(step, /never fork it/);
+  assert.match(step, /one question/);
+  assert.match(step, /assumed-ask/);
+  assert.match(ref, /## Components/);
+  for (const v of ["REUSE_WITH_PROP", "PROP_GAP", "COMPOSE", "NEW_COMPONENT"]) assert.match(ref, new RegExp(`\`${v}\``));
+  assert.match(ref, /resolve-component/);
 });

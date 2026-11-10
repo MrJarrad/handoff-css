@@ -226,6 +226,35 @@ Design System Handoff export (brownfield), `match` above is the path.
 
 **Done when** every need is `REUSE` or `RULED`, or is one open question with its fallback row.
 
+### 3c. A component or block that may already exist — reuse, then add
+
+Before building a component or block the pair names (or one the layout needs), find out whether the system
+already has it and how it builds such things. **Reuse first; add only when nothing fits.** No system is assumed:
+what a component is called, how names are grouped, which properties it carries and how deeply components nest
+are read from the exports, never from memory of another system.
+
+1. `handoff-css components --export <design-handoff>.json [--export …]` writes `component-profile.md`: the
+   components seen (a layer export lists only the components its layers use, so the count is "N of an unknown
+   total"), how they are named, the properties they share, how deep they nest, and which token collections they
+   bind. Keep it beside the work. Facts only; a tier or a gap is never a verdict.
+2. Write each component or block the build needs as a list (`schema/resolve-component-need.v1.schema.json`) and
+   run `handoff-css components --export … --need <needs.json> [--rulings <md>]`. Verdicts and the rulings table:
+   `references/reuse-or-add.md` § Components.
+3. `REUSE` and `REUSE_WITH_PROP` close the need: build the component as it is, setting only the properties the
+   report lists. `RULED` closes it too. `PROP_GAP`, `SIBLING`, `COMPOSE`, `NEW_COMPONENT` and `RULING_STALE`
+   are **one question** to the designer with a recommendation; a component is never added to the design file,
+   and a new one never enters the code, on your own call. A missing property value is `PROP_GAP`: extend the
+   component the system has, never fork it. `COMPOSE` builds from the existing parts and asks whether the
+   composition becomes a named block.
+4. On the designer's yes to a new component, record a `new` row, build it following the naming, property and
+   tier pattern the report quotes, and add it to the code where the system's other components live.
+5. Until a need is ruled, build a local, unexported component and mark it `assumed-ask`.
+
+`components --need` exits 2 while a need is open: the report is written, and it is a question, not a failure.
+
+**Done when** every component need is `REUSE`, `REUSE_WITH_PROP` or `RULED`, or is one open question with its
+fallback.
+
 ### 4. Implement against tokens only, with the Build standards as the mechanism rules
 
 The **Build standards** are the mechanism, not style advice. A right number produced by the
