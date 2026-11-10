@@ -6,6 +6,7 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Fixed
 
+- `resolve`: a `*` want binds a new name only to a candidate holding the value in every mode (it used the first mode); the 0.5 and 5 tolerances are in the README and tested either side, with `SIBLING`; the no-house-names test now bans quoted `light`/`dark`/`core`/`palette` and has no exemption.
 - `system-profile.v1.schema.json` is closed (`additionalProperties: false`) with types on `source`, `ends`, `detectedBy`; the no-house-names test covers every file in `src/`; the synthetic test export passes `assertValidExport`.
 - HT-109: `hsl()`/`oklch()` hues written in `turn`, `rad` or `grad` were read as degrees (a wrong colour, not reported
   unreadable). They are converted; an unknown hue unit drops the colour. `test/raw-values.test.mjs`.

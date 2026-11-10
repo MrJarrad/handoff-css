@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
 
 import { dispatch } from "../src/cli.mjs";
-import { synthetic } from "./synthetic-export.mjs";
+import { synthetic, variable, cell } from "./synthetic-export.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jhdGz = path.join(root, "fixtures", "jhd-v19-2026-10-29", "design-system-handoff.json.gz");
@@ -170,4 +170,92 @@ test("a family of two groups is only an observation: it shows in the candidates'
   assert.equal(need.verdict, "NEW_NAME");
   assert.doesNotMatch(need.findings[0].message, /sibling gap/);
   assert.ok(need.candidates.some((c) => c.evidence.some((e) => e.from === "siblingObservations")));
+});
+
+// ---- "every mode" for `*` ---------------------------------------------------------------------------
+/** The synthetic export written to a fresh file, after `edit(doc)`. */
+function editedFile(edit) {
+  const doc = synthetic();
+  edit(doc);
+  const file = path.join(mkdtempSync(path.join(tmpdir(), "synthetic-")), "edited.json");
+  writeFileSync(file, JSON.stringify(doc));
+  return file;
+}
+const dropHues = (doc) => { doc.collections[0].variables = doc.collections[0].variables.filter((v) => !v.name.startsWith("Hue/")); };
+
+test("`*` wants the value in every mode of a candidate: a name that holds it in one mode only is no bind target", async () => {
+  // Day holds #002828 in Surface/main, Night does not. With the hue primitives gone nothing holds it, or sits near it, in both.
+  const file = editedFile(dropHues);
+  const named = await resolve(file, [{ id: "n", name: "Ink/danger", wants: { "*": "#002828FF" } }]);
+  assert.equal(named.rep.needs[0].verdict, "NEW_RAMP");
+  assert.equal(named.rep.needs[0].bindTo, undefined);
+  // The value-only path measures every mode too, so it agrees.
+  const byValue = await resolve(file, [{ id: "v", group: "Surface", wants: { "*": "#002828FF" } }]);
+  assert.equal(byValue.rep.needs[0].verdict, "NEW_RAMP");
+  // A per-mode ask is still met by the one mode.
+  const perMode = await resolve(file, [{ id: "p", name: "Ink/danger", wants: { Day: "#002828FF" } }]);
+  assert.equal(perMode.rep.needs[0].verdict, "NEW_NAME");
+  assert.ok(perMode.rep.needs[0].bindTo.Day.name);
+});
+
+test("`*` binds to a name that holds the value in every mode", async () => {
+  const r = await resolve(syntheticFile(), [{ id: "n", name: "Ink/danger", wants: { "*": "#002828FF" } }]);
+  assert.equal(r.rep.needs[0].verdict, "NEW_NAME");
+  assert.equal(r.rep.needs[0].bindTo["*"].name, "Hue/Teal/20");
+});
+
+// ---- tolerances: SAME 0.5, NEAR 5, tested either side --------------------------------------------------
+// One FLOAT of 1000 so the distance is a clean percentage: |a-b| / max(|a|,|b|,1) x 100, rounded to 2 places.
+const big = (extra) => editedFile((doc) => { doc.collections[0].variables.push(variable("Size/huge", "FLOAT", [{ ...cell("f1", 1000), modeName: "base" }])); extra?.(doc); });
+const byValue = async (file, n) => (await resolve(file, [{ id: "w", wants: { "*": n } }])).rep.needs[0];
+
+test("SAME is 0.5: a value 0.5% off is the same value (REUSE), 0.6% off is only a sibling", async () => {
+  const file = big();
+  const at = await byValue(file, 1005); // 5/1005 = 0.4975 -> 0.5
+  assert.equal(at.candidates[0].name, "Size/huge");
+  assert.equal(at.candidates[0].distance, 0.5);
+  assert.equal(at.verdict, "REUSE");
+  const over = await byValue(file, 1006); // 0.5964 -> 0.6
+  assert.equal(over.candidates[0].distance, 0.6);
+  assert.equal(over.verdict, "SIBLING");
+});
+
+test("NEAR is 5: 4.94 off is still a sibling, 5.03 off is NEW_RAMP", async () => {
+  const file = big();
+  const at = await byValue(file, 1052); // 52/1052 = 4.94
+  assert.equal(at.candidates[0].distance, 4.94);
+  assert.equal(at.verdict, "SIBLING");
+  const over = await byValue(file, 1053); // 53/1053 = 5.03
+  assert.equal(over.verdict, "NEW_RAMP");
+});
+
+test("SIBLING: the nearest name within tolerance is offered once, open, with the fallback", async () => {
+  const need = await byValue(big(), 1030);
+  assert.equal(need.verdict, "SIBLING");
+  assert.equal(need.open, true);
+  assert.equal(need.candidates[0].name, "Size/huge");
+  assert.equal(need.findings[0].code, "SIBLING");
+  assert.match(need.findings[0].message, /Size\/huge is the nearest \(distance 2\.91\)/);
+  assert.deepEqual(need.fallback, { kind: "raw-value", status: "assumed-ask", values: { "*": 1030 } });
+});
+
+test("REUSE with a name asked uses the same 0.5 line: 0.5 off reuses, 0.6 off is a MISMATCH", async () => {
+  const file = big();
+  const verdict = async (n) => (await resolve(file, [{ id: "w", name: "Size/huge", wants: { "*": n } }])).rep.needs[0].verdict;
+  assert.equal(await verdict(1005), "REUSE");
+  assert.equal(await verdict(1006), "MISMATCH");
+});
+
+test("colour tolerance: the same two lines hold in OKLab delta E x 100", async () => {
+  // Grey steps of one 8-bit unit differ by about 0.38 delta E x 100 near mid-grey; four units by about 1.5.
+  const grey = (h) => `#${h}${h}${h}FF`;
+  const file = editedFile((doc) => doc.collections[0].variables.push(variable("Grey/mid", "COLOR", [{ ...cell("f1", grey("80"), grey("80")), modeName: "base" }])));
+  const d = async (h) => (await resolve(file, [{ id: "c", wants: { "*": grey(h) } }])).rep.needs[0];
+  const one = await d("81");
+  assert.ok(one.candidates[0].distance <= 0.5 && one.candidates[0].distance > 0, String(one.candidates[0].distance));
+  assert.equal(one.verdict, "REUSE");
+  const far = await d("8C");
+  assert.ok(far.candidates[0].distance > 0.5 && far.candidates[0].distance <= 5, String(far.candidates[0].distance));
+  assert.equal(far.verdict, "SIBLING");
+  assert.equal((await d("C0")).verdict, "NEW_RAMP");
 });

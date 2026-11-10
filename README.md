@@ -404,6 +404,12 @@ percentage difference) and `evidence` naming the profile fact it came from, then
 | `RULED` | a ruling row settles it | no |
 | `RULING_STALE` | a `use` ruling names something the export does not have | yes |
 
+Two tolerances decide the verdicts, on the `distance` above and the worst mode (a `*` want must hold in every mode of
+a candidate). **Same**: a distance of **0.5 or less** is the same value (colour ΔE×100 plus alpha; numbers as a percent);
+this is also `REUSE`'s line, whether or not a name is asked, so 0.5 reuses and anything over it is a `SIBLING` (no name)
+or a `MISMATCH` (name asked). **Near**: a distance of **5 or less** is close enough to rank, to be offered as a `SIBLING`
+and to be a `bindTo` target; over 5 is `NEW_RAMP`. Both edges are tested on either side (`test/resolve.test.mjs`).
+
 Ranking, in order: the exact name; a sibling in the asked group (a name in a `siblingGaps` family is cited as
 evidence); the smaller distance (worst mode, then sum); semantic before primitive; name text. Every open need carries
 `fallback: raw-value, assumed-ask`: build the raw value and say so until it is ruled. `siblingObservations` appear in a
