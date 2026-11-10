@@ -30,7 +30,8 @@ Rulings use the table `match` reads, `| kind | figma | ruling | code | note |`, 
 A `new` row for a name-only need carries the approved name in `code`. While the export lacks that name the
 verdict is `RULED` (approved, not yet written; build the raw value as `assumed-ask`). When the export has it,
 the verdict is `REUSE`, the report keeps the `ruling`, and the name is bound. A `new` row with an empty
-`code` stays `RULED`. A colour need that goes to `ramp` gets no `new` row.
+`code` stays `RULED`. So does a `new` row whose `code` names a variable of another kind, or a different name
+from the one the need asked for; the report says which, and a `use` row binds a name the designer chose instead. A colour need that goes to `ramp` gets no `new` row.
 
 ## Ramp
 
