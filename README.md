@@ -232,6 +232,9 @@ handoff-css conform --export <json> --handoff <md> --tokens <css>
 
 handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--json]
 
+handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch]
+                 [--for <semantic>[@step]… --on <surface>… [--use text|large-text|ui] [--keep-anchor]] [--out <dir>] [--json]
+
 handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 ```
 
@@ -421,6 +424,48 @@ Exit codes: `0` every need is `REUSE` or `RULED`; `2` at least one need is open 
 `1` a usage or input error (nothing written). The report is a function of the export, the needs and the rulings, so a
 rerun is byte-identical (`test/resolve.test.mjs`).
 
+### `ramp` — a whole new ramp, and which step each colour uses
+
+`handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch] [--for <semantic>[@step]… --on <surface>… [--use text|large-text|ui] [--keep-anchor]] [--out <dir>] [--json]`
+is for the case `resolve` reports as `NEW_RAMP`: nothing in the system holds the colour. It proposes a **whole primitive ramp**
+(never one colour) and writes `ramp-proposal.json` (a patch, `schema/ramp-proposal.v1.schema.json`) and
+`ramp-proposal.md`. It writes nothing into Figma: an agent (after a yes) or the designer applies the patch there, then the
+export is taken again and `profile`/`resolve` see the new ramp.
+
+- **The system's own steps and naming.** Steps, the dark and light ends, and the evenness and hue-drift limits come from
+  `fitToSystem` over the system's colour ramps; the collection, parent group and web-name pattern come from those ramps'
+  variables. A system with no colour ramps, or `--from-scratch`, gets the engine's defaults (100–900, darkest step at L 0.30).
+  Nothing is assumed about a house: no collection, mode, step or group name is written in the code.
+- **Anchors.** `--anchor` repeats; `#hex@step` pins a colour to a step and it is kept exactly there. Several anchors are
+  merged into one ramp when `mergeVerdict` says they make sense as one; if not, the proposal is one ramp per anchor.
+- **The name** is yours (`--name`) or generated (Name that Color, skipping names the system already uses for a ramp).
+  Neither is forced: a generated name is printed with a question ("keep it, or give your own?") and `nameSource` says which.
+- **Semantic colours.** `--for <variable>[@step]` names a semantic colour; `--on <variable>` names the surface(s) it is read
+  on (several: it must pass on all of them). Nothing is inferred from names. For each mode of the semantic's collection the
+  report gives the step, the contrast ratio on the surface, and why. The start step is the `@step`, else the lowest anchor
+  step. The collection's default mode keeps the start step if it passes, else the nearest step that does. A mode whose
+  surface is darker than the default mode's by more than 0.15 OKLCH L is mapped by mirroring the start step by lightness,
+  then the nearest passing step if the mirror fails; `--keep-anchor` keeps an anchor step across modes instead when it
+  passes there. A step used that clears 4.5 by more than 0.5 is eased back toward 4.5 (never an anchor; see the helpers).
+  `--use` picks the floor: `text` 4.5 (default), `large-text` and `ui` 3.
+- **Exit codes.** `0` every mapping has a passing step; `2` at least one has none (written, and named in the report);
+  `1` a usage or input error (nothing written). A run is deterministic.
+
+The mapping uses these color-engine helpers (`handoff-css/color-engine`), all pure and on any step scale:
+
+| Entry | What it does |
+| --- | --- |
+| `contrast(fg, bg)`, `grade(fg, bg, use?)` | WCAG 2.x ratio to two places; `{ ratio, pass, floor }` against AA 4.5 (`text`) or 3 (`large-text`, `ui`). |
+| `nearestPassingStep(ramp, from, surfaces, use?)` | The step nearest `from` that passes on **every** surface; a tie goes to the lower step number; `null` if none. |
+| `mirrorStep(ramp, lightStep)` | The step whose lightness mirrors the light step's across the ramp's own range (darkest + lightest − L), not the step number. A step the ramp lacks mirrors across the ends of the scale. |
+| `pullBack(ramp, step, surface, { anchor? })` | Eases an overshooting step toward 4.5: moves its lightness toward the surface to a hair past 4.5, within 0.05 L of where it was and 0.05 L from each neighbour so the ramp stays monotonic. `null` if it does not overshoot by more than 0.5, is an anchor, or has no room. |
+
+Open choices, because the helpers' origin is silent on them (each is tested, and changing one is a one-line decision):
+the mirrored-mode test (surface darker by 0.15 L); where a mapping starts when no `@step` is given (lowest anchor step);
+`--keep-anchor` being a flag rather than inferred from a name; the 3:1 floor for `large-text` and `ui` also standing in
+for the pull-back, which only runs for `text`; and eased-back steps being recorded on the ramp (`nudged.from`) rather than
+applied to a sibling.
+
 ### `vendor` — add a new export without overwriting the old one
 
 ```sh
@@ -507,7 +552,7 @@ Every one of them is pure: text or parsed documents in, findings out.
 is pure (colours in, ramps out) and works in OKLCH.
 
 ```js
-import { ramp, mergeVerdict, fitToSystem, nameColor, auditRamp, DEFAULTS } from "handoff-css/color-engine";
+import { ramp, mergeVerdict, fitToSystem, nameColor, auditRamp, DEFAULTS, grade, nearestPassingStep, mirrorStep, pullBack } from "handoff-css/color-engine";
 
 // An existing system: take its step scale, its ramps' ends and its own limits.
 const system = fitToSystem([{ name: "sky", steps: [{ step: 50, hex: "#e9faff" }, /* … */] }, /* … */]);

@@ -26,7 +26,8 @@
     "./schema/profile": "./schema/system-profile.v1.schema.json",
     "./schema/link-run": "./schema/design-handoff-link-run.v1.schema.json",
     "./schema/resolve-need": "./schema/resolve-need.v1.schema.json",
-    "./schema/resolve-report": "./schema/resolve-report.v1.schema.json"
+    "./schema/resolve-report": "./schema/resolve-report.v1.schema.json",
+    "./schema/ramp-proposal": "./schema/ramp-proposal.v1.schema.json"
   },
   "files": [
     "bin",

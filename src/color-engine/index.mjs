@@ -6,3 +6,5 @@ export { mergeVerdict } from "./merge.mjs";
 export { fitToSystem } from "./fit.mjs";
 export { nameColor } from "./name.mjs";
 export { auditRamp } from "./ramp.mjs";
+export { contrast, grade, AA } from "./wcag.mjs";
+export { nearestPassingStep, mirrorStep, pullBack, PULL } from "./map.mjs";
