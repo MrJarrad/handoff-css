@@ -12,55 +12,14 @@ import Ajv2020 from "ajv/dist/2020.js";
 
 import { dispatch } from "../src/cli.mjs";
 import { buildProfile, renderProfileMarkdown } from "../src/profile.mjs";
+import { assertValidExport } from "../src/validate-export.mjs";
+import { synthetic, variable, cell, collection } from "./synthetic-export.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const fixtureGz = path.join(root, "fixtures", "jhd-v19-2026-10-29", "design-system-handoff.json.gz");
 const jhd = () => JSON.parse(gunzipSync(readFileSync(fixtureGz)).toString("utf8"));
 const schema = JSON.parse(readFileSync(path.join(root, "schema", "system-profile.v1.schema.json"), "utf8"));
 const validate = new Ajv2020({ strict: false }).compile(schema);
-
-// ---- synthetic, non-JHD export -------------------------------------------------------------
-let n = 0;
-const variable = (name, type, modes, extra = {}) => {
-  const id = `VariableID:s:${(n += 1)}`;
-  const parts = name.split("/");
-  return {
-    id, name, group: parts.slice(0, -1), leafName: parts.at(-1), type,
-    description: "", scopes: ["ALL_SCOPES"],
-    codeSyntax: { WEB: { value: `--${parts.join("-").toLowerCase()}`, source: "derived" } },
-    modes, ...extra,
-  };
-};
-const cell = (modeId, raw) => ({ modeId, raw });
-function synthetic() {
-  n = 0;
-  const base = [10, 20, 30, 40, 50, 60, 70, 80, 90].map((s) => variable(`Hue/Teal/${s}`, "COLOR", [cell("f1", `#00${(s + 20).toString(16).padStart(2, "0")}${(s + 20).toString(16).padStart(2, "0")}FF`)]));
-  const space = ["xxs", "xs", "sm", "md", "lg"].map((s, i) => variable(`Space/${s}`, "FLOAT", [cell("f1", 4 * (i + 1))]));
-  const idOf = (name) => [...base, ...space].find((v) => v.name === name).id;
-  const alias = (name) => ({ type: "VARIABLE_ALIAS", id: idOf(name) });
-  const roles = (group, skip) =>
-    ["main", "quiet", "accent", "danger"].filter((r) => r !== skip).map((r) =>
-      variable(`${group}/${r}`, "COLOR", [cell("d1", alias("Hue/Teal/20")), cell("n1", alias("Hue/Teal/80"))]));
-  const sem = [...roles("Surface"), ...roles("Ink", "danger"), ...roles("Edge")];
-  const bp = variable("Page/gutter", "FLOAT", [cell("b1", alias("Space/sm")), cell("b2", alias("Space/lg"))]);
-  const col = (name, modes, variables, defaultModeId) => ({ id: name, name, modes, defaultModeId, variables, hiddenFromPublishing: false });
-  return {
-    schema: "design-system-handoff", schemaVersion: 19, documentName: "Acme Kit", exportVersion: 3, contentHash: "abc",
-    collections: [
-      col("Foundations", [{ id: "f1", name: "base" }], [...base, ...space], "f1"),
-      col("Semantic", [{ id: "d1", name: "Day" }, { id: "n1", name: "Night" }], sem, "d1"),
-      col("Breakpoints", [{ id: "b1", name: "S" }, { id: "b2", name: "L" }], [bp], "b1"),
-    ],
-    mode: { collections: [
-      { collectionName: "Semantic", mappings: [
-        { modeId: "d1", modeName: "Day", isTheme: true, theme: "day", source: "theme-name", confidence: "high" },
-        { modeId: "n1", modeName: "Night", isTheme: true, theme: "night", source: "theme-name", confidence: "high" } ] },
-      { collectionName: "Breakpoints", mappings: [
-        { modeId: "b1", modeName: "S", isTheme: false, isResponsiveLayout: true, source: "explicit-name", confidence: "high" },
-        { modeId: "b2", modeName: "L", isTheme: false, isResponsiveLayout: false, source: "unresolved", confidence: "none" } ] },
-    ] },
-  };
-}
 
 test("synthetic system: layers come from the alias graph, not from collection names", () => {
   const p = buildProfile(synthetic());
@@ -109,11 +68,49 @@ test("the profile validates against its schema and is deterministic", () => {
   }
 });
 
-test("src/ names nothing of the house: no JHD token, collection or mode strings", () => {
+test("src/ names nothing of the house: no JHD token, collection or mode strings in any source file", () => {
   const src = path.join(root, "src");
   const banned = /\b(bttf|cod-grey|text-primitives|color-primitives|JHD)\b/;
-  const hits = readdirSync(src).filter((f) => /^profile.*\.mjs$/.test(f) && banned.test(readFileSync(path.join(src, f), "utf8")));
-  assert.deepEqual(hits, []);
+  // A comment in a file older than the profile names a collection once; this list only ever shrinks.
+  const legacy = new Set(["resolve.mjs"]);
+  const files = readdirSync(src).filter((f) => f.endsWith(".mjs") && !legacy.has(f));
+  assert.ok(files.includes("profile.mjs") && files.includes("resolve-need.mjs") && files.includes("resolve-cli.mjs"));
+  assert.deepEqual(files.filter((f) => banned.test(readFileSync(path.join(src, f), "utf8"))), []);
+});
+
+test("the synthetic export is schema-valid: it passes assertValidExport, as a real export would", () => {
+  assert.doesNotThrow(() => assertValidExport(synthetic()));
+});
+
+// ---- sibling thresholds: stated, and the edges are tested -----------------------------------------
+const family = (groups) => {
+  const cols = [collection("Sys", [{ id: "m", name: "base" }], Object.entries(groups).flatMap(([g, leaves]) => leaves.map((l) => variable(`${g}/${l}`, "COLOR", [cell("m", "#112233FF", "#112233FF")]))), "m")];
+  return { schema: "design-system-handoff", schemaVersion: 19, documentName: "Edge", exportVersion: 1, contentHash: "e", collections: cols };
+};
+
+test("sibling gap: three groups, a leaf in a strict majority and missing from one is a gap", () => {
+  const p = buildProfile(family({ "A/x": ["p", "q", "r"], "A/y": ["p", "q", "r"], "A/z": ["p", "q"] }));
+  assert.deepEqual(p.siblingGaps.map((g) => [g.group, g.lacks]), [["A/z", "r"]]);
+  assert.deepEqual(p.siblingObservations, []);
+});
+
+test("sibling edge: a family of two cannot outvote itself, so a difference is an observation, never a gap", () => {
+  const p = buildProfile(family({ "A/x": ["p", "q", "r"], "A/y": ["p", "q"] }));
+  assert.deepEqual(p.siblingGaps, []);
+  assert.deepEqual(p.siblingObservations, [{ collection: "Sys", family: "A/*", groups: ["A/x", "A/y"], onlyIn: { "A/x": ["r"], "A/y": [] } }]);
+  assert.match(renderProfileMarkdown(p), /`A\/x` only has `r`; `A\/y` only has nothing extra/);
+  assert.equal(buildProfile(family({ "A/x": ["p", "q"], "A/y": ["p", "q"] })).siblingObservations.length, 0, "two identical groups raise nothing");
+});
+
+test("sibling edge: a group sharing under half its leaves is left out of the family, with no gap and no observation", () => {
+  const p = buildProfile(family({ "A/x": ["p", "q", "r"], "A/y": ["p", "q", "r"], "A/z": ["u", "v", "w", "p"] }));
+  assert.deepEqual(p.siblingGaps, []);
+  assert.deepEqual(p.siblingObservations, []);
+});
+
+test("sibling edge: a leaf held by exactly half of a family is not a gap (needs a strict majority)", () => {
+  const p = buildProfile(family({ "A/w": ["p", "q", "r"], "A/x": ["p", "q", "r"], "A/y": ["p", "q"], "A/z": ["p", "q"] }));
+  assert.deepEqual(p.siblingGaps, []);
 });
 
 // ---- JHD v19 ---------------------------------------------------------------------------------

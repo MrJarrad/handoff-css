@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://handoff-css/schema/resolve-need.v1.schema.json",
+  "title": "Resolve needs",
+  "description": "What `handoff-css resolve --need` reads: what a build needs from the system. `kind` is open to later kinds (component, block); `wants` maps a mode name (or `*` for every mode) to a raw value.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id"],
+    "anyOf": [{ "required": ["name"] }, { "required": ["group"] }, { "required": ["wants"] }],
+    "properties": {
+      "id": { "type": "string", "minLength": 1 },
+      "kind": { "const": "token" },
+      "name": { "type": "string", "description": "The name the build would like, as the export writes it (slash-separated)." },
+      "collection": { "type": "string" },
+      "group": { "type": "string", "description": "The group path the need belongs under; defaults to the name's parent." },
+      "intent": { "type": "string" },
+      "wants": { "type": "object", "minProperties": 1, "additionalProperties": { "type": ["string", "number"] } }
+    }
+  }
+}

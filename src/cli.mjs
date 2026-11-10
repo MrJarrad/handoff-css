@@ -15,7 +15,7 @@ import { validateSet } from "./set.mjs";
 import { validateLinkRunJson } from "./link-run.mjs";
 import { zipTextFiles } from "./zip.mjs";
 
-export const SUBCOMMANDS = ["validate", "conform", "match", "vendor"];
+export const SUBCOMMANDS = ["validate", "conform", "match", "profile", "resolve", "vendor"];
 
 const USAGE = `handoff-css — Design Handoff export → CSS custom properties
 
@@ -26,6 +26,7 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
               [--config <mjs>] [--allow-name <name>…] [--json]
   handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--json]
   handoff-css profile --export <json|json.gz|zip> [--out <dir>] [--check]
+  handoff-css resolve --export <json|json.gz|zip> --need <needs.json> [--rulings <md>] [--out <dir>] [--json]
   handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 `;
 
@@ -47,6 +48,10 @@ export async function dispatch(argv, { cwd = process.cwd(), stdout = process.std
   if (first === "profile") {
     const { profileCommand } = await import("./profile-cli.mjs");
     return profileCommand(rest, { cwd, stdout, stderr });
+  }
+  if (first === "resolve") {
+    const { resolveCommand } = await import("./resolve-cli.mjs");
+    return resolveCommand(rest, { cwd, stdout, stderr });
   }
   if (first === "vendor") {
     const { vendorCommand } = await import("./vendor-cli.mjs");
