@@ -13,15 +13,25 @@ const USAGE = `handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@ste
 export const RAMP_FILES = { json: "ramp-proposal.json", md: "ramp-proposal.md" };
 /** Exit code when the proposal is complete / on a usage or input error / when a mapping has no passing step. */
 export const EXIT = { settled: 0, error: 1, open: 2 };
-const VALUE_FLAGS = ["--export", "--anchor", "--name", "--for", "--on", "--use", "--out"];
 
 export async function rampCommand(args, { cwd = process.cwd(), stdout = process.stdout, stderr = process.stderr } = {}) {
   const abs = (p) => (path.isAbsolute(p) ? p : path.join(cwd, p));
-  const all = (flag) => args.flatMap((a, i) => (a === flag && args[i + 1] !== undefined && !args[i + 1].startsWith("--") ? [args[i + 1]] : []));
-  const bad = args.find((a, i) => a.startsWith("--") && !VALUE_FLAGS.includes(a) && !["--from-scratch", "--keep-anchor", "--json"].includes(a));
+  const given = { "--export": [], "--anchor": [], "--name": [], "--for": [], "--on": [], "--use": [], "--out": [] };
+  const flags = new Set();
+  let complaint = null;
+  for (let i = 0; i < args.length && !complaint; i++) {
+    const a = args[i];
+    if (a in given) {
+      const v = args[i + 1];
+      if (v === undefined || v === "" || v.startsWith("--")) complaint = `${a} needs a value`;
+      else (given[a].push(v), i++);
+    } else if (["--from-scratch", "--keep-anchor", "--json"].includes(a)) flags.add(a);
+    else complaint = a.startsWith("--") ? `unknown flag ${a}` : `unexpected argument ${JSON.stringify(a)}`;
+  }
+  const all = (flag) => given[flag];
   const exportPath = all("--export")[0];
-  if (!exportPath || !all("--anchor").length || bad) {
-    stderr.write(USAGE);
+  if (complaint || !exportPath || !all("--anchor").length) {
+    stderr.write(`${complaint ? `ramp: ${complaint}\n` : ""}${USAGE}`);
     return EXIT.error;
   }
   try {
@@ -43,15 +53,15 @@ export async function rampCommand(args, { cwd = process.cwd(), stdout = process.
     if (docs.length !== 1) throw new Error(`${exportPath}: ${docs.length} exports; ramp reads exactly one`);
     assertValidExport(docs[0]);
     const proposal = proposeRamp({
-      doc: docs[0], anchors, name: all("--name")[0], fromScratch: args.includes("--from-scratch"),
-      forColours, on: all("--on"), use, keepAnchor: args.includes("--keep-anchor"),
+      doc: docs[0], anchors, name: all("--name")[0], fromScratch: flags.has("--from-scratch"),
+      forColours, on: all("--on"), use, keepAnchor: flags.has("--keep-anchor"),
     });
     const outDir = abs(all("--out")[0] ?? ".");
     mkdirSync(outDir, { recursive: true });
     const json = `${JSON.stringify(proposal, null, 2)}\n`;
     writeFileSync(path.join(outDir, RAMP_FILES.json), json);
     writeFileSync(path.join(outDir, RAMP_FILES.md), renderRampMarkdown(proposal));
-    if (args.includes("--json")) stdout.write(json);
+    if (flags.has("--json")) stdout.write(json);
     else {
       const r = proposal.ramps.map((x) => `${x.name} (${x.nameSource}, ${x.variables.length} steps)`).join(", ");
       stdout.write(`handoff-css (ramp): ${r}; ${proposal.mapping.length} mappings, ${proposal.open} open; wrote ${Object.values(RAMP_FILES).join(", ")} to ${outDir}; nothing written into Figma\n`);

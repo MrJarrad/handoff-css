@@ -12,7 +12,7 @@ import Ajv2020 from "ajv/dist/2020.js";
 
 import { dispatch } from "../src/cli.mjs";
 import { proposeRamp, renderRampMarkdown } from "../src/ramp.mjs";
-import { grade } from "../src/color-engine/index.mjs";
+import { grade, auditRamp } from "../src/color-engine/index.mjs";
 import { synthetic, variable, cell } from "./synthetic-export.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -244,4 +244,62 @@ test("CLI: a mapping no step can satisfy exits 2 and says which", async () => {
   });
   assert.equal(code, 2);
   assert.match(err.join(""), /2 mapping\(s\) have no passing step/);
+});
+
+// --- r1 ambers -------------------------------------------------------------------------------------------
+
+test("CLI (amber 1): a value flag with no value, an empty value or a stray positional exits 1 and writes nothing", async () => {
+  const A = ["--anchor", "#14d7fb"];
+  const cases = {
+    "--name then a flag": [...A, "--name", "--from-scratch"],
+    "--name last": [...A, "--name"],
+    "--name empty": [...A, "--name", ""],
+    "--anchor without value": [...A, "--anchor"],
+    "--anchor empty": [...A, "--anchor", ""],
+    "--out without value": [...A, "--out", "--json"],
+    "--use without value": [...A, "--use"],
+    "stray positional": [...A, "stray"],
+  };
+  for (const [what, args] of Object.entries(cases)) {
+    const r = await run(args);
+    assert.equal(r.code, 1, `${what}: exit ${r.code}`);
+    assert.deepEqual(readdirSync(r.dir), [], `${what}: wrote files`);
+    assert.match(r.err, /ramp:/, what);
+  }
+});
+
+test("CLI (amber 1): the strict parse leaves a good run alone, flags in any order", async () => {
+  const r = await run(["--name", "cyan", "--from-scratch", "--anchor", "#14d7fb", "--json"]);
+  assert.equal(r.code, 0, r.err);
+  assert.equal(JSON.parse(r.out).ramps[0].name, "cyan");
+});
+
+test("a name is one path segment and clashes with no group or ramp anywhere in the export (amber 2)", () => {
+  const ok = (name) => proposeRamp({ doc: jhd(), anchors: ANCHORS, name });
+  assert.throws(() => ok("a/b"), /one path segment/);
+  assert.throws(() => ok(""), /one path segment|empty/);
+  assert.throws(() => ok("   "), /one path segment|empty/);
+  assert.throws(() => ok("!!!"), /one path segment|empty/);
+  // a group that is not a ramp, and a ramp group of another collection
+  assert.throws(() => ok("background"), /already a group/); // a non-ramp group of the chosen collection's neighbour
+  assert.throws(() => ok("Palette"), /already a group/);
+  assert.throws(() => ok("aspect"), /already a group/); // a group of another collection
+  assert.equal(ok("glow").ramps[0].name, "glow");
+});
+
+test("alpha literals are not colours: an alpha scale is no colour ramp, so a system with only that gets the defaults (amber 3)", () => {
+  const doc = jhd();
+  doc.collections = doc.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !v.name.startsWith("color/palette/")) }));
+  const p = proposeRamp({ doc, anchors: [{ hex: "#14d7fb" }], name: "cyan" });
+  assert.equal(p.basis.kind, "defaults", p.basis.reason);
+  assert.deepEqual(p.basis.steps, [100, 200, 300, 400, 500, 600, 700, 800, 900]);
+});
+
+test("the audit is taken after the pull-back, so it describes the written variables (amber 4)", () => {
+  const p = proposeRamp({ doc: jhd(), anchors: ANCHORS, name: "cyan", ...MAP });
+  assert.ok(p.ramps[0].variables.some((v) => v.nudged), "the fixture run eases a step");
+  const again = auditRamp(p.ramps[0].variables);
+  assert.equal(p.ramps[0].audit.evenness, again.evenness);
+  assert.equal(p.ramps[0].audit.hueDrift, again.hueDrift);
+  assert.match(renderRampMarkdown(p), new RegExp(`Evenness ${again.evenness}`));
 });
