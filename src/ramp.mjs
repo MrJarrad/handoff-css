@@ -76,14 +76,17 @@ export function proposeRamp({ doc, anchors, name, fromScratch = false, forColour
   // One merged ramp when the anchors make sense as one; otherwise one ramp per anchor.
   const verdict = anchors.length > 1 ? mergeVerdict({ anchors, steps, system: system ?? undefined }) : null;
   const sets = !verdict || verdict.merge ? [anchors] : anchors.map((a) => [a]);
-  if (sets.length > 1 && name) fail(`ramp: the anchors do not make one ramp (${verdict.reasons.filter((r) => r.veto && !r.pass).map((r) => r.check).join(", ")}), so --name cannot name them all; run once per anchor`);
+  if (sets.length > 1 && name !== undefined) fail(`ramp: the anchors do not make one ramp (${verdict.reasons.filter((r) => r.veto && !r.pass).map((r) => r.check).join(", ")}), so --name cannot name them all; run once per anchor`);
   if (sets.length > 1 && forColours.length) fail("ramp: the anchors do not make one ramp, so a semantic colour has no single ramp to map onto; run once per anchor");
 
   // Where the new variables go, and how siblings are named.
   const collection = commonest(existing.map((r) => r.collection)) ?? profile.layers.find((l) => l.role === "primitive")?.collection ?? null;
   const siblings = existing.filter((r) => r.collection === collection);
   const parent = commonest(siblings.map((r) => r.parent)) ?? "";
-  const taken = new Set(siblings.map((r) => slug(r.name)));
+  // A name must not be any group of the export, in any collection, nor a ramp already beside the new one.
+  const groupNames = new Set(doc.collections.flatMap((c) => c.variables.flatMap((v) => v.group ?? v.name.split("/").slice(0, -1))).map(slug));
+  const taken = new Set([...siblings.map((r) => slug(r.name)), ...groupNames]);
+  if (name !== undefined && (typeof name !== "string" || !slug(name) || name.includes("/") || name !== name.trim())) fail(`ramp: --name ${JSON.stringify(name)} must be one path segment: no "/", no surrounding space, some letter or digit`);
   const sib = siblings[0] && { rampName: siblings[0].name, label: siblings[0].steps.at(-1).label, web: siblings[0].steps.at(-1).web };
   const labelOf = new Map(siblings[0]?.steps.map((s) => [s.step, s.label]) ?? []);
   const label = (n) => labelOf.get(n) ?? String(n);
@@ -93,10 +96,10 @@ export function proposeRamp({ doc, anchors, name, fromScratch = false, forColour
     const seed = [...r.placement].sort((a, b) => a.step - b.step)[0];
     let rampName;
     let nameSource;
-    if (name) {
+    if (name !== undefined) {
       rampName = name;
       nameSource = "given";
-      if (taken.has(slug(name))) fail(`ramp: ${JSON.stringify(name)} is already a ramp in ${collection}; choose another name`);
+      if (taken.has(slug(name))) fail(`ramp: ${JSON.stringify(name)} is already ${siblings.some((r) => slug(r.name) === slug(name)) ? `a ramp in ${collection}` : "a group of the export"}; choose another name`);
     } else {
       rampName = nameColor(seed.hex, { exclude: [...taken] }).slug;
       nameSource = "generated";

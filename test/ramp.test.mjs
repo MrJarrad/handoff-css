@@ -273,3 +273,16 @@ test("CLI (amber 1): the strict parse leaves a good run alone, flags in any orde
   assert.equal(r.code, 0, r.err);
   assert.equal(JSON.parse(r.out).ramps[0].name, "cyan");
 });
+
+test("a name is one path segment and clashes with no group or ramp anywhere in the export (amber 2)", () => {
+  const ok = (name) => proposeRamp({ doc: jhd(), anchors: ANCHORS, name });
+  assert.throws(() => ok("a/b"), /one path segment/);
+  assert.throws(() => ok(""), /one path segment|empty/);
+  assert.throws(() => ok("   "), /one path segment|empty/);
+  assert.throws(() => ok("!!!"), /one path segment|empty/);
+  // a group that is not a ramp, and a ramp group of another collection
+  assert.throws(() => ok("background"), /already a group/); // a non-ramp group of the chosen collection's neighbour
+  assert.throws(() => ok("Palette"), /already a group/);
+  assert.throws(() => ok("aspect"), /already a group/); // a group of another collection
+  assert.equal(ok("glow").ramps[0].name, "glow");
+});
