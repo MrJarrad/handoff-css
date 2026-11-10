@@ -12,7 +12,7 @@ import Ajv2020 from "ajv/dist/2020.js";
 
 import { dispatch } from "../src/cli.mjs";
 import { proposeRamp, renderRampMarkdown } from "../src/ramp.mjs";
-import { grade } from "../src/color-engine/index.mjs";
+import { grade, auditRamp } from "../src/color-engine/index.mjs";
 import { synthetic, variable, cell } from "./synthetic-export.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -293,4 +293,13 @@ test("alpha literals are not colours: an alpha scale is no colour ramp, so a sys
   const p = proposeRamp({ doc, anchors: [{ hex: "#14d7fb" }], name: "cyan" });
   assert.equal(p.basis.kind, "defaults", p.basis.reason);
   assert.deepEqual(p.basis.steps, [100, 200, 300, 400, 500, 600, 700, 800, 900]);
+});
+
+test("the audit is taken after the pull-back, so it describes the written variables (amber 4)", () => {
+  const p = proposeRamp({ doc: jhd(), anchors: ANCHORS, name: "cyan", ...MAP });
+  assert.ok(p.ramps[0].variables.some((v) => v.nudged), "the fixture run eases a step");
+  const again = auditRamp(p.ramps[0].variables);
+  assert.equal(p.ramps[0].audit.evenness, again.evenness);
+  assert.equal(p.ramps[0].audit.hueDrift, again.hueDrift);
+  assert.match(renderRampMarkdown(p), new RegExp(`Evenness ${again.evenness}`));
 });

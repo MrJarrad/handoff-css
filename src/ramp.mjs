@@ -8,7 +8,7 @@
 // which the export is taken again.
 import { buildProfile } from "./profile.mjs";
 import { fail } from "./resolve.mjs";
-import { ramp, DEFAULTS, fitToSystem, mergeVerdict, nameColor, grade, nearestPassingStep, mirrorStep, pullBack } from "./color-engine/index.mjs";
+import { ramp, DEFAULTS, fitToSystem, mergeVerdict, nameColor, grade, nearestPassingStep, mirrorStep, pullBack, auditRamp } from "./color-engine/index.mjs";
 import { hexToOklch } from "./color-engine/color.mjs";
 
 export const RAMP_VERSION = 1;
@@ -117,6 +117,7 @@ export function proposeRamp({ doc, anchors, name, fromScratch = false, forColour
   });
 
   const mapping = forColours.length ? mapSemantics({ doc, built: built[0], forColours, on, use, keepAnchor }) : [];
+  if (mapping.length) built[0].audit = auditRamp(built[0].variables); // the pull-back rewrote some steps after the audit was taken
   const open = mapping.filter((m) => m.step === null).length;
   const questions = built.filter((b) => b.nameSource === "generated").map((b) => ({
     id: "name",
