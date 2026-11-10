@@ -149,7 +149,7 @@
         "variants": {
           "type": "object",
           "additionalProperties": { "type": "object", "additionalProperties": { "type": "string" } },
-          "description": "Optional. Per total theme, a map of sibling mode name to the variant mode that replaces it while the total theme is on: `{ bttf: { dark: \"bttf-dark\" } }` selects the `bttf-dark` block by `.bttf .dark` and `.bttf.dark` and stops `bttf` claiming `dark` (P10b)."
+          "description": "Optional. Per total theme, a map of sibling mode name to the variant mode that replaces it while the total theme is on: `{ ocean: { dark: \"ocean-dark\" } }` selects the `ocean-dark` block by `.ocean .dark` and `.ocean.dark` and stops `ocean` claiming `dark` (P10b)."
         }
       }
     },

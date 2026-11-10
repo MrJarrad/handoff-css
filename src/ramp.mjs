@@ -1,4 +1,4 @@
-// `handoff-css ramp` (HT-112, plan slice B-S2) — a colour nothing in the system fits, as a whole ramp.
+// `handoff-css ramp` — a colour nothing in the system fits, as a whole ramp.
 //
 // Pure: export + anchors in, proposal out. The ramp is built in the system's own steps (the most common
 // scale among its colour ramps) and fitted to its ramps' lightness; a system with no colour ramps, or a
