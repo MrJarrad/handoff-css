@@ -166,7 +166,7 @@ const unit = (row) => (row.kind === "type" && row.property === "fontWeight" ? ""
 const keyOf = (row) => (row.kind === "colour" ? String(row.value).toUpperCase() : `${row.kind === "type" ? `${row.property} ` : ""}${row.value}${unit(row)}`);
 
 /**
- * HT-110 — a tie is built, never silent. `ranked` is already ordered by distance, then name
+ * A tie is built, never silent. `ranked` is already ordered by distance, then name
  * (`localeCompare`), so the first is the pick whatever order the files were read in. The losers stay
  * in `suggestions`, and a `keep`/`use` ruling still overrides.
  */

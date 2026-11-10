@@ -403,7 +403,7 @@ percentage difference) and `evidence` naming the profile fact it came from, then
 | `SIBLING` | no name asked; the nearest name is within tolerance but not the same value — ask once | yes |
 | `MISMATCH` | the name exists but holds another value | yes |
 | `NEW_NAME` | the name is not in the system; `bindTo` shows the existing value each mode could point at | yes |
-| `NEW_RAMP` | nothing in the system holds the wanted value in every mode asked — the designer decides (HT-112) | yes |
+| `NEW_RAMP` | nothing in the system holds the wanted value in every mode asked — the designer decides | yes |
 | `RULED` | a ruling row settles it | no |
 | `RULING_STALE` | a `use` ruling names something the export does not have | yes |
 

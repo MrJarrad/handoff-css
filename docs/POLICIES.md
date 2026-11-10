@@ -400,9 +400,9 @@ block does. That edit is in the consumer's stylesheet, not here.
 
 **P10b — variants.** `themes.variants: { total: { sibling: variant } }` hands one
 sibling over to a variant theme while the total theme is on. With
-`{ bttf: { dark: "bttf-dark" } }` the `bttf-dark` block is selected by
-`.bttf-dark, .bttf .dark, .bttf.dark` and `.bttf` no longer claims `dark` (nor
-`bttf-dark`), so `.bttf` alone keeps its own palette while a dark surface under
+`{ ocean: { dark: "ocean-dark" } }` the `ocean-dark` block is selected by
+`.ocean-dark, .ocean .dark, .ocean.dark` and `.ocean` no longer claims `dark` (nor
+`ocean-dark`), so `.ocean` alone keeps its own palette while a dark surface under
 it takes the variant's. Specificity is unchanged from P10 (0,2,0 against the
 sibling's 0,1,0). The key is optional; without it output is byte-identical. Every
 name must be a mode of the collection and each total theme must be in

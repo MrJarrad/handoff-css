@@ -1,4 +1,4 @@
-// `handoff-css resolve` (HT-111 A-S2) — a need in, ranked candidates and a verdict out.
+// `handoff-css resolve` — a need in, ranked candidates and a verdict out.
 //
 // Pure: export + needs + rulings in, report out. The agent only reuses what the system already has;
 // this module never invents a name. A name the system lacks is a NEW_NAME finding, a value nothing in
