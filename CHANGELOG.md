@@ -16,6 +16,12 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Added
 
+- HT-111 (A-S1): `handoff-css profile --export <json|json.gz|zip> [--out <dir>] [--check]` writes `system-profile.json`
+  and `system-profile.md`: the system's layers (from the alias graph), naming, groups, ramps (each with its own
+  steps), sibling gaps (a leaf one group lacks that most of its family has, stated as a fact), what each mode means and
+  how that was detected, scope and description coverage, and every existing variable name. Nothing is read from a house
+  config; `--check` exits 1 naming the file that would change. Schema: `handoff-css/schema/profile`.
+  `test/profile.test.mjs` (JHD v19 and a synthetic non-JHD export).
 - `themes.variants` (P10b): a total theme can hand one sibling to a variant theme, e.g. `{ bttf: { dark: "bttf-dark" } }` emits
   `.bttf-dark, .bttf .dark, .bttf.dark` and `bttf` stops claiming `dark`. Optional; output without it is byte-identical.
   `test/theme-variants.test.mjs`.

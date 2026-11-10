@@ -40,6 +40,7 @@ export {
   renderJson as renderConformJson,
 } from "./conform.mjs";
 export { parseHandoffMarkdown, validateHandoffMarkdown } from "./validate-handoff-md.mjs";
+export { buildProfile, renderProfileMarkdown } from "./profile.mjs";
 export { validateBriefJson, BRIEF_SCHEMA_VERSIONS } from "./brief.mjs";
 export { validateExport, assertValidExport, exportSchema, VALIDATED_SCHEMA_VERSIONS } from "./validate-export.mjs";
 

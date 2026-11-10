@@ -367,6 +367,15 @@ no token of its kind **needs a call** — built with the exact value and a devia
 ruled `use` or `keep` (`raw-<kind>` rows). Listed raw values never fail the run. Worked example:
 `fixtures/ht102-raw-values/`.
 
+### `profile` — how is this system built?
+
+`handoff-css profile --export <json|json.gz|zip> [--out <dir>] [--check]` writes `system-profile.json` and
+`system-profile.md` from one Design System Handoff export, for any system's naming: collection roles from the alias
+graph (primitive, semantic, mixed, standalone), name shape and code-name rule, groups, ramps with their own steps and
+end colours, sibling gaps, mode meaning with how it was detected (the export's own classification, or the mode count),
+scope and description coverage, and the list of existing names. A gap is a fact, not a verdict. `--check` writes
+nothing and exits 1 naming the file that has drifted.
+
 ### `vendor` — add a new export without overwriting the old one
 
 ```sh
