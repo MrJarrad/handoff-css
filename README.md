@@ -526,7 +526,7 @@ nameColor("#14d7fb", { exclude: ["Bright Turquoise"] }); // { name, slug, hex, d
 | `mergeVerdict({ anchors, steps?, system? })` | `{ merge, reasons, ramp }`. Lightness, evenness and hue drift decide; the pairing rule (one hue within 10°, at least two steps apart, neutrals only with neutrals of the same temperature) is reported but does not decide. |
 | `nameColor(hex, { exclude? })` | The nearest name on the Name that Color list. |
 | `auditRamp(steps)` | Lightness drop per step, evenness (spread of those drops, 0 = even) and hue drift (smallest arc of the wheel holding every hue with chroma above 0.05). |
-| `DEFAULTS` | A new system with nothing to fit: steps 100–900, darkest step at L 0.30, lightest step as light as the hue allows. With no system, `mergeVerdict` allows evenness up to 0.0319 (the widest the default ramps make) and hue drift up to 50°. |
+| `DEFAULTS` | A new system with nothing to fit: steps 100–900, darkest step at L 0.30, lightest step as light as the hue allows. With no system, `mergeVerdict` allows evenness up to the widest the default ramps make on the scale in use (0.0319 on 100–900, 0.0975 on 100–500) and hue drift up to 50°. |
 
 The colour names are Name that Color by Chirag Mehta, under Creative Commons Attribution 2.5; see
 `src/color-engine/THIRD-PARTY-NOTICES.md`. Everything else is MIT.

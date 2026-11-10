@@ -151,14 +151,27 @@ test("a ramp that does not get darker step by step is never a merge", () => {
   assert.equal(byCheck(v).lightness.veto, true);
 });
 
-test("from scratch, the evenness bar is the widest spread the default ramps make", async () => {
-  const { DEFAULT_EVENNESS_MAX } = await import("../src/color-engine/merge.mjs");
+test("from scratch, the evenness bar is the widest spread the default ramps make on the scale in use", async () => {
+  const { defaultEvennessMax } = await import("../src/color-engine/merge.mjs");
   const { oklchToHex, maxChroma } = await import("../src/color-engine/color.mjs");
-  let max = 0;
-  for (let h = 0; h < 360; h += 30) for (const l of [0.3, 0.45, 0.6, 0.75, 0.9]) for (const c of [0.02, 0.06, 0.12, 0.2]) {
-    max = Math.max(max, ramp({ anchors: [{ hex: oklchToHex({ l, c: Math.min(c, maxChroma(l, h)), h }) }] }).audit.evenness);
+  const FIVE = [100, 200, 300, 400, 500];
+  for (const steps of [HUND, FIVE, FIFTY]) {
+    let max = 0;
+    for (let h = 0; h < 360; h += 30) for (const l of [0.3, 0.45, 0.6, 0.75, 0.9]) for (const c of [0.02, 0.06, 0.12, 0.2]) {
+      max = Math.max(max, ramp({ anchors: [{ hex: oklchToHex({ l, c: Math.min(c, maxChroma(l, h)), h }) }], steps }).audit.evenness);
+    }
+    assert.equal(defaultEvennessMax(steps), max, steps.join(","));
   }
-  assert.equal(DEFAULT_EVENNESS_MAX, max);
+  assert.equal(defaultEvennessMax(HUND), 0.0319);
+  assert.equal(defaultEvennessMax(FIVE), 0.0975);
+});
+
+test("on 100–500 with no system, the bar is the 5-step one", () => {
+  // Steps 200 and 400 of the default ramp from #984260, refused against the 9-step bar before.
+  const FIVE = [100, 200, 300, 400, 500];
+  const v = mergeVerdict({ anchors: [{ hex: "#fabccd", step: 200 }, { hex: "#bf6582", step: 400 }], steps: FIVE });
+  assert.equal(byCheck(v).evenness.pass, true, byCheck(v).evenness.text);
+  assert.match(byCheck(v).evenness.text, /≤ 0\.0975, the widest of the default ramps on 5 steps/);
 });
 
 test("mergeVerdict needs two anchors", () => {

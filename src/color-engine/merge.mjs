@@ -1,12 +1,24 @@
 // Does a set of colours make sense as one ramp? Build the merged ramp and audit it against the system's
 // own ramps (or, with no system, against what the default ramps do). The classic pairing rule (one hue,
 // at least two steps apart) is reported as a reason but does not decide.
-import { hexToOklch } from "./color.mjs";
+import { hexToOklch, oklchToHex, maxChroma } from "./color.mjs";
 import { ramp, DEFAULTS } from "./build.mjs";
 
-/** Widest evenness (spread of lightness drops) a default single-anchor ramp makes, over a sweep of hues
- *  every 30°, L 0.30–0.90 and chroma 0.02–0.20. The from-scratch evenness bar. */
-export const DEFAULT_EVENNESS_MAX = 0.0319;
+/** The from-scratch evenness bar for a step scale: the widest evenness (spread of lightness drops) a
+ *  default single-anchor ramp makes on that scale, over hues every 30°, L 0.30–0.90 and chroma 0.02–0.20.
+ *  0.0319 on 100–900. Computed once per scale. */
+export function defaultEvennessMax(steps) {
+  const key = [...steps].sort((a, b) => a - b).join(",");
+  if (!evennessBars.has(key)) {
+    let max = 0;
+    for (let h = 0; h < 360; h += 30)
+      for (const l of [0.3, 0.45, 0.6, 0.75, 0.9])
+        for (const c of [0.02, 0.06, 0.12, 0.2]) max = Math.max(max, ramp({ anchors: [{ hex: oklchToHex({ l, c: Math.min(c, maxChroma(l, h)), h }) }], steps }).audit.evenness);
+    evennessBars.set(key, max);
+  }
+  return evennessBars.get(key);
+}
+const evennessBars = new Map();
 /** From-scratch hue drift bar, degrees. */
 export const DEFAULT_HUE_DRIFT_MAX = 50;
 
@@ -32,7 +44,7 @@ export function mergeVerdict({ anchors, steps, system }) {
   if (!Array.isArray(anchors) || anchors.length < 2) throw new TypeError("mergeVerdict needs two or more anchors");
   const r = ramp({ anchors, steps: steps ?? system?.steps ?? DEFAULTS.steps, lightness: system?.lightness ?? {} });
   const scale = r.steps.map((s) => s.step);
-  const against = system ? "the system's own ramps" : "the default ramps";
+  const against = system ? "the system's own ramps" : `the default ramps on ${scale.length} steps`;
   const reasons = [];
 
   const ls = r.steps.map((s) => hexToOklch(s.hex).l);
@@ -44,7 +56,7 @@ export function mergeVerdict({ anchors, steps, system }) {
     text: turn < 0 ? "gets darker at every step" : `step ${scale[turn]} is not darker than step ${scale[turn - 1]}`,
   });
 
-  const evenMax = system ? system.evenness.max : DEFAULT_EVENNESS_MAX;
+  const evenMax = system ? system.evenness.max : defaultEvennessMax(scale);
   const even = r.audit.evenness;
   reasons.push({ check: "evenness", pass: even <= evenMax, veto: true, text: `evenness ${even} ${even <= evenMax ? "≤" : ">"} ${evenMax}, the widest of ${against}` });
 
