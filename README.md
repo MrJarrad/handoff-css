@@ -424,6 +424,22 @@ Exit codes: `0` every need is `REUSE` or `RULED`; `2` at least one need is open 
 `1` a usage or input error (nothing written). The report is a function of the export, the needs and the rulings, so a
 rerun is byte-identical (`test/resolve.test.mjs`).
 
+
+### `components` — how does this system build its components, and does it already have this one?
+
+`handoff-css components --export <layer export .json|.json.gz>… [--out <dir>] [--check]` reads one or more Design
+Handoff layer exports and writes `component-profile.json` and `component-profile.md`: the components seen (a layer
+export lists only the components its layers use and define, so the count is "of an unknown total"), how they are
+named, the properties they share, how deeply they nest, and which token collections they bind. Facts only. A
+component name defined in two exports is read as one component and warned about.
+
+`... --need <needs.json> [--rulings <md>]` resolves each need (`schema/resolve-component-need.v1.schema.json`:
+`{ "id", "name"?, "wants"? }`, with `wants.props` and `wants.children`) and writes `component-resolve-report.json`
+and `.md`. Verdicts: `REUSE`, `REUSE_WITH_PROP` (build it, set the listed properties), `PROP_GAP` (extend the
+component, never fork it), `SIBLING`, `COMPOSE`, `NEW_COMPONENT` (with the naming and property pattern the system
+shows), `RULED`, `RULING_STALE`. Rulings use kind `resolve-component`. Exit 2 while a need is open. Detail:
+`skills/handoff-to-code/references/reuse-or-add.md` § Components.
+
 ### `ramp` — a whole new ramp, and which step each colour uses
 
 `handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch] [--for <semantic>[@step]… --on <surface>… [--use text|large-text|ui] [--keep-anchor]] [--out <dir>] [--json]`
