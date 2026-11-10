@@ -255,12 +255,19 @@ function resolveOne(need, ctx) {
       report.verdict = "RULING_STALE";
       report.ruling = row;
     } else {
-      // A `new` row that names a variable the export now has is the name written and exported: reuse it.
-      const written = ruled.ruling === "new" && ruled.code && names.has(ruled.code);
-      report.verdict = written ? "REUSE" : "RULED";
+      // A `new` row reads REUSE once the export has the variable it names, and only if that is the right one:
+      // the name the need asked for, and a variable of the kind the need wants. Otherwise it stays RULED and says why.
+      const named = ruled.ruling === "new" && ruled.code ? index.filter((e) => e.name === ruled.code) : [];
+      const wrongKind = named.length > 0 && type && !named.some((e) => e.type === type);
+      const wrongName = named.length > 0 && need.name && ruled.code !== need.name;
+      report.verdict = named.length > 0 && !wrongKind && !wrongName ? "REUSE" : "RULED";
       report.open = false;
       report.ruling = row;
-      report.findings = [];
+      report.findings = wrongKind
+        ? [{ code: "MISMATCH", message: `the ruling names ${ruled.code}, which is ${named[0].type === "COLOR" ? "a colour" : `a ${named[0].type}`} variable, not the ${type === "COLOR" ? "colour" : type} this need wants; it stays ruled, not reused — rule it \`use\` with the right name` }]
+        : wrongName
+          ? [{ code: "NEW_NAME", message: `the ruling names ${ruled.code}, but the need asks for ${need.name}; it stays ruled, not reused — rule it \`use\` to bind ${ruled.code}, or write ${need.name}` }]
+          : [];
     }
   } else {
     report.open = !SETTLED.includes(report.verdict);

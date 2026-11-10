@@ -172,6 +172,32 @@ test("a family of two groups is only an observation: it shows in the candidates'
   assert.ok(need.candidates.some((c) => c.evidence.some((e) => e.from === "siblingObservations")));
 });
 
+// ---- a `new` row closes at REUSE only for the right variable -----------------------------------------
+test("a `new` row naming a different existing variable stays RULED and says so", async () => {
+  const need = [{ id: "danger-ink", name: "Ink/danger" }];
+  const other = await resolve(syntheticFile(), need, table("| resolve-need | danger-ink | new | Ink/main | designer approved |"));
+  const [n] = other.rep.needs;
+  assert.equal(n.verdict, "RULED");
+  assert.equal(n.open, false);
+  assert.equal(other.code, 0, other.err);
+  assert.match(n.findings[0].message, /Ink\/main.*Ink\/danger/);
+  assert.equal(n.ruling.code, "Ink/main");
+  assert.equal(report(other.rep), true, JSON.stringify(report.errors));
+  assert.match(other.md, /Ink\/main/);
+});
+
+test("a `new` row naming a variable of another kind stays RULED and says so", async () => {
+  const need = [{ id: "tint", wants: { Day: "#002828FF" } }];
+  const wrong = await resolve(syntheticFile(), need, table("| resolve-need | tint | new | Space/sm | designer approved |"));
+  const [n] = wrong.rep.needs;
+  assert.equal(n.verdict, "RULED");
+  assert.equal(wrong.code, 0, wrong.err);
+  assert.match(n.findings[0].message, /Space\/sm.*(colour|COLOR)/i);
+  assert.equal(report(wrong.rep), true, JSON.stringify(report.errors));
+  const right = await resolve(syntheticFile(), need, table("| resolve-need | tint | new | Surface/main | designer approved |"));
+  assert.equal(right.rep.needs[0].verdict, "REUSE");
+});
+
 // ---- "every mode" for `*` ---------------------------------------------------------------------------
 /** The synthetic export written to a fresh file, after `edit(doc)`. */
 function editedFile(edit) {
