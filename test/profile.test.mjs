@@ -70,10 +70,10 @@ test("the profile validates against its schema and is deterministic", () => {
 
 test("src/ names nothing of the house: no JHD token, collection or mode strings in any source file", () => {
   const src = path.join(root, "src");
-  const banned = /\b(bttf|cod-grey|text-primitives|color-primitives|JHD)\b/;
-  // A comment in a file older than the profile names a collection once; this list only ever shrinks.
-  const legacy = new Set(["resolve.mjs"]);
-  const files = readdirSync(src).filter((f) => f.endsWith(".mjs") && !legacy.has(f));
+  // House names only, so generic words stay free: `light`, `dark`, `core` and `palette` are banned as a
+  // quoted or backticked token (a mode or collection named in a comment or string), not as a bare English word.
+  const banned = /\b(bttf|cod-grey|text-primitives|color-primitives|JHD)\b|[`'"](?:light|dark|core|palette)[`'"]/;
+  const files = readdirSync(src).filter((f) => f.endsWith(".mjs"));
   assert.ok(files.includes("profile.mjs") && files.includes("resolve-need.mjs") && files.includes("resolve-cli.mjs"));
   assert.deepEqual(files.filter((f) => banned.test(readFileSync(path.join(src, f), "utf8"))), []);
 });

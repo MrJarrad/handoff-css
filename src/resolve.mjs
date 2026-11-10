@@ -174,8 +174,8 @@ export const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
 /**
  * P9 — COMPOSE_COLOR (schema 7 / handoff 8). `expressionFunction:
- * "COMPOSE_COLOR"` with exactly two `VARIABLE_ALIAS` arguments — arg 1 a
- * `color-primitives` colour, arg 2 a `core` `opacity/opacity-*` FLOAT — is
+ * "COMPOSE_COLOR"` with exactly two `VARIABLE_ALIAS` arguments — arg 1
+ * a colour primitive, arg 2 an `opacity/opacity-*` FLOAT — is
  * Figma's replacement for the alpha black/white ramp handoff 6 hand-authored.
  * Schema 7 resolves the expression itself: `mode.build.css` is a ready CSS
  * string (relative colour syntax, `rgb(from var(--<colour>) r g b /
