@@ -25,6 +25,7 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
   handoff-css conform --export <json> --handoff <md> --tokens <css> --css <file…>
               [--config <mjs>] [--allow-name <name>…] [--json]
   handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--json]
+  handoff-css profile --export <json|json.gz|zip> [--out <dir>] [--check]
   handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 `;
 
@@ -42,6 +43,10 @@ export async function dispatch(argv, { cwd = process.cwd(), stdout = process.std
   if (first === "match") {
     const { matchCommand } = await import("./match-cli.mjs");
     return matchCommand(rest, { cwd, stdout, stderr });
+  }
+  if (first === "profile") {
+    const { profileCommand } = await import("./profile-cli.mjs");
+    return profileCommand(rest, { cwd, stdout, stderr });
   }
   if (first === "vendor") {
     const { vendorCommand } = await import("./vendor-cli.mjs");

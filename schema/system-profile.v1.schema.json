@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://handoff-css/schema/system-profile.v1.schema.json",
+  "title": "System profile",
+  "description": "How a design system is built, derived from its Design System Handoff export. Facts only: a gap is never a verdict.",
+  "type": "object",
+  "required": ["profileVersion", "source", "layers", "naming", "groups", "ramps", "rampStepSets", "siblingGaps", "modes", "coverage", "names"],
+  "properties": {
+    "profileVersion": { "const": 1 },
+    "source": { "type": "object", "required": ["documentName", "schemaVersion", "exportVersion", "contentHash"] },
+    "layers": { "type": "array", "items": { "type": "object", "required": ["collection", "role", "variables", "modes", "hidden", "evidence"],
+      "properties": { "role": { "enum": ["primitive", "semantic", "mixed", "standalone"] } } } },
+    "naming": { "type": "array", "items": { "type": "object", "required": ["collection", "separator", "segmentDepth", "leafCase", "webName"] } },
+    "groups": { "type": "array", "items": { "type": "object", "required": ["collection", "path", "leaves"] } },
+    "ramps": { "type": "array", "items": { "type": "object", "required": ["collection", "path", "type", "steps", "stepGaps", "ends"] } },
+    "rampStepSets": { "type": "array", "items": { "type": "object", "required": ["steps", "ramps"] } },
+    "siblingGaps": { "type": "array", "items": { "type": "object", "required": ["collection", "group", "lacks", "presentIn", "family"] } },
+    "modes": { "type": "array", "items": { "type": "object", "required": ["collection", "defaultMode", "modes"],
+      "properties": { "modes": { "type": "array", "items": { "type": "object", "required": ["name", "meaning", "detectedBy"],
+        "properties": { "meaning": { "enum": ["single", "theme", "responsive-layout", "unclassified"] } } } } } } },
+    "coverage": { "type": "array", "items": { "type": "object", "required": ["collection", "variables", "withDescription", "scopes"] } },
+    "names": { "type": "array", "items": { "type": "object", "required": ["collection", "names"] } }
+  }
+}
