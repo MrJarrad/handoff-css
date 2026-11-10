@@ -53,9 +53,9 @@ test("5: the name is asked as one question: generated or the designer's own", ()
   assert.match(ref, /nameSource/);
 });
 
-test("6: the word orbit appears nowhere the skill ships", () => {
+test("6: the product the ramp method came from is never named nowhere the skill ships", () => {
   const files = [main, ref, ...readdirSync(path.join(skill, "references")).map((f) => readFileSync(path.join(skill, "references", f), "utf8")), ...Object.values(outputs())];
-  for (const t of files) assert.doesNotMatch(t, /orbit/i);
+  for (const t of files) assert.doesNotMatch(t, new RegExp(["or", "bit"].join(""), "i"));
 });
 
 test("the Figma write is a required stop on a yes, then a read-back, with no one tool assumed", () => {
