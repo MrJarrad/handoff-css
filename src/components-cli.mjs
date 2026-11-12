@@ -36,7 +36,8 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
       }
     };
     const docs = exportPaths.map(readJson);
-    const profile = buildComponentProfile(docs, { inventory: dsPaths.map(readJson) });
+    const inventory = dsPaths.map(readJson);
+    const profile = buildComponentProfile(docs, { inventory });
     for (const w of profile.warnings) stderr.write(`handoff-css (components): warning: ${w}\n`);
     const outDir = abs(one("--out") ?? ".");
     const needPath = one("--need");
@@ -71,7 +72,7 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
       throw new Error(`handoff-css: ${needPath}: ${err.message}`);
     }
     const rulingsPath = one("--rulings");
-    const report = resolveComponentNeeds({ profile, needs, rulings: rulingsPath ? readFileSync(abs(rulingsPath), "utf8") : null });
+    const report = resolveComponentNeeds({ profile, needs, inventory, rulings: rulingsPath ? readFileSync(abs(rulingsPath), "utf8") : null });
     mkdirSync(outDir, { recursive: true });
     const json = `${JSON.stringify(report, null, 2)}\n`;
     writeFileSync(path.join(outDir, COMPONENT_RESOLVE_FILES.json), json);

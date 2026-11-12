@@ -260,3 +260,37 @@ test("components command: --ds-export makes the total known; a Design System Han
   assert.equal(r.code, 1);
   assert.match(r.err, /schema 20/);
 });
+
+// ---- the Design System Handoff export's components[] widens what a need is ranked against --------------
+const libraryWith = (components) => ({ schema: "design-system-handoff", schemaVersion: 20, documentName: "Library", contentHash: "h".repeat(64), components });
+const tooltip = { id: "9:1", name: "Tooltip", kind: "set", page: "Components", properties: [{ name: "placement", type: "VARIANT", defaultValue: "top", options: ["top", "bottom"] }] };
+
+test("resolve with an inventory: a component no layer places is ranked, and a need for it is reused, not asked", () => {
+  const profile = buildComponentProfile(flatSystem());
+  const inventory = [libraryWith([tooltip])];
+  const without = resolveComponentNeeds({ profile, needs: [{ id: "t", name: "Tooltip" }] });
+  assert.equal(without.needs[0].verdict, "NEW_COMPONENT");
+  const withLib = resolveComponentNeeds({ profile: buildComponentProfile(flatSystem(), { inventory }), needs: [{ id: "t", name: "Tooltip", wants: { props: { placement: "bottom" } } }, { id: "s", name: "Tooltip Popover" }], inventory });
+  assert.deepEqual(verdicts(withLib), { t: "REUSE_WITH_PROP", s: "SIBLING" });
+  assert.deepEqual(withLib.needs[0].set, { placement: "bottom" });
+  assert.equal(withLib.needs[1].candidates[0].name, "Tooltip");
+  assert.match(withLib.needs[1].candidates[0].evidence.join(" "), /placed by no layer/);
+});
+
+test("resolve with an inventory: a component a layer places keeps the layer's record, and the inventory adds no duplicate", () => {
+  const profile = buildComponentProfile(flatSystem());
+  const r = resolveComponentNeeds({ profile, needs: [{ id: "b", name: "Button" }], inventory: [libraryWith([{ ...tooltip, name: "Button", properties: [] }, tooltip])] });
+  assert.equal(r.needs[0].verdict, "REUSE");
+  assert.equal(r.needs[0].candidates.filter((c) => c.name === "Button").length, 1);
+  assert.ok(r.needs[0].candidates[0].properties.length > 0);
+});
+
+test("components command: --ds-export with --need ranks over the library's components", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "components-inv-"));
+  writeFileSync(path.join(dir, "flat.json"), JSON.stringify(flatSystem()));
+  writeFileSync(path.join(dir, "ds.json"), JSON.stringify(libraryWith([tooltip])));
+  writeFileSync(path.join(dir, "needs.json"), JSON.stringify([{ id: "t", name: "Tooltip" }]));
+  const r = await run(["components", "--export", "flat.json", "--ds-export", "ds.json", "--need", "needs.json", "--out", "res"], dir);
+  assert.equal(r.code, 0, r.err);
+  assert.equal(JSON.parse(readFileSync(path.join(dir, "res", "component-resolve-report.json"), "utf8")).needs[0].verdict, "REUSE");
+});

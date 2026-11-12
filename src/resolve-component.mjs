@@ -89,14 +89,26 @@ function patternFor(need, profile) {
   };
 }
 
+/** Library components no layer places, shaped like the profile's own rows so they rank and resolve the same way. */
+function inventoryOnly(inventory, seen) {
+  const rows = new Map();
+  for (const d of inventory) {
+    for (const c of d.components ?? []) {
+      if (seen.has(c.name) || rows.has(c.name)) continue;
+      rows.set(c.name, { name: c.name, kind: c.kind, tier: null, fromInventory: true, properties: (c.properties ?? []).map((p) => ({ name: p.name, type: p.type, default: p.defaultValue ?? null, options: p.options?.length ? p.options : null })) });
+    }
+  }
+  return [...rows.values()];
+}
+
 function resolveOne(need, ctx) {
-  const { profile, byName, rulings } = ctx;
+  const { profile, byName, rulings, candidatesPool } = ctx;
   const wantedProps = need.wants?.props ?? {};
   const children = need.wants?.children ?? [];
   const ask = { ...(need.name ? { name: need.name } : {}), ...(need.wants ? { wants: need.wants } : {}) };
   const findings = [];
 
-  const ranked = profile.components
+  const ranked = candidatesPool
     .map((c) => ({ c, ...similarity(need, c) }))
     .filter((r) => r.score > 0 || byName.get(need.name) === r.c)
     .sort((a, b) => (byName.get(need.name) === b.c) - (byName.get(need.name) === a.c) || b.score - a.score || byText(a.c.name, b.c.name))
@@ -109,7 +121,7 @@ function resolveOne(need, ctx) {
       properties: r.c.properties.map((p) => `${p.name}${p.options ? `: ${p.options.join(" | ")}` : ""}`),
       score: Math.round(r.score * 100) / 100,
       nameScore: r.nameScore,
-      evidence: byName.get(need.name) === r.c ? ["name exists", ...r.evidence] : r.evidence,
+      evidence: [...(byName.get(need.name) === r.c ? ["name exists"] : []), ...r.evidence, ...(r.c.fromInventory ? ["in the library; placed by no layer here"] : [])],
     }));
 
   const report = { id: need.id, kind: "component", ask, verdict: null, open: true, candidates: ranked, findings };
@@ -161,10 +173,11 @@ function resolveOne(need, ctx) {
 }
 
 /**
- * @param {{ profile: object, needs: object[], rulings?: string|null }} input
+ * @param {{ profile: object, needs: object[], rulings?: string|null, inventory?: object[] }} input
+ *   `inventory`: Design System Handoff exports (schema 20+); their `components[]` join the components a need is ranked against.
  * @returns {object} the component resolve report
  */
-export function resolveComponentNeeds({ profile, needs, rulings = null }) {
+export function resolveComponentNeeds({ profile, needs, rulings = null, inventory = [] }) {
   if (!checkNeeds(needs)) {
     fail(`components: the need file does not match schema resolve-component-need.v1:\n${checkNeeds.errors.map((e) => `  ${e.instancePath || "/"} ${e.message}`).join("\n")}`);
   }
@@ -173,7 +186,8 @@ export function resolveComponentNeeds({ profile, needs, rulings = null }) {
     if (ids.has(n.id)) fail(`components: duplicate need id ${n.id}`);
     ids.add(n.id);
   }
-  const ctx = { profile, byName: new Map(profile.components.map((c) => [c.name, c])), rulings: rulings ? readRulings(rulings) : [] };
+  const candidatesPool = [...profile.components, ...inventoryOnly(inventory, new Set(profile.components.map((c) => c.name)))];
+  const ctx = { profile, candidatesPool, byName: new Map(candidatesPool.map((c) => [c.name, c])), rulings: rulings ? readRulings(rulings) : [] };
   const results = needs.map((n) => resolveOne(n, ctx));
   const counts = {};
   for (const r of results) counts[r.verdict] = (counts[r.verdict] ?? 0) + 1;
@@ -201,7 +215,7 @@ export function renderResolveComponentMarkdown(r) {
     if (n.parts) out.push(`Build from: ${n.parts.map(code).join(", ")}.`, "");
     if (n.candidates.length) {
       out.push("| # | component | kind | tier | properties | why |", "| --- | --- | --- | --- | --- | --- |",
-        ...n.candidates.map((c) => `| ${c.rank} | ${code(c.name)} | ${c.kind} | ${c.tier} | ${c.properties.join("; ")} | ${c.evidence.join("; ")} |`), "");
+        ...n.candidates.map((c) => `| ${c.rank} | ${code(c.name)} | ${c.kind} | ${c.tier ?? "–"} | ${c.properties.join("; ")} | ${c.evidence.join("; ")} |`), "");
     }
     if (n.pattern) {
       out.push(`This system names components ${n.pattern.naming.flat ? "flat" : `with category prefixes (${Object.keys(n.pattern.naming.categoryPrefixes).join(", ") || "none seen"})`}, separator ${n.pattern.naming.separator ?? "none"}, leaf case ${JSON.stringify(n.pattern.naming.leafCase)}.`,
