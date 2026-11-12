@@ -1,18 +1,20 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://handoff-css/schema/design-system-handoff.v12plus.schema.json",
-  "title": "design-system-handoff, schema 12–19",
-  "description": "Schema 12+ = the 8–19 base document (`design-system-handoff.schema.json`, referenced below) PLUS the four structures schema 12 introduces and this generator now reads by name: `styles.*[].cssClass` (P21), `styles.TEXT[].typeRamp` (type ramp v2), a STRING variable's `fontWeightNumeric` (P22), and `cssCustomPropertySheets` (the export's own `:root`/theme blocks, cross-checked and never emitted). Stating them here rather than in the base keeps a schema 8-11 export validating exactly as it did before: those exports do not carry these fields, and requiring them there would fail a document that is still correct for its own version. `validate-export.mjs` dispatches on `schemaVersion`. Schema 18 adds `specs[]` and `builtReference[]` (present only when the file has them); schema 19 adds `annotations` (categories, and each node's annotations by node id) and `mixedStrokeCaps[]` (node ids), what the REST API cannot read, for the link-run Design handoff script (source-repo PRs #28/#30).",
-  "$comment": "The top level is closed. Every key a schema 12–19 export writes is named here (its shape, where it has one, is in the allOf documents), so a field the plugin adds without a new schemaVersion fails validate instead of passing unread.",
-  "properties": { "annotations": true, "artifact": true, "artifactFilename": true, "breakpoints": true, "builtReference": true, "changes": true, "collections": true, "compatibility": true, "contentHash": true, "contentHashPolicy": true, "counts": true, "cssCustomPropertySheets": true, "documentName": true, "exportVersion": true, "expressions": true, "figma": true, "fingerprint": true, "generatedAt": true, "globalUsage": true, "mixedStrokeCaps": true, "mode": true, "naming": true, "policies": true, "schema": true, "schemaChangeNote": true, "schemaVersion": true, "specs": true, "styleSummaries": true, "styles": true, "textStyleInheritance": true, "units": true, "validation": true },
+  "title": "design-system-handoff, schema 12–20",
+  "description": "Schema 12+ = the 8–20 base document (`design-system-handoff.schema.json`, referenced below) PLUS the four structures schema 12 introduces and this generator now reads by name: `styles.*[].cssClass` (P21), `styles.TEXT[].typeRamp` (type ramp v2), a STRING variable's `fontWeightNumeric` (P22), and `cssCustomPropertySheets` (the export's own `:root`/theme blocks, cross-checked and never emitted). Stating them here rather than in the base keeps a schema 8-11 export validating exactly as it did before: those exports do not carry these fields, and requiring them there would fail a document that is still correct for its own version. `validate-export.mjs` dispatches on `schemaVersion`. Schema 18 adds `specs[]` and `builtReference[]` (present only when the file has them); schema 20 adds `components[]` (every component and component set the file defines, once each; variants are not listed) and `counts.components`, present only when the file defines one; schema 19 adds `annotations` (categories, and each node's annotations by node id) and `mixedStrokeCaps[]` (node ids), what the REST API cannot read, for the link-run Design handoff script (source-repo PRs #28/#30).",
+  "$comment": "The top level is closed. Every key a schema 12–20 export writes is named here (its shape, where it has one, is in the allOf documents), so a field the plugin adds without a new schemaVersion fails validate instead of passing unread.",
+  "properties": { "annotations": true, "artifact": true, "artifactFilename": true, "breakpoints": true, "builtReference": true, "changes": true, "collections": true, "compatibility": true, "components": true, "contentHash": true, "contentHashPolicy": true, "counts": true, "cssCustomPropertySheets": true, "documentName": true, "exportVersion": true, "expressions": true, "figma": true, "fingerprint": true, "generatedAt": true, "globalUsage": true, "mixedStrokeCaps": true, "mode": true, "naming": true, "policies": true, "schema": true, "schemaChangeNote": true, "schemaVersion": true, "specs": true, "styleSummaries": true, "styles": true, "textStyleInheritance": true, "units": true, "validation": true },
   "unevaluatedProperties": false,
   "allOf": [
     { "$ref": "https://handoff-css/schema/design-system-handoff.schema.json" },
     {
       "type": "object",
       "required": ["schemaVersion", "styles", "cssCustomPropertySheets"],
+      "if": { "required": ["components"] },
+      "then": { "properties": { "schemaVersion": { "minimum": 20 } } },
       "properties": {
-        "schemaVersion": { "enum": [12, 13, 14, 15, 16, 17, 18, 19] },
+        "schemaVersion": { "enum": [12, 13, 14, 15, 16, 17, 18, 19, 20] },
         "styles": {
           "type": "object",
           "required": ["PAINT", "TEXT", "EFFECT", "GRID"],
@@ -76,6 +78,34 @@
                       "type": "array",
                       "items": { "type": "object", "required": ["type"], "properties": { "type": { "type": "string" } } }
                     }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "kind", "page", "properties"],
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "kind": { "enum": ["set", "component"] },
+              "page": { "type": "string" },
+              "properties": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["name", "type", "defaultValue", "options"],
+                  "properties": {
+                    "name": { "type": "string" },
+                    "type": { "type": "string" },
+                    "defaultValue": { "type": ["string", "number", "boolean", "null"] },
+                    "options": { "type": "array", "items": { "type": "string" } }
                   }
                 }
               }

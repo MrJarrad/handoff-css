@@ -59,7 +59,7 @@ values, then the semantic aliases. Add; never rewrite or remove a variable the d
 ## Components
 
 Step 3c is the same rule for components and blocks. `handoff-css components --export <layer export .json|.json.gz>…
-[--need <needs.json> [--rulings <md>]] [--out <dir>] [--json]`. With no `--need` it writes `component-profile.json`
+[--ds-export <design-system-handoff>.json…] [--need <needs.json> [--rulings <md>]] [--out <dir>] [--json]`. With no `--need` it writes `component-profile.json`
 and `component-profile.md` (`--check` reports drift). With `--need` it writes `component-resolve-report.json` and
 `.md`; exit 0 when every need is settled, 2 when one is open, 1 on an input error.
 

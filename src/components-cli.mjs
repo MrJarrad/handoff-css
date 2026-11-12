@@ -1,5 +1,5 @@
 // `handoff-css components` — the filesystem boundary around the component profile and component resolve.
-//   components --export <layer export>… [--out <dir>] [--check]                      profile only
+//   components --export <layer export>… [--ds-export <Design System Handoff export>…] [--out <dir>] [--check]   profile only
 //   components --export <layer export>… --need <needs.json> [--rulings <md>] [--json]  profile + resolve
 import path from "node:path";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
@@ -8,7 +8,7 @@ import { gunzipSync } from "node:zlib";
 import { buildComponentProfile, renderComponentProfileMarkdown } from "./component-profile.mjs";
 import { resolveComponentNeeds, renderResolveComponentMarkdown } from "./resolve-component.mjs";
 
-const USAGE = `handoff-css components --export <layer export .json|.json.gz>… [--out <dir>] [--check]\n  handoff-css components --export <layer export>… --need <needs.json> [--rulings <md>] [--out <dir>] [--json]\n`;
+const USAGE = `handoff-css components --export <layer export .json|.json.gz>… [--ds-export <Design System Handoff export>…] [--out <dir>] [--check]\n  handoff-css components --export <layer export>… --need <needs.json> [--rulings <md>] [--out <dir>] [--json]\n`;
 export const COMPONENT_FILES = { json: "component-profile.json", md: "component-profile.md" };
 export const COMPONENT_RESOLVE_FILES = { json: "component-resolve-report.json", md: "component-resolve-report.md" };
 export const EXIT = { settled: 0, error: 1, open: 2 };
@@ -20,12 +20,13 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
     return at === -1 || args[at + 1]?.startsWith("--") ? undefined : args[at + 1];
   };
   const exportPaths = args.flatMap((a, i) => (a === "--export" && args[i + 1] && !args[i + 1].startsWith("--") ? [args[i + 1]] : []));
+  const dsPaths = args.flatMap((a, i) => (a === "--ds-export" && args[i + 1] && !args[i + 1].startsWith("--") ? [args[i + 1]] : []));
   if (exportPaths.length === 0) {
     stderr.write(USAGE);
     return EXIT.error;
   }
   try {
-    const docs = exportPaths.map((p) => {
+    const readJson = (p) => {
       const file = abs(p);
       const text = /\.gz$/i.test(file) ? gunzipSync(readFileSync(file)).toString("utf8") : readFileSync(file, "utf8");
       try {
@@ -33,8 +34,9 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
       } catch (err) {
         throw new Error(`handoff-css: ${p}: ${err.message}`);
       }
-    });
-    const profile = buildComponentProfile(docs);
+    };
+    const docs = exportPaths.map(readJson);
+    const profile = buildComponentProfile(docs, { inventory: dsPaths.map(readJson) });
     for (const w of profile.warnings) stderr.write(`handoff-css (components): warning: ${w}\n`);
     const outDir = abs(one("--out") ?? ".");
     const needPath = one("--need");
@@ -58,7 +60,7 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
       }
       mkdirSync(outDir, { recursive: true });
       for (const [name, text] of Object.entries(outputs)) writeFileSync(path.join(outDir, name), text);
-      stdout.write(`handoff-css (components): ${profile.coverage.seen} components seen of an unknown total; wrote ${Object.keys(outputs).join(", ")} to ${outDir}\n`);
+      stdout.write(`handoff-css (components): ${profile.coverage.total === "unknown" ? `${profile.coverage.seen} components seen of an unknown total` : `${profile.coverage.seenInInventory} of ${profile.coverage.total} defined in the library are placed (${profile.coverage.outsideInventory} more from outside it)`}; wrote ${Object.keys(outputs).join(", ")} to ${outDir}\n`);
       return EXIT.settled;
     }
 

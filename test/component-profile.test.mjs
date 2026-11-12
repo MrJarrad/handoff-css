@@ -17,7 +17,7 @@ import { flatSystem, tieredSystem } from "./synthetic-components.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jhd = () => JSON.parse(gunzipSync(readFileSync(path.join(root, "fixtures", "jhd-v19-2026-10-29", "overlay.json.gz"))).toString("utf8"));
-const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(path.join(root, "schema", "component-profile.v1.schema.json"), "utf8")));
+const validate = new Ajv2020({ strict: false }).compile(JSON.parse(readFileSync(path.join(root, "schema", "component-profile.v2.schema.json"), "utf8")));
 const resolve = (profile, needs, rulings = null) => resolveComponentNeeds({ profile, needs, rulings });
 const verdicts = (r) => Object.fromEntries(r.needs.map((x) => [x.id, x.verdict]));
 
@@ -203,4 +203,60 @@ test("components command: writes the profile, checks drift, resolves needs, exit
 
   assert.equal((await run(["components"], dir)).code, 1);
   assert.equal((await run(["components", "--export", "nope.json"], dir)).code, 1);
+});
+
+// ---- HT-126: the Design System Handoff export's inventory makes the total known -----------------------
+// The inventory is a stand-in Design System Handoff export (schema 20) listing components by name; the
+// expected counts are derived from the profile built without it, never typed in from a real export.
+const inventoryOf = (names) => ({ schema: "design-system-handoff", schemaVersion: 20, documentName: "Library", contentHash: "h".repeat(64), components: names.map((name, i) => ({ id: `9:${i}`, name, kind: "set", page: "Components", properties: [] })) });
+
+test("inventory: total is the inventory's count, seen is split into in-inventory and outside, the rest is notSeen", () => {
+  const base = buildComponentProfile(tieredSystem());
+  const seenNames = base.components.map((c) => c.name);
+  const defined = base.components.filter((c) => c.defined).map((c) => c.name);
+  const p = buildComponentProfile(tieredSystem(), { inventory: [inventoryOf([...defined, "Zz Not Placed", "Aa Not Placed"])] });
+  assert.equal(validate(p), true, JSON.stringify(validate.errors));
+  assert.equal(p.coverage.total, defined.length + 2);
+  assert.equal(p.coverage.seenInInventory, defined.length);
+  assert.equal(p.coverage.outsideInventory, seenNames.length - defined.length);
+  assert.deepEqual(p.coverage.notSeen.map((x) => x.name), ["Aa Not Placed", "Zz Not Placed"]);
+  assert.equal(p.coverage.seen, base.coverage.seen);
+});
+
+test("inventory: absent keeps the total unknown and adds no inventory fields", () => {
+  const p = buildComponentProfile(flatSystem());
+  assert.equal(p.coverage.total, "unknown");
+  for (const k of ["seenInInventory", "outsideInventory", "notSeen"]) assert.equal(k in p.coverage, false, k);
+  assert.match(renderComponentProfileMarkdown(p), /of an unknown total/);
+});
+
+test("inventory: two exports of one library count a component once; an export without components[] is refused and names schema 20", () => {
+  const p = buildComponentProfile(flatSystem(), { inventory: [inventoryOf(["Button", "Card"]), inventoryOf(["Card", "Badge"])] });
+  assert.equal(p.coverage.total, 3);
+  assert.throws(() => buildComponentProfile(flatSystem(), { inventory: [{ schema: "design-system-handoff", schemaVersion: 19, documentName: "Old" }] }), /schema 20/);
+  assert.throws(() => buildComponentProfile(flatSystem(), { inventory: [{ schema: "design-handoff" }] }), /Design System Handoff export/);
+});
+
+test("inventory: the markdown states N of a known total and lists what no layer placed", () => {
+  const md = renderComponentProfileMarkdown(buildComponentProfile(flatSystem(), { inventory: [inventoryOf(["Button", "Card", "Tooltip"])] }));
+  assert.match(md, /of 3 defined in the library/);
+  assert.match(md, /Tooltip/);
+  assert.doesNotMatch(md, /unknown total/);
+});
+
+test("components command: --ds-export makes the total known; a Design System Handoff export without components is refused", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "components-ds-"));
+  writeFileSync(path.join(dir, "flat.json"), JSON.stringify(flatSystem()));
+  writeFileSync(path.join(dir, "ds.json"), JSON.stringify(inventoryOf(["Button", "Card", "Badge", "Tooltip"])));
+  let r = await run(["components", "--export", "flat.json", "--ds-export", "ds.json", "--out", "out"], dir);
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /of 4 defined in the library/);
+  const profile = JSON.parse(readFileSync(path.join(dir, "out", "component-profile.json"), "utf8"));
+  assert.equal(profile.coverage.total, 4);
+  assert.equal(profile.source.inventory[0].documentName, "Library");
+
+  writeFileSync(path.join(dir, "old.json"), JSON.stringify({ schema: "design-system-handoff", schemaVersion: 19, documentName: "Old" }));
+  r = await run(["components", "--export", "flat.json", "--ds-export", "old.json", "--out", "out2"], dir);
+  assert.equal(r.code, 1);
+  assert.match(r.err, /schema 20/);
 });

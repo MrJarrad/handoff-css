@@ -7,11 +7,13 @@
 // designer's to say.
 //
 // The limit is stated in the output, never hidden: a layer export lists the components its layers use
-// (and defines the ones it holds), so the profile sees "N of an unknown total". A Design System Handoff
-// export carries variables and styles only and has no component inventory.
+// (and defines the ones it holds), so on layer exports alone the profile sees "N of an unknown total".
+// A Design System Handoff export (schema 20+) lists every component its file defines; passed as
+// `inventory`, it makes the total known: the components that file defines. A library component a layer
+// only places is outside that inventory and is counted as such, never added to the total.
 import { fail } from "./resolve.mjs";
 
-export const COMPONENT_PROFILE_VERSION = 1;
+export const COMPONENT_PROFILE_VERSION = 2;
 
 const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 const count = (map, key, n = 1) => map.set(key, (map.get(key) ?? 0) + n);
@@ -37,12 +39,24 @@ function walk(node, visit, parent = null) {
 
 /**
  * @param {object[]} docs layer exports (schema `design-handoff`)
- * @returns {object} the component profile (see schema/component-profile.v1.schema.json)
+ * @param {{ inventory?: object[] }} [options] Design System Handoff exports (schema 20+) whose `components[]` is the inventory
+ * @returns {object} the component profile (see schema/component-profile.v2.schema.json)
  */
-export function buildComponentProfile(docs) {
+export function buildComponentProfile(docs, { inventory = [] } = {}) {
   const list = Array.isArray(docs) ? docs : [docs];
   if (list.length === 0 || list.some((d) => d?.schema !== "design-handoff" || !Array.isArray(d.layerTree) && !d.layerTree)) {
     fail("components: not a Design Handoff layer export (schema design-handoff with a layerTree)");
+  }
+
+  const inventoryDocs = Array.isArray(inventory) ? inventory : [inventory];
+  for (const d of inventoryDocs) {
+    if (d?.schema !== "design-system-handoff") fail("components: --ds-export is not a Design System Handoff export (schema design-system-handoff)");
+    if (!Array.isArray(d.components)) fail(`components: ${d.documentName ?? "the Design System Handoff export"} (schema ${d.schemaVersion ?? "?"}) lists no components; export it again with the Design System Handoff plugin (schema 20 or newer lists them)`);
+  }
+  // One inventory entry per name: two exports of the same library, or a set that repeats, count once.
+  const inventoryByName = new Map();
+  for (const d of inventoryDocs) {
+    for (const c of d.components) if (!inventoryByName.has(c.name)) inventoryByName.set(c.name, { name: c.name, kind: c.kind, page: c.page ?? null, file: d.documentName ?? "(unnamed)" });
   }
 
   const comps = new Map(); // name -> record
@@ -182,13 +196,26 @@ export function buildComponentProfile(docs) {
 
   return {
     componentProfileVersion: COMPONENT_PROFILE_VERSION,
-    source: { documents: list.map((d) => ({ documentName: d.documentName ?? null, contentHash: d.contentHash ?? null })) },
+    source: {
+      documents: list.map((d) => ({ documentName: d.documentName ?? null, contentHash: d.contentHash ?? null })),
+      ...(inventoryDocs.length ? { inventory: inventoryDocs.map((d) => ({ documentName: d.documentName ?? null, contentHash: d.contentHash ?? null })) } : {}),
+    },
     coverage: {
       seen: components.length,
       defined: components.filter((c) => c.defined).length,
       instanceOnly: components.filter((c) => !c.defined).length,
-      total: "unknown",
-      note: "A layer export lists the components its layers use and defines; it is not the library's inventory. A component missing here may still exist in the system.",
+      ...(inventoryDocs.length
+        ? {
+            total: inventoryByName.size,
+            seenInInventory: components.filter((c) => inventoryByName.has(c.name)).length,
+            outsideInventory: components.filter((c) => !inventoryByName.has(c.name)).length,
+            notSeen: [...inventoryByName.values()].filter((x) => !comps.has(x.name)).sort((a, b) => byText(a.name, b.name)),
+            note: "The total is the components the Design System Handoff export's file defines. A component a layer places from another library is outside it (outsideInventory) and not added to the total.",
+          }
+        : {
+            total: "unknown",
+            note: "A layer export lists the components its layers use and defines; it is not the library's inventory. A component missing here may still exist in the system. Pass a Design System Handoff export (schema 20+) to make the total known.",
+          }),
     },
     naming: {
       private: privateNames.length,
@@ -219,7 +246,12 @@ const table = (head, rows) => [`| ${head.join(" | ")} |`, `| ${head.map(() => "-
 
 export function renderComponentProfileMarkdown(p) {
   const out = ["# Component profile", ""];
-  out.push(`${p.coverage.seen} components seen (${p.coverage.defined} defined in these exports, ${p.coverage.instanceOnly} only placed), of an unknown total. ${p.coverage.note}`, "");
+  if (p.coverage.total === "unknown") {
+    out.push(`${p.coverage.seen} components seen (${p.coverage.defined} defined in these exports, ${p.coverage.instanceOnly} only placed), of an unknown total. ${p.coverage.note}`, "");
+  } else {
+    out.push(`${p.coverage.seenInInventory} of ${p.coverage.total} defined in the library are placed by these layer exports; ${p.coverage.outsideInventory} more are placed from outside it (${p.coverage.seen} components seen). ${p.coverage.note}`, "");
+    if (p.coverage.notSeen.length) out.push("## In the library, placed by no layer here", "", ...table(["Component", "Kind", "Page"], p.coverage.notSeen.map((x) => [x.name, x.kind, x.page])));
+  }
   out.push("Facts only: a gap or a tier is observed, never a verdict.", "");
   for (const w of p.warnings) out.push(`> Warning: ${w}`, "");
   out.push("## Naming", "", ...table(["Separator", "Depths", "Leaf case", "Flat", "Private (leading . or _)"],

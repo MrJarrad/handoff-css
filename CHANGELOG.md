@@ -4,6 +4,11 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ## Unreleased
 
+### Added
+
+- Design System Handoff schema 20 (figma-plugins): `components[]` lists every component and component set the file defines, once each (variants are not listed), with id, name, kind, page and property definitions, and `counts.components`. Present only when the file defines one. It is in `contentHash` and not in `designSystemStateHash`, so a new component never makes a token pair stale. A library component a file only places is not listed. `components[]` on an export that declares less than 20 is an error. The house preset accepts 20.
+- `components --ds-export <design-system-handoff>.json…`: the inventory makes the total known. The profile (now `componentProfileVersion` 2, `schema/component-profile.v2.schema.json`; the v1 schema stays at `./schema/component-profile/v1`) reports `total`, `seenInInventory`, `outsideInventory` and `notSeen`. Without `--ds-export` it is as before ("of an unknown total"). An export that lists no components is refused, naming schema 20.
+
 ### Fixed
 
 - `resolve`: a `*` want binds a new name only to a candidate holding the value in every mode (it used the first mode); the 0.5 and 5 tolerances are in the README and tested either side, with `SIBLING`; the no-house-names test now bans quoted `light`/`dark`/`core`/`palette` and has no exemption.
