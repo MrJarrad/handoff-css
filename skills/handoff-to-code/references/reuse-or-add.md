@@ -64,8 +64,10 @@ and `component-profile.md` (`--check` reports drift). With `--need` it writes `c
 `.md`; exit 0 when every need is settled, 2 when one is open, 1 on an input error.
 
 A layer export lists the components its layers use and define. It is not the library's inventory: the profile says
-how many it has seen "of an unknown total", and a component missing from it may still exist in the system. When the
-need is a new component, ask the designer to confirm it does not exist before the question is put as a new one.
+how many it has seen "of an unknown total". With `--ds-export`, `--need` also ranks against every component that export
+lists (a library component no layer places can be `REUSE`, `PROP_GAP` or the nearest `SIBLING`; its row says so); without
+it, only the components the layer exports use. When the need is a new component, ask the designer to confirm it does not
+exist before the question is put as a new one.
 
 A need is `{ "id", "name"?, "wants"? }` with at least one of `name`, `wants`. `wants.props` maps a property name to
 the value the build sets; `wants.children` lists component names a composition is made of.

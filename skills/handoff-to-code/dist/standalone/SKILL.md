@@ -239,7 +239,8 @@ are read from the exports, never from memory of another system.
    bind. Keep it beside the work. Facts only; a tier or a gap is never a verdict.
 2. Write each component or block the build needs as a list (`schema/resolve-component-need.v1.schema.json`) and
    run `handoff-css components --export … --need <needs.json> [--rulings <md>]`. Verdicts and the rulings table:
-   `references/reuse-or-add.md` § Components.
+   `references/reuse-or-add.md` § Components. With `--ds-export`, the need is ranked against every component that export
+   lists; without it, only the components the layer exports use.
 3. `REUSE` and `REUSE_WITH_PROP` close the need: build the component as it is, setting only the properties the
    report lists. `RULED` closes it too. `PROP_GAP`, `SIBLING`, `COMPOSE`, `NEW_COMPONENT` and `RULING_STALE`
    are **one question** to the designer with a recommendation; a component is never added to the design file,
