@@ -2,6 +2,12 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
+## Unreleased
+
+### Changed
+
+- `components --need` with `--ds-export`: a need is ranked against the library's full `components[]`, not only the components a layer export uses. A library component no layer places can now be `REUSE`, `REUSE_WITH_PROP`, `PROP_GAP` or the nearest `SIBLING`; its candidate row says it is in the library and placed by no layer here. A component a layer does place keeps the layer's record. Without `--ds-export` nothing changes.
+
 ## 0.17.0 — 2026-11-12
 
 ### Added
