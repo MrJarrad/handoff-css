@@ -191,7 +191,7 @@ const code = (s) => `\`${s}\``;
 
 export function renderResolveComponentMarkdown(r) {
   const out = ["# Component resolve report", "",
-    `${r.needs.length} needs, ${r.open} open. Components seen: ${r.coverage.seen} of an unknown total — a component not listed may still exist in the system.`, "",
+    `${r.needs.length} needs, ${r.open} open. ${r.coverage.total === "unknown" ? `Components seen: ${r.coverage.seen} of an unknown total — a component not listed may still exist in the system.` : `Components seen: ${r.coverage.seen}; the library defines ${r.coverage.total}, ${r.coverage.seenInInventory} of them placed by these layers.`}`, "",
     "Reuse comes first: a component the system has is used as it is, with its own properties. Anything else is one question for the designer, never an invented component. Until ruled, the build carries a local component marked `assumed-ask`.", ""];
   for (const n of r.needs) {
     out.push(`## ${n.id} — ${n.verdict}`, "", `Asked: ${n.ask.name ? code(n.ask.name) : "(no name)"}${n.ask.wants ? ` ${code(JSON.stringify(n.ask.wants))}` : ""}.`, "");

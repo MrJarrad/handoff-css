@@ -427,9 +427,12 @@ rerun is byte-identical (`test/resolve.test.mjs`).
 
 ### `components` — how does this system build its components, and does it already have this one?
 
-`handoff-css components --export <layer export .json|.json.gz>… [--out <dir>] [--check]` reads one or more Design
+`handoff-css components --export <layer export .json|.json.gz>… [--ds-export <Design System Handoff export>…] [--out <dir>] [--check]` reads one or more Design
 Handoff layer exports and writes `component-profile.json` and `component-profile.md`: the components seen (a layer
-export lists only the components its layers use and define, so the count is "of an unknown total"), how they are
+export lists only the components its layers use and define, so the count is "of an unknown total" unless `--ds-export`
+passes a Design System Handoff export of schema 20 or newer: it lists every component its file defines, so the profile
+reports "N of M defined in the library are placed", names the ones no layer placed, and counts a component placed
+from another library as outside it, never in the total), how they are
 named, the properties they share, how deeply they nest, and which token collections they bind. Facts only. A
 component name defined in two exports is read as one component and warned about.
 

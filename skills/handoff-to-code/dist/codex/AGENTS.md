@@ -216,9 +216,10 @@ already has it and how it builds such things. **Reuse first; add only when nothi
 what a component is called, how names are grouped, which properties it carries and how deeply components nest
 are read from the exports, never from memory of another system.
 
-1. `handoff-css components --export <design-handoff>.json [--export …]` writes `component-profile.md`: the
-   components seen (a layer export lists only the components its layers use, so the count is "N of an unknown
-   total"), how they are named, the properties they share, how deep they nest, and which token collections they
+1. `handoff-css components --export <design-handoff>.json [--export …] [--ds-export <design-system-handoff>.json]`
+   writes `component-profile.md`: the components seen (a layer export lists only the components its layers use,
+   so the count is "N of an unknown total" unless the Design System Handoff export, schema 20 or newer, is passed
+   with `--ds-export`: it lists every component its file defines, so the count is "N of M"), how they are named, the properties they share, how deep they nest, and which token collections they
    bind. Keep it beside the work. Facts only; a tier or a gap is never a verdict.
 2. Write each component or block the build needs as a list (`schema/resolve-component-need.v1.schema.json`) and
    run `handoff-css components --export … --need <needs.json> [--rulings <md>]`. Verdicts and the rulings table:
