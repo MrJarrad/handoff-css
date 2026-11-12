@@ -2,12 +2,16 @@
 
 All notable changes to `handoff-css`. Dates are the release date; versions follow semver.
 
-## Unreleased
+## 0.17.0 — 2026-11-12
 
 ### Added
 
 - Design System Handoff schema 20 (figma-plugins): `components[]` lists every component and component set the file defines, once each (variants are not listed), with id, name, kind, page and property definitions, and `counts.components`. Present only when the file defines one. It is in `contentHash` and not in `designSystemStateHash`, so a new component never makes a token pair stale. A library component a file only places is not listed. `components[]` on an export that declares less than 20 is an error. The house preset accepts 20.
 - `components --ds-export <design-system-handoff>.json…`: the inventory makes the total known. The profile (now `componentProfileVersion` 2, `schema/component-profile.v2.schema.json`; the v1 schema stays at `./schema/component-profile/v1`) reports `total`, `seenInInventory`, `outsideInventory` and `notSeen`. Without `--ds-export` it is as before ("of an unknown total"). An export that lists no components is refused, naming schema 20.
+
+### Changed
+
+- Component profile version 2 (`componentProfileVersion`, `schema/component-profile.v2.schema.json`). A component profile committed from an earlier release (version 1) needs one regenerate: run `handoff-css components … --out <dir>` again, and `components --check` reports it as out of date until you do.
 
 ### Fixed
 
