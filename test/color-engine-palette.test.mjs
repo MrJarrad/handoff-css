@@ -33,7 +33,7 @@ test("a brand palette with a near-black keeps it as the neutral ramp; none is ad
   const sys = paletteToSystem(SLACK);
   assert.equal(byName(sys, "neutral"), undefined);
   assert.equal(sys.neutral.from, "brand");
-  assert.equal(sys.neutral.ramp, "black");
+  assert.deepEqual(sys.neutral.ramps, ["black"]);
 });
 
 test("a palette with no neutral gets one derived at the hue of its darkest colour, barely tinted", () => {
@@ -87,4 +87,25 @@ test("bad input is refused by name", () => {
   assert.throws(() => paletteToSystem([]), /at least one colour/);
   assert.throws(() => paletteToSystem([{ name: "a", hex: "#111111" }, { name: "a", hex: "#222222" }]), /duplicate colour name "a"/);
   assert.throws(() => paletteToSystem([{ name: "a", hex: "nope" }]), /not a colour/);
+});
+
+test("a brand colour named like a role the system adds keeps its name; the added ramp takes a suffix", () => {
+  const sys = paletteToSystem([{ name: "neutral", hex: "#cc3300" }, { name: "info", hex: "#ff00aa" }]);
+  const names = sys.ramps.map((r) => r.name);
+  assert.equal(new Set(names).size, names.length, `duplicate ramp names: ${names}`);
+  assert.equal(byName(sys, "neutral").source, "brand");
+  assert.equal(byName(sys, "info").source, "brand");
+  const derived = sys.ramps.find((r) => r.source === "derived-neutral");
+  assert.notEqual(derived.name, "neutral");
+  assert.ok(derived.name.startsWith("neutral"));
+  assert.deepEqual(sys.neutral, { from: "derived", ramps: [derived.name] });
+  const info = sys.feedback.find((f) => f.role === "info");
+  assert.ok(info.added, "a magenta does not cover info");
+  assert.equal(byName(sys, info.added).source, "feedback");
+  assert.notEqual(info.added, "info");
+});
+
+test("two brand greys are both reported as the neutral", () => {
+  const sys = paletteToSystem([{ name: "ink", hex: "#1d1c1d" }, { name: "stone", hex: "#8a8a8a" }, { name: "red", hex: "#e01e5a" }]);
+  assert.deepEqual(sys.neutral, { from: "brand", ramps: ["ink", "stone"] });
 });
