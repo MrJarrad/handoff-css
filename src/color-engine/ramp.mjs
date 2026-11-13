@@ -220,8 +220,13 @@ export function generateRampMulti(opts) {
   });
 }
 
-/** Placement ladder: lightness of a step on a gamma-warped white→black ladder. */
-function ladderLightness(step, steps, lightMax = 0.98, lightMin = 0.14) {
+// Placement ladder: lightness of a step on a gamma-warped white→black ladder. Its ends are the ends the ramp
+// is generated to when the caller names them (a fitted system's, or its own: `lightMax`, `lightMin`), so a
+// colour is placed on the ladder its ramp will be built on. With none named, the ladder is this default pair,
+// which is not the generation default (a per-hue light ceiling and DEFAULT_LIGHT_MIN).
+const LADDER_LIGHT_MAX = 0.98;
+const LADDER_LIGHT_MIN = 0.14;
+function ladderLightness(step, steps, lightMax = LADDER_LIGHT_MAX, lightMin = LADDER_LIGHT_MIN) {
   const first = Math.min(...steps);
   const last = Math.max(...steps);
   return lightMax - rampG(step, first, last) * (lightMax - lightMin);
@@ -229,7 +234,8 @@ function ladderLightness(step, steps, lightMax = 0.98, lightMin = 0.14) {
 
 // A fully saturated colour may sit no lighter than a quarter of the way down the ramp (300 on 100–900).
 const VIBRANCY_FLOOR_POS = 0.25;
-const GEN_DARK = 0.3;
+// A colour no lighter than this is placed on the last step (the default dark end of a generated ramp).
+const GEN_DARK = DEFAULT_LIGHT_MIN;
 // Below this chroma a colour is a near-neutral and is placed by lightness alone.
 const NEUTRAL_C = 0.035;
 
@@ -254,14 +260,17 @@ function rampEvenness(seedHex, steps, anchorStep, lightness) {
 /** The step a colour occupies on a ramp with these steps (any scale). Its ladder rung by placement
  *  lightness, held no lighter than the vibrancy floor; a chromatic colour then takes whichever of that rung
  *  and its two neighbours gives the most even ramp. Works by step index, so 50–950 or 1–12 place the same
- *  way 100–900 does.
+ *  way 100–900 does. The ladder runs between the `lightness` ends when they are named (the ends the ramp is
+ *  generated to), and between 0.98 and 0.14 when they are not; a colour no lighter than `lightMin` (0.30 when
+ *  not named) is placed on the last step.
  *  @param {string} seedHex @param {number[]} steps @param {{ lightMin?: number, lightMax?: number }} [lightness] */
 export function nearestStep(seedHex, steps, lightness = {}) {
   const sorted = [...steps].sort((a, b) => a - b);
   const o = hexToOklch(seedHex);
   const L = placementLightness(seedHex);
-  if (L <= GEN_DARK) return sorted[sorted.length - 1];
-  const byLight = sorted.reduce((best, s, i) => (Math.abs(ladderLightness(s, sorted) - L) < Math.abs(ladderLightness(sorted[best], sorted) - L) ? i : best), 0);
+  if (L <= (lightness.lightMin ?? GEN_DARK)) return sorted[sorted.length - 1];
+  const rung = (s) => Math.abs(ladderLightness(s, sorted, lightness.lightMax, lightness.lightMin) - L);
+  const byLight = sorted.reduce((best, s, i) => (rung(s) < rung(sorted[best]) ? i : best), 0);
   const sat = clamp(o.c / SAT_FULL, 0, 1);
   const floor = Math.round(sat * VIBRANCY_FLOOR_POS * (sorted.length - 1));
   const natural = Math.min(Math.max(byLight, floor), sorted.length - 1);

@@ -10,6 +10,7 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Changed
 
+- Colour engine: placement now follows the lightness ends a ramp is generated to. `nearestStep` puts a colour on the white-to-black ladder between the `lightMin` and `lightMax` it is given (a fitted system's, or the caller's), and the "place on the last step" cut-off is that same `lightMin`. With none given, the ladder (0.98 to 0.14) and the cut-off (0.30) are unchanged, so placement without named ends and the recorded golden are unchanged. On a fitted system, some colours place one step differently. New golden `fixtures/color-engine/placement-fitted.json.gz` (rebuild with `node test/placement-golden-build.mjs`).
 - `components --need` with `--ds-export`: a need is ranked against the library's full `components[]`, not only the components a layer export uses. A library component no layer places can now be `REUSE`, `REUSE_WITH_PROP`, `PROP_GAP` or the nearest `SIBLING`; its candidate row says it is in the library and placed by no layer here. A component a layer does place keeps the layer's record. Without `--ds-export` nothing changes.
 
 ## 0.17.0 — 2026-11-12
