@@ -20,7 +20,7 @@ const cellHex = (cell) => hex6(cell?.build?.literal ?? cell?.alias?.terminalValu
 const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 /** The system's colour ramps with every step's colour, read from the export. */
-function colourRamps(doc, profile) {
+export function colourRamps(doc, profile) {
   const out = [];
   for (const r of profile.ramps.filter((x) => x.type === "COLOR")) {
     const c = doc.collections.find((x) => x.name === r.collection);
