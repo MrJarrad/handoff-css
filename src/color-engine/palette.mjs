@@ -28,7 +28,7 @@ const hueDist = (a, b) => {
 
 /** @param {{ name: string, hex: string, step?: number }[]} colours
  *  @param {Partial<typeof PALETTE_DEFAULTS>} [options]
- *  @returns {{ ramps: object[], neutral: { from: "brand" | "derived", ramp: string },
+ *  @returns {{ ramps: object[], neutral: { from: "brand" | "derived", ramps: string[] },
  *    feedback: ({ role: string, hue: number, covers: string } | { role: string, hue: number, added: string } | { role: string, hue: number, gap: true })[],
  *    notes: { kind: "anchor-at-end-step", ramp: string, step: number }[] }} */
 export function paletteToSystem(colours, options = {}) {
@@ -53,9 +53,15 @@ export function paletteToSystem(colours, options = {}) {
 
   const notes = [];
   const ramps = groups.map((g) => build(g.name, g.members, "brand", opt, notes));
-  const neutralBrand = groups.find((g) => g.neutral);
+  const neutralBrand = groups.filter((g) => g.neutral);
+  // An added ramp never takes a brand name: on a collision it gets a numbered suffix.
+  const free = (name) => {
+    const taken = new Set(ramps.map((r) => r.name));
+    for (let n = 1, c = name; ; c = `${name}-${++n}`) if (!taken.has(c)) return c;
+  };
   const darkest = [...given].sort((a, b) => a.o.l - b.o.l)[0];
-  if (!neutralBrand) ramps.push(build("neutral", [{ hex: oklchToHex({ ...NEUTRAL_SEED, h: darkest.o.h }) }], "derived-neutral", opt, notes));
+  let neutralName = null;
+  if (!neutralBrand.length) ramps.push(build((neutralName = free("neutral")), [{ hex: oklchToHex({ ...NEUTRAL_SEED, h: darkest.o.h }) }], "derived-neutral", opt, notes));
 
   const chromatic = ramps.filter((r) => r.source === "brand" && !groups.find((g) => g.name === r.name).neutral);
   const feedback = Object.entries(FEEDBACK_HUES).map(([role, hue]) => {
@@ -66,13 +72,14 @@ export function paletteToSystem(colours, options = {}) {
     if (near) return { role, hue, covers: near.r.name };
     if (!opt.addFeedback) return { role, hue, gap: true };
     const seed = oklchToHex({ l: FEEDBACK_SEED.l, c: Math.min(FEEDBACK_SEED.c, maxChroma(FEEDBACK_SEED.l, hue)), h: hue });
-    ramps.push(build(role, [{ hex: seed }], "feedback", opt, notes));
-    return { role, hue, added: role };
+    const added = free(role);
+    ramps.push(build(added, [{ hex: seed }], "feedback", opt, notes));
+    return { role, hue, added };
   });
 
   return {
     ramps,
-    neutral: neutralBrand ? { from: "brand", ramp: neutralBrand.name } : { from: "derived", ramp: "neutral" },
+    neutral: neutralBrand.length ? { from: "brand", ramps: neutralBrand.map((g) => g.name) } : { from: "derived", ramps: [neutralName] },
     feedback,
     notes,
   };
