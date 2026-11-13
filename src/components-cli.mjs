@@ -10,7 +10,7 @@ import { scanComponentSource, compareComponents, renderComponentCompareMarkdown 
 import { buildComponentProfile, renderComponentProfileMarkdown } from "./component-profile.mjs";
 import { resolveComponentNeeds, renderResolveComponentMarkdown } from "./resolve-component.mjs";
 
-const USAGE = `handoff-css components --export <layer export .json|.json.gz>… [--ds-export <Design System Handoff export>…] [--src <code paths…>] [--out <dir>] [--check]\n  handoff-css components --export <layer export>… --need <needs.json> [--rulings <md>] [--out <dir>] [--json]\n`;
+const USAGE = `handoff-css components [--export <layer export .json|.json.gz>…] [--ds-export <Design System Handoff export>…] [--src <code paths…>] [--out <dir>] [--check]   (--export or --ds-export, or both)\n  handoff-css components --export <layer export>… --need <needs.json> [--rulings <md>] [--out <dir>] [--json]\n`;
 export const COMPONENT_FILES = { json: "component-profile.json", md: "component-profile.md" };
 export const COMPONENT_COMPARE_FILES = { json: "component-code-compare.json", md: "component-code-compare.md" };
 export const COMPONENT_RESOLVE_FILES = { json: "component-resolve-report.json", md: "component-resolve-report.md" };
@@ -24,7 +24,7 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
   };
   const exportPaths = args.flatMap((a, i) => (a === "--export" && args[i + 1] && !args[i + 1].startsWith("--") ? [args[i + 1]] : []));
   const dsPaths = args.flatMap((a, i) => (a === "--ds-export" && args[i + 1] && !args[i + 1].startsWith("--") ? [args[i + 1]] : []));
-  if (exportPaths.length === 0) {
+  if (exportPaths.length === 0 && dsPaths.length === 0) {
     stderr.write(USAGE);
     return EXIT.error;
   }
@@ -71,7 +71,7 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
       }
       mkdirSync(outDir, { recursive: true });
       for (const [name, text] of Object.entries(outputs)) writeFileSync(path.join(outDir, name), text);
-      stdout.write(`handoff-css (components): ${profile.coverage.total === "unknown" ? `${profile.coverage.seen} components seen of an unknown total` : `${profile.coverage.seenInInventory} of ${profile.coverage.total} defined in the library are placed (${profile.coverage.outsideInventory} more from outside it)`}; wrote ${Object.keys(outputs).join(", ")} to ${outDir}\n`);
+      stdout.write(`handoff-css (components): ${profile.coverage.basis === "inventory" ? `${profile.coverage.total} components defined in the library (no layer export given)` : profile.coverage.total === "unknown" ? `${profile.coverage.seen} components seen of an unknown total` : `${profile.coverage.seenInInventory} of ${profile.coverage.total} defined in the library are placed (${profile.coverage.outsideInventory} more from outside it)`}; wrote ${Object.keys(outputs).join(", ")} to ${outDir}\n`);
       if (compare) stdout.write(`handoff-css (components): against code, ${compare.counts.components.matched} matched, ${compare.counts.props.propGaps} prop gaps, ${compare.counts.components.codeOnly} code-only\n`);
       return EXIT.settled;
     }

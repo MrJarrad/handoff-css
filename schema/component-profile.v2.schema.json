@@ -165,6 +165,31 @@
               }
             }
           }
+        },
+        "basis": {
+          "const": "inventory"
+        },
+        "ambiguousNames": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "pages"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "pages": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -392,6 +417,18 @@
           },
           "tokenGroups": {
             "$ref": "#/$defs/counts"
+          },
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "page": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       }

@@ -427,7 +427,7 @@ rerun is byte-identical (`test/resolve.test.mjs`).
 
 ### `components` — how does this system build its components, and does it already have this one?
 
-`handoff-css components --export <layer export .json|.json.gz>… [--ds-export <Design System Handoff export>…] [--out <dir>] [--check]` reads one or more Design
+`handoff-css components [--export <layer export .json|.json.gz>…] [--ds-export <Design System Handoff export>…] [--out <dir>] [--check]` reads one or more Design
 Handoff layer exports and writes `component-profile.json` and `component-profile.md`: the components seen (a layer
 export lists only the components its layers use and define, so the count is "of an unknown total" unless `--ds-export`
 passes a Design System Handoff export of schema 20 or newer: it lists every component its file defines, so the profile
@@ -435,6 +435,8 @@ reports "N of M defined in the library are placed", names the ones no layer plac
 from another library as outside it, never in the total), how they are
 named, the properties they share, how deeply they nest, and which token collections they bind. Facts only. A
 component name defined in two exports is read as one component and warned about.
+
+`--ds-export` alone (no `--export`) makes the profile the inventory itself: every component the Design System Handoff export's file defines, with its properties, none counted as placed. The inventory is counted per library component (page and name), so a name defined on two pages is two components; a layer instance names the component but not its page, so `coverage.ambiguousNames` lists those names.
 
 `... --src <code paths…>` also reads each React component's structure from code and writes `component-code-compare.json` and `.md`: per design component, its code match (names equal once case and separators are set aside; never by similarity), each property as matched, a value gap (variant options differ) or a prop gap (no same-named code prop; the Figma `#id` suffix and kebab case are set aside), composition (a nested component the code does not render, and the reverse), code props the design lacks, and the design-only and code-only components. It is a text scan, not a type checker: a props type it cannot see into is listed as extended, never guessed. Classing a gap (build prop, state, responsive, Figma-only) stays the designer's.
 
