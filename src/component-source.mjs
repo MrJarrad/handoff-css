@@ -213,6 +213,9 @@ const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
  * @returns the comparison: counts, matched components with per-property and composition rows, design-only and code-only components
  */
 export function compareComponents(profile, scan) {
+  // A library component that carries a page (a profile built from an inventory) keeps it on its row, so
+  // components sharing a name on different pages stay separate rows.
+  const where = (d) => (d.page !== undefined ? { id: d.id, page: d.page } : {});
   const code = new Map(scan.components.map((c) => [nameKey(c.name), c]));
   const codeKeyOf = (designName) => code.get(nameKey(designName));
   const design = profile.components;
@@ -222,7 +225,7 @@ export function compareComponents(profile, scan) {
 
   for (const d of design) {
     const c = codeKeyOf(d.name);
-    if (!c) { designOnly.push({ name: d.name, kind: d.kind, properties: d.properties.length }); continue; }
+    if (!c) { designOnly.push({ name: d.name, ...where(d), kind: d.kind, properties: d.properties.length }); continue; }
     matchedCode.add(c.name);
     const codeProps = new Map(c.props.map((p) => [propKey(p.name), p]));
     const rows = d.properties.map((dp) => {
@@ -242,6 +245,7 @@ export function compareComponents(profile, scan) {
     const rendered = new Set(c.renders.map(nameKey));
     matched.push({
       name: d.name,
+      ...where(d),
       code: { name: c.name, file: c.file, line: c.line },
       props: rows,
       codeOnlyProps: c.props.filter((p) => !d.properties.some((dp) => propKey(dp.name) === propKey(p.name))).map((p) => p.name).sort(byText),
@@ -268,13 +272,13 @@ export function renderComponentCompareMarkdown(r) {
   const out = ["# Design vs code: components", "",
     `${c.matched} of ${c.design} design components matched in code; ${c.designOnly} design-only, ${c.codeOnly} code-only. Of ${p.design} properties on the matched ones: ${p.matched} matched, ${p.valueGaps} with differing values, ${p.propGaps} with no code prop.`, "", r.note, ""];
   out.push("## Matched components", "", ...table(["Design", "Code", "Property", "Status", "Detail"],
-    r.matched.flatMap((m) => m.props.map((x) => [m.name, `${m.code.name} (${m.code.file}:${m.code.line})`, x.name, x.status,
+    r.matched.flatMap((m) => m.props.map((x) => [m.page ? `${m.name} (${m.page})` : m.name, `${m.code.name} (${m.code.file}:${m.code.line})`, x.name, x.status,
       x.status === "value-gap" ? `design-only: ${x.missingInCode.join(", ") || "none"}; code-only: ${x.onlyInCode.join(", ") || "none"}` : x.status === "prop-gap" ? `design ${x.design.type}` : ""]))));
   const comp = r.matched.filter((m) => m.composition.missingInCode.length || m.composition.onlyInCode.length);
   if (comp.length) out.push("## Composition", "", ...table(["Component", "Design nests, code does not render", "Code renders, design does not nest"], comp.map((m) => [m.name, m.composition.missingInCode.join(", "), m.composition.onlyInCode.join(", ")])));
   const extra = r.matched.filter((m) => m.codeOnlyProps.length);
   if (extra.length) out.push("## Code props the design does not have", "", ...table(["Component", "Props"], extra.map((m) => [m.name, m.codeOnlyProps.join(", ")])));
-  out.push("## Design components with no code match", "", ...table(["Component", "Kind", "Properties"], r.designOnly.map((x) => [x.name, x.kind, x.properties])));
+  out.push("## Design components with no code match", "", ...table(["Component", "Kind", "Properties"], r.designOnly.map((x) => [x.page ? `${x.name} (${x.page})` : x.name, x.kind, x.properties])));
   out.push("## Code components with no design match", "", ...table(["Component", "Where", "Props"], r.codeOnly.map((x) => [x.name, `${x.file}:${x.line}`, x.props])));
   return out.join("\n");
 }

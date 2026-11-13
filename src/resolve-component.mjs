@@ -94,8 +94,9 @@ function inventoryOnly(inventory, seen) {
   const rows = new Map();
   for (const d of inventory) {
     for (const c of d.components ?? []) {
-      if (seen.has(c.name) || rows.has(c.name)) continue;
-      rows.set(c.name, { name: c.name, kind: c.kind, tier: null, fromInventory: true, properties: (c.properties ?? []).map((p) => ({ name: p.name, type: p.type, default: p.defaultValue ?? null, options: p.options?.length ? p.options : null })) });
+      const key = `${c.page ?? ""}\u0000${c.name}`;
+      if (seen.has(c.name) || rows.has(key)) continue;
+      rows.set(key, { name: c.name, ...(c.page ? { page: c.page } : {}), kind: c.kind, tier: null, fromInventory: true, properties: (c.properties ?? []).map((p) => ({ name: p.name, type: p.type, default: p.defaultValue ?? null, options: p.options?.length ? p.options : null })) });
     }
   }
   return [...rows.values()];
@@ -116,6 +117,7 @@ function resolveOne(need, ctx) {
     .map((r, i) => ({
       rank: i + 1,
       name: r.c.name,
+      ...(r.c.page ? { page: r.c.page } : {}),
       kind: r.c.kind,
       tier: r.c.tier,
       properties: r.c.properties.map((p) => `${p.name}${p.options ? `: ${p.options.join(" | ")}` : ""}`),
@@ -187,7 +189,7 @@ export function resolveComponentNeeds({ profile, needs, rulings = null, inventor
     ids.add(n.id);
   }
   const candidatesPool = [...profile.components, ...inventoryOnly(inventory, new Set(profile.components.map((c) => c.name)))];
-  const ctx = { profile, candidatesPool, byName: new Map(candidatesPool.map((c) => [c.name, c])), rulings: rulings ? readRulings(rulings) : [] };
+  const ctx = { profile, candidatesPool, byName: new Map([...candidatesPool].reverse().map((c) => [c.name, c])), rulings: rulings ? readRulings(rulings) : [] };
   const results = needs.map((n) => resolveOne(n, ctx));
   const counts = {};
   for (const r of results) counts[r.verdict] = (counts[r.verdict] ?? 0) + 1;

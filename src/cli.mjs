@@ -26,7 +26,7 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
               [--config <mjs>] [--allow-name <name>…] [--json]
   handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--json]
   handoff-css profile --export <json|json.gz|zip> [--out <dir>] [--check]
-  handoff-css components --export <layer export .json|.json.gz>… [--need <needs.json> [--rulings <md>]] [--out <dir>] [--check|--json]
+  handoff-css components [--export <layer export .json|.json.gz>…] [--ds-export <Design System Handoff export>…] [--src <code paths…>] [--need <needs.json> [--rulings <md>]] [--out <dir>] [--check|--json]
   handoff-css resolve --export <json|json.gz|zip> --need <needs.json> [--rulings <md>] [--out <dir>] [--json]
   handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch]
                    [--for <semantic>[@step]… --on <surface>… [--use text|large-text|ui] [--keep-anchor]] [--out <dir>] [--json]

@@ -44,26 +44,42 @@ function walk(node, visit, parent = null) {
  */
 export function buildComponentProfile(docs, { inventory = [] } = {}) {
   const list = Array.isArray(docs) ? docs : [docs];
-  if (list.length === 0 || list.some((d) => d?.schema !== "design-handoff" || !Array.isArray(d.layerTree) && !d.layerTree)) {
+  const inventoryDocs = Array.isArray(inventory) ? inventory : [inventory];
+  // No layer export is allowed when an inventory is given: the profile is then the inventory itself.
+  if ((list.length === 0 && inventoryDocs.length === 0) || list.some((d) => d?.schema !== "design-handoff" || !Array.isArray(d.layerTree) && !d.layerTree)) {
     fail("components: not a Design Handoff layer export (schema design-handoff with a layerTree)");
   }
 
-  const inventoryDocs = Array.isArray(inventory) ? inventory : [inventory];
   for (const d of inventoryDocs) {
     if (d?.schema !== "design-system-handoff") fail("components: --ds-export is not a Design System Handoff export (schema design-system-handoff)");
     if (!Array.isArray(d.components)) fail(`components: ${d.documentName ?? "the Design System Handoff export"} (schema ${d.schemaVersion ?? "?"}) lists no components; export it again with the Design System Handoff plugin (schema 20 or newer lists them)`);
   }
-  // One inventory entry per name: two exports of the same library, or a set that repeats, count once.
-  const inventoryByName = new Map();
+  // One inventory entry per library component: its file, page and name. Two components with one name on
+  // different pages stay two; the same library exported twice counts each component once.
+  const inventoryEntries = new Map();
   for (const d of inventoryDocs) {
-    for (const c of d.components) if (!inventoryByName.has(c.name)) inventoryByName.set(c.name, { name: c.name, kind: c.kind, page: c.page ?? null, file: d.documentName ?? "(unnamed)" });
+    for (const c of d.components) {
+      const file = d.documentName ?? "(unnamed)";
+      const key = [file, c.page ?? "", c.name].join("\u0000");
+      if (!inventoryEntries.has(key)) inventoryEntries.set(key, { id: c.id ?? null, name: c.name, kind: c.kind, page: c.page ?? null, file, properties: c.properties ?? [] });
+    }
   }
+  const inventoryNames = new Set([...inventoryEntries.values()].map((x) => x.name));
+  const inventoryOnly = list.length === 0;
 
   const comps = new Map(); // name -> record
   const rec = (name) => {
     if (!comps.has(name)) comps.set(name, { name, defined: false, kind: null, ids: new Set(), definedIn: new Set(), properties: new Map(), observed: new Map(), nests: new Map(), bindings: new Map(), placed: 0, files: new Set() });
     return comps.get(name);
   };
+
+  if (inventoryOnly) {
+    // The inventory is the profile: each library component is a defined row with its own properties; nothing is placed.
+    for (const [key, e] of inventoryEntries) {
+      Object.assign(rec(key), { name: e.name, defined: true, kind: e.kind ?? "component", id: e.id, page: e.page, files: new Set([e.file]),
+        properties: new Map(e.properties.map((x) => [cleanKey(x.name), { type: x.type, default: x.defaultValue ?? null, options: x.options?.length ? x.options : null }])) });
+    }
+  }
 
   for (const [docIndex, doc] of list.entries()) {
     const file = doc.documentName ?? "(unnamed)";
@@ -121,7 +137,7 @@ export function buildComponentProfile(docs, { inventory = [] } = {}) {
     .sort((a, b) => byText(a.name, b.name))
     .map((r) => `${r.name} is defined in ${r.definedIn.size} exports (${[...r.definedIn].map((x) => x.split("\u0000")[1]).join(", ")}); they are read as one component and the later export's properties win. Check they are the same component.`);
 
-  const rows = [...comps.values()].sort((a, b) => byText(a.name, b.name));
+  const rows = [...comps.values()].sort((a, b) => byText(a.name, b.name) || byText(a.page ?? "", b.page ?? ""));
 
   // Tiers: how deep each component's nesting goes, over the components seen. Names for tiers are never imposed.
   const level = new Map();
@@ -144,6 +160,7 @@ export function buildComponentProfile(docs, { inventory = [] } = {}) {
       : [...r.observed].sort(([a], [b]) => byText(a, b)).map(([name, d]) => ({ name, type: d.type, default: null, options: d.values.size ? [...d.values].sort(byText) : null, from: "instances" }));
     return {
       name: r.name,
+      ...(r.id !== undefined ? { id: r.id, page: r.page } : {}),
       kind: r.kind ?? "instance-only",
       defined: r.defined,
       files: [...r.files].sort(byText),
@@ -194,6 +211,15 @@ export function buildComponentProfile(docs, { inventory = [] } = {}) {
   const bindingTotals = new Map();
   for (const c of components) for (const [k, n] of Object.entries(c.tokenGroups)) count(bindingTotals, k.split(" › ")[0], n);
 
+  // A name the library defines on more than one page: a layer instance names the component, not its page, so a
+  // layer-placed name cannot tell which of them it is.
+  const pagesByName = new Map();
+  for (const e of inventoryEntries.values()) {
+    if (!pagesByName.has(e.name)) pagesByName.set(e.name, []);
+    pagesByName.get(e.name).push(e.page ?? "");
+  }
+  const ambiguous = [...pagesByName].filter(([, p]) => p.length > 1).map(([name, pages]) => ({ name, pages: pages.sort(byText) })).sort((a, b) => byText(a.name, b.name));
+
   return {
     componentProfileVersion: COMPONENT_PROFILE_VERSION,
     source: {
@@ -204,18 +230,28 @@ export function buildComponentProfile(docs, { inventory = [] } = {}) {
       seen: components.length,
       defined: components.filter((c) => c.defined).length,
       instanceOnly: components.filter((c) => !c.defined).length,
-      ...(inventoryDocs.length
+      ...(inventoryOnly
         ? {
-            total: inventoryByName.size,
-            seenInInventory: components.filter((c) => inventoryByName.has(c.name)).length,
-            outsideInventory: components.filter((c) => !inventoryByName.has(c.name)).length,
-            notSeen: [...inventoryByName.values()].filter((x) => !comps.has(x.name)).sort((a, b) => byText(a.name, b.name)),
+            total: inventoryEntries.size,
+            seenInInventory: 0,
+            outsideInventory: 0,
+            notSeen: [],
+            basis: "inventory",
+            note: "No layer export was given: these are the components the Design System Handoff export's file defines, and none is counted as placed.",
+          }
+        : inventoryDocs.length
+        ? {
+            total: inventoryEntries.size,
+            seenInInventory: components.filter((c) => inventoryNames.has(c.name)).length,
+            outsideInventory: components.filter((c) => !inventoryNames.has(c.name)).length,
+            notSeen: [...inventoryEntries.values()].filter((x) => !comps.has(x.name)).map(({ id, properties, ...x }) => x).sort((a, b) => byText(a.name, b.name) || byText(a.page ?? "", b.page ?? "")),
             note: "The total is the components the Design System Handoff export's file defines. A component a layer places from another library is outside it (outsideInventory) and not added to the total.",
           }
         : {
             total: "unknown",
             note: "A layer export lists the components its layers use and defines; it is not the library's inventory. A component missing here may still exist in the system. Pass a Design System Handoff export (schema 20+) to make the total known.",
           }),
+      ...(ambiguous.length ? { ambiguousNames: ambiguous } : {}),
     },
     naming: {
       private: privateNames.length,
@@ -246,7 +282,9 @@ const table = (head, rows) => [`| ${head.join(" | ")} |`, `| ${head.map(() => "-
 
 export function renderComponentProfileMarkdown(p) {
   const out = ["# Component profile", ""];
-  if (p.coverage.total === "unknown") {
+  if (p.coverage.basis === "inventory") {
+    out.push(`${p.coverage.total} components defined in the library (the Design System Handoff export's file). There is no layer export, so none is counted as placed. ${p.coverage.note}`, "");
+  } else if (p.coverage.total === "unknown") {
     out.push(`${p.coverage.seen} components seen (${p.coverage.defined} defined in these exports, ${p.coverage.instanceOnly} only placed), of an unknown total. ${p.coverage.note}`, "");
   } else {
     out.push(`${p.coverage.seenInInventory} of ${p.coverage.total} defined in the library are placed by these layer exports; ${p.coverage.outsideInventory} more are placed from outside it (${p.coverage.seen} components seen). ${p.coverage.note}`, "");
