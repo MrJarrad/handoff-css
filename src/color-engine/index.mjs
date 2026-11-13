@@ -4,6 +4,7 @@
 export { ramp, DEFAULTS } from "./build.mjs";
 export { mergeVerdict } from "./merge.mjs";
 export { fitToSystem } from "./fit.mjs";
+export { paletteToSystem } from "./palette.mjs";
 export { nameColor } from "./name.mjs";
 export { auditRamp } from "./ramp.mjs";
 export { contrast, grade, AA } from "./wcag.mjs";

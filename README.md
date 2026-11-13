@@ -235,6 +235,8 @@ handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--r
 handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch]
                  [--for <semantic>[@step]… --on <surface>… [--use text|large-text|ui] [--keep-anchor]] [--out <dir>] [--json]
 
+handoff-css ramp --from-palette <name>=<#hex>… [--feedback-tolerance <degrees>] [--no-add-feedback] [--pin-end] [--json]
+
 handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 ```
 
@@ -459,6 +461,11 @@ export is taken again and `profile`/`resolve` see the new ramp.
   `fitToSystem` over the system's colour ramps; the collection, parent group and web-name pattern come from those ramps'
   variables. A system with no colour ramps, or `--from-scratch`, gets the engine's defaults (100–900, darkest step at L 0.30).
   Nothing is assumed about a house: no collection, mode, step or group name is written in the code.
+- **A brand palette, no export.** `ramp --from-palette <name>=<#hex>…` builds the whole from-scratch system from a
+  brand book's colours: a default ramp per colour (each hex exact at its natural step), one neutral (the palette's own
+  near-black or grey, else one derived at the darkest colour's hue), and a ramp for each feedback role (error, success,
+  warning, info) no brand hue is within `--feedback-tolerance` degrees of (default 30; `--no-add-feedback` reports the gap
+  only). A hex on an end step is noted; `--pin-end` moves it one step in. It writes nothing; `--json` prints the system.
 - **Anchors.** `--anchor` repeats; `#hex@step` pins a colour to a step and it is kept exactly there. Several anchors are
   merged into one ramp when `mergeVerdict` says they make sense as one; if not, the proposal is one ramp per anchor.
 - **The name** is yours (`--name`) or generated (Name that Color, skipping names the system already uses for a ramp).

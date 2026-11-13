@@ -30,6 +30,7 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
   handoff-css resolve --export <json|json.gz|zip> --need <needs.json> [--rulings <md>] [--out <dir>] [--json]
   handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch]
                    [--for <semantic>[@step]… --on <surface>… [--use text|large-text|ui] [--keep-anchor]] [--out <dir>] [--json]
+  handoff-css ramp --from-palette <name>=<#hex>… [--feedback-tolerance <degrees>] [--no-add-feedback] [--pin-end] [--json]
   handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 `;
 
