@@ -255,6 +255,6 @@ test("nameColor refuses what is not a colour", () => {
 // ── published entry ─────────────────────────────────────────────────────────────────────────────────
 test("handoff-css/color-engine is the published entry and carries the whole interface", async () => {
   const pub = await import("handoff-css/color-engine");
-  assert.deepEqual(Object.keys(pub).sort(), ["AA", "DEFAULTS", "PULL", "auditRamp", "contrast", "fitToSystem", "grade", "mergeVerdict", "mirrorStep", "nameColor", "nearestPassingStep", "pullBack", "ramp"]);
+  assert.deepEqual(Object.keys(pub).sort(), ["AA", "DEFAULTS", "PULL", "auditRamp", "contrast", "fitToSystem", "grade", "mergeVerdict", "mirrorStep", "nameColor", "nearestPassingStep", "paletteToSystem", "pullBack", "ramp"]);
   assert.equal(pub.ramp, ramp);
 });

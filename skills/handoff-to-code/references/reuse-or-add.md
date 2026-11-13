@@ -40,6 +40,11 @@ from the one the need asked for; the report says which, and a `use` row binds a 
 [--out <dir>] [--json]` writes `ramp-proposal.json` (a patch) and `ramp-proposal.md`, and writes nothing into
 the design file. `--for` and `--on` each name a variable the export has, in full (the full names are in `system-profile.json`); none is inferred, and a name the export lacks exits 1.
 
+**From a brand palette.** With no system and only a brand book's colours, `handoff-css ramp --from-palette
+<name>=<#hex>… [--feedback-tolerance <degrees>] [--no-add-feedback] [--pin-end]` lists the ramps the system needs (one per
+brand colour, a neutral, a ramp for each feedback role no brand hue covers) with each hex's step. It writes nothing; the
+ramp names and which uncovered feedback ramps to add go to the designer as one question with its output as the recommendation.
+
 **The name.** The ramp's name is the designer's (`--name`) or generated; `nameSource` in the proposal records
 which. The question is in 3b.
 
