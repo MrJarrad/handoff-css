@@ -4,12 +4,15 @@
 import path from "node:path";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
+import { flagValues, sources } from "./match-cli.mjs";
+import { scanComponentSource, compareComponents, renderComponentCompareMarkdown } from "./component-source.mjs";
 
 import { buildComponentProfile, renderComponentProfileMarkdown } from "./component-profile.mjs";
 import { resolveComponentNeeds, renderResolveComponentMarkdown } from "./resolve-component.mjs";
 
-const USAGE = `handoff-css components --export <layer export .json|.json.gz>… [--ds-export <Design System Handoff export>…] [--out <dir>] [--check]\n  handoff-css components --export <layer export>… --need <needs.json> [--rulings <md>] [--out <dir>] [--json]\n`;
+const USAGE = `handoff-css components --export <layer export .json|.json.gz>… [--ds-export <Design System Handoff export>…] [--src <code paths…>] [--out <dir>] [--check]\n  handoff-css components --export <layer export>… --need <needs.json> [--rulings <md>] [--out <dir>] [--json]\n`;
 export const COMPONENT_FILES = { json: "component-profile.json", md: "component-profile.md" };
+export const COMPONENT_COMPARE_FILES = { json: "component-code-compare.json", md: "component-code-compare.md" };
 export const COMPONENT_RESOLVE_FILES = { json: "component-resolve-report.json", md: "component-resolve-report.md" };
 export const EXIT = { settled: 0, error: 1, open: 2 };
 
@@ -47,6 +50,13 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
         [COMPONENT_FILES.json]: `${JSON.stringify(profile, null, 2)}\n`,
         [COMPONENT_FILES.md]: `${renderComponentProfileMarkdown(profile)}`,
       };
+      const srcPaths = flagValues(args, "--src");
+      let compare = null;
+      if (srcPaths.length) {
+        compare = compareComponents(profile, scanComponentSource(sources(srcPaths, cwd)));
+        outputs[COMPONENT_COMPARE_FILES.json] = `${JSON.stringify(compare, null, 2)}\n`;
+        outputs[COMPONENT_COMPARE_FILES.md] = renderComponentCompareMarkdown(compare);
+      }
       if (args.includes("--check")) {
         const drift = Object.entries(outputs).filter(([name, text]) => {
           const f = path.join(outDir, name);
@@ -62,6 +72,7 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
       mkdirSync(outDir, { recursive: true });
       for (const [name, text] of Object.entries(outputs)) writeFileSync(path.join(outDir, name), text);
       stdout.write(`handoff-css (components): ${profile.coverage.total === "unknown" ? `${profile.coverage.seen} components seen of an unknown total` : `${profile.coverage.seenInInventory} of ${profile.coverage.total} defined in the library are placed (${profile.coverage.outsideInventory} more from outside it)`}; wrote ${Object.keys(outputs).join(", ")} to ${outDir}\n`);
+      if (compare) stdout.write(`handoff-css (components): against code, ${compare.counts.components.matched} matched, ${compare.counts.props.propGaps} prop gaps, ${compare.counts.components.codeOnly} code-only\n`);
       return EXIT.settled;
     }
 
