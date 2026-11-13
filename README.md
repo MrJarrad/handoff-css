@@ -436,6 +436,8 @@ from another library as outside it, never in the total), how they are
 named, the properties they share, how deeply they nest, and which token collections they bind. Facts only. A
 component name defined in two exports is read as one component and warned about.
 
+`... --src <code paths…>` also reads each React component's structure from code and writes `component-code-compare.json` and `.md`: per design component, its code match (names equal once case and separators are set aside; never by similarity), each property as matched, a value gap (variant options differ) or a prop gap (no same-named code prop; the Figma `#id` suffix and kebab case are set aside), composition (a nested component the code does not render, and the reverse), code props the design lacks, and the design-only and code-only components. It is a text scan, not a type checker: a props type it cannot see into is listed as extended, never guessed. Classing a gap (build prop, state, responsive, Figma-only) stays the designer's.
+
 `... --need <needs.json> [--rulings <md>]` resolves each need (`schema/resolve-component-need.v1.schema.json`:
 `{ "id", "name"?, "wants"? }`, with `wants.props` and `wants.children`) and writes `component-resolve-report.json`
 and `.md`. Verdicts: `REUSE`, `REUSE_WITH_PROP` (build it, set the listed properties), `PROP_GAP` (extend the

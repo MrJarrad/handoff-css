@@ -21,7 +21,7 @@ function unboundValues(briefPath) {
 const SOURCE = /\.(css|tsx|jsx|ts|js|mjs)$/;
 
 /** `--name a b c` → ["a","b","c"] (values up to the next flag). */
-function flagValues(args, flag) {
+export function flagValues(args, flag) {
   const at = args.indexOf(flag);
   if (at === -1) return [];
   const values = [];
@@ -30,7 +30,7 @@ function flagValues(args, flag) {
 }
 
 /** Every source file under each path, node_modules and dot-folders skipped; paths relative to cwd. */
-function sources(roots, cwd) {
+export function sources(roots, cwd) {
   const out = [];
   const walk = (abs) => {
     if (statSync(abs).isDirectory()) {
