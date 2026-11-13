@@ -168,3 +168,35 @@ test("--src writes component-code-compare files beside the profile; without --sr
   assert.match(r.out, /2 matched/);
   assert.equal(readFileSync(path.join(dir, "out", "component-profile.json"), "utf8"), readFileSync(path.join(dir, "plain", "component-profile.json"), "utf8"));
 });
+
+test("only top-level declarations are components: a local const or function inside a component body is not", () => {
+  const scan = scanComponentSource([{ path: "a.tsx", text: `
+export function Action({ asChild }: { asChild?: boolean }) {
+  const Comp = asChild ? Slot : "button"
+  const Root = as as React.ElementType
+  function Inner() { return <i /> }
+  return <Comp><Root /><Inner /></Comp>
+}
+export const Tag = ({ tone }: { tone?: string }) => {
+  const Wrapper = "b"
+  return <Wrapper>{tone}</Wrapper>
+}
+` }]);
+  assert.deepEqual(scan.components.map((c) => c.name).sort(), ["Action", "Tag"]);
+  assert.deepEqual(byName(scan, "Action").renders, []);
+});
+
+test("--check honours --src: it is out of date until the compare files are written, then up to date", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "hcss-check-"));
+  mkdirSync(path.join(dir, "src"));
+  writeFileSync(path.join(dir, "src", "c.tsx"), CODE);
+  writeFileSync(path.join(dir, "flat.json"), JSON.stringify(flatSystem()));
+  assert.equal((await run(["--export", "flat.json", "--out", "out"], dir)).code, 0);
+  const stale = await run(["--export", "flat.json", "--src", "src", "--out", "out", "--check"], dir);
+  assert.equal(stale.code, 1);
+  assert.match(stale.err, /component-code-compare\.json/);
+  assert.equal((await run(["--export", "flat.json", "--src", "src", "--out", "out"], dir)).code, 0);
+  assert.equal((await run(["--export", "flat.json", "--src", "src", "--out", "out", "--check"], dir)).code, 0);
+  writeFileSync(path.join(dir, "src", "c.tsx"), `${CODE}\nexport function Extra() { return <p /> }\n`);
+  assert.equal((await run(["--export", "flat.json", "--src", "src", "--out", "out", "--check"], dir)).code, 1);
+});

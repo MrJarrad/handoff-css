@@ -50,6 +50,13 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
         [COMPONENT_FILES.json]: `${JSON.stringify(profile, null, 2)}\n`,
         [COMPONENT_FILES.md]: `${renderComponentProfileMarkdown(profile)}`,
       };
+      const srcPaths = flagValues(args, "--src");
+      let compare = null;
+      if (srcPaths.length) {
+        compare = compareComponents(profile, scanComponentSource(sources(srcPaths, cwd)));
+        outputs[COMPONENT_COMPARE_FILES.json] = `${JSON.stringify(compare, null, 2)}\n`;
+        outputs[COMPONENT_COMPARE_FILES.md] = renderComponentCompareMarkdown(compare);
+      }
       if (args.includes("--check")) {
         const drift = Object.entries(outputs).filter(([name, text]) => {
           const f = path.join(outDir, name);
@@ -61,13 +68,6 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
         }
         stdout.write("handoff-css (components check): up to date\n");
         return EXIT.settled;
-      }
-      const srcPaths = flagValues(args, "--src");
-      let compare = null;
-      if (srcPaths.length) {
-        compare = compareComponents(profile, scanComponentSource(sources(srcPaths, cwd)));
-        outputs[COMPONENT_COMPARE_FILES.json] = `${JSON.stringify(compare, null, 2)}\n`;
-        outputs[COMPONENT_COMPARE_FILES.md] = renderComponentCompareMarkdown(compare);
       }
       mkdirSync(outDir, { recursive: true });
       for (const [name, text] of Object.entries(outputs)) writeFileSync(path.join(outDir, name), text);

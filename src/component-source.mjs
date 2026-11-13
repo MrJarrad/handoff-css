@@ -50,6 +50,22 @@ function closing(text, at) {
   return -1;
 }
 
+/** Bracket depth ({ ( [ only) at the start of each line, strings and template literals skipped. */
+function depthByLine(text) {
+  const depths = [0];
+  let depth = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    const c = text[i];
+    if (c === '"' || c === "'" || c === "`") {
+      i += 1;
+      while (i < text.length && text[i] !== c) { if (text[i] === "\\") i += 1; else if (text[i] === "\n") depths.push(depth); i += 1; }
+    } else if (c === "{" || c === "(" || c === "[") depth += 1;
+    else if (c === "}" || c === ")" || c === "]") depth -= 1;
+    else if (c === "\n") depths.push(depth);
+  }
+  return depths;
+}
+
 /** Split at top level on any of `seps`; a newline separates only when the member is complete (not before or after `|`/`&`). */
 function splitTop(text, seps, { newline = false } = {}) {
   const parts = [];
@@ -162,7 +178,10 @@ export function scanComponentSource(files) {
     for (const [k, v] of t.shapes) types.shapes.set(k, v);
   }
   for (const { path, text } of sources) {
-    const starts = [...text.matchAll(/(?:^|\n)[ \t]*(?:export\s+)?(?:default\s+)?(?:function\s+|const\s+)([A-Z](?=[A-Za-z0-9]*[a-z])[A-Za-z0-9]*)/g)];
+    const depths = depthByLine(text);
+    // Only a declaration at the top of the file is a component; a `const Comp = …` inside a component body is not.
+    const starts = [...text.matchAll(/(?:^|\n)[ \t]*(?:export\s+)?(?:default\s+)?(?:function\s+|const\s+)([A-Z](?=[A-Za-z0-9]*[a-z])[A-Za-z0-9]*)/g)]
+      .filter((m) => depths[text.slice(0, m.index + m[0].length - m[1].length).split("\n").length - 1] === 0);
     starts.forEach((m, i) => {
       const at = m.index + m[0].length - m[1].length;
       const body = text.slice(at, starts[i + 1]?.index ?? text.length);
