@@ -357,7 +357,7 @@ Each pair is a foreground and a background colour variable, resolved in **every 
 the export. A variable that is a colour at an opacity is flattened over what sits behind it: the
 background over the page colour (`--page`, default `color/background/default/primary`), then the
 foreground over that. The ratio is graded at 4.5 for `text`, 3 for `large-text` and `ui`
-(non-text). Exit 1 when any pair fails.
+(non-text). The composite is kept unrounded and compared to the floor unrounded; the ratio is rounded to two places for display only (a 2.9953 never prints as a pass). A variable that lacks a mode reads its collection's default mode. Exit 1 when any pair fails.
 
 `pairs.json` names variables only; no colour value is written into it:
 

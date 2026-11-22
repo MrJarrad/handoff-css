@@ -9,7 +9,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { dispatch } from "../src/cli.mjs";
-import { pairsFromBrief } from "../src/contrast.mjs";
+import { contrastReport, pairsFromBrief } from "../src/contrast.mjs";
 
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "fixtures", "ht134-contrast");
 const before = path.join(dir, "ds-export-16-nov.json.gz");
@@ -30,7 +30,7 @@ test("the 16 Nov export: the three PF-1743 fails are flagged at the recorded rat
   for (const [id, ratio] of Object.entries(expected)) {
     const r = row(report, id, "bttf");
     assert.equal(r.pass, false, `${id} is a fail`);
-    assert.ok(Math.abs(r.ratio - ratio) <= 0.02, `${id}: ${r.ratio} vs recorded ${ratio}`);
+    assert.ok(Math.abs(r.ratio - ratio) <= (id === "switch-inactive-half" ? 0.005 : 0.02), `${id}: ${r.ratio} vs recorded ${ratio}`);
   }
 });
 
@@ -93,4 +93,23 @@ test("contrast --brief reads the pairs off a real layer brief and says what it c
   assert.ok(report.rows.length > 0, "the navigation brief yields graded rows");
   assert.ok(report.rows.every((r) => r.source === "brief" && Number.isFinite(r.ratio)));
   for (const key of ["unresolved", "skipped", "notGraded"]) assert.ok(key in report, key);
+});
+
+// A one-mode export of two opaque colours: the page colour and a foreground.
+const tiny = (fgHex) => {
+  const v = (id, name, raw) => ({ id, name, modes: [{ modeId: "m", modeName: "light", raw }] });
+  return {
+    collections: [{
+      id: "c", name: "color", defaultModeId: "m", modeMapping: [{ modeId: "m", modeName: "light", isTheme: true }],
+      variables: [v("v1", "page", "#FFFFFFFF"), v("v2", "ink", `${fgHex}FF`)],
+    }],
+  };
+};
+
+test("the verdict is taken on the unrounded ratio: 2.9953 is a fail although it prints as 3.00", () => {
+  const edge = contrastReport(tiny("#959595"), { pairs: [{ id: "edge", fg: "ink", bg: "page", use: "ui" }], page: "page" }).rows[0];
+  assert.equal(edge.ratio, 3);
+  assert.equal(edge.pass, false);
+  const clear = contrastReport(tiny("#949494"), { pairs: [{ id: "edge", fg: "ink", bg: "page", use: "ui" }], page: "page" }).rows[0];
+  assert.equal(clear.pass, true);
 });

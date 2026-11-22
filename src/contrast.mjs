@@ -4,13 +4,16 @@
 // what sits behind them — and graded against WCAG AA (4.5 text, 3 large text and
 // non-text). Pure over a Design System Handoff export; the pairs come from the
 // caller (a pairs list, or a layer brief via `pairsFromBrief`).
-import { contrast, AA } from "./color-engine/wcag.mjs";
+import { wcagContrast } from "culori";
+import { AA } from "./color-engine/wcag.mjs";
 import { fail } from "./resolve.mjs";
 
 export const DEFAULT_PAGE = "color/background/default/primary";
 
 const hex2 = (n) => Math.round(Math.min(255, Math.max(0, n))).toString(16).padStart(2, "0");
 const toHex = ([r, g, b]) => `#${hex2(r)}${hex2(g)}${hex2(b)}`;
+/** Display only: the hex a viewer's screen rounds to. The grade never reads it. */
+const toRgb = ([r, g, b]) => ({ mode: "rgb", r: r / 255, g: g / 255, b: b / 255 });
 
 /** `top` painted over an opaque `under`: the colour a viewer sees. */
 const over = (top, under) => ({ rgb: top.rgb.map((c, i) => c * top.alpha + under.rgb[i] * (1 - top.alpha)), alpha: 1 });
@@ -92,9 +95,9 @@ export function contrastReport(ds, { pairs, page = DEFAULT_PAGE, skipped = [], n
       if (AA[use] === undefined) fail(`contrast: pair ${pair.id} has use ${JSON.stringify(use)} (text, large-text, ui)`);
       const bg = over(resolve(pair.bg, mode), pageColour);
       const fg = over(resolve(pair.fg, mode), bg);
-      const ratio = contrast(toHex(fg.rgb), toHex(bg.rgb));
+      const exact = wcagContrast(toRgb(fg.rgb), toRgb(bg.rgb));
       rows.push({
-        id: pair.id, mode, fg: pair.fg, bg: pair.bg, use, floor: AA[use], ratio, pass: ratio >= AA[use],
+        id: pair.id, mode, fg: pair.fg, bg: pair.bg, use, floor: AA[use], ratio: +exact.toFixed(2), exact, pass: exact >= AA[use],
         fgColour: toHex(fg.rgb), bgColour: toHex(bg.rgb), ...(pair.note ? { note: pair.note } : {}), ...(pair.source ? { source: pair.source } : {}),
       });
     }
