@@ -1,0 +1,7 @@
+{
+  "pairs": [
+    { "id": "action-label", "fg": "color/content/action/primary", "bg": "color/background/action/primary", "use": "text", "note": "Action label on its own fill" },
+    { "id": "action-focus-ring", "fg": "color/border/focused/dark", "bg": "color/background/action/primary", "use": "ui", "note": "Focus ring (effect style border/border-focused) against the Action fill" },
+    { "id": "switch-inactive-half", "fg": "color/content/action/secondary", "bg": "color/background/action/primary", "use": "large-text", "note": "ActionButtonSwitch inactive half, 24px label" }
+  ]
+}

@@ -230,6 +230,9 @@ handoff-css validate <file|zip…> [--spec-index <md>] [--json]
 handoff-css conform --export <json> --handoff <md> --tokens <css>
                     --css <file…> [--json]
 
+handoff-css contrast --export <json|json.gz|zip> [--pairs <pairs.json>]
+                     [--brief <layer brief .json|.json.gz>] [--page <variable>] [--json]
+
 handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--json]
 
 handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch]
@@ -343,6 +346,31 @@ export default {
 
 An allowed name never raises `UNKNOWN_NAME`. It is not a mute button: a name your own
 stylesheet declares is still `LOCAL_ONLY`.
+
+### `contrast` — do the colours a component binds clear WCAG AA?
+
+```
+handoff-css contrast --export design-system-handoff.json --pairs action-pairs.json
+```
+
+Each pair is a foreground and a background colour variable, resolved in **every theme mode** of
+the export. A variable that is a colour at an opacity is flattened over what sits behind it: the
+background over the page colour (`--page`, default `color/background/default/primary`), then the
+foreground over that. The ratio is graded at 4.5 for `text`, 3 for `large-text` and `ui`
+(non-text). The composite is kept unrounded and compared to the floor unrounded; the ratio is rounded to two places for display only (a 2.9953 never prints as a pass). A variable that lacks a mode reads its collection's default mode. Exit 1 when any pair fails.
+
+`pairs.json` names variables only; no colour value is written into it:
+
+```json
+{ "pairs": [ { "id": "action-label", "fg": "color/content/action/primary", "bg": "color/background/action/primary", "use": "text" } ] }
+```
+
+`--brief` reads the pairs from a layer brief instead: each TEXT node and leaf shape whose fill is
+bound to a variable, against the nearest ancestor surface's fill. The brief does not say whether
+a label is large text, so a brief's text pair is graded at 4.5; restate it in `pairs.json` with
+`use: "large-text"` to grade it at 3. What could not be graded is listed, not guessed: a variable
+absent from this export (pass the library's export), a fill bound to no variable, and bound frame
+and instance strokes. A ring that is an effect style has no node fill, so name it in `pairs.json`.
 
 ### `match` — brownfield: a brief against code that already exists
 
