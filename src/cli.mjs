@@ -15,7 +15,7 @@ import { validateSet } from "./set.mjs";
 import { validateLinkRunJson } from "./link-run.mjs";
 import { zipTextFiles } from "./zip.mjs";
 
-export const SUBCOMMANDS = ["validate", "conform", "match", "profile", "components", "resolve", "ramp", "vendor"];
+export const SUBCOMMANDS = ["validate", "conform", "match", "profile", "components", "resolve", "ramp", "vendor", "contrast"];
 
 const USAGE = `handoff-css — Design Handoff export → CSS custom properties
 
@@ -31,6 +31,7 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
   handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch]
                    [--for <semantic>[@step]… --on <surface>… [--use text|large-text|ui] [--keep-anchor]] [--out <dir>] [--json]
   handoff-css ramp --from-palette <name>=<#hex>… [--feedback-tolerance <degrees>] [--no-add-feedback] [--pin-end] [--json]
+  handoff-css contrast --export <json|json.gz|zip> [--pairs <pairs.json>] [--brief <layer brief .json|.json.gz>] [--page <variable>] [--json]
   handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 `;
 
@@ -64,6 +65,10 @@ export async function dispatch(argv, { cwd = process.cwd(), stdout = process.std
   if (first === "resolve") {
     const { resolveCommand } = await import("./resolve-cli.mjs");
     return resolveCommand(rest, { cwd, stdout, stderr });
+  }
+  if (first === "contrast") {
+    const { contrastCommand } = await import("./contrast-cli.mjs");
+    return contrastCommand(rest, { cwd, stdout, stderr });
   }
   if (first === "vendor") {
     const { vendorCommand } = await import("./vendor-cli.mjs");
