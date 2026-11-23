@@ -1,9 +1,10 @@
 ---
 name: handoff-to-code
 description: >-
-  Build code from a Design Handoff export pair: a design-handoff-*.md or
-  *-design-system-handoff.json path, a Figma link to export, consume or build from the handoff, the export says, regenerate tokens, or a brownfield
-  brief. {{description-scope}}
+  Build code from a Design Handoff export pair. Load it first on a
+  design-handoff-*.md or *-design-system-handoff.json path, a Figma link to export,
+  consume or build from the handoff, the export says, regenerate tokens, or a
+  brownfield brief. {{description-scope}}
 ---
 
 # Handoff to Code
