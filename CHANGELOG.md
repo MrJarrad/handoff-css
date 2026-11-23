@@ -4,6 +4,10 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ## Unreleased
 
+### Changed
+
+- `handoff-to-code` skill split for size: `SKILL.md` keeps the contract, every law sentence, the warning codes and one short paragraph per step, each pointing at the new `references/steps.md`, which holds every step in full under the same `### N.` headings (moved verbatim, nothing dropped). The Claude plugin build goes from 4,605 to 1,497 words, under the 5,000-token budget a skill keeps after a context summary. Descriptions shortened: the Claude plugin host's is 297 characters. The step-detail tests in `skill-reuse-or-add` and `skill-close-out` read `references/steps.md`.
+
 ### Added
 
 - `contrast --export <design-system-handoff> [--pairs <pairs.json>] [--brief <layer brief>] [--page <variable>] [--json]`: a contrast report. Every foreground/background pair is resolved in each theme mode of the export (alias chains followed; a variable that is a colour at an opacity is flattened over what sits behind it, the foreground over the flattened background) and graded against WCAG AA: 4.5 for text, 3 for large text and non-text. Pairs come from a `pairs.json` (`{ pairs: [{ id, fg, bg, use, note? }] }`, variable names only) and/or from a layer brief: every TEXT node and leaf shape bound to a colour variable against the nearest ancestor surface's fill (a node with no surface sits on `--page`, default `color/background/default/primary`). A brief's text pair is graded at 4.5 because the brief carries no large-text signal; name the pair in `pairs.json` with `use: "large-text"` to grade it at 3. The report lists what it did not grade (variable not in this export, fill bound to no variable, bound frame and instance strokes). Exits 1 when any pair fails. Library: `contrastReport`, `pairsFromBrief`, `colourResolver`.

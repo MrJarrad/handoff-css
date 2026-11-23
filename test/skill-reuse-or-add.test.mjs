@@ -13,7 +13,10 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const skill = path.join(root, "skills", "handoff-to-code");
 const main = readFileSync(path.join(skill, "SKILL.md"), "utf8");
 const ref = readFileSync(path.join(skill, "references", "reuse-or-add.md"), "utf8");
-const section = (from, to) => main.slice(main.indexOf(from), main.indexOf(to));
+// SKILL.md states each step's rule and points at references/steps.md, which holds the step in full
+// under the same heading; the step-detail assertions read it there.
+const steps = readFileSync(path.join(skill, "references", "steps.md"), "utf8");
+const section = (from, to) => steps.slice(steps.indexOf(from), steps.indexOf(to));
 const profileStep = section("### 2b.", "### 3.");
 const addStep = section("### 3b.", "### 3c.");
 const resolveSrc = readFileSync(path.join(root, "src", "resolve-need.mjs"), "utf8");
@@ -26,7 +29,7 @@ test("1: the system is profiled first and the profile is kept beside the work", 
 });
 
 test("2: no particular system is assumed and nothing is house-named", () => {
-  for (const [name, text] of [["SKILL.md", main], ["reuse-or-add.md", ref]]) {
+  for (const [name, text] of [["SKILL.md", main], ["reuse-or-add.md", ref], ["steps.md", steps]]) {
     assert.doesNotMatch(text, /jhd/i, `${name} names the house`);
   }
   assert.match(profileStep, /not all built alike/i);
