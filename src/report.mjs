@@ -78,7 +78,7 @@ PRIVATE and EXCLUDED variables (policy P7, §0) are never counted in
 MATCH/VALUE-DRIFT/NAME-ONLY-IN-EXPORT — they are not public design-system
 tokens. Of the two, **only PRIVATE is emitted**, because published tokens
 alias it and a referenced-but-undeclared custom property is invalid at
-computed-value time. The Figma hide flag drops nothing: a hidden variable no
+computed-value time. The source's hide flag drops nothing: a hidden variable no
 published token aliases is emitted as an ordinary token (ruling
 2026-11-02, "hide from publishing is for figma only").
 
@@ -87,9 +87,9 @@ published token aliases is emitted as an ordinary token (ruling
 Not public tokens, and excluded from every other class in this report (policy P7
 in \`${cfg.report.policyRef}\`). ${note("private")}
 
-**PRIVATE** — hidden in Figma, but reachable by alias from a published token, so
+**PRIVATE** — hidden in the source, but reachable by alias from a published token, so
 they **are** emitted (same names, fenced in a marked block). Not publishing a
-primitive in Figma means *"don't pick this in a layout"*; it does not mean the
+primitive in the source means *"don't pick this in a layout"*; it does not mean the
 value is unused. CSS has no such distinction — dropping these would leave the
 semantic tokens that reference them invalid at computed-value time. Reference the
 semantic token in the "Aliased by" column, never the private name.
@@ -165,7 +165,7 @@ ${widths.size
   ? (() => {
       const overridden = [...widths.keys()].some((id) => layout.samples.get(id) !== widths.get(id));
       const header = overridden
-        ? ["| Mode | Width | Figma sample | layoutVariant | Emitted as |", "| --- | --- | --- | --- | --- |"]
+        ? ["| Mode | Width | source sample | layoutVariant | Emitted as |", "| --- | --- | --- | --- | --- |"]
         : ["| Mode | Width | layoutVariant | Emitted as |", "| --- | --- | --- | --- |"];
       const rows = (doc.collections.find((c) => c.name === cfg.layout.collection)?.modes ?? []).map((m) => {
         const variant = variants.get(m.id) ?? "default";
@@ -182,7 +182,7 @@ mobile-first \`@media (min-width: …)\` blocks in ascending width order. The
 second axis — \`layoutVariant\` — is a selector, not a width: \`default\` lands on
 \`:root\`, every other variant on \`[${cfg.layout.variantAttribute}="<variant>"]\` inside
 the same media block.${overridden ? ` **Width** is the emitted min-width
-threshold; **Figma sample** is the untouched \`device/width\` sample
+threshold; **source sample** is the untouched \`device/width\` sample
 \`breakpoints.entries\` publishes — the two differ only where
 \`layout.breakpoints\` states a policy override for that family (P6.1).` : ""}
 
@@ -241,7 +241,7 @@ ${["| Namespace | Why it is held |", "| --- | --- |", ...cfg.tailwind.held.map((
 
 ### Breakpoints emitted (P8.4)
 
-${["| Key | Value | Figma |", "| --- | --- | --- |",
+${["| Key | Value | Source |", "| --- | --- | --- |",
    ...themeRows.filter((r) => r.ns === "breakpoint").map((r) => `| \`${r.key}\` | \`${r.value}\` | ${r.note} |`)].join("\n")}
 
 ${note("breakpointNote")}`;
@@ -306,7 +306,7 @@ ${untrustedRows.length
 
 **Warnings (${warnings.length})** — what the generator would not guess at. A
 variable in a \`viewport.groups\` group with no stated fraction keeps its px
-samples: the fix is one description in Figma, not a heuristic here.
+samples: the fix is one description in the source, not a heuristic here.
 
 ${warnings.length
   ? ["| Code | Token | Detail |", "| --- | --- | --- |",
@@ -367,7 +367,7 @@ function stylesSection(styleRows, fontWeightRows, sheetRows, cfg, handFile) {
 
   return `## 11. Styles (P21) and font weights (P22)
 
-One class per Figma style, from the export's own \`cssClass\` — **selector and
+One class per style, from the export's own \`cssClass\` — **selector and
 declarations verbatim, in the export's order**. Nothing here is recomputed from
 a style name or from \`properties\`: a style the export gives no declarations
 for is listed and not emitted. Hand-authored wins per class exactly as it does
@@ -402,7 +402,7 @@ The style name and confidence are the export's; nothing here maps a name to a
 number.
 
 ${fontWeightRows.length
-  ? ["| Token | Collection | Value | Figma style name | Confidence | Emitted |", "| --- | --- | --- | --- | --- | --- |",
+  ? ["| Token | Collection | Value | source style name | Confidence | Emitted |", "| --- | --- | --- | --- | --- | --- |",
      ...fontWeightRows.map((r) => `| \`${r.name}\` | ${r.collection} | \`${r.value}\` | ${r.sourceStyleName ? `\`${r.sourceStyleName}\`` : "—"} | ${r.confidence} | ${r.emitted ? "yes" : `no — hand-authored in ${handFile} (P2)`} |`)].join("\n")
   : "None."}
 

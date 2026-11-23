@@ -1,6 +1,6 @@
 /* GENERATED FILE — DO NOT EDIT BY HAND.
 
-   The Tailwind v4 namespace bridge: house/Figma names as `@theme` keys, so
+   The Tailwind v4 namespace bridge: house/source names as `@theme` keys, so
    every generated utility speaks house vocabulary and Tailwind's own default
    scale is reset away. Policy P8 (suffix rule, values, resets, breakpoints,
    hand-authored reconciliation) is documented at the top of
@@ -253,8 +253,8 @@
   /* --- breakpoint -------------------------------------------- */
   /* from breakpoints.entries (P8.4) */
   --breakpoint-*: initial;
-  --breakpoint-sm: 23.4375rem; /* 375px — Figma sm device width */
-  --breakpoint-md: 48rem; /* 768px — Figma md device width */
-  --breakpoint-lg: 80rem; /* 1280px — Figma lg device width */
-  --breakpoint-xl: 120rem; /* 1920px — Figma xl device width */
+  --breakpoint-sm: 23.4375rem; /* 375px — source sm device width */
+  --breakpoint-md: 48rem; /* 768px — source md device width */
+  --breakpoint-lg: 80rem; /* 1280px — source lg device width */
+  --breakpoint-xl: 120rem; /* 1920px — source xl device width */
 }

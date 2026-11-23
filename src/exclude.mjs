@@ -1,4 +1,4 @@
-// Policy P7 — PRIVATE / EXCLUDED. A variable hidden in Figma but aliased by an
+// Policy P7 — PRIVATE / EXCLUDED. A variable hidden in the source but aliased by an
 // emitted token is PRIVATE (emitted, fenced): a custom property that is
 // referenced and not declared is invalid at computed-value time. The Figma hide
 // flag drops nothing (ruling 2026-11-02, "hide from publishing is for
@@ -11,7 +11,7 @@ import { webName } from "./schema.mjs";
 // Applied wholesale on path identity: hidden state is irrelevant, and
 // reachability never revives an entry (see P7 above).
 //
-//   `.utility/`           durable: a Figma authoring scratch collection, never
+//   `.utility/`           durable: a source authoring scratch collection, never
 //                         published.
 //   `layout/grid/aspect/` durable as an EXCLUSION, and deliberately READ by P20.
 //                         Design-system decision: "we didn't bring in aspect

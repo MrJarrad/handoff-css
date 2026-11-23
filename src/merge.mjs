@@ -1,4 +1,4 @@
-// One design system split across Figma files. Each file's
+// One design system split across source files. Each file's
 // Design System Handoff export lists only its own variables; a variable used
 // from a library arrives as an alias whose id carries the library's key
 // (`VariableID:<key>/<id>`) and whose chain hop names that key. Given every
@@ -20,7 +20,7 @@ const statement = (v) => JSON.stringify({ name: v.codeSyntax?.WEB?.value ?? null
   modes: v.modes.map((m) => [m.modeName, m.alias?.terminalValue ?? m.raw ?? null]) });
 
 /**
- * @param {object[]} docs  parsed Design System Handoff exports, one per Figma file
+ * @param {object[]} docs  parsed Design System Handoff exports, one per source file
  * @returns {object} one export-shaped document holding every file's variables
  */
 export function mergeExports(docs) {

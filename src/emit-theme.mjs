@@ -39,7 +39,7 @@ export function themeEntries(doc, byId, cfg) {
     if (spec.from === "breakpoints") {
       // P8.4/P6.1 — default-variant rows only, one per family, px -> rem at
       // 16. `thresholdPx` applies the house `layout.breakpoints` policy
-      // override on top of the Figma sample width, same as the `@media`
+      // override on top of the source sample width, same as the `@media`
       // emission in modes.mjs, so the token and the media query can never
       // disagree.
       const seen = new Map();
@@ -58,8 +58,8 @@ export function themeEntries(doc, byId, cfg) {
       for (const [family, px] of [...seen].sort((a, b) => a[1] - b[1])) {
         const sample = sampleSeen.get(family);
         const note = px === sample
-          ? `${num(px)}px — Figma ${family} device width`
-          : `${num(px)}px — policy threshold (Figma ${family} sample ${num(sample)}px)`;
+          ? `${num(px)}px — source ${family} device width`
+          : `${num(px)}px — policy threshold (source ${family} sample ${num(sample)}px)`;
         rows.push({
           ns: spec.ns,
           key: `--${spec.ns}-${family}`,
@@ -114,7 +114,7 @@ export function themeCss(doc, rows, cfg) {
   const header = [
     "/* GENERATED FILE — DO NOT EDIT BY HAND.",
     "",
-    "   The Tailwind v4 namespace bridge: house/Figma names as `@theme` keys, so",
+    "   The Tailwind v4 namespace bridge: house/source names as `@theme` keys, so",
     "   every generated utility speaks house vocabulary and Tailwind's own default",
     "   scale is reset away. Policy P8 (suffix rule, values, resets, breakpoints,",
     "   hand-authored reconciliation) is documented at the top of",

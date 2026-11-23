@@ -23,7 +23,7 @@ PRIVATE and EXCLUDED variables (policy P7, §0) are never counted in
 MATCH/VALUE-DRIFT/NAME-ONLY-IN-EXPORT — they are not public design-system
 tokens. Of the two, **only PRIVATE is emitted**, because published tokens
 alias it and a referenced-but-undeclared custom property is invalid at
-computed-value time. The Figma hide flag drops nothing: a hidden variable no
+computed-value time. The source's hide flag drops nothing: a hidden variable no
 published token aliases is emitted as an ordinary token (ruling
 2026-11-02, "hide from publishing is for figma only").
 
@@ -34,9 +34,9 @@ in `docs/handoff-css.md`). Operator ruling 2026-09-06: *"i don't publish
 the color primitives because only semantic colors should be used in layout but
 the primitive color are alias's in semantic colors"*.
 
-**PRIVATE** — hidden in Figma, but reachable by alias from a published token, so
+**PRIVATE** — hidden in the source, but reachable by alias from a published token, so
 they **are** emitted (same names, fenced in a marked block). Not publishing a
-primitive in Figma means *"don't pick this in a layout"*; it does not mean the
+primitive in the source means *"don't pick this in a layout"*; it does not mean the
 value is unused. CSS has no such distinction — dropping these would leave the
 semantic tokens that reference them invalid at computed-value time. Reference the
 semantic token in the "Aliased by" column, never the private name.
@@ -461,12 +461,12 @@ because the export has no variable behind it.
 
 ### Breakpoints emitted (P8.4)
 
-| Key | Value | Figma |
+| Key | Value | Source |
 | --- | --- | --- |
-| `--breakpoint-sm` | `23.4375rem` | 375px — Figma sm device width |
-| `--breakpoint-md` | `48rem` | 768px — Figma md device width |
-| `--breakpoint-lg` | `80rem` | 1280px — Figma lg device width |
-| `--breakpoint-xl` | `120rem` | 1920px — Figma xl device width |
+| `--breakpoint-sm` | `23.4375rem` | 375px — source sm device width |
+| `--breakpoint-md` | `48rem` | 768px — source md device width |
+| `--breakpoint-lg` | `80rem` | 1280px — source lg device width |
+| `--breakpoint-xl` | `120rem` | 1920px — source xl device width |
 
 Tailwind's own `sm` 640 / `md` 768 / `lg` 1024 / `xl` 1280 / `2xl` 1536 are gone
 with the reset. `2xl` has no replacement because Figma publishes no fifth device
@@ -541,7 +541,7 @@ None.
 
 **Warnings (0)** — what the generator would not guess at. A
 variable in a `viewport.groups` group with no stated fraction keeps its px
-samples: the fix is one description in Figma, not a heuristic here.
+samples: the fix is one description in the source, not a heuristic here.
 
 None.
 

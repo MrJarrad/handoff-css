@@ -46,8 +46,8 @@ export const honours = (cfg, cls) =>
 
 /**
  * The description convention, a FIRST-CLASS input rather than a fallback: it
- * is the only place a Figma designer can currently state "this variable is a
- * fraction of the screen", because Figma variables carry no viewport
+ * is the only place a designer can currently state "this variable is a
+ * fraction of the screen", because variables carry no viewport
  * semantics. Anchored and exact — a description that merely mentions a
  * percentage ("about 20% of screen height on mobile") does not match, and a
  * variable the generator cannot classify is reported, never guessed at.
@@ -57,7 +57,7 @@ const DESCRIPTION = /^(\d+(?:\.\d+)?)% of screen (height|width)$/;
 /**
  * P15 — the rounding ruling (memo `2026-09-10-handoff-viewport-tokens-brief`,
  * Addendum 2, 2026-09-11): "the export never states a value that was not input
- * into Figma". A DERIVED fraction (value ÷ screen reference) is the one
+ * into the source". A DERIVED fraction (value ÷ screen reference) is the one
  * exception, so the consumer rounds it back to the whole percent the designer
  * typed — 244/812 = 0.300493 → `30dvh`, 568/812 → `70dvh`, 731/812 → `90dvh`.
  *
@@ -218,7 +218,7 @@ const allRulesFixed = (rules) =>
  *
  * The generator does not second-guess a stated fraction otherwise. A
  * description of "20% of screen width" on a full-bleed variable yields `20vw`
- * — a wrong token from a wrong description, correctable in Figma in one edit,
+ * — a wrong token from a wrong description, correctable in the source in one edit,
  * and visible in the report's §10 source column. Inventing a plausibility
  * check here would make the export stop being the contract.
  *

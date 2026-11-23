@@ -30,7 +30,7 @@
           "type": ["string", "array"],
           "items": { "type": "string" },
           "minItems": 1,
-          "description": "The vendored Design System Handoff export (.json, or the plugin's .zip). A design system split across Figma files lists one export per file; they are joined by variable key."
+          "description": "The vendored Design System Handoff export (.json, or the plugin's .zip). A design system split across source files lists one export per file; they are joined by variable key."
         },
         "out": { "type": "string", "description": "The token stylesheet." },
         "theme": { "type": "string", "description": "The Tailwind `@theme` bridge." },
@@ -71,13 +71,13 @@
       "properties": {
         "timingUnit": {
           "enum": ["ms", "s"],
-          "description": "The unit a TIMING variable (`motion/duration/*`, `motion/delay/*`) publishes. Figma stores seconds. `ms` republishes them as milliseconds, so a step named for its milliseconds reads in the unit its name states; `s` is the pre-0.4.0 form."
+          "description": "The unit a TIMING variable (`motion/duration/*`, `motion/delay/*`) publishes. the source stores seconds. `ms` republishes them as milliseconds, so a step named for its milliseconds reads in the unit its name states; `s` is the pre-0.4.0 form."
         },
         "delayAliasOf": {
           "type": ["object", "null"],
           "additionalProperties": false,
           "required": ["delay", "duration"],
-          "description": "Ruling 2026-09-12 row 4 makes every delay step an ALIAS of the duration step of the same value, so the two can never drift. Naming the two groups lets the generator REPORT a delay Figma authored as its own literal copy (`DELAY_NOT_ALIASED`). It never rewrites one: pairing them here would look identical today and silently overwrite the first delay that legitimately differs. `null` switches the check off.",
+          "description": "Ruling 2026-09-12 row 4 makes every delay step an ALIAS of the duration step of the same value, so the two can never drift. Naming the two groups lets the generator REPORT a delay the source authored as its own literal copy (`DELAY_NOT_ALIASED`). It never rewrites one: pairing them here would look identical today and silently overwrite the first delay that legitimately differs. `null` switches the check off.",
           "properties": {
             "delay": { "type": "string", "description": "`\"<collection>/<variable>\"` prefix of the delay ramp." },
             "duration": { "type": "string", "description": "`\"<collection>/<variable>\"` prefix of the duration ramp it aliases." }
@@ -89,7 +89,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["ratioPaths", "descriptionGroup", "descriptionPattern"],
-      "description": "P20 — ASPECT RATIOS. Figma has no aspect-ratio TYPE, so a design system authors each ratio as a STRING variable holding `a:b`. This states which variables those are, so they render as the CSS ratio `a / b` instead of a quoted string.",
+      "description": "P20 — ASPECT RATIOS. the source has no aspect-ratio TYPE, so a design system authors each ratio as a STRING variable holding `a:b`. This states which variables those are, so they render as the CSS ratio `a / b` instead of a quoted string.",
       "properties": {
         "ratioPaths": {
           "type": "array",
@@ -120,7 +120,7 @@
         "breakpoints": {
           "type": "object",
           "additionalProperties": { "type": "number" },
-          "description": "P6.1 — MIN-WIDTH THRESHOLD policy, `{ family: px }` keyed by `breakpoints.entries[].family` (e.g. `\"lg\"`). Overrides the emitted `@media (min-width)` threshold and the matching `--breakpoint-<family>` token; a family absent from the map keeps the Figma sample `widthPx` unchanged. Figma `device/width` samples are never rewritten by this key — required (may be `{}`) so a consumer states the policy rather than inheriting a silent default. Example: `{ md: 768, lg: 1025, xl: 1440 }` over Figma samples of 375/768/1280/1920."
+          "description": "P6.1 — MIN-WIDTH THRESHOLD policy, `{ family: px }` keyed by `breakpoints.entries[].family` (e.g. `\"lg\"`). Overrides the emitted `@media (min-width)` threshold and the matching `--breakpoint-<family>` token; a family absent from the map keeps the source sample `widthPx` unchanged. source `device/width` samples are never rewritten by this key — required (may be `{}`) so a consumer states the policy rather than inheriting a silent default. Example: `{ md: 768, lg: 1025, xl: 1440 }` over source samples of 375/768/1280/1920."
         }
       }
     },

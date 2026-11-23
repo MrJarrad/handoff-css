@@ -1,9 +1,11 @@
 # handoff-css
 
-Turn a Figma **Design Handoff** export into production-ready CSS: custom
+Turn a design system's **Design Handoff** export (today read from Figma) into production-ready CSS: custom
 properties for every variable, a Tailwind v4 `@theme` bridge so utilities speak
 your names instead of Tailwind's, and a reconciliation report that tells you
 exactly what it did and what it refused to guess.
+
+**Input today.** The design system's source of truth is whatever you author it in (Figma, code tokens, Storybook). The one reader built so far reads Figma, so the export, the live read and the write-back below name Figma where they describe that route. Everything else says "the source".
 
 Its job is to set up **production-ready code from the handoff** — not to have
 opinions about your design system. Every opinion lives in one config file.
@@ -28,7 +30,7 @@ them are silent:
 
 - It **invents** a value the export did not state (a unit, a divisor, a
   breakpoint) and ships something plausible but wrong.
-- It **drops** a variable Figma marked "don't publish", leaving every semantic
+- It **drops** a variable the source marks "don't publish", leaving every semantic
   token that aliases it invalid at computed-value time — the element renders
   unstyled, with no error.
 - It emits a key that **cycles** (`--radius-300: var(--radius-300)`), so the
@@ -113,17 +115,17 @@ before it is rendered, so you can build your own checks on them.
 | --- | --- |
 | `schema.name` / `schema.versions` | Which export contract you have actually read. A superseded schema still parses, so it is rejected rather than accepted. |
 | `paths.*` | Export in, four artifacts out, plus your own stylesheet. |
-| `paths.styles` | Optional, schema 12+: where the style classes go. One class per Figma style, selector and declarations from the export's own `cssClass`, verbatim (P21). Unset, or an older export, writes no file. |
-| `exclude.paths` | `"<collection>/<variable>"` prefixes that are never emitted — authoring scratch, Figma-only hacks. Applied on path identity, never revived by an alias. |
+| `paths.styles` | Optional, schema 12+: where the style classes go. One class per style, selector and declarations from the export's own `cssClass`, verbatim (P21). Unset, or an older export, writes no file. |
+| `exclude.paths` | `"<collection>/<variable>"` prefixes that are never emitted — authoring scratch, source-only hacks. Applied on path identity, never revived by an alias. |
 | `color.format` | `rgb-slash-percent` (`#rrggbb` at full alpha, else `rgb(r g b / pct)`) or `hex8`. |
-| `motion.timingUnit` | `ms` or `s`. Figma stores a TIMING variable in seconds; `ms` republishes it in milliseconds, so a step named for its milliseconds reads in the unit its name states (P19). |
+| `motion.timingUnit` | `ms` or `s`. the source stores a TIMING variable in seconds; `ms` republishes it in milliseconds, so a step named for its milliseconds reads in the unit its name states (P19). |
 | `motion.delayAliasOf` | The delay and duration group prefixes. A delay step holding a duration step's value as its own literal instead of aliasing it raises `DELAY_NOT_ALIASED`. Reported, never rewritten (P19). |
 | `aspect.ratioPaths` | `"<collection>/<variable>"` prefixes whose STRING variables hold a ratio (`core/aspect/`). `"3:2"` renders as the CSS value `3 / 2`; every STRING outside them stays quoted (P20). |
 | `aspect.descriptionGroup` / `.descriptionPattern` | Optional cross-check: the excluded per-column-span height groups that describe the same ratios. A description contradicting the authored variable raises `ASPECT_DESCRIPTION_DISAGREES` and changes no value (P20). |
 | `layout.collection` | The collection whose modes are responsive breakpoints rather than themes. |
 | `layout.variantAttribute` | The attribute that selects a non-default layout variant. |
 | `layout.baseMode` | `smallest-default-variant` (mobile-first) or `collection-default`. |
-| `layout.breakpoints` | `{ family: px }` house MIN-WIDTH THRESHOLD policy, keyed by `breakpoints.entries[].family` (e.g. `"lg"`). Overrides the emitted `@media (min-width)` threshold and the matching `--breakpoint-<family>` token; a family not in the map keeps the Figma sample `widthPx` unchanged — Figma's `device/width` samples are never rewritten (P6.1). Required, may be `{}`. |
+| `layout.breakpoints` | `{ family: px }` house MIN-WIDTH THRESHOLD policy, keyed by `breakpoints.entries[].family` (e.g. `"lg"`). Overrides the emitted `@media (min-width)` threshold and the matching `--breakpoint-<family>` token; a family not in the map keeps the source sample `widthPx` unchanged — the source's `device/width` samples are never rewritten (P6.1). Required, may be `{}`. |
 | `modes.collectionModeAttribute` | Selector template for a multi-mode collection with no width or theme semantics. `{collection}` is substituted. |
 | `themes.collection` | Fallback gate if an export ever stops publishing `isTheme`. |
 | `themes.total` | Theme modes that replace their siblings entirely (see P10). |
@@ -157,7 +159,7 @@ matching exactly `N% of screen height` / `N% of screen width`, else the
 export's own `responsiveBehavior.rules[].viewportFraction` (a fraction stated
 by the rule itself, source `rule`), else a bare `.strategy` with no fraction
 (a hint only), else the per-mode default. The description convention is a
-supported input rather than a stopgap: Figma variables carry no viewport
+supported input rather than a stopgap: variables carry no viewport
 semantics, so it is the only place a designer can currently state the
 fraction — which is also why it beats a rule fraction on disagreement (more
 than 0.005 apart): a `VIEWPORT_FRACTION_DISAGREES` warning names both values
@@ -178,7 +180,7 @@ prefix keeps its per-mode samples and is reported as
 Nothing is guessed either way: a `viewport.groups` member with no stated
 fraction stays px and is reported as `VIEWPORT_UNFLAGGED`, and a wrong
 description yields a wrong token on purpose (the export is the contract; the
-fix is in Figma). Full rules: [P11](docs/POLICIES.md).
+fix is in the source). Full rules: [P11](docs/POLICIES.md).
 
 ### Cell trust
 
@@ -251,7 +253,7 @@ plugin and `design-handoff-script` save, in place of the `.json` and `.md` insid
 names each file as `<zip> › <file>`; anything else in the zip (screenshots) is ignored.
 Stored and deflated entries are read with `node:zlib`; ZIP64 and encrypted zips are refused.
 
-**A design system split across Figma files** (0.14.0). Each file's Design System Handoff
+**A design system split across source files** (0.14.0). Each file's Design System Handoff
 export lists only its own variables; a variable used from a library arrives as an alias carrying
 the library's key. Give every file's export — `--input` once per file, or a list in
 `paths.input` — and they are joined by variable key into one token file, library aliases kept
@@ -380,7 +382,7 @@ For a project with its own tokens and components and no Design System Handoff ex
 handoff-css match --handoff design-handoff-block-overlay.md --src src --rulings handoff-rulings.md
 ```
 
-Every Figma variable (the brief's token rows) and component (its component list) gets the
+Every variable (the brief's token rows) and component (its component list) gets the
 closest existing code match — evidence on name, value and usage, and a confidence
 (`high`/`medium`/`low`) — or is reported unmatched. A value alone is never a proposal. The text
 report ends with every unruled item as a row of the ruling table (`| kind | figma | ruling |
@@ -389,7 +391,7 @@ next run reuses it, reporting `RULING_STALE` when a `use` names code that has go
 every item is ruled. Rules and shape: `docs/POLICIES.md` P26,
 `skills/handoff-to-code/references/brownfield.md`.
 
-**Raw values.** A value the layer states as a plain number, not bound to a Figma variable,
+**Raw values.** A value the layer states as a plain number, not bound to a variable,
 is listed by `design-handoff-script` in the link-run file beside the brief (`unboundValues`; a layer
 that binds no variables needs no Design System Handoff export). `--export <brief .json>` matches each,
 by value, to the project's token of the same kind: a colour you can't tell apart (CIEDE2000 ΔE < 1,
@@ -482,7 +484,7 @@ shows), `RULED`, `RULING_STALE`. Rulings use kind `resolve-component`. Exit 2 wh
 `handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch] [--for <semantic>[@step]… --on <surface>… [--use text|large-text|ui] [--keep-anchor]] [--out <dir>] [--json]`
 is for the case `resolve` reports as `NEW_RAMP`: nothing in the system holds the colour. It proposes a **whole primitive ramp**
 (never one colour) and writes `ramp-proposal.json` (a patch, `schema/ramp-proposal.v1.schema.json`) and
-`ramp-proposal.md`. It writes nothing into Figma: an agent (after a yes) or the designer applies the patch there, then the
+`ramp-proposal.md`. It writes nothing into the source: an agent (after a yes) or the designer applies the patch there, then the
 export is taken again and `profile`/`resolve` see the new ramp.
 
 - **The system's own steps and naming.** Steps, the dark and light ends, and the evenness and hue-drift limits come from

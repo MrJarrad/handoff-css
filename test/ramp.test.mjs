@@ -175,9 +175,9 @@ test("the proposal is deterministic: the same input gives the same bytes", () =>
   assert.equal(a, b);
 });
 
-test("markdown: the ramp, the name question, the mapping, and that nothing was written into Figma", () => {
+test("markdown: the ramp, the name question, the mapping, and that nothing was written into the source", () => {
   const md = renderRampMarkdown(proposeRamp({ doc: jhd(), anchors: ANCHORS, ...MAP }));
-  assert.match(md, /Nothing has been written into Figma/);
+  assert.match(md, /Nothing has been written into the source/);
   assert.match(md, /\*\*Question:\*\*/);
   assert.match(md, /## Semantic colours, by mode/);
   assert.match(md, /color\/palette\/.+\/300/);
@@ -192,7 +192,7 @@ test("CLI: usage errors exit 1; a settled run exits 0 and writes exactly the two
   const p = JSON.parse(readFileSync(path.join(r.dir, "ramp-proposal.json"), "utf8"));
   assert.ok(validate(p));
   assert.equal(p.ramps[0].variables.find((v) => v.step === 300).hex, "#14d7fb");
-  assert.match(r.out, /nothing written into Figma/);
+  assert.match(r.out, /nothing written into the source/);
   const j = await run(["--anchor", "#14d7fb@300", "--anchor", "#2b67b9@700", "--name", "cyan", "--json"]);
   assert.equal(JSON.parse(j.out).ramps[0].name, "cyan");
 });

@@ -65,11 +65,11 @@ export function generate(doc, config, { handAuthoredCss = "", handAuthoredMissin
 }
 
 /**
- * One design system split across Figma files: every file's export,
+ * One design system split across source files: every file's export,
  * each checked against the schema, joined by variable key (`merge.mjs`), then
  * generated as one. A single export behaves exactly as `generate`.
  *
- * @param docs  the parsed exports, one per Figma file
+ * @param docs  the parsed exports, one per source file
  */
 export function generateSet(docs, config, { handAuthoredCss = "", handAuthoredMissing = false } = {}) {
   assertConfig(config);
@@ -119,7 +119,7 @@ function build(doc, config, { handAuthoredCss, handAuthoredMissing = false }) {
   //             CSS alone would report them as public MATCHes. They are neither.
   //
   // A hidden variable nothing aliases is neither listed here nor dropped: the
-  // Figma hide flag drops nothing (ruling 2026-11-02), so it is emitted as an
+  // source hide flag drops nothing (ruling 2026-11-02), so it is emitted as an
   // ordinary public token.
   const exclusionsJson = `${JSON.stringify(
     {
@@ -162,7 +162,7 @@ function build(doc, config, { handAuthoredCss, handAuthoredMissing = false }) {
 
 function parseArgs(argv, defaults) {
   const opts = { ...defaults, check: false };
-  // One `--input` per Figma file of a split design system; any given
+  // One `--input` per source file of a split design system; any given
   // replace the config's list, never add to it.
   const inputs = [];
   for (let i = 0; i < argv.length; i += 1) {

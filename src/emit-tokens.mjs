@@ -60,7 +60,7 @@ export function emitTokens(doc, handDeclared, cfg) {
         excludedRows.push({ collection: c.name, name, reason: `EXCLUDE_PATHS (${c.name})` });
         continue;
       }
-      // The Figma hide flag governs the Figma library only (ruling
+      // The source's hide flag governs the source library only (ruling
       // 2026-11-02: "hide from publishing is for figma only"): a hidden variable
       // nothing aliases is emitted like any other token. `hiddenRows` stays in the
       // result, always empty, so consumers reading the field keep working.
@@ -146,7 +146,7 @@ export function emitTokens(doc, handDeclared, cfg) {
           code: resp.warning,
           name,
           collection: c.name,
-          detail: `states a viewport fraction but sits outside every \`viewport.groups\` prefix (${(cfg.viewport?.groups ?? []).map((g) => `\`${g}\``).join(", ") || "none"}) — treated as a hint, per-mode samples emitted unchanged. Correct the class in Figma, or declare the group.`,
+          detail: `states a viewport fraction but sits outside every \`viewport.groups\` prefix (${(cfg.viewport?.groups ?? []).map((g) => `\`${g}\``).join(", ") || "none"}) — treated as a hint, per-mode samples emitted unchanged. Correct the class in the source, or declare the group.`,
         });
       } else if (resp.warning) {
         warnings.push({
@@ -321,12 +321,12 @@ export function emitTokens(doc, handDeclared, cfg) {
     head.push(...renderGroups(groups));
 
     // P7 — PRIVATE: emitted so the published aliases above resolve, but fenced
-    // and labelled so the file carries the intent Figma's publish flag meant.
+    // and labelled so the file carries the intent the source's publish flag meant.
     if (privGroups.size) {
       head.push(
         "",
         `/* private — alias targets of published tokens; not for direct use.`,
-        `   These are hidden in Figma (only semantic tokens belong in a layout), but a`,
+        `   These are hidden in the source (only semantic tokens belong in a layout), but a`,
         `   custom property that is referenced and not declared is invalid at`,
         `   computed-value time — so the names must exist. Reference the semantic`,
         `   token that aliases these, never these. See policy P7 in`,
@@ -338,7 +338,7 @@ export function emitTokens(doc, handDeclared, cfg) {
   }
 
   // P19/P20 — two lanes that report on the DESIGN FILE without changing a byte
-  // of what is emitted: a delay step Figma authored as its own copy of a
+  // of what is emitted: a delay step the source authored as its own copy of a
   // duration's value, and a `grid/aspect/*` description that contradicts the
   // authored `core/aspect/*` variable. Both are one-line Figma fixes.
   warnings.push(...delayAliasFindings(doc, cfg), ...aspectDescriptionFindings(doc, cfg));

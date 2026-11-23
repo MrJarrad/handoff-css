@@ -67,7 +67,7 @@ export async function rampCommand(args, { cwd = process.cwd(), stdout = process.
     if (flags.has("--json")) stdout.write(json);
     else {
       const r = proposal.ramps.map((x) => `${x.name} (${x.nameSource}, ${x.variables.length} steps)`).join(", ");
-      stdout.write(`handoff-css (ramp): ${r}; ${proposal.mapping.length} mappings, ${proposal.open} open; wrote ${Object.values(RAMP_FILES).join(", ")} to ${outDir}; nothing written into Figma\n`);
+      stdout.write(`handoff-css (ramp): ${r}; ${proposal.mapping.length} mappings, ${proposal.open} open; wrote ${Object.values(RAMP_FILES).join(", ")} to ${outDir}; nothing written into the source\n`);
       for (const q of proposal.questions) stdout.write(`question: ${q.ask}\n`);
     }
     if (proposal.open > 0) stderr.write(`handoff-css (ramp): ${proposal.open} mapping(s) have no passing step; see ${RAMP_FILES.md}\n`);

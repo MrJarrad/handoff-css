@@ -6,7 +6,7 @@
    State:    eab3d422694a61d30e30e6961dd690023df3d5db3965ced39a562dcdb98498cc
 
    Regenerate with:  pnpm run tokens
-   One class per Figma style, from the export's own `cssClass` — selector and
+   One class per style, from the export's own `cssClass` — selector and
    declarations verbatim, in the export's order (policy P21). A class already
    declared by hand in styles.css wins the cascade and is not emitted;
    the reconciliation report lists every style and its status.

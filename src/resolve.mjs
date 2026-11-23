@@ -8,7 +8,7 @@ export const fail = (msg) => {
   throw new Error(`handoff-css: ${msg}`);
 };
 
-/** Figma stores float32; round off the representation noise deterministically. */
+/** the source stores float32; round off the representation noise deterministically. */
 export const num = (n) => {
   if (typeof n !== "number" || !Number.isFinite(n)) fail(`non-finite number ${n}`);
   const r = Math.round(n * 1e6) / 1e6;
@@ -37,7 +37,7 @@ export const color = (hex8, cfg) => {
 };
 
 /**
- * P19 — MOTION. Figma stores a TIMING variable in SECONDS; `motion.timingUnit`
+ * P19 — MOTION. the source stores a TIMING variable in SECONDS; `motion.timingUnit`
  * states which unit the design system publishes. A system that names its steps
  * by their milliseconds
  * so the value has to read in the same unit the name states or the token lies
@@ -353,7 +353,7 @@ export function resolveValue(v, mode, byId, cfg, collection = null) {
       }
       return plain(color(raw, cfg));
     case "STRING":
-      // P22 — a STRING variable Figma holds a FONT STYLE NAME in ("Medium") is
+      // P22 — a STRING variable the source holds a FONT STYLE NAME in ("Medium") is
       // a font weight, and `font-weight: "Medium"` is not a value CSS accepts.
       // Schema 12 states the number itself on the variable, so the value is
       // the export's own `css` verbatim — nothing here maps a style name to a

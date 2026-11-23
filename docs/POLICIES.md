@@ -127,7 +127,7 @@ there is no published design intent below it.
 
 ## P7 — Private / hidden / excluded
 
-Figma-only scaffolding must never become a public design-system token. But
+Source-only scaffolding must never become a public design-system token. But
 hidden-in-Figma does **not** mean absent-from-CSS, and conflating the two ships
 broken CSS.
 
@@ -152,7 +152,7 @@ Two classes, reported separately:
   because the aliases have to resolve — fenced in a marked block so the file
   states the intent the publish flag was carrying: these exist to be aliased, not
   used directly. Never a public row, never MISSING or EXTRA downstream.
-- **Hidden and unreachable** — *not a class any more.* The Figma hide flag governs the Figma
+- **Hidden and unreachable** — *not a class any more.* The source's hide flag governs the Figma
   library only (ruling 2026-11-02: "hide from publishing is for figma only"), so a
   hidden variable nothing aliases is emitted like any other token. (Until then it was dropped
   as HIDDEN.)
@@ -439,7 +439,7 @@ preferred over the literal because it survives upstream token renames.
    path.
 2. The **description convention**: a description matching exactly
    `N% of screen height` or `N% of screen width`. A supported first-class
-   input, not a stopgap — Figma variables carry no viewport semantics, so a
+   input, not a stopgap — variables carry no viewport semantics, so a
    description is the only place a designer can currently state the fraction.
    Anchored: "roughly 20% of screen height on mobile" is not a signal. Switched
    with `viewport.descriptionFallback`.
@@ -489,7 +489,7 @@ consumer with no group convention.
 
 **Nothing is guessed.** A `viewport.groups` member with none of the **three**
 signals keeps its px samples and is reported as `VIEWPORT_UNFLAGGED` — the fix
-is one edit in Figma, not a heuristic here. The three that silence it, all of
+is one edit in the source, not a heuristic here. The three that silence it, all of
 them statements rather than absences:
 
 1. a `responsive` field stating the fraction;
@@ -511,7 +511,7 @@ Likewise a `fluid-clamp` with no `css` expression
 
 And nothing is second-guessed. A description of "20% of screen width" on a
 full-bleed variable emits `20vw`. That is a wrong token from a wrong
-description, correctable in Figma in one edit and named in the report's §10; a
+description, correctable in the source in one edit and named in the report's §10; a
 plausibility check here would make the export stop being the contract.
 
 **The export's own `fluid-clamp` numbers are checked, never recomputed
@@ -664,7 +664,7 @@ the current `†` and the pre-2026-09-11 `⚠` note form (0.3.2).
 
 ## P15 — Derived viewport fractions round to the input
 
-The rule: **the export never states a value that was not input into Figma.**
+The rule: **the export never states a value that was not input into the source.**
 Every ordinary token already meets it — `244` exports as `244` / `15.25rem`. The
 single exception is a fraction the plugin DERIVES (value ÷ a screen reference),
 where float division turns `244/812` into `0.300493`.
@@ -786,11 +786,11 @@ export states the value and CSS has exactly one syntax for it.
 Naming is P1's job, not this policy's. A design system can retire
 role-flavoured names (`quad-out-gill`, `power2-out`, `expo-out-card`) in favour of curve
 families — `quad-out`, `cubic-out`, `quart-out`, `expo-out`, `ease-out`, `circ-in-out`,
-`linear` — a rename **in Figma**, which arrived through `codeSyntax.WEB` with export v11
+`linear` — a rename **in the source**, which arrived through `codeSyntax.WEB` with export v11
 and changed no code here. A role name, if one is ever wanted, is a semantic alias layer
 (P12), never a second declaration of a curve.
 
-**TIMING.** Figma stores a TIMING variable in SECONDS. `motion.timingUnit` states
+**TIMING.** the source stores a TIMING variable in SECONDS. `motion.timingUnit` states
 which unit the house publishes:
 
 | `timingUnit` | `duration/375` (0.375 stored) |
@@ -805,7 +805,7 @@ Float32 noise is rounded off **in seconds, before the scale**. `0.10000000149011
 1000` is `100.00000149011612`, and `num()`'s six decimal places would faithfully
 preserve that as `100.000001ms`.
 
-**Delays alias durations — in Figma, and the generator only says so.** Ruling row 4
+**Delays alias durations — in the source, and the generator only says so.** Ruling row 4
 makes every `motion/delay` step an alias of the `motion/duration` step of the same
 value, *"so values can never drift"*. When Figma authors that, the export carries an
 ordinary alias hop and P5 emits `--delay-375: var(--duration-375)`, with the
@@ -816,7 +816,7 @@ into `var(--duration-…)` on a value match would look identical today and would
 overwrite the first delay step that legitimately differs — the class of guess this
 package exists to remove. Instead `motion.delayAliasOf` names the two groups and the
 generator REPORTS the gap: a delay step holding a duration step's value as its own
-literal raises `DELAY_NOT_ALIASED`, naming the variable to re-point at in Figma. A delay
+literal raises `DELAY_NOT_ALIASED`, naming the variable to re-point at in the source. A delay
 with no matching duration step (`delay/50`, which has no `duration/50`) is not a
 finding — the ruling only pairs steps that exist. Stagger is `index × step` in the
 consumer's code, not a token.
@@ -827,7 +827,7 @@ consumer's code, not a token.
 
 `config.aspect` · `src/aspect.mjs` · `test/aspect-v10.test.mjs`
 
-Figma has no aspect-ratio **type**, but it has STRING variables, and as of export v11
+the source has no aspect-ratio **type**, but it has STRING variables, and as of export v11
 the design system authors the four ratios properly:
 `core/aspect/{landscape, portrait, square, tall}` hold `"3:2"`, `"4:5"`, `"1:1"`,
 `"2:3"`.
@@ -853,7 +853,7 @@ describe the ratio they were computed from, so `aspect.descriptionGroup` +
 variable of the same name and raise `ASPECT_DESCRIPTION_DISAGREES` when they
 contradict. **That finding changes no value.** The authored variable is the value,
 always; a stale description means a designer is reading the wrong number off the wrong
-place, and the fix is one edit in Figma.
+place, and the fix is one edit in the source.
 
 *(Superseded before release: 0.4.0's first cut DERIVED the ratios from those
 descriptions, because no variable held them. `ASPECT_RATIO_MIXED` and
@@ -994,7 +994,7 @@ On the v13 fixture all 52 TEXT classes bind to `--family-font-sans`.
 
 `src/resolve.mjs` · `test/styles-v13.test.mjs`
 
-Figma holds a font weight as the STRING style name it is spelled with — `weight/strong`
+the source holds a font weight as the STRING style name it is spelled with — `weight/strong`
 is `"Medium"`. `font-weight: "Medium"` is not a value CSS accepts, and mapping a style
 name to a number is precisely the guess that goes wrong on the first family whose
 "Medium" is not 500.
@@ -1002,7 +1002,7 @@ name to a number is precisely the guess that goes wrong on the first family whos
 Schema 12 states the number on the variable: `fontWeightNumeric` carries `numeric`,
 `css`, `cssProperty` and a `confidence`. A STRING variable that has one emits the
 export's own `css` verbatim — `--weight-strong: 500` — and a STRING variable without one
-stays quoted, exactly as before. The report names the Figma style name and the confidence
+stays quoted, exactly as before. The report names the source style name and the confidence
 the export attached, so a weight the plugin guessed at is visible rather than folded
 silently into the ramp.
 
@@ -1104,7 +1104,7 @@ the same reason it already was — this bind only looks at declarations starting
 ## Determinism
 
 Collections sorted by name, variables by WEB name, numbers rounded to 6 decimal
-places (Figma stores float32, so raws arrive as `0.10000000149011612`). Same
+places (the source stores float32, so raws arrive as `0.10000000149011612`). Same
 inputs → byte-identical output. `--check` writes nothing and exits 1 if any
 committed artifact would change, which is what a consumer's CI runs.
 
@@ -1122,7 +1122,7 @@ states `text-indent`. Finding: `STYLE_CLASS_PARAGRAPH_INDENT_BOUND`. Implemented
 A project that already has code and no Design System Handoff export (brownfield): it matches what the design names to what the codebase already
 has. `handoff-css match` reads the brief markdown — the
 only half that carries each variable's CSS name and mode values, and the component list —
-and the project's sources, and proposes per Figma item the closest code match. It never
+and the project's sources, and proposes per design-system item the closest code match. It never
 adopts one: a match is a question for a human until the project's ruling table answers it,
 so the run exits 1 while any item is unruled.
 

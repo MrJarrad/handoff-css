@@ -465,7 +465,7 @@ export function emitStyles(doc, byId, handClasses, handUtils, cfg) {
   if (!rows.some((r) => r.status === "GENERATED")) return { css: null, rows, warnings };
 
   const header = generatedHeader(doc, cfg, [
-    "   One class per Figma style, from the export's own `cssClass` — selector and",
+    "   One class per style, from the export's own `cssClass` — selector and",
     "   declarations verbatim, in the export's order (policy P21). A class already",
     `   declared by hand in ${handAuthoredName(cfg)} wins the cascade and is not emitted;`,
     "   the reconciliation report lists every style and its status.",

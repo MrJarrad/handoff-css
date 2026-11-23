@@ -1,6 +1,6 @@
 ## Raw values
 
-11 values not bound to a Figma variable · 6 built with a token · 5 need your call · 0 ruled
+11 values not bound to a variable · 6 built with a token · 5 need your call · 0 ruled
 
 ### Built with a token
 

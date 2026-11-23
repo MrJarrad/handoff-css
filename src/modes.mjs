@@ -34,8 +34,8 @@ export function themeModeIds(doc) {
  * P6.1 — the house MIN-WIDTH THRESHOLD policy, `cfg.layout.breakpoints`: a
  * `{ family: px }` map (family = `breakpoints.entries[].family`, e.g. `"lg"`)
  * that overrides the emitted `@media (min-width)` / `--breakpoint-<family>`
- * threshold. A family absent from the map keeps the Figma sample `widthPx`
- * unchanged — Figma's `device/width` variables are never rewritten; this is a
+ * threshold. A family absent from the map keeps the source sample `widthPx`
+ * unchanged — the source's `device/width` variables are never rewritten; this is a
  * pipeline-policy layer on top of the sample, not a correction to it (lock
  * row 31: "my breakpoints in figma are fixed point within a range, i don't
  * have the same min max functionality in figma").

@@ -1,4 +1,4 @@
-// Policy P20 — ASPECT RATIOS. Figma has no aspect-ratio *type*, but it does
+// Policy P20 — ASPECT RATIOS. the source has no aspect-ratio *type*, but it does
 // have STRING variables, and as of export v11 the design system authors the
 // four ratios as `core/aspect/{landscape, portrait, square, tall}` holding
 // `"3:2"`, `"4:5"`, `"1:1"`, `"2:3"`.
@@ -9,7 +9,7 @@
 // `a / b`, because `aspect-ratio: "3:2"` is not a value CSS accepts.
 //
 // The per-column-span HEIGHT variables under `layout/grid/aspect/` remain the
-// Figma workaround they always were: EXCLUDED (P7), never tokens. They still
+// source workaround they always were: EXCLUDED (P7), never tokens. They still
 // carry the ratio in their descriptions, so this module cross-checks them
 // against the authored variable and reports a disagreement. That is a
 // validation note about the design file, not an input to what is emitted —
@@ -101,7 +101,7 @@ export function aspectDescriptionFindings(doc, cfg) {
       code: "ASPECT_DESCRIPTION_DISAGREES",
       name: auth.name,
       collection: descriptionGroup,
-      detail: `\`${auth.name}\` is authored \`${auth.ratio}\`, but ${wrong.map(([ratio, who]) => `\`${who}\` describes ${ratio == null ? "no recognisable ratio" : `\`${ratio}\``}`).join(" and ")} in \`${descriptionGroup}${leaf}\`. The authored variable is the value; correct the description in Figma so a designer reading the height group is not reading a stale number.`,
+      detail: `\`${auth.name}\` is authored \`${auth.ratio}\`, but ${wrong.map(([ratio, who]) => `\`${who}\` describes ${ratio == null ? "no recognisable ratio" : `\`${ratio}\``}`).join(" and ")} in \`${descriptionGroup}${leaf}\`. The authored variable is the value; correct the description in the source so a designer reading the height group is not reading a stale number.`,
     });
   }
   return findings.sort((a, b) => cmp(a.name, b.name));
