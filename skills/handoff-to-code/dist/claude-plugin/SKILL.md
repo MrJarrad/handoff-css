@@ -11,8 +11,8 @@ description: >-
 
 **The handoff pair is the contract: every node, token, copy string and annotation in it is
 built — never Figma pixels, never inferred values.** A value the pair does not state is not
-yours to supply. The pair is read, not re-described; the brief points at it rather than paraphrasing it. The Figma MCP
-cannot replace it: no per-mode code-named tokens, generated CSS, changelog or pair hashes
+yours to supply. The pair is read, not re-described; the brief points at it. The Figma MCP does not replace the pair: it cannot return
+per-mode code-named tokens, generated CSS, the changelog or the pair hashes
 (`2026-10-17-keep-design-handoff`).
 
 ## When it fires
@@ -23,8 +23,9 @@ cannot replace it: no per-mode code-named tokens, generated CSS, changelog or pa
 | No export — reading the design file live (selection, screenshots, variant matrix, copy inventory) | `capture-figma` |
 | A page is already built and needs measuring back against the design | `audit-build` |
 
-`capture-figma` supplies what a pair cannot carry (renders, prototype detail, REST `--raw` binding
-proofs, the live-annotation spot check): reach for it *inside* step 4 when the pair is silent — not instead of it.
+`capture-figma` still supplies what a pair cannot carry: renders, interaction/prototype
+detail, spot-verified binding proofs via REST `--raw`, and the live-annotation spot check. Reach for it *inside* step 4
+when the pair is silent — not instead of it.
 
 ## The export is a set
 
@@ -39,7 +40,7 @@ The brief is the set. `handoff-css match --handoff <design-handoff>.md --src <co
 proposes the closest existing code match for every variable and component.
 **A proposal is a question, never a binding.** Each item is ruled `use`, `new` or `skip` in the
 ruling table; a `use` whose code has gone is `RULING_STALE`. **Done when** `match` exits 0: every
-item ruled, none stale. Shape and confidence rules: `references/brownfield.md`.
+item ruled, none stale. Rules: `references/brownfield.md`.
 
 **Raw values** (values bound to no variable): `match --export` pairs each with the project's own
 token; one the token reproduces is built with it. Otherwise **Build the exact value and
@@ -111,8 +112,8 @@ wrong mechanism is a defect. Tokens only: a matching literal is still a defect.
 `[Grid]` frames are CSS Grid containers. `col-span(N/M)` maps directly. Widths computed from column maths are a defect even when they measure right.
 
 **Every property the Figma panel shows is a ledger row, nested exposed ones included.** One
-table row is one return row; a table row with no return row is red. An `(open)` row is a question
-answered in chat, never a reason to stop.
+table row is one return row; a table row with no return row is red. An `(open)` row is a chat
+question, never a reason to stop.
 
 **A placed instance's settings are ledger rows, and what it changes is layout config the build carries.**
 A setting not listed in the brief uses the component's own, so build the component's default for it and nothing more.
@@ -134,7 +135,7 @@ section with zero findings still exists and says so.
 A brief ends with `## Asks`, answered in chat. **answered** and **waiting on Figma**: build the
 answer; **assumed**: build the suggestion. **An open ask is a reported item, never a guess.** Every
 waiting, assumed or open ask is a deviation row. Writing a note into the file on the person's yes:
-`references/write-back.md`. Ledger shape: `references/steps.md` § 5b.
+`references/write-back.md`. Ledger: `references/steps.md` § 5b.
 
 ### 6. Check the built CSS back against the pair
 

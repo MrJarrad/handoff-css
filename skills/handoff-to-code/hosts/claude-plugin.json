@@ -1,8 +1,8 @@
 {
   "_": "The Claude plugin (JHD discipline) host: sibling skills exist by name, and the house tail is allowed — but only under `## At JHD`, and only here.",
   "description-scope": "Reading Figma live is capture-figma;\n  measuring a built page is audit-build.",
-  "contract-read": "The pair is read, not re-described; the brief points at it rather than paraphrasing it. The Figma MCP\ncannot replace it: no per-mode code-named tokens, generated CSS, changelog or pair hashes\n(`2026-10-17-keep-design-handoff`).",
+  "contract-read": "The pair is read, not re-described; the brief points at it. The Figma MCP does not replace the pair: it cannot return\nper-mode code-named tokens, generated CSS, the changelog or the pair hashes\n(`2026-10-17-keep-design-handoff`).",
   "fires-table": "| Situation | Skill |\n| --- | --- |\n| An export pair exists and code is being written from it | **this skill** |\n| No export — reading the design file live (selection, screenshots, variant matrix, copy inventory) | `capture-figma` |\n| A page is already built and needs measuring back against the design | `audit-build` |",
-  "sibling-skills": "`capture-figma` supplies what a pair cannot carry (renders, prototype detail, REST `--raw` binding\nproofs, the live-annotation spot check): reach for it *inside* step 4 when the pair is silent — not instead of it.",
+  "sibling-skills": "`capture-figma` still supplies what a pair cannot carry: renders, interaction/prototype\ndetail, spot-verified binding proofs via REST `--raw`, and the live-annotation spot check. Reach for it *inside* step 4\nwhen the pair is silent — not instead of it.",
   "ruling-ref-cites": "`ruling ref` cites the lock row or ruling that authorised a non-match."
 }
