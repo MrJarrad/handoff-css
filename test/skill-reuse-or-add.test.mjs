@@ -65,7 +65,7 @@ test("the Figma write is a required stop on a yes, then a read-back, with no one
   assert.match(addStep, /stop/i);
   assert.match(addStep, /yes/i);
   assert.match(addStep, /read(?:s)? (?:it )?back/i);
-  assert.ok(carries(addStep, "host's Figma write tool, following that tool's own instructions"));
+  assert.ok(carries(addStep, "host's write tool for the source, following that tool's own instructions"));
   assert.doesNotMatch(addStep, /use_figma|figma-use/, "the step names no tool; the reference carries the worked case");
   assert.match(ref, /write-back\.md/);
 });

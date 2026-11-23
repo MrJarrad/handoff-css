@@ -4,7 +4,7 @@
 //
 // This replaces a hand-authored alias block: hand-authoring one means every
 // new token leaf has to be remembered twice, and a leaf that is added or
-// renamed in Figma silently stops having an alias.
+// renamed in the source silently stops having an alias.
 import { cmp, fail } from "./resolve.mjs";
 
 /**

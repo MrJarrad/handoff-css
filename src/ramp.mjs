@@ -4,7 +4,7 @@
 // scale among its colour ramps) and fitted to its ramps' lightness; a system with no colour ramps, or a
 // caller who says so, gets the color engine's defaults. The name is the caller's or a generated one. For
 // each semantic colour the caller names, the proposal says which step it uses in every mode, and why.
-// It writes nothing into Figma: the proposal is a patch that an agent or the designer applies there, after
+// It writes nothing into the source: the proposal is a patch that an agent or the designer applies there, after
 // which the export is taken again.
 import { buildProfile } from "./profile.mjs";
 import { fail } from "./resolve.mjs";
@@ -218,7 +218,7 @@ function nudgeOvershoots(rows, built, rampSteps, anchorSteps) {
 
 export function renderRampMarkdown(p) {
   const out = [`# Ramp proposal${p.source.documentName ? ` for ${p.source.documentName}` : ""}`, "",
-    `Nothing has been written into Figma. This is a patch: apply it there (an agent after a yes, or the designer), then take the export again.`, "",
+    `Nothing has been written into the source. This is a patch: apply it there (an agent after a yes, or the designer), then take the export again.`, "",
     `- Basis: ${p.basis.reason}; steps ${p.basis.steps.join(", ")}; darkest step at lightness ${p.basis.lightness.min.toFixed(3)}.`,
     `- Anchors: ${p.anchors.map((a) => `\`${a.hex}\`${a.step !== undefined ? ` at ${a.step}` : ""}`).join(", ")}.`];
   if (p.merge) out.push(`- ${p.merge.merge ? "These anchors make one ramp" : "These anchors do not make one ramp"}: ${p.merge.reasons.map((r) => `${r.check} ${r.pass ? "ok" : "no"}`).join(", ")}.`);

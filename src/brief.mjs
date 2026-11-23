@@ -55,7 +55,7 @@ export const briefSchemaV13 = require("../schema/design-handoff.v13.schema.json"
 
 /**
  * 0.11.0 — schema v14 is additive over v13, written only when the selection
- * holds a spec or a code layer: `specs[]` (markdown null when Figma gives the
+ * holds a spec or a code layer: `specs[]` (markdown null when the source gives the
  * exporter no spec text) and `builtReference[]`. v13 also gained the fields
  * the plugin already wrote at v13 (`screenshots`, `spacer`, nullable
  * annotation fields) and the link-run script's `linkRun`.
@@ -76,7 +76,7 @@ export const briefSchemaV16 = require("../schema/design-handoff.v16.schema.json"
 
 /**
  * 0.17.0 — schema v17 is additive over v16, written whenever the selection holds a component or
- * component set with properties: `componentProperties[]`, every property the Figma properties panel
+ * component set with properties: `componentProperties[]`, every property the design source's properties panel
  * shows (own, then each exposed nested instance's), and `component.exposed` / `exposedInstances` on
  * each instance. `validateBriefJson` also requires a row for every such property (PROPERTY_ROW_MISSING)
  * and refuses a row with no property behind it (PROPERTY_ROW_DANGLING).
@@ -160,7 +160,7 @@ function checkComponentProperties(doc) {
   const have = new Set(rows.map((row) => `${row.nodeId}\u0000${row.property}`));
   for (const want of expectedPropertyRows(doc.layerTree)) {
     if (!have.has(`${want.nodeId}\u0000${want.property}`)) {
-      errors.push({ code: "PROPERTY_ROW_MISSING", keyword: "componentProperties", path: "/componentProperties", message: `${want.where} \`${want.property}\` (node ${want.nodeId}) is a property the Figma panel shows and has no row in componentProperties[]` });
+      errors.push({ code: "PROPERTY_ROW_MISSING", keyword: "componentProperties", path: "/componentProperties", message: `${want.where} \`${want.property}\` (node ${want.nodeId}) is a property the design source's panel shows and has no row in componentProperties[]` });
     }
   }
   rows.forEach((row, index) => {

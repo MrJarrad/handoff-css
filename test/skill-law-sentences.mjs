@@ -12,7 +12,7 @@
 // `skills/handoff-to-code/SKILL.md`: a per-host sentence cannot be law.
 export const LAW_SENTENCES = [
   // The contract itself.
-  "The handoff pair is the contract: every node, token, copy string and annotation in it is built — never Figma pixels, never inferred values.",
+  "The handoff pair is the contract: every node, token, copy string and annotation in it is built — never source-design pixels, never inferred values.",
   "A value the pair does not state is not yours to supply.",
 
   // Step 1 — the pair is one design-system state.
@@ -24,7 +24,7 @@ export const LAW_SENTENCES = [
   "A warning you build *around* is drift.",
 
   // Step 4, rule 11 (HT-75, HT-76): the property table is the ledger's rows, and its open rows are asks that never block.
-  "**Every property the Figma panel shows is a ledger row, nested exposed ones included.**",
+  "**Every property the design source's panel shows is a ledger row, nested exposed ones included.**",
   "a table row with no return row is red",
   "never a reason to stop",
 
@@ -58,7 +58,7 @@ export const LAW_SENTENCES = [
   "**The newest pair wins over any prior record.**",
 
   // Step 6 — the deviation table.
-  "| element | Figma binding | token used | value | status | ruling ref |",
+  "| element | Source binding | token used | value | status | ruling ref |",
   "**match**",
   "**resolved-to-export**",
   "**unflagged-viewport**",

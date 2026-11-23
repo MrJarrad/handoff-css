@@ -555,7 +555,7 @@
 }
 
 /* private — alias targets of published tokens; not for direct use.
-   These are hidden in Figma (only semantic tokens belong in a layout), but a
+   These are hidden in the source (only semantic tokens belong in a layout), but a
    custom property that is referenced and not declared is invalid at
    computed-value time — so the names must exist. Reference the semantic
    token that aliases these, never these. See policy P7 in

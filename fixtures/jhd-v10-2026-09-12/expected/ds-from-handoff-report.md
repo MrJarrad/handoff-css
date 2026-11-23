@@ -23,7 +23,7 @@ PRIVATE and EXCLUDED variables (policy P7, §0) are never counted in
 MATCH/VALUE-DRIFT/NAME-ONLY-IN-EXPORT — they are not public design-system
 tokens. Of the two, **only PRIVATE is emitted**, because published tokens
 alias it and a referenced-but-undeclared custom property is invalid at
-computed-value time. The Figma hide flag drops nothing: a hidden variable no
+computed-value time. The source's hide flag drops nothing: a hidden variable no
 published token aliases is emitted as an ordinary token (ruling
 2026-11-02, "hide from publishing is for figma only").
 
@@ -34,9 +34,9 @@ in `docs/handoff-css.md`). Operator ruling 2026-09-06: *"i don't publish
 the color primitives because only semantic colors should be used in layout but
 the primitive color are alias's in semantic colors"*.
 
-**PRIVATE** — hidden in Figma, but reachable by alias from a published token, so
+**PRIVATE** — hidden in the source, but reachable by alias from a published token, so
 they **are** emitted (same names, fenced in a marked block). Not publishing a
-primitive in Figma means *"don't pick this in a layout"*; it does not mean the
+primitive in the source means *"don't pick this in a layout"*; it does not mean the
 value is unused. CSS has no such distinction — dropping these would leave the
 semantic tokens that reference them invalid at computed-value time. Reference the
 semantic token in the "Aliased by" column, never the private name.
@@ -462,12 +462,12 @@ because the export has no variable behind it.
 
 ### Breakpoints emitted (P8.4)
 
-| Key | Value | Figma |
+| Key | Value | Source |
 | --- | --- | --- |
-| `--breakpoint-sm` | `23.4375rem` | 375px — Figma sm device width |
-| `--breakpoint-md` | `48rem` | 768px — Figma md device width |
-| `--breakpoint-lg` | `80rem` | 1280px — Figma lg device width |
-| `--breakpoint-xl` | `120rem` | 1920px — Figma xl device width |
+| `--breakpoint-sm` | `23.4375rem` | 375px — source sm device width |
+| `--breakpoint-md` | `48rem` | 768px — source md device width |
+| `--breakpoint-lg` | `80rem` | 1280px — source lg device width |
+| `--breakpoint-xl` | `120rem` | 1920px — source xl device width |
 
 Tailwind's own `sm` 640 / `md` 768 / `lg` 1024 / `xl` 1280 / `2xl` 1536 are gone
 with the reset. `2xl` has no replacement because Figma publishes no fifth device
@@ -542,23 +542,23 @@ None.
 
 **Warnings (13)** — what the generator would not guess at. A
 variable in a `viewport.groups` group with no stated fraction keeps its px
-samples: the fix is one description in Figma, not a heuristic here.
+samples: the fix is one description in the source, not a heuristic here.
 
 | Code | Token | Detail |
 | --- | --- | --- |
-| `DELAY_NOT_ALIASED` | `--delay-0` | holds the same value as `--duration-0` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-0` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-100` | holds the same value as `--duration-100` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-100` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-1000` | holds the same value as `--duration-1000` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-1000` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-200` | holds the same value as `--duration-200` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-200` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-300` | holds the same value as `--duration-300` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-300` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-375` | holds the same value as `--duration-375` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-375` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-400` | holds the same value as `--duration-400` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-400` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-500` | holds the same value as `--duration-500` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-500` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-600` | holds the same value as `--duration-600` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-600` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-700` | holds the same value as `--duration-700` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-700` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-750` | holds the same value as `--duration-750` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-750` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-800` | holds the same value as `--duration-800` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-800` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
-| `DELAY_NOT_ALIASED` | `--delay-900` | holds the same value as `--duration-900` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-900` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-0` | holds the same value as `--duration-0` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-0` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-100` | holds the same value as `--duration-100` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-100` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-1000` | holds the same value as `--duration-1000` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-1000` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-200` | holds the same value as `--duration-200` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-200` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-300` | holds the same value as `--duration-300` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-300` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-375` | holds the same value as `--duration-375` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-375` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-400` | holds the same value as `--duration-400` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-400` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-500` | holds the same value as `--duration-500` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-500` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-600` | holds the same value as `--duration-600` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-600` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-700` | holds the same value as `--duration-700` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-700` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-750` | holds the same value as `--duration-750` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-750` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-800` | holds the same value as `--duration-800` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-800` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
+| `DELAY_NOT_ALIASED` | `--delay-900` | holds the same value as `--duration-900` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at `--duration-900` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself. |
 
 **Aliases (16)** — published names that are a `var()` hop onto a
 generated token, expanded from `aliases` over the emitted leaves. The token is

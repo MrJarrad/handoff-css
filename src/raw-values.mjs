@@ -1,4 +1,4 @@
-// RAW VALUES — values a layer states as plain numbers, not bound to a Figma variable, matched to the
+// RAW VALUES — values a layer states as plain numbers, not bound to a variable, matched to the
 // project's own coded tokens (CSS custom properties). The design-handoff script lists them in the
 // link-run file (`unboundValues`); this matches each to the closest token of its own kind.
 //
@@ -248,7 +248,7 @@ export function matchRawValues({ rows, files, rulings = null }) {
 export function renderRawValues({ items, findings, counts, unreadable = [] }) {
   const cell = (s) => String(s ?? "").replace(/\|/g, "\\|");
   const layers = (i) => `${i.layers.length} layer${i.layers.length === 1 ? "" : "s"}`;
-  const lines = ["## Raw values", "", `${counts.values} values not bound to a Figma variable · ${counts.built} built with a token · ${counts.listed} need your call · ${counts.ruled} ruled`, ""];
+  const lines = ["## Raw values", "", `${counts.values} values not bound to a variable · ${counts.built} built with a token · ${counts.listed} need your call · ${counts.ruled} ruled`, ""];
   for (const f of findings) lines.push(`- ${f.code} ${f.kind} ${f.figma} — ${f.message}`);
   if (findings.length) lines.push("");
   if (unreadable.length) lines.push(`Not read: ${unreadable.join(", ")} — colour tokens in a form this pass does not convert (lab(), lch(), oklab(), hwb(), color(), color-mix()); a value they hold is not matched.`, "");

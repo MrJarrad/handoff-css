@@ -9,7 +9,7 @@
 // today and would silently overwrite the first delay step that legitimately
 // differs, which is the class of guess this package exists to remove. So a
 // delay authored as its own copy of a duration's value is REPORTED: one
-// finding, naming both variables, with the fix in Figma.
+// finding, naming both variables, with the fix in the source.
 //
 // See docs/POLICIES.md P19.
 import { cmp } from "./resolve.mjs";
@@ -56,7 +56,7 @@ export function delayAliasFindings(doc, cfg) {
         code: "DELAY_NOT_ALIASED",
         name: webName(v),
         collection: pair.delay,
-        detail: `holds the same value as \`${target}\` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at \`${target}\` in Figma. Emitted verbatim meanwhile — the generator does not pair the two itself.`,
+        detail: `holds the same value as \`${target}\` as its own literal, not as an alias of it. Ruling 2026-09-12 row 4 makes every delay step an alias of the matching duration step so the two can never drift; re-point this variable at \`${target}\` in the source. Emitted verbatim meanwhile — the generator does not pair the two itself.`,
       });
       break; // one finding per variable, not one per mode
     }

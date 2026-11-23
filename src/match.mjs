@@ -1,7 +1,7 @@
 // BROWNFIELD MODE. A project that already has code and no Design System
-// Handoff export: the brief still names every Figma variable (with its CSS name
+// Handoff export: the brief still names every variable (with its CSS name
 // and mode values) and every component it uses, and the codebase already has
-// its own custom properties and components. This proposes, per Figma item, the
+// its own custom properties and components. This proposes, per design-system item, the
 // closest existing code match with the evidence for it and a confidence — and
 // reports every item with no match for a human to rule on. A proposal is never
 // adopted here and no name is invented: the human's ruling, recorded in the
@@ -96,7 +96,7 @@ export function inventory(files) {
   return { tokens, components };
 }
 
-// Figma variables only (the raw-value pass keeps this rule to them): a raw value has no name, so
+// variables only (the raw-value pass keeps this rule to them): a raw value has no name, so
 // src/raw-values.mjs matches raw values by value, under its own tolerances.
 // Name evidence is the CSS name's `-` segments: identical, or the share of
 // segments the two names have in common. Half or more is a proposal; less is
@@ -179,10 +179,10 @@ function matchComponent(component, code) {
     const share = [...x].filter((w) => y.has(w)).length / new Set([...x, ...y]).size;
     const confidence = a === b ? "high" : a.includes(b) || b.includes(a) ? "medium" : share >= PROPOSE_AT ? "low" : null;
     const why = [
-      a === b ? "name: the code has the Figma component's name"
+      a === b ? "name: the code has the design component's name"
         : confidence === "medium" ? `name: ${a.includes(b) ? `${c.name} is inside ${component.label}` : `${component.label} is inside ${c.name}`}`
         : `name: shares ${[...x].filter((w) => y.has(w)).join(", ")} with ${component.label}`,
-      `usage: declared at ${c.declaredAt}, rendered ${c.uses}× in the scanned code; Figma places ${component.instances}`,
+      `usage: declared at ${c.declaredAt}, rendered ${c.uses}× in the scanned code; the source places ${component.instances}`,
     ];
     return { code: c.name, confidence, why, score: { high: 3, medium: 2, low: 1 }[confidence] ?? share };
   }).filter((e) => e.score > 0).sort((p, q) => q.score - p.score || p.code.localeCompare(q.code));
