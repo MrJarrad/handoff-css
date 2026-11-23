@@ -12,8 +12,9 @@ import { fileURLToPath } from "node:url";
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const bin = path.join(root, "bin", "handoff-css.mjs");
 const exportGz = path.join(root, "fixtures", "jhd-v19-2026-10-29", "design-system-handoff.json.gz");
-const main = readFileSync(path.join(root, "skills", "handoff-to-code", "SKILL.md"), "utf8");
-const addStep = main.slice(main.indexOf("### 3b."), main.indexOf("### 4."));
+// Step 3b in full lives in references/steps.md under the same heading; SKILL.md points at it.
+const steps = readFileSync(path.join(root, "skills", "handoff-to-code", "references", "steps.md"), "utf8");
+const addStep = steps.slice(steps.indexOf("### 3b."), steps.indexOf("### 4."));
 const cli = (...args) => spawnSync(process.execPath, [bin, ...args], { encoding: "utf8" });
 
 const dir = mkdtempSync(path.join(tmpdir(), "close-out-"));
