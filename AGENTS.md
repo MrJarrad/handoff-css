@@ -31,7 +31,7 @@ The brief is the set. `handoff-css match --handoff <design-handoff>.md --src <co
 proposes the closest existing code match for every variable and component.
 **A proposal is a question, never a binding.** Each item is ruled `use`, `new` or `skip` in the
 ruling table; a `use` whose code has gone is `RULING_STALE`. **Done when** `match` exits 0: every
-item ruled, none stale. Shape and confidence rules: `references/brownfield.md`.
+item ruled, none stale. Rules: `references/brownfield.md`.
 
 **Raw values** (values bound to no variable): `match --export` pairs each with the project's own
 token; one the token reproduces is built with it. Otherwise **Build the exact value and
@@ -93,8 +93,8 @@ ramp comes only from `handoff-css ramp --export`, after one question and a yes. 
 
 #### 3c. A component or block that may already exist — reuse, then add
 
-`handoff-css components` profiles and ranks the components the system has before you add one; a
-new component is one question to the designer. Full step: `references/steps.md` § 3c.
+`handoff-css components` ranks the system's components before you add one; a new one is one
+question to the designer: `references/steps.md` § 3c.
 
 #### 4. Implement against tokens only, with the Build standards as the mechanism rules
 
@@ -103,8 +103,8 @@ wrong mechanism is a defect. Tokens only: a matching literal is still a defect.
 `[Grid]` frames are CSS Grid containers. `col-span(N/M)` maps directly. Widths computed from column maths are a defect even when they measure right.
 
 **Every property the Figma panel shows is a ledger row, nested exposed ones included.** One
-table row is one return row; a table row with no return row is red. An `(open)` row is a question
-answered in chat, never a reason to stop.
+table row is one return row; a table row with no return row is red. An `(open)` row is a chat
+question, never a reason to stop.
 
 **A placed instance's settings are ledger rows, and what it changes is layout config the build carries.**
 A setting not listed in the brief uses the component's own, so build the component's default for it and nothing more.
@@ -126,12 +126,12 @@ section with zero findings still exists and says so.
 A brief ends with `## Asks`, answered in chat. **answered** and **waiting on Figma**: build the
 answer; **assumed**: build the suggestion. **An open ask is a reported item, never a guess.** Every
 waiting, assumed or open ask is a deviation row. Writing a note into the file on the person's yes:
-`references/write-back.md`. Ledger shape: `references/steps.md` § 5b.
+`references/write-back.md`. Ledger: `references/steps.md` § 5b.
 
 #### 6. Check the built CSS back against the pair
 
 Run `handoff-css conform` against every rendering of the export's nodes, not the component file
-alone. Red fails; amber is a deviation row with a reason.
+alone.
 In brownfield, pass the brief's JSON as `--export`, the project's token stylesheet as `--tokens`, and each ruled `use` name declared outside it as `--allow-name`;
 each `UNMAPPED_BINDING` is a ruled item. Codes: `references/steps.md` § 6.
 **Done when** the run is red-free, or every red has a deviation row and a ruling.
@@ -149,7 +149,6 @@ One row per node whose value did not come straight from the pair, plus one per l
 Every unbuilt item is a row.
 
 `ruling ref` cites the entry in the ruling list that authorised a non-match. An empty `ruling ref` on a non-match row is an unauthorised deviation.
-An empty table means every item was built exactly.
 
 Schema v9 hints and style classes: `references/steps.md`.
 

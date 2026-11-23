@@ -1,9 +1,9 @@
 ---
 name: handoff-to-code
 description: >-
-  Build code from a Design Handoff export pair (design-handoff .md and its
-  design-system-handoff .json): consume the handoff, build from the handoff, the
-  export says, regenerate tokens, or a brownfield brief with no export. Not for a live design-file read
+  Build code from a Design Handoff export pair: a design-handoff-*.md or
+  *-design-system-handoff.json path, a Figma link to export, consume or build from the handoff, the export says, regenerate tokens, or a brownfield
+  brief. Not for a live design-file read
   or for measuring an already-built page.
 ---
 
@@ -102,8 +102,8 @@ ramp comes only from `handoff-css ramp --export`, after one question and a yes. 
 
 ### 3c. A component or block that may already exist — reuse, then add
 
-`handoff-css components` profiles and ranks the components the system has before you add one; a
-new component is one question to the designer. Full step: `references/steps.md` § 3c.
+`handoff-css components` ranks the system's components before you add one; a new one is one
+question to the designer: `references/steps.md` § 3c.
 
 ### 4. Implement against tokens only, with the Build standards as the mechanism rules
 
@@ -140,7 +140,7 @@ waiting, assumed or open ask is a deviation row. Writing a note into the file on
 ### 6. Check the built CSS back against the pair
 
 Run `handoff-css conform` against every rendering of the export's nodes, not the component file
-alone. Red fails; amber is a deviation row with a reason.
+alone.
 In brownfield, pass the brief's JSON as `--export`, the project's token stylesheet as `--tokens`, and each ruled `use` name declared outside it as `--allow-name`;
 each `UNMAPPED_BINDING` is a ruled item. Codes: `references/steps.md` § 6.
 **Done when** the run is red-free, or every red has a deviation row and a ruling.
@@ -158,7 +158,6 @@ One row per node whose value did not come straight from the pair, plus one per l
 Every unbuilt item is a row.
 
 `ruling ref` cites the entry in the ruling list that authorised a non-match. An empty `ruling ref` on a non-match row is an unauthorised deviation.
-An empty table means every item was built exactly.
 
 Schema v9 hints and style classes: `references/steps.md`.
 

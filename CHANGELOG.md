@@ -6,7 +6,7 @@ All notable changes to `handoff-css`. Dates are the release date; versions follo
 
 ### Changed
 
-- `handoff-to-code` skill split for size: `SKILL.md` keeps the contract, every law sentence, the warning codes and one short paragraph per step, each pointing at the new `references/steps.md`, which holds every step in full under the same `### N.` headings (moved verbatim, nothing dropped). The Claude plugin build goes from 4,605 to 1,497 words, under the 5,000-token budget a skill keeps after a context summary. Descriptions shortened: the Claude plugin host's is 297 characters. The step-detail tests in `skill-reuse-or-add` and `skill-close-out` read `references/steps.md`.
+- `handoff-to-code` skill split for size: `SKILL.md` keeps the contract, every law sentence, the warning codes and one short paragraph per step, each pointing at the new `references/steps.md`, which holds every step in full under the same `### N.` headings (moved verbatim from the body). The Claude plugin host keeps its `## At JHD` lines word for word. The Claude plugin build goes from 4,605 to 1,500 words or fewer, under the 5,000-token budget a skill keeps after a context summary. The description leads with its triggers (a handoff file path, a Figma link to export, consume or build from the handoff, the export says, regenerate tokens, a brownfield brief) and is under 300 characters in the Claude plugin host. The step-detail tests in `skill-reuse-or-add` and `skill-close-out` read `references/steps.md`.
 
 ### Added
 
