@@ -374,6 +374,12 @@ a label is large text, so a brief's text pair is graded at 4.5; restate it in `p
 absent from this export (pass the library's export), a fill bound to no variable, and bound frame
 and instance strokes. A ring that is an effect style has no node fill, so name it in `pairs.json`.
 
+A ring that is an effect style (a solid drop shadow, offset 0, blur 0, spread above 0) is graded against **both** neighbours, per mode: the page outside it and the component fill inside it. The export binds no effect style to a component, so name the fill in `pairs.json`; the ring colour is read from the style's bound colour variable. Both sides are graded at 3 (non-text); a ring fails when either does, and a ring with no `fill` is graded outside only.
+
+```json
+{ "rings": [ { "id": "action-ring", "style": "border/border-focused", "fill": "color/background/action/primary" } ] }
+```
+
 ### `match` — brownfield: a brief against code that already exists
 
 For a project with its own tokens and components and no Design System Handoff export:
