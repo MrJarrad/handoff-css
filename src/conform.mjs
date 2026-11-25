@@ -6,6 +6,8 @@
 // Everything here is pure — text in, findings out — so the CLI is a renderer
 // and the tests never touch a filesystem they did not build.
 //
+import { componentDrift } from "./conform-drift.mjs";
+
 // Scope, stated: CSS only. A binding that lives in markup (a Tailwind class, a
 // styled component, an inline style) is invisible to this check. That is a
 // named gap, not an oversight — see docs/POLICIES.md P16.
@@ -23,6 +25,9 @@ export const FINDINGS = {
   SAMPLE_PX_LITERAL: "red",
   GRID_ARITHMETIC: "red",
   PLACEHOLDER_COPY: "amber",
+  COMPONENT_TOKEN_DRIFT: "red",
+  COMPONENT_TOKEN_MODIFIED: "amber",
+  CODE_ONLY_TOKEN: "amber",
 };
 
 const DECLARATION = /(^|[;{\s])(--[a-z0-9-]+)\s*:/gi;
@@ -207,7 +212,7 @@ export function samplePixels(doc) {
  *   `LOCAL_ONLY`, because that is a different claim about a different mistake.
  * @returns {{ findings: {code, severity, file, line, name?, message}[], summary: object }}
  */
-export function conform({ doc, handoff, tokensCss, files, allowNames = [] }) {
+export function conform({ doc, handoff = {}, tokensCss = "", files, allowNames = [], bindings: componentBindings = null, onlyCodes = null }) {
   const allowed = new Set(allowNames);
   const findings = [];
   const add = (code, file, line, message, name, severity = FINDINGS[code]) =>
@@ -285,6 +290,11 @@ export function conform({ doc, handoff, tokensCss, files, allowNames = [] }) {
       }
     }
   }
+
+  // Component token drift: a component rule that reads a different token than the export binds.
+  if (componentBindings) findings.push(...componentDrift({ doc, bindings: componentBindings, files, graph }));
+
+  if (onlyCodes) findings.splice(0, findings.length, ...findings.filter((f) => onlyCodes.includes(f.code)));
 
   findings.sort((a, b) => String(a.file).localeCompare(String(b.file)) || a.line - b.line || a.code.localeCompare(b.code));
   const summary = {

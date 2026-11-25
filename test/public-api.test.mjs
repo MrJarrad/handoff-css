@@ -50,7 +50,7 @@ test("conform runs end to end through the public entry, against the real v8b pai
 
 test("FINDINGS still states a severity for every code, so a caller can rank without the CLI", () => {
   assert.deepEqual(Object.keys(api.FINDINGS).sort(), [
-    "GRID_ARITHMETIC", "LOCAL_ONLY", "PLACEHOLDER_COPY", "SAMPLE_PX_LITERAL",
-    "UNKNOWN_NAME", "UNMAPPED_BINDING",
+    "CODE_ONLY_TOKEN", "COMPONENT_TOKEN_DRIFT", "COMPONENT_TOKEN_MODIFIED", "GRID_ARITHMETIC", "LOCAL_ONLY",
+    "PLACEHOLDER_COPY", "SAMPLE_PX_LITERAL", "UNKNOWN_NAME", "UNMAPPED_BINDING",
   ]);
 });
