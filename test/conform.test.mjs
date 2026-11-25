@@ -152,10 +152,11 @@ test("every fixture in fixtures/conform is covered by a named class or is clean"
     "alias-hop.css", "clean.css", "grid-arithmetic.css", "local-only.css",
     "placeholder-copy.css", "sample-px-literal.css", "unknown-name.css",
   ]);
-  // Every code except UNMAPPED_BINDING (a handoff-side finding) has a fixture.
+  // Every code except UNMAPPED_BINDING (a handoff-side finding) and the component-drift codes
+  // (they need a bindings file; test/conform-drift.test.mjs owns their fixtures) has a fixture.
   const codes = new Set(check(...files).findings.map((f) => f.code));
   for (const code of Object.keys(FINDINGS)) {
-    if (code === "UNMAPPED_BINDING") continue;
+    if (code === "UNMAPPED_BINDING" || /^COMPONENT_|^CODE_ONLY/.test(code)) continue;
     assert.ok(codes.has(code), `no fixture raises ${code}`);
   }
 });

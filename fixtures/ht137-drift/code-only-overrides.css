@@ -1,0 +1,26 @@
+/* Three code-only overrides (an Action label, a switch inactive half, a skip-link ring),
+   quoted from a design-system stylesheet before they were removed; nesting kept. */
+@utility action-base {
+  &[data-layout="primary"] {
+    @apply bg-background-action-primary text-content-action-primary;
+    .bttf & { color: var(--content-focused-dark); }
+    .bttf-dark &, .bttf .dark &, .bttf.dark & { color: var(--content-action-primary); }
+  }
+}
+@utility action-button-title-base {
+  &[data-state="default"] { color: var(--content-action-primary); }
+  &[data-state="inactive"] {
+    color: var(--content-action-secondary);
+    .bttf & { color: rgb(from var(--color-palette-malibu-600) r g b / var(--opacity-800)); }
+    .bttf-dark &, .bttf .dark &, .bttf.dark & { color: var(--content-action-secondary); }
+  }
+}
+@utility skip-link-base {
+  .bttf &:focus-visible,
+  .bttf &[data-state="focused"] {
+    box-shadow: 0 0 0 var(--border-200) var(--border-focused-darker);
+  }
+  .bttf-dark &:focus-visible {
+    box-shadow: 0 0 0 var(--border-200) var(--border-focused-dark);
+  }
+}

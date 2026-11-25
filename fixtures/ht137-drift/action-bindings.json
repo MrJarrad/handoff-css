@@ -1,0 +1,13 @@
+{
+  "$comment": "Component -> property -> design-system variable, by variable name only (no colour values). Names resolve to CSS names through the export's codeSyntax.WEB.",
+  "bindings": [
+    { "id": "action-label", "component": "Action", "selectors": ["action-base"], "property": "color",
+      "variable": "color/content/action/primary", "except": ["disabled"] },
+    { "id": "action-focus-ring", "component": "Action", "selectors": ["action-focus-ring", "skip-link-base"], "property": "box-shadow",
+      "variable": "color/border/focused/dark" },
+    { "id": "switch-inactive-half", "component": "ActionButtonSwitch", "selectors": ["action-button-title-base"], "when": "data-state=\"inactive\"",
+      "property": "color", "variable": "color/content/action/secondary", "except": ["disabled", ":hover"] },
+    { "id": "switch-active-half", "component": "ActionButtonSwitch", "selectors": ["action-button-title-base"], "when": "data-state=\"default\"",
+      "property": "color", "variable": "color/content/action/primary", "except": ["disabled"] }
+  ]
+}

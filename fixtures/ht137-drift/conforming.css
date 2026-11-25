@@ -1,0 +1,11 @@
+@utility action-focus-ring {
+  &:focus-visible { box-shadow: 0 0 0 var(--border-200) var(--border-focused-dark); }
+}
+@utility action-base {
+  &[data-layout="primary"] { color: var(--content-action-primary); }
+  &:disabled { color: var(--content-disabled-dark); }
+}
+@utility action-button-title-base {
+  &[data-state="inactive"] { color: rgb(from var(--content-action-secondary) r g b / var(--opacity-800)); }
+}
+@utility unrelated-thing { color: var(--content-focused-dark); }

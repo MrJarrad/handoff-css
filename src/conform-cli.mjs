@@ -1,12 +1,13 @@
 // `handoff-css conform` — the filesystem boundary around `src/conform.mjs`.
 import path from "node:path";
 import { readFileSync } from "node:fs";
+import { gunzipSync } from "node:zlib";
 import { pathToFileURL } from "node:url";
 
 import { conform, renderJson, renderMarkdown } from "./conform.mjs";
 import { parseHandoffMarkdown } from "./validate-handoff-md.mjs";
 
-const USAGE = `handoff-css conform --export <json> --handoff <md> --tokens <css> --css <file…> [--config <mjs>] [--allow-name <--name>…] [--json]\n`;
+const USAGE = `handoff-css conform --export <json> --handoff <md> --tokens <css> --css <file…> [--bindings <json> [--drift-only]] [--config <mjs>] [--allow-name <--name>…] [--json]\n`;
 
 /** `--name a b c` → ["a","b","c"] (values up to the next flag). */
 function flagValues(args, flag) {
@@ -39,7 +40,11 @@ export async function conformCommand(args, { cwd = process.cwd(), stdout = proce
   const tokensPath = one("--tokens");
   const cssPaths = flagValues(args, "--css");
   const configPath = one("--config");
-  if (!exportPath || !handoffPath || !tokensPath || cssPaths.length === 0) {
+  const bindingsPath = one("--bindings");
+  // `--bindings` alone is a drift check: the export and the CSS are all it needs, so
+  // the brief and the generated tokens (the alias graph) become optional.
+  const driftOnly = Boolean(bindingsPath) && !handoffPath;
+  if (!exportPath || (!driftOnly && (!handoffPath || !tokensPath)) || cssPaths.length === 0) {
     stderr.write(USAGE);
     return 1;
   }
@@ -60,10 +65,13 @@ export async function conformCommand(args, { cwd = process.cwd(), stdout = proce
 
   let result;
   try {
+    const raw = readFileSync(abs(exportPath));
     result = conform({
-      doc: JSON.parse(readFileSync(abs(exportPath), "utf8")),
-      handoff: { ...parseHandoffMarkdown(readFileSync(abs(handoffPath), "utf8")), file: handoffPath },
-      tokensCss: readFileSync(abs(tokensPath), "utf8"),
+      doc: JSON.parse((/\.gz$/i.test(exportPath) ? gunzipSync(raw) : raw).toString("utf8")),
+      handoff: handoffPath ? { ...parseHandoffMarkdown(readFileSync(abs(handoffPath), "utf8")), file: handoffPath } : undefined,
+      tokensCss: tokensPath ? readFileSync(abs(tokensPath), "utf8") : "",
+      onlyCodes: args.includes("--drift-only") ? ["COMPONENT_TOKEN_DRIFT", "COMPONENT_TOKEN_MODIFIED", "CODE_ONLY_TOKEN"] : null,
+      bindings: bindingsPath ? JSON.parse(readFileSync(abs(bindingsPath), "utf8")) : null,
       files: cssPaths.map((p) => ({ path: p, text: readFileSync(abs(p), "utf8") })),
       allowNames: allowed,
     });
