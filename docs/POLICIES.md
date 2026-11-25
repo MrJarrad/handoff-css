@@ -790,7 +790,7 @@ families — `quad-out`, `cubic-out`, `quart-out`, `expo-out`, `ease-out`, `circ
 and changed no code here. A role name, if one is ever wanted, is a semantic alias layer
 (P12), never a second declaration of a curve.
 
-**TIMING.** the source stores a TIMING variable in SECONDS. `motion.timingUnit` states
+**TIMING.** The source stores a TIMING variable in SECONDS. `motion.timingUnit` states
 which unit the house publishes:
 
 | `timingUnit` | `duration/375` (0.375 stored) |
@@ -827,7 +827,7 @@ consumer's code, not a token.
 
 `config.aspect` · `src/aspect.mjs` · `test/aspect-v10.test.mjs`
 
-the source has no aspect-ratio **type**, but it has STRING variables, and as of export v11
+The source has no aspect-ratio **type**, but it has STRING variables, and as of export v11
 the design system authors the four ratios properly:
 `core/aspect/{landscape, portrait, square, tall}` hold `"3:2"`, `"4:5"`, `"1:1"`,
 `"2:3"`.
@@ -994,7 +994,7 @@ On the v13 fixture all 52 TEXT classes bind to `--family-font-sans`.
 
 `src/resolve.mjs` · `test/styles-v13.test.mjs`
 
-the source holds a font weight as the STRING style name it is spelled with — `weight/strong`
+The source holds a font weight as the STRING style name it is spelled with — `weight/strong`
 is `"Medium"`. `font-weight: "Medium"` is not a value CSS accepts, and mapping a style
 name to a number is precisely the guess that goes wrong on the first family whose
 "Medium" is not 500.
