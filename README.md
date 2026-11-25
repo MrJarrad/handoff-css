@@ -380,6 +380,8 @@ A ring that is an effect style (a solid drop shadow, offset 0, blur 0, spread ab
 { "rings": [ { "id": "action-ring", "style": "border/border-focused", "fill": "color/background/action/primary" } ] }
 ```
 
+**Ladder warnings.** Every run also checks the `lighter` / `light` / `dark` / `darker` sets of the `color` collection (`color/<role>/<state>/<step>`), per theme mode, and lists what looks wrong under `## Ladder warnings` (and `ladder` in `--json`). Warnings only: they never change the exit code. `out-of-order`: lightness (OKLCH, translucent steps flattened over the page) rises from lighter to darker, labelled `reversed` when it only rises and `shuffled` otherwise (translucent materials over a dark page commonly read reversed). `step-collision`: two steps of one set resolve to the identical colour. `state-sharing`: two sets of one role in different states resolve a step to the identical colour. `unreadable`: a step's alias chain does not resolve in this export.
+
 ### `match` — brownfield: a brief against code that already exists
 
 For a project with its own tokens and components and no Design System Handoff export:
