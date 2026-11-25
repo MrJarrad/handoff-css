@@ -8,7 +8,7 @@ export const fail = (msg) => {
   throw new Error(`handoff-css: ${msg}`);
 };
 
-/** the source stores float32; round off the representation noise deterministically. */
+/** The source stores float32; round off the representation noise deterministically. */
 export const num = (n) => {
   if (typeof n !== "number" || !Number.isFinite(n)) fail(`non-finite number ${n}`);
   const r = Math.round(n * 1e6) / 1e6;
@@ -37,7 +37,7 @@ export const color = (hex8, cfg) => {
 };
 
 /**
- * P19 — MOTION. the source stores a TIMING variable in SECONDS; `motion.timingUnit`
+ * P19 — MOTION. The source stores a TIMING variable in SECONDS; `motion.timingUnit`
  * states which unit the design system publishes. A system that names its steps
  * by their milliseconds
  * so the value has to read in the same unit the name states or the token lies
