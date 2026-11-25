@@ -1,5 +1,5 @@
 // The ladder sanity check. A ladder is a set of colour variables named
-// `<set>/lighter`, `<set>/light`, `<set>/dark`, `<set>/darker` (`color/content/negative/dark`),
+// <set>/lighter, <set>/light, <set>/dark, <set>/darker (for example color/content/negative/dark),
 // read in every theme mode. Warnings only — a ladder is the design's to judge, so none
 // of these fails a run:
 //   out-of-order   lightness (OKLCH L, translucent steps flattened over the page) rises
@@ -11,7 +11,7 @@
 //                  step to the identical colour
 import { oklch } from "culori";
 
-export const STEPS = ["lighter", "light", "dark", "darker"];
+export const STEPS = "lighter light dark darker".split(" ");
 const TIE = 0.0005;
 
 /** `top` over an opaque `under`, in 0..255 channels. */
