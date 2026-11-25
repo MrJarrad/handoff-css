@@ -175,3 +175,81 @@ test("the existing pair rows are unchanged by the rings list", async () => {
   assert.equal(report.rows.length, 12);
   assert.equal(row(report, "action-focus-ring", "bttf").ratio, 2.97);
 });
+
+// HT-136: ladder sanity check — lighter/light/dark/darker sets per theme mode.
+const ladderOf = async (file) => (await contrast(["--export", file, "--pairs", pairs])).report.ladder;
+const summary = (ladder) => ladder.map((w) => `${w.kind}${w.shape ? `:${w.shape}` : ""} ${w.set} ${w.mode}`).sort();
+
+const expectedLadder = [
+  ...["light", "bttf"].map((m) => `step-collision color/content/negative ${m}`),
+  ...["dark", "bttf-dark"].flatMap((m) => [
+    `step-collision color/content/disabled ${m}`, `out-of-order:shuffled color/content/disabled ${m}`,
+    `out-of-order:reversed color/border/disabled ${m}`, `out-of-order:reversed color/background/disabled ${m}`,
+  ]),
+].sort();
+
+for (const [label, file] of [["16 Nov", before], ["21 Nov", after]]) {
+  test(`the ${label} export: the ladder warnings are the recorded ones, and nothing else`, async () => {
+    assert.deepEqual(summary(await ladderOf(file)), expectedLadder);
+  });
+}
+
+test("ladder: a step collision names the shared colour and both steps", async () => {
+  const w = (await ladderOf(after)).find((x) => x.kind === "step-collision" && x.set === "color/content/negative" && x.mode === "light");
+  assert.deepEqual(w.steps, ["light", "dark"]);
+  assert.match(w.detail, /punch\/600/);
+});
+
+test("ladder: warnings never change the exit code", async () => {
+  const { code, report } = await contrast(["--export", after, "--pairs", pairs]);
+  assert.ok(report.ladder.length > 0);
+  assert.equal(code, report.fails.length || report.ringFails.length ? 1 : 0);
+});
+
+test("ladder: the markdown report carries a Ladder warnings section and the translucent-material note", async () => {
+  let out = "";
+  await dispatch(["contrast", "--export", after, "--pairs", pairs], { stdout: { write: (s) => { out += s; } }, stderr: { write: () => {} } });
+  assert.match(out, /## Ladder warnings/);
+  assert.match(out, /Translucent materials over a dark page commonly read reversed/);
+});
+
+function synthetic(values) {
+  const modes = ["light", "dark"].map((modeName, i) => ({ modeId: `m${i}`, modeName, isTheme: true }));
+  const variable = (name, hexes) => ({ id: name, name, modes: modes.map((m, i) => ({ modeId: m.modeId, modeName: m.modeName, raw: hexes[i] })) });
+  const vars = [variable("color/background/default/primary", ["#ffffff", "#000000"])];
+  for (const [step, hexes] of Object.entries(values)) vars.push(variable(`color/content/negative/${step}`, hexes));
+  return { collections: [{ name: "color", defaultModeId: "m0", modeMapping: modes, variables: vars }] };
+}
+const same = (hex) => [hex, hex];
+
+test("ladder: an ordered set with distinct steps is silent", () => {
+  const ds = synthetic({ lighter: same("#eeeeee"), light: same("#cccccc"), dark: same("#999999"), darker: same("#444444") });
+  assert.deepEqual(contrastReport(ds, { pairs: [] }).ladder, []);
+});
+
+test("ladder: a shuffled set warns once per mode, with the offending steps", () => {
+  const ds = synthetic({ lighter: same("#eeeeee"), light: same("#999999"), dark: same("#cccccc"), darker: same("#444444") });
+  const ladder = contrastReport(ds, { pairs: [] }).ladder;
+  assert.deepEqual(ladder.map((w) => [w.kind, w.shape, w.mode]), [["out-of-order", "shuffled", "light"], ["out-of-order", "shuffled", "dark"]]);
+});
+
+test("ladder: a fully ascending set is reversed, not shuffled", () => {
+  const ds = synthetic({ lighter: same("#444444"), light: same("#999999"), dark: same("#cccccc"), darker: same("#eeeeee") });
+  assert.equal(contrastReport(ds, { pairs: [] }).ladder[0].shape, "reversed");
+});
+
+test("ladder: sets of the same role but different states sharing a colour warn", () => {
+  const ds = synthetic({ lighter: same("#eeeeee"), light: same("#cccccc"), dark: same("#999999"), darker: same("#444444") });
+  const v = ds.collections[0].variables;
+  v.push(...["lighter", "light", "dark", "darker"].map((s, i) => ({ ...v[i + 1], id: `p${s}`, name: `color/content/positive/${s}`, modes: v[i + 1].modes })));
+  const ladder = contrastReport(ds, { pairs: [] }).ladder.filter((w) => w.kind === "state-sharing");
+  assert.equal(ladder.length, 8, "four steps x two modes");
+  assert.match(ladder[0].detail, /content\/negative.*content\/positive|content\/positive.*content\/negative/);
+});
+
+test("ladder: a set whose alias chain does not resolve is reported unreadable, never a crash", () => {
+  const ds = synthetic({ lighter: same("#eeeeee"), light: same("#cccccc") });
+  ds.collections[0].variables[1].modes.forEach((m) => { m.raw = { type: "VARIABLE_ALIAS", id: "missing" }; });
+  const ladder = contrastReport(ds, { pairs: [] }).ladder;
+  assert.ok(ladder.length > 0 && ladder.every((w) => w.kind === "unreadable"));
+});

@@ -7,6 +7,7 @@
 import { wcagContrast } from "culori";
 import { AA } from "./color-engine/wcag.mjs";
 import { fail } from "./resolve.mjs";
+import { ladderReport } from "./ladder.mjs";
 
 export const DEFAULT_PAGE = "color/background/default/primary";
 
@@ -104,7 +105,7 @@ export function contrastReport(ds, { pairs, rings = [], page = DEFAULT_PAGE, ski
     }
   }
   const ringRowList = ringRows(ds, rings, resolve, modes, page);
-  return { page, modes, rows, fails: rows.filter((r) => !r.pass), rings: ringRowList, ringFails: ringRowList.filter((r) => !r.pass), unresolved, skipped, notGraded };
+  return { page, modes, rows, fails: rows.filter((r) => !r.pass), rings: ringRowList, ringFails: ringRowList.filter((r) => !r.pass), ladder: ladderReport(ds, { resolve, modes, page }), unresolved, skipped, notGraded };
 }
 
 /**
@@ -213,6 +214,11 @@ export function renderMarkdown(report, { exportName } = {}) {
       "| ring | style | mode | outside: page | ratio | inside: fill | ratio | floor | result |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
       ...report.rings.map((r) => `| ${cell(r.id)} | ${cell(r.style)} | ${r.mode} | ${cell(report.page)} ${r.outside.bgColour} | ${ratio(r.outside)} | ${r.inside ? `${cell(r.inside.fill)} ${r.inside.bgColour}` : "—"} | ${ratio(r.inside)} | ${r.floor} | ${r.pass ? "pass" : "FAIL"} |`), "");
   }
+  lines.push("## Ladder warnings", "",
+    "Warnings only: they never change the exit code. A set is `<set>/lighter|light|dark|darker`; its lightness should fall from lighter to darker in every mode. Translucent materials over a dark page commonly read reversed.", "",
+    ...(report.ladder.length
+      ? ["| set | mode | warning | detail |", "| --- | --- | --- | --- |", ...report.ladder.map((w) => `| ${cell(w.set)} | ${w.mode} | ${w.kind}${w.shape ? ` (${w.shape})` : ""} | ${cell(w.detail)} |`), ""]
+      : ["None.", ""]));
   lines.push("## Not graded", "",
     `- Variable not in this export (${report.unresolved.length}): ${report.unresolved.map((u) => `${u.pair} → ${u.variable}`).join("; ") || "none"}`,
     `- Fill not bound to a variable (${report.skipped.length}): ${report.skipped.map((k) => `${k.node} (${k.reason})`).join("; ") || "none"}`,
