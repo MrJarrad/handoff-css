@@ -773,7 +773,7 @@ CSS accepts. Schema 12 states the number on the variable itself
 The style name and confidence are the export's; nothing here maps a name to a
 number.
 
-| Token | Collection | Value | source style name | Confidence | Emitted |
+| Token | Collection | Value | Source style name | Confidence | Emitted |
 | --- | --- | --- | --- | --- | --- |
 | `--weight-strong` | text-primitives | `500` | `Medium` | high | yes |
 

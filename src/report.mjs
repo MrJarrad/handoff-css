@@ -165,7 +165,7 @@ ${widths.size
   ? (() => {
       const overridden = [...widths.keys()].some((id) => layout.samples.get(id) !== widths.get(id));
       const header = overridden
-        ? ["| Mode | Width | source sample | layoutVariant | Emitted as |", "| --- | --- | --- | --- | --- |"]
+        ? ["| Mode | Width | Source sample | layoutVariant | Emitted as |", "| --- | --- | --- | --- | --- |"]
         : ["| Mode | Width | layoutVariant | Emitted as |", "| --- | --- | --- | --- |"];
       const rows = (doc.collections.find((c) => c.name === cfg.layout.collection)?.modes ?? []).map((m) => {
         const variant = variants.get(m.id) ?? "default";
@@ -402,7 +402,7 @@ The style name and confidence are the export's; nothing here maps a name to a
 number.
 
 ${fontWeightRows.length
-  ? ["| Token | Collection | Value | source style name | Confidence | Emitted |", "| --- | --- | --- | --- | --- | --- |",
+  ? ["| Token | Collection | Value | Source style name | Confidence | Emitted |", "| --- | --- | --- | --- | --- | --- |",
      ...fontWeightRows.map((r) => `| \`${r.name}\` | ${r.collection} | \`${r.value}\` | ${r.sourceStyleName ? `\`${r.sourceStyleName}\`` : "—"} | ${r.confidence} | ${r.emitted ? "yes" : `no — hand-authored in ${handFile} (P2)`} |`)].join("\n")
   : "None."}
 

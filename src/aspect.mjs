@@ -1,4 +1,4 @@
-// Policy P20 — ASPECT RATIOS. the source has no aspect-ratio *type*, but it does
+// Policy P20 — ASPECT RATIOS. The source has no aspect-ratio *type*, but it does
 // have STRING variables, and as of export v11 the design system authors the
 // four ratios as `core/aspect/{landscape, portrait, square, tall}` holding
 // `"3:2"`, `"4:5"`, `"1:1"`, `"2:3"`.
