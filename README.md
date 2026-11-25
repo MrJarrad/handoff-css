@@ -359,7 +359,7 @@ Each pair is a foreground and a background colour variable, resolved in **every 
 the export. A variable that is a colour at an opacity is flattened over what sits behind it: the
 background over the page colour (`--page`, default `color/background/default/primary`), then the
 foreground over that. The ratio is graded at 4.5 for `text`, 3 for `large-text` and `ui`
-(non-text). The composite is kept unrounded and compared to the floor unrounded; the ratio is rounded to two places for display only (a 2.9953 never prints as a pass). A variable that lacks a mode reads its collection's default mode. Exit 1 when any pair fails.
+(non-text). The composite is kept unrounded and compared to the floor unrounded; the ratio is rounded to two places for display only (a 2.9953 never prints as a pass). A variable that lacks a mode reads its collection's default mode. Exit 1 when any pair fails or any ring fails (see the ring section below).
 
 `pairs.json` names variables only; no colour value is written into it:
 
@@ -373,6 +373,12 @@ a label is large text, so a brief's text pair is graded at 4.5; restate it in `p
 `use: "large-text"` to grade it at 3. What could not be graded is listed, not guessed: a variable
 absent from this export (pass the library's export), a fill bound to no variable, and bound frame
 and instance strokes. A ring that is an effect style has no node fill, so name it in `pairs.json`.
+
+A ring that is an effect style (a solid drop shadow, offset 0, blur 0, spread above 0) is graded against **both** neighbours, per mode: the page outside it and the component fill inside it. The export binds no effect style to a component, so name the fill in `pairs.json`; the ring colour is read from the style's bound colour variable. Both sides are graded at 3 (non-text); a ring fails when either does, and a ring with no `fill` is graded outside only.
+
+```json
+{ "rings": [ { "id": "action-ring", "style": "border/border-focused", "fill": "color/background/action/primary" } ] }
+```
 
 ### `match` — brownfield: a brief against code that already exists
 

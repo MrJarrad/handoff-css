@@ -113,3 +113,65 @@ test("the verdict is taken on the unrounded ratio: 2.9953 is a fail although it 
   const clear = contrastReport(tiny("#949494"), { pairs: [{ id: "edge", fg: "ink", bg: "page", use: "ui" }], page: "page" }).rows[0];
   assert.equal(clear.pass, true);
 });
+
+// --- HT-135: a ring effect style is graded against BOTH neighbours ---------------------------
+// The outside (page) and inside (component fill) numbers for the Action ring are the PF-1743
+// measurements in the vault backlog: 3.26 vs page; 2.97 (light) and 1.93 (dark) vs the fill.
+const ring = (report, mode) => report.rings.find((r) => r.id === "action-ring" && r.mode === mode);
+
+test("the 16 Nov export: the Action ring passes the page and fails its own fill, per mode", async () => {
+  const { code, report } = await contrast(["--export", before, "--pairs", pairs]);
+  assert.equal(code, 1);
+  assert.deepEqual(report.rings.map((r) => r.mode), ["light", "dark", "bttf", "bttf-dark"]);
+  const bttf = ring(report, "bttf");
+  assert.equal(bttf.style, "border/border-focused");
+  assert.equal(bttf.ring, "color/border/focused/dark");
+  assert.equal(bttf.floor, 3);
+  assert.equal(bttf.outside.ratio, 3.26);
+  assert.equal(bttf.outside.pass, true);
+  assert.equal(bttf.inside.ratio, 2.97);
+  assert.equal(bttf.inside.pass, false);
+  assert.equal(bttf.pass, false);
+  assert.equal(ring(report, "bttf-dark").inside.ratio, 1.93);
+  assert.equal(ring(report, "bttf-dark").outside.ratio, 4.42);
+});
+
+test("the 21 Nov export: the remap clears the ring in Time Circuits, default light and dark still fail the fill", async () => {
+  const { report } = await contrast(["--export", after, "--pairs", pairs]);
+  assert.equal(ring(report, "bttf").inside.ratio, 4.33);
+  assert.equal(ring(report, "bttf").pass, true);
+  assert.equal(ring(report, "bttf-dark").inside.ratio, 3.87);
+  assert.equal(ring(report, "bttf-dark").pass, true);
+  assert.equal(ring(report, "light").inside.ratio, 2.55);
+  assert.equal(ring(report, "light").pass, false);
+  assert.equal(ring(report, "dark").inside.ratio, 2.23);
+});
+
+test("the markdown lists the ring against both neighbours with its verdict", async () => {
+  let out = "";
+  await dispatch(["contrast", "--export", before, "--pairs", pairs], { stdout: { write: (s) => { out += s; } }, stderr: { write: () => {} } });
+  assert.match(out, /## Ring and focus styles: both neighbours/);
+  assert.match(out, /\| action-ring \| border\/border-focused \| bttf \|[^\n]*\| 3\.26 \|[^\n]*\| 2\.97 \| 3 \| FAIL \|/);
+});
+
+test("a ring with no fill named is graded outside only and says so", () => {
+  const ds = tiny("#949494");
+  ds.styles = { EFFECT: [{ name: "ring", properties: { effects: [{ type: "DROP_SHADOW", visible: true, radius: 0, spread: 2, offset: { x: 0, y: 0 }, boundVariables: { color: { id: "v2" } } }] } }] };
+  const r = contrastReport(ds, { pairs: [], page: "page", rings: [{ id: "r", style: "ring" }] }).rings[0];
+  assert.equal(r.outside.pass, true);
+  assert.equal(r.inside, null);
+  assert.equal(r.pass, true);
+});
+
+test("an effect style that is not a ring, or is absent, is refused by name", () => {
+  const ds = tiny("#949494");
+  ds.styles = { EFFECT: [{ name: "blur", properties: { effects: [{ type: "LAYER_BLUR", visible: true, radius: 4 }] } }] };
+  assert.throws(() => contrastReport(ds, { pairs: [], page: "page", rings: [{ id: "b", style: "blur" }] }), /blur.*not a ring/);
+  assert.throws(() => contrastReport(ds, { pairs: [], page: "page", rings: [{ id: "b", style: "nope" }] }), /no effect style "nope"/);
+});
+
+test("the existing pair rows are unchanged by the rings list", async () => {
+  const { report } = await contrast(["--export", before, "--pairs", pairs]);
+  assert.equal(report.rows.length, 12);
+  assert.equal(row(report, "action-focus-ring", "bttf").ratio, 2.97);
+});

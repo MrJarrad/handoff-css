@@ -74,6 +74,7 @@ export function colourResolver(ds) {
     return v;
   };
   colour.has = (name) => index.has(name);
+  colour.nameOf = (ref) => lookup(ref).variable.name;
   return colour;
 }
 
@@ -81,7 +82,7 @@ export function colourResolver(ds) {
  * @param {object} ds  a Design System Handoff export
  * @param {{ pairs: { id: string, fg: string, bg: string, use?: "text"|"large-text"|"ui", note?: string, source?: string }[], page?: string }} opts
  */
-export function contrastReport(ds, { pairs, page = DEFAULT_PAGE, skipped = [], notGraded = 0 }) {
+export function contrastReport(ds, { pairs, rings = [], page = DEFAULT_PAGE, skipped = [], notGraded = 0 }) {
   const resolve = colourResolver(ds);
   const modes = themeModes(ds);
   const rows = [];
@@ -102,7 +103,49 @@ export function contrastReport(ds, { pairs, page = DEFAULT_PAGE, skipped = [], n
       });
     }
   }
-  return { page, modes, rows, fails: rows.filter((r) => !r.pass), unresolved, skipped, notGraded };
+  const ringRowList = ringRows(ds, rings, resolve, modes, page);
+  return { page, modes, rows, fails: rows.filter((r) => !r.pass), rings: ringRowList, ringFails: ringRowList.filter((r) => !r.pass), unresolved, skipped, notGraded };
+}
+
+/**
+ * The colour variable of a ring effect style: an EFFECT style whose every visible effect is a
+ * solid drop shadow (offset 0, blur 0, spread > 0) painted in one bound colour variable.
+ * @returns {string} the variable's id (the resolver reads ids)
+ */
+function ringColourOf(ds, styleName) {
+  const style = (ds.styles?.EFFECT ?? []).find((e) => e.name === styleName) ?? fail(`contrast: no effect style ${JSON.stringify(styleName)} in the export`);
+  const effects = (style.properties?.effects ?? []).filter((e) => e.visible !== false);
+  const isRing = (e) => e.type === "DROP_SHADOW" && !e.radius && !e.offset?.x && !e.offset?.y && e.spread > 0;
+  if (!effects.length || !effects.every(isRing)) fail(`contrast: effect style ${styleName} is not a ring (a solid drop shadow: offset 0, blur 0, spread above 0)`);
+  const ids = [...new Set(effects.map((e) => e.boundVariables?.color?.id))];
+  if (ids.length !== 1 || !ids[0]) fail(`contrast: ring ${styleName} does not paint in one bound colour variable`);
+  return ids[0];
+}
+
+/**
+ * Each ring effect style graded against both neighbours, per theme mode: the page outside it
+ * and the component fill inside it (named by the caller; the export binds no style to a
+ * component). A translucent ring or fill is flattened over what sits behind it.
+ */
+function ringRows(ds, rings, resolve, modes, page) {
+  const rows = [];
+  for (const mode of modes) {
+    const pageColour = resolve(page, mode);
+    for (const r of rings) {
+      const ringVar = ringColourOf(ds, r.style);
+      const side = (bg) => {
+        const exact = wcagContrast(toRgb(over(resolve(ringVar, mode), bg).rgb), toRgb(bg.rgb));
+        return { ratio: +exact.toFixed(2), exact, pass: exact >= AA.ui, bgColour: toHex(bg.rgb) };
+      };
+      const outside = side(pageColour);
+      const inside = r.fill ? { fill: r.fill, ...side(over(resolve(r.fill, mode), pageColour)) } : null;
+      rows.push({
+        id: r.id, style: r.style, mode, ring: resolve.nameOf(ringVar), floor: AA.ui, outside, inside,
+        pass: outside.pass && (inside?.pass ?? true), ...(r.note ? { note: r.note } : {}),
+      });
+    }
+  }
+  return rows;
 }
 
 const SURFACE = new Set(["SECTION", "FRAME", "INSTANCE", "COMPONENT", "COMPONENT_SET", "GROUP"]);
@@ -158,12 +201,18 @@ export function renderMarkdown(report, { exportName } = {}) {
   const lines = ["# Contrast report", ""];
   if (exportName) lines.push(`Export: ${exportName}`);
   lines.push(`Page behind every fill: \`${report.page}\` (a translucent fill is flattened over it, then the foreground over that).`,
-    `Pairs: ${new Set(report.rows.map((r) => r.id)).size} · modes: ${report.modes.join(", ")} · rows: ${report.rows.length} · fails: ${report.fails.length}`, "");
+    `Pairs: ${new Set(report.rows.map((r) => r.id)).size} · modes: ${report.modes.join(", ")} · rows: ${report.rows.length} · fails: ${report.fails.length}${report.rings.length ? ` · rings: ${new Set(report.rings.map((r) => r.id)).size} · ring fails: ${report.ringFails.length}` : ""}`, "");
   const table = (rows) => [
     "| pair | mode | foreground | background | use | ratio | floor | result |", "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ...rows.map((r) => `| ${cell(r.id)} | ${r.mode} | ${cell(r.fg)} ${r.fgColour} | ${cell(r.bg)} ${r.bgColour} | ${r.use} | ${r.ratio.toFixed(2)} | ${r.floor} | ${r.pass ? "pass" : "FAIL"} |`),
   ];
   lines.push("## Fails", "", ...(report.fails.length ? table(report.fails) : ["None."]), "", "## All rows", "", ...table(report.rows), "");
+  if (report.rings.length) {
+    const ratio = (x) => (x ? x.ratio.toFixed(2) : "no fill named");
+    lines.push("## Ring and focus styles: both neighbours", "",
+      "| ring | style | mode | outside: page | ratio | inside: fill | ratio | floor | result |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+      ...report.rings.map((r) => `| ${cell(r.id)} | ${cell(r.style)} | ${r.mode} | ${cell(report.page)} ${r.outside.bgColour} | ${ratio(r.outside)} | ${r.inside ? `${cell(r.inside.fill)} ${r.inside.bgColour}` : "—"} | ${ratio(r.inside)} | ${r.floor} | ${r.pass ? "pass" : "FAIL"} |`), "");
+  }
   lines.push("## Not graded", "",
     `- Variable not in this export (${report.unresolved.length}): ${report.unresolved.map((u) => `${u.pair} → ${u.variable}`).join("; ") || "none"}`,
     `- Fill not bound to a variable (${report.skipped.length}): ${report.skipped.map((k) => `${k.node} (${k.reason})`).join("; ") || "none"}`,

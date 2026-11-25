@@ -29,11 +29,12 @@ export async function contrastCommand(args, { cwd = process.cwd(), stdout = proc
     assertValidExport(docs[0]);
     const page = one("--page") ?? DEFAULT_PAGE;
     const read = (f) => (/\.gz$/i.test(f) ? gunzipSync(readFileSync(abs(f))).toString("utf8") : readFileSync(abs(f), "utf8"));
-    const explicit = pairsPath ? JSON.parse(read(pairsPath)).pairs : [];
+    const given = pairsPath ? JSON.parse(read(pairsPath)) : {};
+    const explicit = given.pairs ?? [];
     const derived = briefPath ? pairsFromBrief(JSON.parse(read(briefPath)), { page }) : { pairs: [], skipped: [], notGraded: 0 };
-    const report = contrastReport(docs[0], { pairs: [...explicit, ...derived.pairs], page, skipped: derived.skipped, notGraded: derived.notGraded });
+    const report = contrastReport(docs[0], { pairs: [...explicit, ...derived.pairs], rings: given.rings ?? [], page, skipped: derived.skipped, notGraded: derived.notGraded });
     stdout.write(args.includes("--json") ? `${JSON.stringify(report, null, 2)}\n` : renderMarkdown(report, { exportName: path.basename(exportPath) }));
-    return report.fails.length ? 1 : 0;
+    return report.fails.length || report.ringFails.length ? 1 : 0;
   } catch (err) {
     stderr.write(`${err.message}\n`);
     return 1;
