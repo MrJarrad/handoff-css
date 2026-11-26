@@ -105,8 +105,21 @@ const SOURCE_LABELS = { figma: "Figma", "tokens-code": "Design tokens (code)", s
  */
 export function sourceOf(config) {
   const { kind = "figma", label } = config?.source ?? {};
+  if (!Object.hasOwn(SOURCE_LABELS, kind) && kind !== "other") {
+    fail(`config: source.kind ${JSON.stringify(kind)} is not one of ${[...Object.keys(SOURCE_LABELS), "other"].join(", ")}`);
+  }
   if (kind === "other" && !label) fail('config: source.kind "other" needs a label naming the source');
   return { kind, label: label ?? SOURCE_LABELS[kind], built: kind === "figma" };
+}
+
+/**
+ * How a sentence names the source's export: `the export` while the label is the
+ * kind's own default, `the <label> export` once a consumer states one. The
+ * default wording is the pre-label wording, so a config that states no label
+ * reads exactly as before.
+ */
+export function sourcePhrase({ kind, label }) {
+  return label === SOURCE_LABELS[kind] ? "the export" : `the ${label} export`;
 }
 
 /** Stop, before any file is read, when the stated source has no reader. */

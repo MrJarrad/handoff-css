@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { pathToFileURL } from "node:url";
 
-import { assertSourceBuilt } from "./config.mjs";
+import { assertConfig, sourceOf } from "./config.mjs";
 import { conform, renderJson, renderMarkdown } from "./conform.mjs";
 import { parseHandoffMarkdown } from "./validate-handoff-md.mjs";
 
@@ -54,13 +54,15 @@ export async function conformCommand(args, { cwd = process.cwd(), stdout = proce
   // consumer states the allowance once instead of on every invocation. The
   // flag adds to it rather than replacing it: both are the same statement.
   let allowed = allowNames(args);
+  let source = null;
   if (configPath) {
     try {
       const config = (await import(pathToFileURL(abs(configPath)).href)).default;
-      assertSourceBuilt(config);
+      assertConfig(config);
+      source = sourceOf(config);
       allowed = [...(config?.conform?.allowNames ?? []), ...allowed];
     } catch (err) {
-      stderr.write(err.message.includes("SOURCE_READER_NOT_BUILT") ? `${err.message}\n` : `handoff-css conform: cannot load config ${abs(configPath)}\n  ${err.message}\n`);
+      stderr.write(/SOURCE_READER_NOT_BUILT|invalid config|source\.kind/.test(err.message) ? `${err.message}\n` : `handoff-css conform: cannot load config ${abs(configPath)}\n  ${err.message}\n`);
       return 1;
     }
   }
@@ -76,6 +78,7 @@ export async function conformCommand(args, { cwd = process.cwd(), stdout = proce
       bindings: bindingsPath ? JSON.parse(readFileSync(abs(bindingsPath), "utf8")) : null,
       files: cssPaths.map((p) => ({ path: p, text: readFileSync(abs(p), "utf8") })),
       allowNames: allowed,
+      source,
     });
   } catch (err) {
     stderr.write(`handoff-css conform: ${err.message}\n`);

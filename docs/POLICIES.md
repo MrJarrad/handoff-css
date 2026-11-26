@@ -1193,9 +1193,17 @@ other read error still throws.
 `tokens-code`, `storybook` or `other` (which needs a `label`). Absent reads as `figma`; the field is
 resolved by `sourceOf(config)` and never written into the config, and stating `figma` changes no output
 byte. Only `figma` has a reader (the Design Handoff export). Any other kind stops `generate`,
-`generateSet`, `run` and `conform --config` with `SOURCE_READER_NOT_BUILT` before a file is read or
-written. Named gap: commands that take no config (`contrast`, `bindings`, `ladder`) read an export file
-directly and are not gated. Move: state `source` only when it is not Figma, and expect the stop until a
-reader for that kind exists.
+`generateSet`, `run`, `conform --config` and `bindings --config` with `SOURCE_READER_NOT_BUILT` before a
+file is read or written. Those paths validate the config against the schema first, so an unknown
+`source.kind` is a schema error and `sourceOf` throws on it; a `conform`-only config fragment is
+refused, so spread your full config. Named gap: `contrast` and `ladder` take no config and are not
+gated, and `bindings` without `--config` is not gated either.
+
+A stated `label` names the source in two findings, and the default label changes no word, finding code
+or JSON key. The two `conform` drift `CODE_ONLY_TOKEN` messages (a name the export never states, a raw
+value the export never states) read `the <label> export` in place of `the export`. `bindings --config`
+appends ` (<label>)` to the `From <files>.` line.
+
+Move: state `source` only when it is not Figma, and expect the stop until a reader for that kind exists.
 
 `sourceOf`, `assertSourceBuilt`, `schema/config.schema.json` · `src/config.mjs`

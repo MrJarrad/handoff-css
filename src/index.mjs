@@ -31,7 +31,7 @@ import { assertValidExport } from "./validate-export.mjs";
 import { mergeExports } from "./merge.mjs";
 import { readExports } from "./zip.mjs";
 
-export { validateConfig, configSchema, sourceOf, assertSourceBuilt } from "./config.mjs";
+export { validateConfig, configSchema, sourceOf, sourcePhrase, assertSourceBuilt } from "./config.mjs";
 // P16 — the consumer conformance check, callable as a library. The package's
 // `exports` map publishes `.` only, so a consumer that wants to run conform
 // from its own test suite (rather than through the CLI) reaches it here.

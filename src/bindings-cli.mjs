@@ -2,13 +2,15 @@
 //   bindings --export <layer export json|json.gz|zip>… --variable <name|--css-name>… [--ds-export <export>] [--out <dir>] [--json]
 // With --out: bindings.md, bindings.json, and the frame images found in a zip under frames/.
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 
+import { assertConfig, sourceOf } from "./config.mjs";
 import { bindingMap, renderBindingsMarkdown } from "./bindings.mjs";
 import { readZip, zipTextFiles, readExports } from "./zip.mjs";
 
-const USAGE = `handoff-css bindings --export <layer export .json|.json.gz|.zip>… --variable <name|--css-name>… [--ds-export <json|json.gz|zip>] [--out <dir>] [--json]\n`;
+const USAGE = `handoff-css bindings --export <layer export .json|.json.gz|.zip>… --variable <name|--css-name>… [--ds-export <json|json.gz|zip>] [--out <dir>] [--json] [--config <mjs>]\n`;
 const IMAGE = /\.(png|jpe?g|webp)$/i;
 const appleDouble = (name) => name.startsWith("__MACOSX/") || /(^|\/)\._/.test(name);
 const stem = (name) => path.posix.basename(name).replace(/\.[^.]+$/, "");
@@ -32,6 +34,13 @@ export async function bindingsCommand(args, { cwd = process.cwd(), stdout = proc
     return 1;
   }
   try {
+    // `--config` only names the source in the output; it is validated and gated like every other config.
+    let source = null;
+    if (one("--config")) {
+      const config = (await import(pathToFileURL(abs(one("--config"))).href)).default;
+      assertConfig(config);
+      source = sourceOf(config);
+    }
     const docs = [];
     const images = [];
     for (const p of exportPaths) {
@@ -66,7 +75,7 @@ export async function bindingsCommand(args, { cwd = process.cwd(), stdout = proc
       extracted.set(rel, hit.data);
       return `[${frame.name}](${rel})`;
     };
-    const md = renderBindingsMarkdown(map, { imageFor, exportNames: exportPaths.map((p) => path.basename(p)) });
+    const md = renderBindingsMarkdown(map, { imageFor, exportNames: exportPaths.map((p) => path.basename(p)), source });
     const json = `${JSON.stringify(map, null, 2)}\n`;
     if (outDir) {
       mkdirSync(path.join(outDir, "frames"), { recursive: true });

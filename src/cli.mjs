@@ -11,7 +11,7 @@ import { run } from "./index.mjs";
 import { validateExport } from "./validate-export.mjs";
 import { validateHandoffMarkdown } from "./validate-handoff-md.mjs";
 import { validateBriefJson, validateBriefPair } from "./brief.mjs";
-import { assertSourceBuilt } from "./config.mjs";
+import { assertConfig } from "./config.mjs";
 import { validateSet } from "./set.mjs";
 import { validateLinkRunJson } from "./link-run.mjs";
 import { zipTextFiles } from "./zip.mjs";
@@ -33,7 +33,7 @@ const USAGE = `handoff-css — Design Handoff export → CSS custom properties
                    [--for <semantic>[@step]… --on <surface>… [--use text|large-text|ui] [--keep-anchor]] [--out <dir>] [--json]
   handoff-css ramp --from-palette <name>=<#hex>… [--feedback-tolerance <degrees>] [--no-add-feedback] [--pin-end] [--json]
   handoff-css contrast --export <json|json.gz|zip> [--pairs <pairs.json>] [--brief <layer brief .json|.json.gz>] [--page <variable>] [--json]
-  handoff-css bindings --export <layer export json|json.gz|zip>… --variable <name|--css-name>… [--ds-export <export>] [--out <dir>] [--json]
+  handoff-css bindings --export <layer export json|json.gz|zip>… --variable <name|--css-name>… [--ds-export <export>] [--out <dir>] [--json] [--config <mjs>]
   handoff-css vendor <export.json> [<export.md>] | <export.zip> --into <dir>
 `;
 
@@ -287,7 +287,7 @@ async function generateCommand(argv, { cwd, stdout, stderr }) {
   }
 
   try {
-    assertSourceBuilt(config);
+    assertConfig(config); // schema first, then the source gate
   } catch (err) {
     stderr.write(`${err.message}\n`);
     return 1;

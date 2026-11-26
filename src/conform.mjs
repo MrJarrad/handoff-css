@@ -212,7 +212,7 @@ export function samplePixels(doc) {
  *   `LOCAL_ONLY`, because that is a different claim about a different mistake.
  * @returns {{ findings: {code, severity, file, line, name?, message}[], summary: object }}
  */
-export function conform({ doc, handoff = {}, tokensCss = "", files, allowNames = [], bindings: componentBindings = null, onlyCodes = null }) {
+export function conform({ doc, handoff = {}, tokensCss = "", files, allowNames = [], bindings: componentBindings = null, onlyCodes = null, source = null }) {
   const allowed = new Set(allowNames);
   const findings = [];
   const add = (code, file, line, message, name, severity = FINDINGS[code]) =>
@@ -292,7 +292,7 @@ export function conform({ doc, handoff = {}, tokensCss = "", files, allowNames =
   }
 
   // Component token drift: a component rule that reads a different token than the export binds.
-  if (componentBindings) findings.push(...componentDrift({ doc, bindings: componentBindings, files, graph }));
+  if (componentBindings) findings.push(...componentDrift({ doc, bindings: componentBindings, files, graph, source }));
 
   if (onlyCodes) findings.splice(0, findings.length, ...findings.filter((f) => onlyCodes.includes(f.code)));
 
