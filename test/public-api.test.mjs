@@ -20,7 +20,7 @@ test("`.` is the only published entry for source — a deep import is not a supp
 
 for (const name of [
   "generate", "run",
-  "validateConfig", "configSchema",
+  "validateConfig", "configSchema", "sourceOf", "assertSourceBuilt",
   "validateExport", "assertValidExport", "exportSchema", "VALIDATED_SCHEMA_VERSIONS",
   "conform", "FINDINGS", "renderConformMarkdown", "renderConformJson",
   "parseHandoffMarkdown", "validateHandoffMarkdown",
