@@ -7,6 +7,8 @@ exactly what it did and what it refused to guess.
 
 **Input today.** The design system's source of truth is whatever you author it in (Figma, code tokens, Storybook). The one reader built so far reads Figma, so the export, the live read and the write-back below name Figma where they describe that route. Everything else says "the source".
 
+**How a design layer arrives.** A layer's brief (the `design-handoff-*.md` and its `.json`) is made from a Figma link by `design-handoff-script` (kept with the Figma plugins), run with a live read of the layer and the latest Design System Handoff export. It writes the brief, a `.link-run.json` and nothing else: screenshots are embedded in the `.md`, and there is no `.zip` and no separate image file. The Design System Handoff plugin still runs in Figma, because only it can read variables.
+
 Its job is to set up **production-ready code from the handoff** — not to have
 opinions about your design system. Every opinion lives in one config file.
 
@@ -18,8 +20,8 @@ export.json  ──▶  handoff-css  ──▶  tokens.generated.css
               your styles.css         exclusions.json
 ```
 
-> **Status: 0.2.0, not on npm yet.** Consume it with a local link
-> (`"handoff-css": "file:../handoff-css"`) until it is published.
+> **Status: 0.18.0, not on npm yet.** Consume it with a `github:` pin to a release tag
+> (`"handoff-css": "github:mrjarrad/handoff-css#v0.18.0"`) until it is published.
 
 ---
 
@@ -50,7 +52,7 @@ npm i -D handoff-css      # pnpm add -D handoff-css
 
 ## Quick start
 
-1. Export your design system with the Design Handoff Figma plugin and commit the
+1. Export your design system with the Design System Handoff Figma plugin and commit the
    JSON. **Vendor it** — the export is the contract, and a generator run should
    be reproducible from the repo alone.
 2. Write a `handoff.config.mjs`. Start from a complete config with
@@ -278,8 +280,9 @@ reported, as it is for a single export.
 handoff-css validate export.json design-handoff-block-navigation.md
 ```
 
-A `.json` file is checked against `schema/design-system-handoff.schema.json` (schema 8
-and 9; schema 7 is skipped: legacy). A `.md` file is checked against the line grammar in
+A `.json` file is checked against `schema/design-system-handoff.schema.json` (schemas 8
+to 11) or `schema/design-system-handoff.v12plus.schema.json` (12 and up, currently 20);
+schema 7 is skipped: legacy. A `.md` file is checked against the line grammar in
 `schema/design-handoff.v6.grammar.md` — identity lines, the companion block, Build
 standards 1–5, token rows, node rows, the responsive grid tables. One line per file, the
 findings under it, exit 1 on any **error**. A warning never fails the run: it is a decision
@@ -313,8 +316,9 @@ handoff-css validate design-handoff-overlay.json design-handoff-overlay.md \
 
 The spec index is a markdown table with `file key | spec node id | spec | path` columns; the
 path is a markdown link, resolved against the index's own folder. Each listed spec's file is
-printed under the `(set)` line (`specs[]` in `--json`). Brief schemas v13 (catch-up) and v14
-(`specs[]`, `builtReference[]`) validate the script's and the plugin's current exports.
+printed under the `(set)` line (`specs[]` in `--json`). Brief schemas v10 to v18 validate
+(`./schema/brief` and `./schema/brief/v11` to `v18`); v14 adds `specs[]` and `builtReference[]`, v15 media,
+v16 measurements, v17 component properties, v18 placed instances.
 
 ### `conform` — does the built CSS honour the pair?
 
