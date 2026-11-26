@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 
 import { assertConfig, sourceOf } from "./config.mjs";
-import { bindingMap, renderBindingsMarkdown } from "./bindings.mjs";
+import { bindingMap, renderBindingsMarkdown, label } from "./bindings.mjs";
 import { readZip, zipTextFiles, readExports } from "./zip.mjs";
 
 const USAGE = `handoff-css bindings --export <layer export .json|.json.gz|.zip>… --variable <name|--css-name>… [--ds-export <json|json.gz|zip>] [--out <dir>] [--json] [--config <mjs>]\n`;
@@ -17,11 +17,23 @@ const stem = (name) => path.posix.basename(name).replace(/\.[^.]+$/, "");
 
 const values = (args, flag) => args.flatMap((a, i) => (a === flag && args[i + 1] !== undefined && !(args[i + 1].startsWith("--") && flag !== "--variable") ? [args[i + 1]] : []));
 
-/** The image in a zip for one exported frame: the file named for the screenshot, else one carrying the node id. */
-export function frameImage(images, frame) {
+/**
+ * The image in a zip for one exported frame: the file named for the screenshot, else one whose
+ * name carries the node id as a whole number group (`5527-5397`, not `15527-539712`). Several
+ * candidates narrow to the ones beside the frame's own export (`dir`); still more than one is
+ * ambiguous and gives none, never a guess.
+ */
+export function frameImage(images, frame, dir = "") {
   if (!frame.screenshot) return null;
-  const ids = [frame.nodeId, frame.nodeId.replace(/:/g, "-"), frame.nodeId.replace(/:/g, "_")];
-  return images.find((e) => stem(e.name) === frame.screenshot) ?? images.find((e) => ids.some((id) => stem(e.name).includes(id))) ?? null;
+  const only = (list) => {
+    if (list.length <= 1) return list[0] ?? null;
+    const near = list.filter((e) => path.posix.dirname(e.name) === dir);
+    return near.length === 1 ? near[0] : null;
+  };
+  const named = images.filter((e) => stem(e.name) === frame.screenshot);
+  if (named.length) return only(named);
+  const ids = [frame.nodeId, frame.nodeId.replace(/:/g, "-"), frame.nodeId.replace(/:/g, "_")].map((id) => new RegExp(`(^|[^0-9])${id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}($|[^0-9])`));
+  return only(images.filter((e) => ids.some((re) => re.test(stem(e.name)))));
 }
 
 export async function bindingsCommand(args, { cwd = process.cwd(), stdout = process.stdout, stderr = process.stderr } = {}) {
@@ -43,10 +55,17 @@ export async function bindingsCommand(args, { cwd = process.cwd(), stdout = proc
     }
     const docs = [];
     const images = [];
+    const dirOf = new Map(); // export label -> the zip folder its JSON sits in
     for (const p of exportPaths) {
       const file = abs(p);
       if (/\.zip$/i.test(file)) {
-        const found = zipTextFiles(file, p).filter((f) => f.name.endsWith(".json")).map((f) => JSON.parse(f.text)).filter((d) => d?.schema === "design-handoff");
+        const found = [];
+        for (const f of zipTextFiles(file, p).filter((e) => e.name.endsWith(".json"))) {
+          const d = JSON.parse(f.text);
+          if (d?.schema !== "design-handoff") continue;
+          found.push(d);
+          dirOf.set(label(d), path.posix.dirname(f.name));
+        }
         if (!found.length) throw new Error(`handoff-css: ${p}: no layer export (.json, schema design-handoff) in the zip`);
         docs.push(...found);
         images.push(...readZip(readFileSync(file), p).filter((e) => IMAGE.test(e.name) && !appleDouble(e.name)));
@@ -67,18 +86,29 @@ export async function bindingsCommand(args, { cwd = process.cwd(), stdout = proc
     const map = bindingMap(docs, { variables, ds });
     const outDir = one("--out") ? abs(one("--out")) : null;
     const extracted = new Map();
+    const claimed = new Map(); // zip entry -> where it landed under frames/
     const imageFor = (frame) => {
-      const hit = frameImage(images, frame);
+      const hit = frameImage(images, frame, dirOf.get(frame.file));
       if (!hit) return null;
       if (!outDir) return `${frame.name} (image in the zip: ${hit.name}; pass --out to extract it)`;
-      const rel = `frames/${path.posix.basename(hit.name)}`;
-      extracted.set(rel, hit.data);
+      let rel = claimed.get(hit.name);
+      if (!rel) {
+        // The basename, unless another entry already holds it: then the entry's whole path, flattened.
+        const base = path.posix.basename(hit.name);
+        const taken = (r) => [...claimed.values()].includes(r);
+        rel = `frames/${base}`;
+        if (taken(rel)) rel = `frames/${hit.name.replace(/[^A-Za-z0-9._-]+/g, "_").replace(/^[._]+/, "")}`;
+        for (let n = 2; taken(rel); n += 1) rel = `frames/${n}-${base}`;
+        claimed.set(hit.name, rel);
+        extracted.set(rel, hit.data);
+      }
       return `[${frame.name}](${rel})`;
     };
     const md = renderBindingsMarkdown(map, { imageFor, exportNames: exportPaths.map((p) => path.basename(p)), source });
     const json = `${JSON.stringify(map, null, 2)}\n`;
     if (outDir) {
-      mkdirSync(path.join(outDir, "frames"), { recursive: true });
+      mkdirSync(outDir, { recursive: true });
+      if (extracted.size) mkdirSync(path.join(outDir, "frames"), { recursive: true });
       writeFileSync(path.join(outDir, "bindings.md"), md);
       writeFileSync(path.join(outDir, "bindings.json"), json);
       for (const [rel, data] of extracted) writeFileSync(path.join(outDir, rel), data);

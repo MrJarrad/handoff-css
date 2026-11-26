@@ -15,7 +15,7 @@ import { fail } from "./resolve.mjs";
 
 const roots = (doc) => (Array.isArray(doc.layerTree) ? doc.layerTree : doc.layerTree ? [doc.layerTree] : []);
 const instanceName = (n) => n.component?.setName || n.component?.sourceName || n.name;
-const label = (doc) => doc.pageName ? `${doc.documentName ?? "(unnamed)"} › ${doc.pageName}` : (doc.documentName ?? "(unnamed)");
+export const label = (doc) => doc.pageName ? `${doc.documentName ?? "(unnamed)"} › ${doc.pageName}` : (doc.documentName ?? "(unnamed)");
 const aliasIds = (o, out = []) => {
   if (Array.isArray(o)) o.forEach((v) => aliasIds(v, out));
   else if (o && typeof o === "object") {
@@ -109,7 +109,7 @@ export function bindingMap(docs, { variables, ds = null }) {
       directBindingUniqueConsumerNodes: u.directBindingUniqueConsumerNodes,
       styleMediatedUniqueConsumerNodes: u.styleMediatedUniqueConsumerNodes,
       named: (u.topConsumers ?? []).length,
-      note: `${(u.topConsumers ?? []).length} of ${u.directBindingUniqueConsumerNodes} consumer nodes are named by the library export (it stops at five, with no component or property); the rows above are what the layer export places`,
+      note: `${(u.topConsumers ?? []).length} of ${u.directBindingUniqueConsumerNodes} consumer nodes are named by the library export (it stops at five, with no component or property); ${consumers.length ? "the rows above are what the layer export places" : "the layer export places none"}`,
     } : null;
     return { name: v.name, id: v.id, web: v.web, consumers, library };
   });
