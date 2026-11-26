@@ -1184,3 +1184,16 @@ the file does not exist (a new consumer with no `src/styles.css` yet), the gener
 crashing with ENOENT. It never creates the file: that would add one the consumer did not ask for.
 Move: file absent, built with no hand declarations; add the file if you want hand overrides. Any
 other read error still throws.
+
+## P28 — The stated source
+
+`source: { kind, label? }` in the config names where the design system is authored: `figma`,
+`tokens-code`, `storybook` or `other` (which needs a `label`). Absent reads as `figma`; the field is
+resolved by `sourceOf(config)` and never written into the config, and stating `figma` changes no output
+byte. Only `figma` has a reader (the Design Handoff export). Any other kind stops `generate`,
+`generateSet`, `run` and `conform --config` with `SOURCE_READER_NOT_BUILT` before a file is read or
+written. Named gap: commands that take no config (`contrast`, `bindings`, `ladder`) read an export file
+directly and are not gated. Move: state `source` only when it is not Figma, and expect the stop until a
+reader for that kind exists.
+
+`sourceOf`, `assertSourceBuilt`, `schema/config.schema.json` · `src/config.mjs`

@@ -7,6 +7,19 @@
   "additionalProperties": false,
   "required": ["schema", "paths", "exclude", "color", "motion", "aspect", "layout", "modes", "themes", "tailwind", "responsive", "viewport", "aliases", "styles", "report", "header"],
   "properties": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "description": "Where the design system is authored. Optional: absent reads as `figma`. Only `figma` has a reader today (a Design Handoff export); any other kind stops the run with `SOURCE_READER_NOT_BUILT` before a file is read.",
+      "properties": {
+        "kind": {
+          "enum": ["figma", "tokens-code", "storybook", "other"],
+          "description": "The kind of source. `other` needs a `label`."
+        },
+        "label": { "type": "string", "description": "What findings and docs call the source. Defaults: Figma, Design tokens (code), Storybook; `other` has no default." }
+      }
+    },
     "schema": {
       "type": "object",
       "additionalProperties": false,

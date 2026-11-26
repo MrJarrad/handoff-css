@@ -93,13 +93,42 @@ export function validateConfig(config, schema = configSchema()) {
   return errors;
 }
 
+const SOURCE_LABELS = { figma: "Figma", "tokens-code": "Design tokens (code)", storybook: "Storybook" };
+
+/**
+ * Where the design system is authored, as the config states it. The one reader
+ * built reads a Design Handoff export, which the Figma plugin writes, so only
+ * `figma` has a reader. A config with no `source` is a Figma source: the field
+ * is read here and never written back into the config, which keeps "no
+ * defaults in the config" true while a consumer who never states it sees no
+ * change.
+ */
+export function sourceOf(config) {
+  const { kind = "figma", label } = config?.source ?? {};
+  if (kind === "other" && !label) fail('config: source.kind "other" needs a label naming the source');
+  return { kind, label: label ?? SOURCE_LABELS[kind], built: kind === "figma" };
+}
+
+/** Stop, before any file is read, when the stated source has no reader. */
+export function assertSourceBuilt(config) {
+  const source = sourceOf(config);
+  if (!source.built) {
+    fail(
+      `SOURCE_READER_NOT_BUILT: source kind "${source.kind}" (${source.label}) has no reader. ` +
+        "The one reader built takes a Design Handoff export from Figma; nothing was read or written.",
+    );
+  }
+}
+
 /**
  * Validate and return the config. There are no defaults on purpose: a silently
  * defaulted house policy is how a token pipeline starts emitting values nobody
- * chose.
+ * chose. A source with no reader stops here, so every path that takes a config
+ * (generate, generateSet, run) refuses it the same way.
  */
 export function assertConfig(config) {
   const errors = validateConfig(config);
   if (errors.length) fail(`invalid config —\n  ${errors.join("\n  ")}`);
+  assertSourceBuilt(config);
   return config;
 }

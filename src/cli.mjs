@@ -11,6 +11,7 @@ import { run } from "./index.mjs";
 import { validateExport } from "./validate-export.mjs";
 import { validateHandoffMarkdown } from "./validate-handoff-md.mjs";
 import { validateBriefJson, validateBriefPair } from "./brief.mjs";
+import { assertSourceBuilt } from "./config.mjs";
 import { validateSet } from "./set.mjs";
 import { validateLinkRunJson } from "./link-run.mjs";
 import { zipTextFiles } from "./zip.mjs";
@@ -282,6 +283,13 @@ async function generateCommand(argv, { cwd, stdout, stderr }) {
     config = (await import(pathToFileURL(abs).href)).default;
   } catch (err) {
     stderr.write(`handoff-css: cannot load config ${abs}\n  ${err.message}\n`);
+    return 1;
+  }
+
+  try {
+    assertSourceBuilt(config);
+  } catch (err) {
+    stderr.write(`${err.message}\n`);
     return 1;
   }
 
