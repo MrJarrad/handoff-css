@@ -11,7 +11,7 @@ import { run } from "./index.mjs";
 import { validateExport } from "./validate-export.mjs";
 import { validateHandoffMarkdown } from "./validate-handoff-md.mjs";
 import { validateBriefJson, validateBriefPair } from "./brief.mjs";
-import { assertSourceBuilt } from "./config.mjs";
+import { assertConfig } from "./config.mjs";
 import { validateSet } from "./set.mjs";
 import { validateLinkRunJson } from "./link-run.mjs";
 import { zipTextFiles } from "./zip.mjs";
@@ -287,7 +287,7 @@ async function generateCommand(argv, { cwd, stdout, stderr }) {
   }
 
   try {
-    assertSourceBuilt(config);
+    assertConfig(config); // schema first, then the source gate
   } catch (err) {
     stderr.write(`${err.message}\n`);
     return 1;

@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { pathToFileURL } from "node:url";
 
-import { assertSourceBuilt, sourceOf } from "./config.mjs";
+import { assertConfig, sourceOf } from "./config.mjs";
 import { conform, renderJson, renderMarkdown } from "./conform.mjs";
 import { parseHandoffMarkdown } from "./validate-handoff-md.mjs";
 
@@ -58,11 +58,11 @@ export async function conformCommand(args, { cwd = process.cwd(), stdout = proce
   if (configPath) {
     try {
       const config = (await import(pathToFileURL(abs(configPath)).href)).default;
-      assertSourceBuilt(config);
+      assertConfig(config);
       source = sourceOf(config);
       allowed = [...(config?.conform?.allowNames ?? []), ...allowed];
     } catch (err) {
-      stderr.write(err.message.includes("SOURCE_READER_NOT_BUILT") ? `${err.message}\n` : `handoff-css conform: cannot load config ${abs(configPath)}\n  ${err.message}\n`);
+      stderr.write(/SOURCE_READER_NOT_BUILT|invalid config|source\.kind/.test(err.message) ? `${err.message}\n` : `handoff-css conform: cannot load config ${abs(configPath)}\n  ${err.message}\n`);
       return 1;
     }
   }

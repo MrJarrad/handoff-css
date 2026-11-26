@@ -105,6 +105,9 @@ const SOURCE_LABELS = { figma: "Figma", "tokens-code": "Design tokens (code)", s
  */
 export function sourceOf(config) {
   const { kind = "figma", label } = config?.source ?? {};
+  if (!Object.hasOwn(SOURCE_LABELS, kind) && kind !== "other") {
+    fail(`config: source.kind ${JSON.stringify(kind)} is not one of ${[...Object.keys(SOURCE_LABELS), "other"].join(", ")}`);
+  }
   if (kind === "other" && !label) fail('config: source.kind "other" needs a label naming the source');
   return { kind, label: label ?? SOURCE_LABELS[kind], built: kind === "figma" };
 }
