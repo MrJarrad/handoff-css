@@ -152,3 +152,26 @@ test("a colour function that reads a colour token stays skipped, even with a raw
   const found = drift("@utility action-base { color: rgb(from var(--content-action-primary) r g b / var(--opacity-50)); }");
   assert.deepEqual(found.map((f) => [f.code, f.reads]), [["COMPONENT_TOKEN_MODIFIED", ["--content-action-primary"]]]);
 });
+
+test("url(#fade) is a reference, not a hex literal", () => {
+  const found = drift("@utility action-base { color: linear-gradient(var(--content-action-primary), url(#fade)); }");
+  assert.deepEqual(found.map((f) => [f.code, f.reads]), [["COMPONENT_TOKEN_MODIFIED", ["--content-action-primary"]]]);
+});
+
+test("a named colour is a raw literal where a token is bound; keywords and names inside other words are not", () => {
+  assert.deepEqual(drift("@utility action-base { color: white; }").map((f) => [f.code, f.severity, f.reads]), [["COMPONENT_TOKEN_DRIFT", "red", ["white"]]]);
+  assert.deepEqual(drift("@utility action-base { color: linear-gradient(var(--content-action-primary), red); }").map((f) => [f.code, f.reads]), [
+    ["COMPONENT_TOKEN_MODIFIED", ["--content-action-primary"]], ["CODE_ONLY_TOKEN", ["red"]]]);
+  assert.deepEqual(drift("@utility action-base { color: var(--red-primary); }").map((f) => [f.code, f.reads]), [["CODE_ONLY_TOKEN", ["--red-primary"]]]);
+  assert.deepEqual(drift("@utility action-base { color: transparent; }"), []);
+});
+
+test("a literal beside only non-colour tokens: reads and message carry the whole value, named colour or hex", () => {
+  for (const lit of ["#f00", "white", "rgb(255 0 0)"]) {
+    const value = `0 0 0 var(--border-200) ${lit}`;
+    const [f, ...rest] = drift(`@utility action-focus-ring { box-shadow: ${value}; }`);
+    assert.equal(rest.length, 0);
+    assert.deepEqual([f.code, f.severity, f.reads], ["COMPONENT_TOKEN_DRIFT", "red", [value]]);
+    assert.ok(f.message.includes(value), f.message);
+  }
+});
