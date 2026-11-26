@@ -362,8 +362,11 @@ handoff-css bindings --export design-handoff-mediarow.zip --variable color/backg
 For each variable: every node of the layer export that binds it, the property it binds, the
 component and instance it sits in, and its exported frame. A frame's image is extracted to
 `<out>/frames/` and linked from the row when the zip carries one named for the frame's
-screenshot (or holding its node id); otherwise the row says "no frame image in the input". The
-render is the whole exported frame, never a crop of the consumer. `--ds-export` lets a CSS name
+screenshot, or holding its node id as a whole number group (`5527-5397` does not match
+`15527-539712`). When several files qualify, the one beside the frame's own export is used,
+else none is; two entries that share a file name are kept apart under a flattened path.
+`frames/` exists only when an image was extracted. Otherwise the row says "no frame image in
+the input". The render is the whole exported frame, never a crop of the consumer. `--ds-export` lets a CSS name
 (`--color-…`) stand for the variable and adds the library-wide count; the library export names
 at most five consumer nodes, with no component or property, so the layer export is the answer.
 A layer export older than schema 12 carries no `tokenBindings`; the report says so instead of
