@@ -71,3 +71,15 @@ test("bindings --config: default config output equals no config; a label shows; 
   assert.equal(stopped.code, 1);
   assert.match(stopped.se, /SOURCE_READER_NOT_BUILT/);
 });
+
+test("drift: the literal-beside-a-token finding names the configured source too; default wording unchanged", () => {
+  const files = [{ path: "a.css", text: "@utility action-base { color: linear-gradient(var(--content-action-primary), #f00); }" }];
+  const lit = (source) => componentDrift({ doc: dsDoc(), bindings: bindings(), graph: new Map(), files, ...(source ? { source } : {}) })
+    .filter((f) => f.code === "CODE_ONLY_TOKEN");
+  const base = lit();
+  const named = lit(sourceOf({ source: { kind: "figma", label: "House Figma file" } }));
+  assert.equal(base.length, 1);
+  assert.match(base[0].message, /a raw value the export never states$/);
+  assert.match(named[0].message, /a raw value the House Figma file export never states$/);
+  assert.deepEqual(lit(sourceOf({})), base);
+});
