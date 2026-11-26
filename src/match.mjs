@@ -64,19 +64,23 @@ export const rulingColumn = (source = null) => (source && source.kind !== "figma
  * ruling is still waiting, so it is not read as one. Raw values (`raw-<kind>` rows,
  * src/raw-values.mjs) are ruled `use` (with a code name) or `keep` (the exact value stays).
  * The second column is headed `figma` or `source`, read the same; the item key is `figma` either way.
- * A table headed with both, or with neither, is an error: it cannot be read as stated.
+ * The first table that has the column is the one read (a legend above it is skipped). A table headed with both is an error;
+ * so is a kind + ruling table with code or note when no table has either column.
  */
 export function readRulings(text) {
   const rows = text.split("\n").filter((l) => l.trim().startsWith("|"))
     .map((l) => l.trim().replace(/^\||\|$/g, "").split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, "|").replace(/^`|`$/g, "")));
-  const header = rows.findIndex((r) => r.includes("kind") && r.includes("ruling"));
-  if (header === -1) return [];
+  const ruled = (r) => r.includes("kind") && r.includes("ruling");
+  const header = rows.findIndex((r) => ruled(r) && (r.includes("figma") || r.includes("source")));
+  if (header === -1) {
+    // A kind + ruling table with code or note and no second column, with no real table beside it, cannot be read.
+    if (rows.some((r) => ruled(r) && (r.includes("code") || r.includes("note")))) {
+      throw new Error("the ruling table has neither a `figma` nor a `source` column; name the second column one of them");
+    }
+    return [];
+  }
   const col = Object.fromEntries(rows[header].map((c, i) => [c, i]));
   if ("figma" in col && "source" in col) throw new Error("the ruling table has both `figma` and `source` columns; keep one");
-  if (!("figma" in col) && !("source" in col)) {
-    if (!rows[header].includes("code") && !rows[header].includes("note")) return [];
-    throw new Error("the ruling table has neither a `figma` nor a `source` column; name the second column one of them");
-  }
   const key = "figma" in col ? col.figma : col.source;
   return rows.slice(header + 1)
     .map((r) => ({ kind: r[col.kind], figma: r[key], ruling: r[col.ruling], code: r[col.code] ?? "", note: r[col.note] ?? "" }))
