@@ -83,3 +83,30 @@ test("conform --config reports the not-built source and exits 1", async () => {
   assert.equal(code, 1);
   assert.match(stderr.text(), /SOURCE_READER_NOT_BUILT: source kind "storybook"/);
 });
+
+test("an unknown source kind is named as invalid by sourceOf, never reported as a reader with no label", () => {
+  assert.throws(() => sourceOf(withSource({ kind: "sketch" })), /source\.kind "sketch" is not one of figma, tokens-code, storybook, other/);
+  assert.throws(() => assertSourceBuilt(withSource({ kind: "sketch" })), (e) => !/undefined/.test(e.message));
+});
+
+test("the generate command validates the config before the gate: an unknown kind is a schema error", async () => {
+  const cwd = configFile({ kind: "sketch" });
+  const stdout = capture(), stderr = capture();
+  assert.equal(await dispatch([], { cwd, stdout, stderr }), 1);
+  assert.match(stderr.text(), /config\.source\.kind: "sketch" is not one of/);
+  assert.doesNotMatch(stderr.text(), /undefined|SOURCE_READER_NOT_BUILT/);
+});
+
+test("conform --config schema-validates the config it reads", async () => {
+  const conformArgs = ["conform", "--export", "x.json", "--handoff", "x.md", "--tokens", "x.css", "--css", "x.css", "--config", "handoff.config.mjs"];
+  const unknown = configFile({ kind: "sketch" });
+  const a = capture();
+  assert.equal(await dispatch(conformArgs, { cwd: unknown, stdout: capture(), stderr: a }), 1);
+  assert.match(a.text(), /config\.source\.kind: "sketch" is not one of/);
+
+  const partial = mkdtempSync(path.join(tmpdir(), "handoff-source-"));
+  writeFileSync(path.join(partial, "handoff.config.mjs"), 'export default { conform: { allowNames: [] } };\n');
+  const b = capture();
+  assert.equal(await dispatch(conformArgs, { cwd: partial, stdout: capture(), stderr: b }), 1);
+  assert.match(b.text(), /invalid config/);
+});
