@@ -235,6 +235,9 @@ handoff-css conform --export <json> --handoff <md> --tokens <css>
 handoff-css contrast --export <json|json.gz|zip> [--pairs <pairs.json>]
                      [--brief <layer brief .json|.json.gz>] [--page <variable>] [--json]
 
+handoff-css bindings --export <layer export json|json.gz|zip>… --variable <name|--css-name>…
+                     [--ds-export <export>] [--out <dir>] [--json]
+
 handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--json]
 
 handoff-css ramp --export <json|json.gz|zip> --anchor <#hex>[@step]… [--name <name>] [--from-scratch]
@@ -348,6 +351,23 @@ export default {
 
 An allowed name never raises `UNKNOWN_NAME`. It is not a mute button: a name your own
 stylesheet declares is still `LOCAL_ONLY`.
+
+### `bindings` — which components and instances bind this variable?
+
+```
+handoff-css bindings --export design-handoff-mediarow.zip --variable color/background/default/primary --out bindings/
+```
+
+For each variable: every node of the layer export that binds it, the property it binds, the
+component and instance it sits in, and its exported frame. A frame's image is extracted to
+`<out>/frames/` and linked from the row when the zip carries one named for the frame's
+screenshot (or holding its node id); otherwise the row says "no frame image in the input". The
+render is the whole exported frame, never a crop of the consumer. `--ds-export` lets a CSS name
+(`--color-…`) stand for the variable and adds the library-wide count; the library export names
+at most five consumer nodes, with no component or property, so the layer export is the answer.
+A layer export older than schema 12 carries no `tokenBindings`; the report says so instead of
+printing an empty map. Bindings the export states only as a bare alias (layout grids) are rows
+with no property named.
 
 ### `contrast` — do the colours a component binds clear WCAG AA?
 
