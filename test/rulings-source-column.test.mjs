@@ -30,8 +30,9 @@ test("a table with no ruling column is still not a ruling table", () => {
 });
 
 const matchResult = { items: [{ kind: "token", figma: "color/a", status: "unmatched", proposal: null, alternatives: [] }], findings: [], counts: { items: 1, proposed: 0, unmatched: 1, ruled: 0 } };
-const rawResult = { items: [{ kind: "colour", figma: "#fff", status: "unmatched", reason: "no-token", suggestions: [], layers: [], built: false }], findings: [], counts: { raw: 1 } };
-const resolveNeed = { counts: {}, findings: [], items: [{ need: { id: "n1" }, status: "unresolved", kind: "resolve-need", candidates: [] }], needs: [], open: [{ need: { id: "n1" }, reason: "x", candidates: [] }], resolved: [] };
+const rawResult = { items: [{ kind: "colour", figma: "#fff", status: "listed", reason: "no-token", why: "no token", suggestions: [], layers: [] }], findings: [], counts: { values: 1, built: 0, listed: 1, ruled: 0 } };
+const need = { id: "n1", verdict: "open", ask: { wants: null }, findings: [], candidates: [], open: true };
+const storybook = sourceOf({ source: { kind: "storybook" } });
 
 test("the match writer's header follows the source: figma by default, source otherwise", () => {
   assert.match(renderMarkdown(matchResult), /\| kind \| figma \| ruling \| code \| note \|/);
@@ -52,9 +53,11 @@ test("a table the writer emits for another source reads back through readRulings
   assert.deepEqual(readRulings(filled).map((r) => [r.kind, r.figma, r.ruling]), [["token", "color/a", "skip"]]);
 });
 
-test("the resolve writers accept the same option", () => {
-  for (const fn of [renderResolveMarkdown, renderResolveComponentMarkdown]) {
-    assert.equal(typeof fn, "function");
-    assert.ok(fn.length <= 2);
-  }
+test("the resolve writers follow the source", () => {
+  const need_ = { source: {}, needs: [need], open: 1 };
+  const comp = { needs: [{ ...need, ask: {} }], open: 1, coverage: { total: 1, seen: 1, seenInInventory: 1 } };
+  assert.match(renderResolveMarkdown(need_), /\| kind \| figma \| ruling/);
+  assert.match(renderResolveMarkdown(need_, { source: storybook }), /\| kind \| source \| ruling/);
+  assert.match(renderResolveComponentMarkdown(comp), /\| kind \| figma \| ruling/);
+  assert.match(renderResolveComponentMarkdown(comp, { source: storybook }), /\| kind \| source \| ruling/);
 });

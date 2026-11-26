@@ -51,20 +51,35 @@ const RULINGS = ["use", "new", "skip"];
 const RAW_RULINGS = ["use", "keep"];
 
 /**
+ * The name of the ruling table's second column. A table written for the default source says
+ * `figma`; one written for any other source kind says `source`. `readRulings` reads either.
+ * @param {{ kind?: string }|null} [source]  `sourceOf(config)`
+ */
+export const rulingColumn = (source = null) => (source && source.kind !== "figma" ? "source" : "figma");
+
+/**
  * The ruling table: `| kind | figma | ruling | code | note |`, one row per
  * decided item, ruling one of `use` (bind this code name or component), `new`
  * (add the brief's own name to the code) or `skip` (not built). A row with no
  * ruling is still waiting, so it is not read as one. Raw values (`raw-<kind>` rows,
  * src/raw-values.mjs) are ruled `use` (with a code name) or `keep` (the exact value stays).
+ * The second column is headed `figma` or `source`, read the same; the item key is `figma` either way.
+ * A table headed with both, or with neither, is an error: it cannot be read as stated.
  */
 export function readRulings(text) {
   const rows = text.split("\n").filter((l) => l.trim().startsWith("|"))
     .map((l) => l.trim().replace(/^\||\|$/g, "").split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, "|").replace(/^`|`$/g, "")));
-  const header = rows.findIndex((r) => r.includes("kind") && r.includes("figma") && r.includes("ruling"));
+  const header = rows.findIndex((r) => r.includes("kind") && r.includes("ruling"));
   if (header === -1) return [];
   const col = Object.fromEntries(rows[header].map((c, i) => [c, i]));
+  if ("figma" in col && "source" in col) throw new Error("the ruling table has both `figma` and `source` columns; keep one");
+  if (!("figma" in col) && !("source" in col)) {
+    if (!rows[header].includes("code") && !rows[header].includes("note")) return [];
+    throw new Error("the ruling table has neither a `figma` nor a `source` column; name the second column one of them");
+  }
+  const key = "figma" in col ? col.figma : col.source;
   return rows.slice(header + 1)
-    .map((r) => ({ kind: r[col.kind], figma: r[col.figma], ruling: r[col.ruling], code: r[col.code] ?? "", note: r[col.note] ?? "" }))
+    .map((r) => ({ kind: r[col.kind], figma: r[key], ruling: r[col.ruling], code: r[col.code] ?? "", note: r[col.note] ?? "" }))
     .filter((r) => (String(r.kind).startsWith("raw-") ? RAW_RULINGS : RULINGS).includes(r.ruling));
 }
 
@@ -204,7 +219,7 @@ function count(items) {
 }
 
 /** The report: counts, stale rulings, then every unruled item as a ruling row to fill. */
-export function renderMarkdown({ items, findings, counts }) {
+export function renderMarkdown({ items, findings, counts }, { source = null } = {}) {
   const cell = (s) => String(s ?? "").replace(/\|/g, "\\|");
   const open = items.filter((i) => i.status !== "ruled");
   const lines = [
@@ -219,7 +234,7 @@ export function renderMarkdown({ items, findings, counts }) {
     lines.push(
       "Rule each row: `use` (bind the code name), `new` (add the brief's name to the code) or `skip`, then pass the table back with `--rulings`.",
       "",
-      "| kind | figma | ruling | code | note |",
+      `| kind | ${rulingColumn(source)} | ruling | code | note |`,
       "| --- | --- | --- | --- | --- |",
     );
     for (const i of open) {
