@@ -365,12 +365,19 @@ handoff-css bindings --export design-handoff-mediarow.zip --variable color/backg
 
 For each variable: every node of the layer export that binds it, the property it binds, the
 component and instance it sits in, and its exported frame. A frame's image is extracted to
-`<out>/frames/` and linked from the row when the zip carries one named for the frame's
-screenshot, or holding its node id as a whole number group (`5527-5397` does not match
-`15527-539712`). When several files qualify, the one beside the frame's own export is used,
-else none is; two entries that share a file name are kept apart under a flattened path.
-`frames/` exists only when an image was extracted. Otherwise the row says "no frame image in
-the input". The render is the whole exported frame, never a crop of the consumer. `--ds-export` lets a CSS name
+`<out>/frames/` and linked from the row. It comes from the brief: the Design Handoff plugin and
+the design-handoff script both write each screenshot into the brief's `.md` as
+`![name](data:image/png;base64,...)` and list its `name` and `nodeId` in the layer export's
+`screenshots.exported`, and `bindings` matches the two by that name: the alt text is the name, followed by ` (exported at <scale>x — too large at 1x)` when the `.json` says the frame was exported below 1x (0.5, 0.25, 0.125), built from the name and scale the `.json` carries, never a prefix match. The `.md` is found by
+file name: `design-handoff-x.json` (or `.json.gz`) reads `design-handoff-x.md` (or `.md.gz`) in
+the same folder; in a zip it is the `.md` with the same name beside the `.json`. A zip may also
+carry image files: one named for the screenshot, or holding the frame's node id as a whole
+number group (`5527-5397` does not match `15527-539712`), is used first. When several files
+qualify, the one beside the frame's own export is used, else none is; two images that would
+share a file name are kept apart under `frames/`. A name that appears twice in one brief, or an
+empty or placeholder payload, gives no image. `frames/` exists only when an image was
+extracted. Otherwise (no `.md` beside the `.json`, or no image for that frame) the row says
+"no frame image in the input". The render is the whole exported frame, never a crop of the consumer. `--ds-export` lets a CSS name
 (`--color-…`) stand for the variable and adds the library-wide count; the library export names
 at most five consumer nodes, with no component or property, so the layer export is the answer.
 A layer export older than schema 12 carries no `tokenBindings`; the report says so instead of

@@ -1,9 +1,11 @@
 // `handoff-css bindings` — the filesystem boundary around `src/bindings.mjs`.
 //   bindings --export <layer export json|json.gz|zip>… --variable <name|--css-name>… [--ds-export <export>] [--out <dir>] [--json]
-// With --out: bindings.md, bindings.json, and the frame images found in a zip under frames/.
+// With --out: bindings.md, bindings.json, and the frame images under frames/. An image comes from the brief
+// (the .md beside a layer .json, or in the same zip: `![name](data:image/...;base64,...)`) matched by the
+// screenshot name the .json lists, or from an image file in a zip.
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 
 import { assertConfig, sourceOf } from "./config.mjs";
@@ -14,6 +16,27 @@ const USAGE = `handoff-css bindings --export <layer export .json|.json.gz|.zip>�
 const IMAGE = /\.(png|jpe?g|webp)$/i;
 const appleDouble = (name) => name.startsWith("__MACOSX/") || /(^|\/)\._/.test(name);
 const stem = (name) => path.posix.basename(name).replace(/\.[^.]+$/, "");
+
+const DATA_URI = /!\[([^\n]*?)\]\(data:image\/(png|jpe?g|webp);base64,([A-Za-z0-9+/=]+)\)/g;
+const MAGIC = { png: [0x89, 0x50, 0x4e, 0x47], jpg: [0xff, 0xd8, 0xff], jpeg: [0xff, 0xd8, 0xff], webp: [0x52, 0x49, 0x46, 0x46] };
+const safeName = (s) => s.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^[-._]+|-+$/g, "").slice(0, 120).replace(/-+$/, "") || "frame";
+/** The alt text the plugin writes for a screenshot: the name, plus the scale when it was exported below 1x. */
+export const briefAlt = (name, scale = 1) => name + (scale < 1 ? ` (exported at ${scale}x — too large at 1x)` : "");
+
+/**
+ * The images a brief carries, by alt text (the screenshot name). Only bytes that start like the
+ * format they claim count, so a placeholder or empty payload is no image; a name carried twice is
+ * ambiguous and gives none.
+ */
+export function briefImages(md) {
+  const found = new Map();
+  for (const [, alt, ext, b64] of md.matchAll(DATA_URI)) {
+    const data = Buffer.from(b64, "base64");
+    const ok = MAGIC[ext.toLowerCase()].every((b, i) => data[i] === b);
+    found.set(alt, found.has(alt) ? null : ok ? { ext: ext.toLowerCase().replace("jpeg", "jpg"), data } : null);
+  }
+  return found;
+}
 
 const values = (args, flag) => args.flatMap((a, i) => (a === flag && args[i + 1] !== undefined && !(args[i + 1].startsWith("--") && flag !== "--variable") ? [args[i + 1]] : []));
 
@@ -56,15 +79,20 @@ export async function bindingsCommand(args, { cwd = process.cwd(), stdout = proc
     const docs = [];
     const images = [];
     const dirOf = new Map(); // export label -> the zip folder its JSON sits in
+    const scaleOf = new Map(); // export label -> screenshot name -> the scale it was exported at
+    const briefOf = new Map(); // export label -> the images in the brief beside its JSON
     for (const p of exportPaths) {
       const file = abs(p);
       if (/\.zip$/i.test(file)) {
         const found = [];
-        for (const f of zipTextFiles(file, p).filter((e) => e.name.endsWith(".json"))) {
+        const texts = zipTextFiles(file, p);
+        for (const f of texts.filter((e) => e.name.endsWith(".json"))) {
           const d = JSON.parse(f.text);
           if (d?.schema !== "design-handoff") continue;
           found.push(d);
           dirOf.set(label(d), path.posix.dirname(f.name));
+          const md = texts.find((e) => e.name === f.name.replace(/\.json$/, ".md"));
+          if (md) briefOf.set(label(d), briefImages(md.text));
         }
         if (!found.length) throw new Error(`handoff-css: ${p}: no layer export (.json, schema design-handoff) in the zip`);
         docs.push(...found);
@@ -73,6 +101,11 @@ export async function bindingsCommand(args, { cwd = process.cwd(), stdout = proc
         const doc = JSON.parse(/\.gz$/i.test(file) ? gunzipSync(readFileSync(file)).toString("utf8") : readFileSync(file, "utf8"));
         if (doc?.schema !== "design-handoff") throw new Error(`handoff-css: ${p}: not a layer export (schema ${JSON.stringify(doc?.schema)}, expected "design-handoff")`);
         docs.push(doc);
+        // The brief beside the layer export: the same name with .md (or .md.gz) for .json (or .json.gz).
+        const stemPath = file.replace(/\.json(\.gz)?$/i, "");
+        for (const [ext, read] of [[".md", (f) => readFileSync(f, "utf8")], [".md.gz", (f) => gunzipSync(readFileSync(f)).toString("utf8")]]) {
+          if (existsSync(stemPath + ext)) { briefOf.set(label(doc), briefImages(read(stemPath + ext))); break; }
+        }
       }
     }
     const dsPath = one("--ds-export");
@@ -83,23 +116,27 @@ export async function bindingsCommand(args, { cwd = process.cwd(), stdout = proc
       if (dsDocs.length !== 1) throw new Error(`handoff-css: ${dsPath}: ${dsDocs.length} exports; bindings reads exactly one`);
       ds = dsDocs[0];
     }
+    for (const d of docs) scaleOf.set(label(d), new Map((d.screenshots?.exported ?? []).map((x) => [x.name, x.scale])));
     const map = bindingMap(docs, { variables, ds });
     const outDir = one("--out") ? abs(one("--out")) : null;
     const extracted = new Map();
     const claimed = new Map(); // zip entry -> where it landed under frames/
     const imageFor = (frame) => {
-      const hit = frameImage(images, frame, dirOf.get(frame.file));
+      // An image file in the zip first (as before), else the brief's own image matched by the name the .json lists.
+      const zipHit = frameImage(images, frame, dirOf.get(frame.file));
+      const inBrief = zipHit || !frame.screenshot ? null : briefOf.get(frame.file)?.get(briefAlt(frame.screenshot, scaleOf.get(frame.file)?.get(frame.screenshot)));
+      const hit = inBrief ? { key: `${frame.file}\0${frame.screenshot}`, base: `${safeName(frame.screenshot)}.${inBrief.ext}`, data: inBrief.data, from: "the brief" }
+        : zipHit ? { key: zipHit.name, base: path.posix.basename(zipHit.name), data: zipHit.data, from: "the zip", flat: zipHit.name } : null;
       if (!hit) return null;
-      if (!outDir) return `${frame.name} (image in the zip: ${hit.name}; pass --out to extract it)`;
-      let rel = claimed.get(hit.name);
+      if (!outDir) return `${frame.name} (image in ${hit.from}${hit.flat ? `: ${hit.flat}` : ""}; pass --out to extract it)`;
+      let rel = claimed.get(hit.key);
       if (!rel) {
-        // The basename, unless another entry already holds it: then the entry's whole path, flattened.
-        const base = path.posix.basename(hit.name);
-        const taken = (r) => [...claimed.values()].includes(r);
-        rel = `frames/${base}`;
-        if (taken(rel)) rel = `frames/${hit.name.replace(/[^A-Za-z0-9._-]+/g, "_").replace(/^[._]+/, "")}`;
-        for (let n = 2; taken(rel); n += 1) rel = `frames/${n}-${base}`;
-        claimed.set(hit.name, rel);
+        // The basename, unless another image already holds it: then a zip entry's whole path, flattened.
+        const taken = (r) => [...claimed.values()].some((v) => v.toLowerCase() === r.toLowerCase());
+        rel = `frames/${hit.base}`;
+        if (taken(rel) && hit.flat) rel = `frames/${hit.flat.replace(/[^A-Za-z0-9._-]+/g, "_").replace(/^[._]+/, "")}`;
+        for (let n = 2; taken(rel); n += 1) rel = `frames/${n}-${hit.base}`;
+        claimed.set(hit.key, rel);
         extracted.set(rel, hit.data);
       }
       return `[${frame.name}](${rel})`;
