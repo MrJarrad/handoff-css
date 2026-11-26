@@ -13,7 +13,6 @@
 import { resolveName, stripComments } from "./conform.mjs";
 
 const VAR = /var\(\s*(--[a-z0-9-]+)/gi;
-const LITERAL_COLOUR = /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/i;
 const NEUTRAL = new Set(["transparent", "currentcolor", "inherit", "initial", "unset", "none", "revert"]);
 // Tailwind colour utilities and the property each paints.
 const APPLY_PROPERTY = { bg: "background-color", text: "color", border: "border-color", ring: "box-shadow", outline: "outline-color", shadow: "box-shadow" };
@@ -77,13 +76,70 @@ export function resolveBindings(doc, spec) {
 
 const word = (s) => new RegExp(`(^|[^\\w-])${s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w-])`);
 
-/** The reads of one declaration that matter to colour: names, whether a literal is present. */
+/** The end of the balanced `(...)` opening at `open`. */
+function closeParen(value, open) {
+  let depth = 0;
+  for (let i = open; i < value.length; i += 1) {
+    if (value[i] === "(") depth += 1;
+    if (value[i] === ")" && --depth === 0) return i + 1;
+  }
+  return value.length;
+}
+
+const COLOUR_FN = /^(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/i;
+const HEX = /^#[0-9a-f]{3,8}(?![\w-])/i;
+
+/**
+ * The raw colour literals a value paints with, outside any `var()`. A `var()` fallback
+ * is not a paint (the name check owns an undefined name), and a colour function that
+ * reads a token (`rgb(from var(--x) r g b / 0.5)`) is a modified use, not a literal.
+ */
+function literalColours(value) {
+  const out = [];
+  for (let i = 0; i < value.length; i += 1) {
+    if (/[\w-]/.test(value[i - 1] ?? "")) continue;
+    const rest = value.slice(i);
+    if (/^var\(/i.test(rest)) { i = closeParen(value, i + 3) - 1; continue; }
+    if (COLOUR_FN.test(rest)) {
+      const end = closeParen(value, i + rest.indexOf("("));
+      const span = value.slice(i, end);
+      if (!/var\(/i.test(span)) out.push(span);
+      i = end - 1;
+      continue;
+    }
+    const hex = HEX.exec(rest);
+    if (hex) { out.push(hex[0]); i += hex[0].length - 1; }
+  }
+  return out;
+}
+
+/** The reads of one declaration that matter to colour: names, and the raw literals beside them. */
 function reads(value, exported, colourNames) {
   const names = [...value.matchAll(VAR)].map((m) => m[1]);
   const colour = names.filter((n) => colourNames.has(n) || !exported.has(n));
   const bare = /^var\(\s*--[a-z0-9-]+\s*\)$/i.test(value);
-  const literal = names.length === 0 && LITERAL_COLOUR.test(value);
-  return { colour, bare, literal };
+  return { value, colour, bare, literals: literalColours(value) };
+}
+
+/** The finding for the token names a declaration reads, or null when they conform. */
+function nameFinding(r, b, exported, graph) {
+  // A name the export states is itself; only a name it does not state hops the alias graph
+  // (the generated sheet's per-mode blocks alias semantic names to primitives).
+  const resolvedReads = r.colour.map((n) => (exported.has(n) ? n : resolveName(n, graph)));
+  const bound = resolvedReads.filter((n) => b.names.includes(n));
+  const others = r.colour.filter((n, i) => !b.names.includes(resolvedReads[i]));
+  if (bound.length && others.length === 0) {
+    if (r.bare || b.property === "box-shadow") return null; // a ring is a width plus the colour: not a modified use
+    return { code: "COMPONENT_TOKEN_MODIFIED", severity: "amber", reads: r.colour,
+      message: (show) => `reads the bound ${show(bound)} inside \`${r.value.slice(0, 70)}\` — the system states the token whole, not a modified use of it` };
+  }
+  const local = others.filter((n) => !exported.has(exported.has(n) ? n : resolveName(n, graph)));
+  if (local.length && local.length === others.length && !bound.length) {
+    return { code: "CODE_ONLY_TOKEN", severity: "amber", reads: others,
+      message: (show) => `reads ${show(others)}, a name the export never states — code-only, binds ${show(b.names)}` };
+  }
+  return { code: "COMPONENT_TOKEN_DRIFT", severity: "red", reads: others,
+    message: (show) => `reads ${show(others)}, binds ${show(b.names)}` };
 }
 
 /**
@@ -128,35 +184,23 @@ export function componentDrift({ doc, bindings, files, graph }) {
         if (NEUTRAL.has(value.toLowerCase())) continue;
 
         const r = reads(value, exported, colourNames);
-        // A name the export states is itself; only a name it does not state hops the alias graph
-        // (the generated sheet's per-mode blocks alias semantic names to primitives).
-        const resolvedReads = r.colour.map((n) => (exported.has(n) ? n : resolveName(n, graph)));
         const at = { file, line: d.line, binding: b.id, component: b.component, property, binds: b.names, selector: context };
-        if (r.colour.length === 0 && !r.literal) continue; // width/opacity-only or neutral: no colour read
+        if (r.colour.length === 0 && r.literals.length === 0) continue; // width/opacity-only or neutral: no colour read
         const show = (list) => list.map((n) => `\`${n}\``).join(", ");
         const where = `${b.component ? `${b.component} ` : ""}${b.id} (${property}, line ${d.line})`;
 
-        if (r.literal) {
+        if (r.colour.length === 0) {
           findings.push({ code: "COMPONENT_TOKEN_DRIFT", severity: "red", ...at, reads: [value],
             message: `${where}: reads the literal \`${value}\`, binds ${show(b.names)} — a raw value where the system states a token` });
           continue;
         }
-        const bound = resolvedReads.filter((n) => b.names.includes(n));
-        const others = r.colour.filter((n, i) => !b.names.includes(resolvedReads[i]));
-        if (bound.length && others.length === 0) {
-          if (r.bare || property === "box-shadow") continue; // a ring is a width plus the colour: not a modified use
-          findings.push({ code: "COMPONENT_TOKEN_MODIFIED", severity: "amber", ...at, reads: r.colour,
-            message: `${where}: reads the bound ${show(bound)} inside \`${value.slice(0, 70)}\` — the system states the token whole, not a modified use of it` });
-          continue;
+        const named = nameFinding(r, b, exported, graph);
+        if (named) findings.push({ ...named, ...at, message: `${where}: ${named.message(show)}` });
+        // A literal beside a token read is a raw value the export never states, whatever the token verdict.
+        if (r.literals.length) {
+          findings.push({ code: "CODE_ONLY_TOKEN", severity: "amber", ...at, reads: r.literals,
+            message: `${where}: reads the literal ${show(r.literals)} beside ${show(r.colour)}, binds ${show(b.names)} — a raw value the export never states` });
         }
-        const local = others.filter((n) => !exported.has(exported.has(n) ? n : resolveName(n, graph)));
-        if (local.length && local.length === others.length && !bound.length) {
-          findings.push({ code: "CODE_ONLY_TOKEN", severity: "amber", ...at, reads: others,
-            message: `${where}: reads ${show(others)}, a name the export never states — code-only, binds ${show(b.names)}` });
-          continue;
-        }
-        findings.push({ code: "COMPONENT_TOKEN_DRIFT", severity: "red", ...at, reads: others,
-          message: `${where}: reads ${show(others)}, binds ${show(b.names)}` });
       }
     }
   }

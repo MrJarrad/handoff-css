@@ -705,9 +705,9 @@ names — the other direction of the same contract.
 | `SAMPLE_PX_LITERAL` | red / amber | red for a device/viewport dimension (`812px` is `100dvh` measured on one phone), amber for any other token px sample |
 | `GRID_ARITHMETIC` | red | `calc(… / M)` or a `*col-unit*` name where the brief states `col-span N/M` — Build standard 5 names a grid container |
 | `PLACEHOLDER_COPY` | amber | a string the brief flags `⚠ placeholder`, shipped as content |
-| `COMPONENT_TOKEN_DRIFT` | red | a component rule whose bound property reads a different colour token than the export binds, or a raw colour literal (needs `--bindings`) |
+| `COMPONENT_TOKEN_DRIFT` | red | a component rule whose bound property reads a different colour token than the export binds, or a raw colour literal with no colour token read (needs `--bindings`) |
 | `COMPONENT_TOKEN_MODIFIED` | amber | the bound token, but inside a function (`rgb(from var(--bound) … / opacity)`) rather than whole |
-| `CODE_ONLY_TOKEN` | amber | the bound property reads a name the export never states (a local custom property) |
+| `CODE_ONLY_TOKEN` | amber | the bound property reads a name the export never states (a local custom property), or a raw colour literal beside a token read (`linear-gradient(var(--bound), #f00)`), reported alongside the verdict on the token |
 
 Two deliberate exemptions. A breakpoint inside an `@media` prelude is the one px
 a stylesheet cannot state as a custom property. And the DEVICE set is built from
@@ -737,7 +737,7 @@ when?, except?, property, variable }` by Figma variable name only, resolved to C
 an alias of it. A name the export states is never followed through the generated alias graph.
 `--bindings` alone needs no `--handoff` or `--tokens`. Named gaps: a rule that reaches the token
 through a local custom property (`bg-(--action-hover-fill)`) is `CODE_ONLY_TOKEN` only where the
-bound property itself reads it; the chain is not followed. `@apply` is read for `bg|text|border|ring|outline|shadow` utilities. Fixture: `fixtures/ht137-drift/` (three code-only overrides).
+bound property itself reads it; the chain is not followed. `@apply` is read for `bg|text|border|ring|outline|shadow` utilities. A literal is a hex or a colour function outside any `var()`: a `var()` fallback is not a paint, and a colour function that reads a token (`rgb(from var(--x) r g b / 0.5)`) is a modified use. Fixture: `fixtures/ht137-drift/` (three code-only overrides).
 
 Scope: CSS only in 0.3.0. A binding that lives in markup is invisible here, and
 that is a named gap rather than a silent one. Exit 1 on any red.
