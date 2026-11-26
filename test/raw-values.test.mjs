@@ -156,7 +156,7 @@ test("a ruling overrules: keep holds a clear match raw, use binds a listed value
 
 // The parent's constraint on HT-106: a listed value never stops a build — the build uses the raw value
 // with a deviation row until it is ruled. `match` exits 0 on listed raw values alone.
-test("listed raw values never fail the run: match --export exits 0 and prints them", () => {
+test("listed raw values never fail the run: match --export exits 0 and prints them", async () => {
   const dir = mkdtempSync(join(tmpdir(), "raw-"));
   writeFileSync(join(dir, "tokens.css"), TOKENS[0].text);
   const brief = { schema: "design-handoff", contentHash: "h" };
@@ -164,18 +164,18 @@ test("listed raw values never fail the run: match --export exits 0 and prints th
   writeFileSync(join(dir, "b.link-run.json"), JSON.stringify({ schema: "design-handoff-link-run", schemaVersion: 1, brief: { contentHash: "h" },
     linkRun: { generatedBy: "design-handoff-script", designSystemExports: [], sources: [], findings: [] }, unboundValues: [row("spacing", "gap", 12), row("colour", "fill", "#2F2F2FFF")] }));
   let out = "";
-  const code = matchCommand(["--export", join(dir, "b.json"), "--src", join(dir, "tokens.css")], { cwd: dir, stdout: { write: (s) => { out += s; } }, stderr: { write: (s) => { out += s; } } });
+  const code = await matchCommand(["--export", join(dir, "b.json"), "--src", join(dir, "tokens.css")], { cwd: dir, stdout: { write: (s) => { out += s; } }, stderr: { write: (s) => { out += s; } } });
   assert.equal(code, 0, out);
   assert.match(out, /## Raw values/);
   assert.match(out, /Needs your call/);
 });
 
-test("a brief with no link-run list is refused, naming the script run that writes it", () => {
+test("a brief with no link-run list is refused, naming the script run that writes it", async () => {
   const dir = mkdtempSync(join(tmpdir(), "raw-"));
   writeFileSync(join(dir, "b.json"), JSON.stringify({ schema: "design-handoff", contentHash: "h" }));
   writeFileSync(join(dir, "tokens.css"), ":root{}");
   let err = "";
-  const code = matchCommand(["--export", join(dir, "b.json"), "--src", join(dir, "tokens.css")], { cwd: dir, stdout: { write() {} }, stderr: { write: (s) => { err += s; } } });
+  const code = await matchCommand(["--export", join(dir, "b.json"), "--src", join(dir, "tokens.css")], { cwd: dir, stdout: { write() {} }, stderr: { write: (s) => { err += s; } } });
   assert.equal(code, 1);
   assert.match(err, /unboundValues/);
   assert.match(err, /design-handoff/);
@@ -184,7 +184,7 @@ test("a brief with no link-run list is refused, naming the script run that write
 // The worked example (HT-102 done-when): a real link-run brief from design-handoff-script and a small
 // custom-properties file → a clear match built, a slightly-off colour listed with a suggestion, an
 // in-between spacing listed with both neighbours.
-test("worked example: fixtures/ht102-raw-values", () => {
+test("worked example: fixtures/ht102-raw-values", async () => {
   const dir = new URL("../fixtures/ht102-raw-values/", import.meta.url);
   const notes = JSON.parse(readFileSync(new URL("card.link-run.json", dir), "utf8"));
   const { items } = matchRawValues({ rows: notes.unboundValues, files: [{ path: "tokens.css", text: readFileSync(new URL("tokens.css", dir), "utf8") }] });
@@ -194,7 +194,7 @@ test("worked example: fixtures/ht102-raw-values", () => {
   assert.deepEqual(find("spacing", 12).suggestions.map((s) => s.token), ["--space-2", "--space-4"]);
   const expected = readFileSync(new URL("match.md", dir), "utf8");
   let out = "";
-  matchCommand(["--export", "card.json", "--src", "tokens.css"], { cwd: new URL(".", dir).pathname, stdout: { write: (s) => { out += s; } }, stderr: { write() {} } });
+  await matchCommand(["--export", "card.json", "--src", "tokens.css"], { cwd: new URL(".", dir).pathname, stdout: { write: (s) => { out += s; } }, stderr: { write() {} } });
   assert.equal(out, expected);
 });
 

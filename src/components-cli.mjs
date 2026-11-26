@@ -8,9 +8,10 @@ import { flagValues, sources } from "./match-cli.mjs";
 import { scanComponentSource, compareComponents, renderComponentCompareMarkdown } from "./component-source.mjs";
 
 import { buildComponentProfile, renderComponentProfileMarkdown } from "./component-profile.mjs";
+import { sourceFromFlag } from "./source-flag.mjs";
 import { resolveComponentNeeds, renderResolveComponentMarkdown } from "./resolve-component.mjs";
 
-const USAGE = `handoff-css components [--export <layer export .json|.json.gz>…] [--ds-export <Design System Handoff export>…] [--src <code paths…>] [--out <dir>] [--check]   (--export or --ds-export, or both)\n  handoff-css components --export <layer export>… --need <needs.json> [--rulings <md>] [--out <dir>] [--json]\n`;
+const USAGE = `handoff-css components [--export <layer export .json|.json.gz>…] [--ds-export <Design System Handoff export>…] [--src <code paths…>] [--out <dir>] [--config <mjs>] [--check]   (--export or --ds-export, or both)\n  handoff-css components --export <layer export>… --need <needs.json> [--rulings <md>] [--out <dir>] [--config <mjs>] [--json]\n`;
 export const COMPONENT_FILES = { json: "component-profile.json", md: "component-profile.md" };
 export const COMPONENT_COMPARE_FILES = { json: "component-code-compare.json", md: "component-code-compare.md" };
 export const COMPONENT_RESOLVE_FILES = { json: "component-resolve-report.json", md: "component-resolve-report.md" };
@@ -29,6 +30,7 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
     return EXIT.error;
   }
   try {
+    const source = await sourceFromFlag(one("--config"), cwd);
     const readJson = (p) => {
       const file = abs(p);
       const text = /\.gz$/i.test(file) ? gunzipSync(readFileSync(file)).toString("utf8") : readFileSync(file, "utf8");
@@ -87,7 +89,7 @@ export async function componentsCommand(args, { cwd = process.cwd(), stdout = pr
     mkdirSync(outDir, { recursive: true });
     const json = `${JSON.stringify(report, null, 2)}\n`;
     writeFileSync(path.join(outDir, COMPONENT_RESOLVE_FILES.json), json);
-    writeFileSync(path.join(outDir, COMPONENT_RESOLVE_FILES.md), renderResolveComponentMarkdown(report));
+    writeFileSync(path.join(outDir, COMPONENT_RESOLVE_FILES.md), renderResolveComponentMarkdown(report, { source }));
     if (args.includes("--json")) stdout.write(json);
     else stdout.write(`handoff-css (components): ${report.needs.length} needs, ${report.open} open (${Object.entries(report.counts).map(([k, v]) => `${v} ${k}`).join(", ") || "none"}); wrote ${Object.values(COMPONENT_RESOLVE_FILES).join(", ")} to ${outDir}\n`);
     if (report.open > 0) stderr.write(`handoff-css (components): ${report.open} need(s) wait for a ruling; see ${COMPONENT_RESOLVE_FILES.md}\n`);
