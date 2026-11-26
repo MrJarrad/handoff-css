@@ -1,0 +1,74 @@
+// Ruling tables name the design system's authoring place in their second column: `figma` (the
+// column every existing table has) or `source`. Both read the same; item keys stay `.figma`.
+// Writers emit `figma` for the default source and `source` for any other kind.
+import { test } from "node:test";
+import assert from "node:assert/strict";
+
+import { readRulings, renderMarkdown } from "../src/match.mjs";
+import { renderRawValues } from "../src/raw-values.mjs";
+import { renderResolveMarkdown } from "../src/resolve-need.mjs";
+import { renderResolveComponentMarkdown } from "../src/resolve-component.mjs";
+import { sourceOf } from "../src/config.mjs";
+
+const table = (col) => `| kind | ${col} | ruling | code | note |\n| --- | --- | --- | --- | --- |\n| token | color/a | use | --a | ok |\n| raw-colour | #fff | keep |  |  |\n`;
+
+test("a table headed `source` reads the same rows as one headed `figma`", () => {
+  assert.deepEqual(readRulings(table("source")), readRulings(table("figma")));
+  assert.equal(readRulings(table("source"))[0].figma, "color/a");
+  assert.equal(readRulings(table("source")).length, 2);
+});
+
+test("both columns, or neither, is a clear error", () => {
+  const both = "| kind | figma | source | ruling | code |\n| --- | --- | --- | --- | --- |\n| token | a | b | use | --a |\n";
+  assert.throws(() => readRulings(both), /both `figma` and `source`/);
+  const neither = "| kind | name | ruling | code |\n| --- | --- | --- | --- |\n| token | a | use | --a |\n";
+  assert.throws(() => readRulings(neither), /neither a `figma` nor a `source` column/);
+});
+
+test("a table with no ruling column is still not a ruling table", () => {
+  assert.deepEqual(readRulings("| kind | figma | token | why |\n| --- | --- | --- | --- |\n| raw-colour | #fff | --a | x |\n"), []);
+});
+
+const matchResult = { items: [{ kind: "token", figma: "color/a", status: "unmatched", proposal: null, alternatives: [] }], findings: [], counts: { items: 1, proposed: 0, unmatched: 1, ruled: 0 } };
+const rawResult = { items: [{ kind: "colour", figma: "#fff", status: "listed", reason: "no-token", why: "no token", suggestions: [], layers: [] }], findings: [], counts: { values: 1, built: 0, listed: 1, ruled: 0 } };
+const need = { id: "n1", verdict: "open", ask: { wants: null }, findings: [], candidates: [], open: true };
+const storybook = sourceOf({ source: { kind: "storybook" } });
+
+test("the match writer's header follows the source: figma by default, source otherwise", () => {
+  assert.match(renderMarkdown(matchResult), /\| kind \| figma \| ruling \| code \| note \|/);
+  assert.match(renderMarkdown(matchResult, { source: sourceOf({}) }), /\| kind \| figma \| ruling/);
+  assert.match(renderMarkdown(matchResult, { source: sourceOf({ source: { kind: "storybook" } }) }), /\| kind \| source \| ruling \| code \| note \|/);
+  assert.match(renderMarkdown(matchResult, { source: sourceOf({ source: { kind: "other", label: "Penpot" } }) }), /\| kind \| source \|/);
+});
+
+test("the raw-value writer follows the source", () => {
+  const out = renderRawValues(rawResult, { source: sourceOf({ source: { kind: "tokens-code" } }) });
+  assert.doesNotMatch(out, /\| figma \|/);
+  assert.match(renderRawValues(rawResult), /\| kind \| figma \| ruling/);
+});
+
+test("a table the writer emits for another source reads back through readRulings", () => {
+  const out = renderMarkdown(matchResult, { source: sourceOf({ source: { kind: "storybook" } }) });
+  const filled = out.replace("| token | color/a |  |", "| token | color/a | skip |");
+  assert.deepEqual(readRulings(filled).map((r) => [r.kind, r.figma, r.ruling]), [["token", "color/a", "skip"]]);
+});
+
+test("the resolve writers follow the source", () => {
+  const need_ = { source: {}, needs: [need], open: 1 };
+  const comp = { needs: [{ ...need, ask: {} }], open: 1, coverage: { total: 1, seen: 1, seenInInventory: 1 } };
+  assert.match(renderResolveMarkdown(need_), /\| kind \| figma \| ruling/);
+  assert.match(renderResolveMarkdown(need_, { source: storybook }), /\| kind \| source \| ruling/);
+  assert.match(renderResolveComponentMarkdown(comp), /\| kind \| figma \| ruling/);
+  assert.match(renderResolveComponentMarkdown(comp, { source: storybook }), /\| kind \| source \| ruling/);
+});
+
+test("a legend table with kind and ruling but no second column does not hide the real table below it", () => {
+  const legend = "| kind | ruling | note |\n| --- | --- | --- |\n| token | use | bind it |\n\n";
+  assert.deepEqual(readRulings(legend + table("figma")), readRulings(table("figma")));
+  assert.deepEqual(readRulings(legend + table("source")), readRulings(table("figma")));
+  assert.equal(readRulings(legend + table("figma")).length, 2);
+});
+
+test("neither is an error only when no table has the column", () => {
+  assert.throws(() => readRulings("| kind | ruling | note |\n| --- | --- | --- |\n| token | use | x |\n"), /neither a `figma` nor a `source` column/);
+});

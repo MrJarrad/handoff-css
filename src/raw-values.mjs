@@ -12,7 +12,7 @@
 // value is built raw, with a deviation row, until it is ruled; it never stops a build.
 //
 // Pure: rows and texts in, result out. `src/match-cli.mjs` is the filesystem boundary.
-import { inventory, readRulings } from "./match.mjs";
+import { inventory, readRulings, rulingColumn } from "./match.mjs";
 
 const SAME_COLOUR = 1;
 const SLIGHTLY_OFF = 5;
@@ -245,7 +245,8 @@ export function matchRawValues({ rows, files, rulings = null }) {
 }
 
 /** The report: what was built with a token (overrule with `keep`), then what needs their call. */
-export function renderRawValues({ items, findings, counts, unreadable = [] }) {
+export function renderRawValues({ items, findings, counts, unreadable = [] }, { source = null } = {}) {
+  const column = rulingColumn(source);
   const cell = (s) => String(s ?? "").replace(/\|/g, "\\|");
   const layers = (i) => `${i.layers.length} layer${i.layers.length === 1 ? "" : "s"}`;
   const lines = ["## Raw values", "", `${counts.values} values not bound to a variable · ${counts.built} built with a token · ${counts.listed} need your call · ${counts.ruled} ruled`, ""];
@@ -255,14 +256,14 @@ export function renderRawValues({ items, findings, counts, unreadable = [] }) {
   const built = items.filter((i) => i.status === "built");
   if (built.length) {
     lines.push("### Built with a token", "", "Each is built with the token. To keep the raw value instead, add a `keep` row to the ruling table.", "",
-      "| kind | figma | token | why | where |", "| --- | --- | --- | --- | --- |");
+      `| kind | ${column} | token | why | where |`, "| --- | --- | --- | --- | --- |");
     for (const i of built) lines.push(`| raw-${i.kind} | ${cell(i.figma)} | ${i.token} | ${cell(i.why)} | ${layers(i)} |`);
     lines.push("");
   }
   const listed = items.filter((i) => i.status === "listed");
   if (listed.length) {
     lines.push("### Needs your call", "", "Built with the exact value and a deviation row until ruled — never a stop. Rule each row `use` (with the token) or `keep`, then pass the table back with `--rulings`.", "",
-      "| kind | figma | ruling | code | note |", "| --- | --- | --- | --- | --- |");
+      `| kind | ${column} | ruling | code | note |`, "| --- | --- | --- | --- | --- |");
     for (const i of listed) {
       const note = `${i.why}${i.suggestions.length ? `; suggested ${i.suggestions.map((s) => `${s.token} (${s.value}, ${s.distance})`).join(" or ")}` : ""}; ${layers(i)}`;
       lines.push(`| raw-${i.kind} | ${cell(i.figma)} |  | ${i.reason === "slightly-off" ? i.suggestions[0].token : ""} | ${cell(note)} |`);
