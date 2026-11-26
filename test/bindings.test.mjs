@@ -3,7 +3,7 @@
 // `tokenBindings` by hand (see the fixture README line), not recomputed with the module's walk.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, writeFileSync, mkdtempSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, existsSync, copyFileSync, readdirSync, rmSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -196,4 +196,94 @@ test("a variable with no consumers does not point at rows above", () => {
   assert.equal(v.consumers.length, 0);
   assert.doesNotMatch(v.library.note, /rows above/);
   assert.match(v.library.note, /places none/);
+});
+
+// ---- frame images from the brief's data URIs ------------------------------------------------
+
+const briefDir = path.join(fx, "bindings-brief-images");
+const PNG1 = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGD4DwABBAEAX+XDSwAAAABJRU5ErkJggg==", "base64");
+const copyBrief = () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "bindmd-"));
+  for (const f of ["design-handoff-mediarow.json.gz", "design-handoff-mediarow.md"]) copyFileSync(path.join(briefDir, f), path.join(dir, f));
+  return dir;
+};
+const ARGS = ["--variable", "color/background/default/primary"];
+
+test("a .json.gz with its sibling .md: the data URI image is written to frames/ and linked from the row", async () => {
+  const dir = copyBrief();
+  const out = path.join(dir, "out");
+  const { code, out: stdout } = await run(["--export", "design-handoff-mediarow.json.gz", ...ARGS, "--out", out], dir);
+  assert.equal(code, 0);
+  assert.deepEqual(readFileSync(path.join(out, "frames", "MediaRow.png")), PNG1);
+  assert.match(readFileSync(path.join(out, "bindings.md"), "utf8"), /\]\(frames\/MediaRow\.png\)/);
+  assert.match(stdout, /1 frame image/);
+  assert.deepEqual(readdirSync(path.join(out, "frames")), ["MediaRow.png"], "the image no frame names is not written");
+});
+
+test("a .json beside its .md reads the same way", async () => {
+  const dir = copyBrief();
+  writeFileSync(path.join(dir, "design-handoff-mediarow.json"), gunzipSync(readFileSync(path.join(dir, "design-handoff-mediarow.json.gz"))));
+  const out = path.join(dir, "out");
+  await run(["--export", "design-handoff-mediarow.json", ...ARGS, "--out", out], dir);
+  assert.ok(existsSync(path.join(out, "frames", "MediaRow.png")));
+});
+
+test("a zip holding the .json and the .md (the plugin's zip) gives the frame image", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "bindmd-"));
+  writeFileSync(path.join(dir, "in.zip"), makeZip([
+    ["design-handoff-mediarow.json", gunzipSync(readFileSync(path.join(briefDir, "design-handoff-mediarow.json.gz")))],
+    ["design-handoff-mediarow.md", readFileSync(path.join(briefDir, "design-handoff-mediarow.md"))],
+  ]));
+  const out = path.join(dir, "out");
+  await run(["--export", "in.zip", ...ARGS, "--out", out], dir);
+  assert.deepEqual(readFileSync(path.join(out, "frames", "MediaRow.png")), PNG1);
+});
+
+test("an image entry in the zip still wins when the zip also has a brief", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "bindmd-"));
+  writeFileSync(path.join(dir, "in.zip"), makeZip([
+    ["design-handoff-mediarow.json", gunzipSync(readFileSync(path.join(briefDir, "design-handoff-mediarow.json.gz")))],
+    ["design-handoff-mediarow.md", readFileSync(path.join(briefDir, "design-handoff-mediarow.md"))],
+    ["screenshots/MediaRow.png", png("entry")],
+  ]));
+  const out = path.join(dir, "out");
+  await run(["--export", "in.zip", ...ARGS, "--out", out], dir);
+  assert.equal(readFileSync(path.join(out, "frames", "MediaRow.png"), "utf8"), "png-entry");
+});
+
+test("no sibling .md: the gap is said and no frames directory is made", async () => {
+  const dir = copyBrief();
+  rmSync(path.join(dir, "design-handoff-mediarow.md"));
+  const out = path.join(dir, "out");
+  await run(["--export", "design-handoff-mediarow.json.gz", ...ARGS, "--out", out], dir);
+  assert.match(readFileSync(path.join(out, "bindings.md"), "utf8"), /no frame image in the input/);
+  assert.ok(!existsSync(path.join(out, "frames")));
+});
+
+test("a placeholder or empty data URI is no image", async () => {
+  const dir = copyBrief();
+  writeFileSync(path.join(dir, "design-handoff-mediarow.md"), "![MediaRow](data:image/png;base64,STRIPPED)\n\n![MediaRow](data:image/png;base64,)\n");
+  const out = path.join(dir, "out");
+  await run(["--export", "design-handoff-mediarow.json.gz", ...ARGS, "--out", out], dir);
+  assert.match(readFileSync(path.join(out, "bindings.md"), "utf8"), /no frame image in the input/);
+  assert.ok(!existsSync(path.join(out, "frames")));
+});
+
+test("the image is matched by screenshot name; a name with slashes and equals signs gets a safe file name", async () => {
+  const dir = copyBrief();
+  const doc = gz(path.join(dir, "design-handoff-mediarow.json.gz"));
+  doc.screenshots.exported[0].name = "Row / device=md+";
+  writeFileSync(path.join(dir, "x.json"), JSON.stringify(doc));
+  writeFileSync(path.join(dir, "x.md"), `![Row / device=md+](data:image/png;base64,${PNG1.toString("base64")})\n`);
+  const out = path.join(dir, "out");
+  await run(["--export", "x.json", ...ARGS, "--out", out], dir);
+  assert.deepEqual(readdirSync(path.join(out, "frames")), ["Row-device-md.png"]);
+  assert.match(readFileSync(path.join(out, "bindings.md"), "utf8"), /\]\(frames\/Row-device-md\.png\)/);
+});
+
+test("without --out the row says the image is in the brief", async () => {
+  const dir = copyBrief();
+  const { out } = await run(["--export", "design-handoff-mediarow.json.gz", ...ARGS], dir);
+  assert.match(out, /image in the brief/);
+  assert.match(out, /pass --out/);
 });
