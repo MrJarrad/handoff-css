@@ -11,7 +11,7 @@ import { createRequire } from "node:module";
 import Ajv2020 from "ajv/dist/2020.js";
 
 import { buildProfile } from "./profile.mjs";
-import { readRulings } from "./match.mjs";
+import { readRulings, rulingColumn } from "./match.mjs";
 import { fail } from "./resolve.mjs";
 
 const require = createRequire(import.meta.url);
@@ -309,7 +309,7 @@ const code = (s) => `\`${s}\``;
 const val = (o) => Object.entries(o ?? {}).map(([k, v]) => `${k}: ${v ?? "n/a"}`).join("; ");
 
 /** The report as markdown, with the ruling-table rows to fill in. */
-export function renderResolveMarkdown(r) {
+export function renderResolveMarkdown(r, { source = null } = {}) {
   const out = ["# Resolve report", "", `Source ${code(r.source.documentName ?? "(unnamed)")}, content hash ${code(r.source.contentHash ?? "none")}. ` +
     `${r.needs.length} needs, ${r.open} open.`, "",
   "Reuse comes first: a name the system has is used as it is. Anything else is one question for the designer, never an invented name. Until ruled, the build carries the raw value, marked `assumed-ask`.", ""];
@@ -327,7 +327,7 @@ export function renderResolveMarkdown(r) {
   const open = r.needs.filter((n) => n.open);
   if (open.length) {
     out.push("## Needs your call", "", "Rule each row `use` (with the existing name), `new` (the designer approved the new name) or `skip`, then pass the table back with `--rulings`.", "",
-      "| kind | figma | ruling | code | note |", "| --- | --- | --- | --- | --- |",
+      `| kind | ${rulingColumn(source)} | ruling | code | note |`, "| --- | --- | --- | --- | --- |",
       ...open.map((n) => `| resolve-need | ${n.id} |  |  | ${n.candidates[0] ? `top candidate ${n.candidates[0].name}` : ""} |`), "");
   }
   return out.join("\n");

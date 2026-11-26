@@ -18,7 +18,7 @@
 import { createRequire } from "node:module";
 import Ajv2020 from "ajv/dist/2020.js";
 
-import { readRulings } from "./match.mjs";
+import { readRulings, rulingColumn } from "./match.mjs";
 import { fail } from "./resolve.mjs";
 
 const require = createRequire(import.meta.url);
@@ -205,7 +205,7 @@ export function resolveComponentNeeds({ profile, needs, rulings = null, inventor
 
 const code = (s) => `\`${s}\``;
 
-export function renderResolveComponentMarkdown(r) {
+export function renderResolveComponentMarkdown(r, { source = null } = {}) {
   const out = ["# Component resolve report", "",
     `${r.needs.length} needs, ${r.open} open. ${r.coverage.total === "unknown" ? `Components seen: ${r.coverage.seen} of an unknown total — a component not listed may still exist in the system.` : `Components seen: ${r.coverage.seen}; the library defines ${r.coverage.total}, ${r.coverage.seenInInventory} of them placed by these layers.`}`, "",
     "Reuse comes first: a component the system has is used as it is, with its own properties. Anything else is one question for the designer, never an invented component. Until ruled, the build carries a local component marked `assumed-ask`.", ""];
@@ -228,7 +228,7 @@ export function renderResolveComponentMarkdown(r) {
   const open = r.needs.filter((n) => n.open);
   if (open.length) {
     out.push("## Needs your call", "", "Rule each row `use` (with the existing component name), `new` (the designer approved the new component) or `skip`, then pass the table back with `--rulings`.", "",
-      "| kind | figma | ruling | code | note |", "| --- | --- | --- | --- | --- |",
+      `| kind | ${rulingColumn(source)} | ruling | code | note |`, "| --- | --- | --- | --- | --- |",
       ...open.map((n) => `| resolve-component | ${n.id} |  |  | ${n.candidates[0] ? `top candidate ${n.candidates[0].name}` : ""} |`), "");
   }
   return out.join("\n");
