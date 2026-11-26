@@ -114,7 +114,7 @@ before it is rendered, so you can build your own checks on them.
 | Key | What it decides |
 | --- | --- |
 | `schema.name` / `schema.versions` | Which export contract you have actually read. A superseded schema still parses, so it is rejected rather than accepted. |
-| `source` | Optional. `{ kind: figma \| tokens-code \| storybook \| other, label? }`: where the design system is authored; absent reads as `figma`. A stated `label` names the source in the `conform` drift findings and the `bindings` heading (`the <label> export`), and the default label changes no word. Only `figma` has a reader; any other kind stops the run with `SOURCE_READER_NOT_BUILT`. |
+| `source` | Optional. `{ kind: figma \| tokens-code \| storybook \| other, label? }`: where the design system is authored; absent reads as `figma`. A stated `label` names the source in the `conform` drift findings (`the <label> export` in place of `the export`) and is appended as ` (<label>)` to the `From <files>.` line of `bindings --config`; the default label changes no word. Only `figma` has a reader; any other kind stops the run with `SOURCE_READER_NOT_BUILT`. |
 | `paths.*` | Export in, four artifacts out, plus your own stylesheet. |
 | `paths.styles` | Optional, schema 12+: where the style classes go. One class per style, selector and declarations from the export's own `cssClass`, verbatim (P21). Unset, or an older export, writes no file. |
 | `exclude.paths` | `"<collection>/<variable>"` prefixes that are never emitted — authoring scratch, source-only hacks. Applied on path identity, never revived by an alias. |
