@@ -1142,7 +1142,7 @@ and the project's sources, and proposes per design-system item the closest code 
 adopts one: a match is a question for a human until the project's ruling table answers it,
 so the run exits 1 while any item is unruled.
 
-The ruling table's second column is headed `figma` or `source`; the two read the same and items keep the key `figma`. A table with both columns is an error, and so is a `kind` + `ruling` table with `code` or `note` when no table has either column; a table with neither is skipped when a real one sits below it. The library writers (`renderMarkdown`, `renderRawValues`, `renderResolveMarkdown`, `renderResolveComponentMarkdown`) accept `{ source }` and head the column `figma` for the default source and `source` for any other kind (`sourceOf`). The `match`, `resolve` and `components` commands read no config and do not pass it yet, so they always write `figma`. Existing tables are unchanged. `src/match.mjs` (`readRulings`, `rulingColumn`)
+The ruling table's second column is headed `figma` or `source`; the two read the same and items keep the key `figma`. A table with both columns is an error, and so is a `kind` + `ruling` table with `code` or `note` when no table has either column; a table with neither is skipped when a real one sits below it. The library writers (`renderMarkdown`, `renderRawValues`, `renderResolveMarkdown`, `renderResolveComponentMarkdown`) accept `{ source }` and head the column `figma` for the default source and `source` for any other kind (`sourceOf`). The `match`, `resolve` and `components` commands take `--config <mjs>`: the config is validated against the schema, then the source is gated (`SOURCE_READER_NOT_BUILT`), and `sourceOf(config)` goes to the writers. Without `--config` they write `figma`, byte for byte as before. Existing tables are unchanged. `src/match.mjs` (`readRulings`, `rulingColumn`)
 
 Evidence is three axes, each named in `why`: **name** (the brief's CSS name exactly, else
 the share of `-` segments; components by name with case and punctuation set aside, then
@@ -1197,7 +1197,7 @@ byte. Only `figma` has a reader (the Design Handoff export). Any other kind stop
 file is read or written. Those paths validate the config against the schema first, so an unknown
 `source.kind` is a schema error and `sourceOf` throws on it; a `conform`-only config fragment is
 refused, so spread your full config. Named gap: `contrast` and `ladder` take no config and are not
-gated, and `bindings` without `--config` is not gated either.
+gated, and `bindings`, `match`, `resolve` and `components` without `--config` are not gated either.
 
 A stated `label` names the source in two findings, and the default label changes no word, finding code
 or JSON key. The two `conform` drift `CODE_ONLY_TOKEN` messages (a name the export never states, a raw
