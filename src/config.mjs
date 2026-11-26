@@ -109,6 +109,16 @@ export function sourceOf(config) {
   return { kind, label: label ?? SOURCE_LABELS[kind], built: kind === "figma" };
 }
 
+/**
+ * How a sentence names the source's export: `the export` while the label is the
+ * kind's own default, `the <label> export` once a consumer states one. The
+ * default wording is the pre-label wording, so a config that states no label
+ * reads exactly as before.
+ */
+export function sourcePhrase({ kind, label }) {
+  return label === SOURCE_LABELS[kind] ? "the export" : `the ${label} export`;
+}
+
 /** Stop, before any file is read, when the stated source has no reader. */
 export function assertSourceBuilt(config) {
   const source = sourceOf(config);

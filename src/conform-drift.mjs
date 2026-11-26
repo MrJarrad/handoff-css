@@ -10,6 +10,7 @@
 // variable the export does not state is an error, never a silent skip.
 //
 // Pure: text in, findings out.
+import { sourcePhrase } from "./config.mjs";
 import { resolveName, stripComments } from "./conform.mjs";
 
 const VAR = /var\(\s*(--[a-z0-9-]+)/gi;
@@ -156,7 +157,7 @@ function reads(value, exported, colourNames) {
 }
 
 /** The finding for the token names a declaration reads, or null when they conform. */
-function nameFinding(r, b, exported, graph) {
+function nameFinding(r, b, exported, graph, phrase) {
   // A name the export states is itself; only a name it does not state hops the alias graph
   // (the generated sheet's per-mode blocks alias semantic names to primitives).
   const resolvedReads = r.colour.map((n) => (exported.has(n) ? n : resolveName(n, graph)));
@@ -170,7 +171,7 @@ function nameFinding(r, b, exported, graph) {
   const local = others.filter((n) => !exported.has(exported.has(n) ? n : resolveName(n, graph)));
   if (local.length && local.length === others.length && !bound.length) {
     return { code: "CODE_ONLY_TOKEN", severity: "amber", reads: others,
-      message: (show) => `reads ${show(others)}, a name the export never states — code-only, binds ${show(b.names)}` };
+      message: (show) => `reads ${show(others)}, a name ${phrase} never states — code-only, binds ${show(b.names)}` };
   }
   return { code: "COMPONENT_TOKEN_DRIFT", severity: "red", reads: others,
     message: (show) => `reads ${show(others)}, binds ${show(b.names)}` };
@@ -181,8 +182,10 @@ function nameFinding(r, b, exported, graph) {
  * @param {object} input.bindings  `{ bindings: [{ id, component?, selectors, when?, except?, property, variable }] }`
  * @param {{path, text}[]} input.files
  * @param {Map} input.graph        the generated sheet's alias graph (`aliasGraph`)
+ * @param {object} [input.source]  `sourceOf(config)`: names the source's export in the findings; omitted reads as the default
  */
-export function componentDrift({ doc, bindings, files, graph }) {
+export function componentDrift({ doc, bindings, files, graph, source = null }) {
+  const phrase = source ? sourcePhrase(source) : "the export";
   const resolved = resolveBindings(doc, bindings);
   const exported = new Set();
   const colourNames = new Set();
@@ -228,7 +231,7 @@ export function componentDrift({ doc, bindings, files, graph }) {
             message: `${where}: reads the literal \`${value}\`, binds ${show(b.names)} — a raw value where the system states a token` });
           continue;
         }
-        const named = nameFinding(r, b, exported, graph);
+        const named = nameFinding(r, b, exported, graph, phrase);
         if (named) findings.push({ ...named, ...at, message: `${where}: ${named.message(show)}` });
         // A literal beside a token read is a raw value the export never states, whatever the token verdict.
         if (r.literals.length) {

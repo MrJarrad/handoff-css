@@ -10,6 +10,7 @@
 // and neither their component nor their property (src/conform-drift.mjs:6-8).
 //
 // Pure: parsed documents in, a map out. Images and files are the CLI's.
+import { sourcePhrase } from "./config.mjs";
 import { fail } from "./resolve.mjs";
 
 const roots = (doc) => (Array.isArray(doc.layerTree) ? doc.layerTree : doc.layerTree ? [doc.layerTree] : []);
@@ -115,9 +116,11 @@ export function bindingMap(docs, { variables, ds = null }) {
   return { variables: out, notes };
 }
 
-export function renderBindingsMarkdown(map, { imageFor = () => null, exportNames = [] } = {}) {
+export function renderBindingsMarkdown(map, { imageFor = () => null, exportNames = [], source = null } = {}) {
   const lines = ["# Binding map", ""];
-  if (exportNames.length) lines.push(`From ${exportNames.join(", ")}.`, "");
+  // The source is named only once a consumer states a label of their own; the default line is unchanged.
+  const named = source && sourcePhrase(source) !== "the export" ? ` (${source.label})` : "";
+  if (exportNames.length) lines.push(`From ${exportNames.join(", ")}${named}.`, "");
   for (const n of map.notes) lines.push(`- Note: ${n}`);
   if (map.notes.length) lines.push("");
   for (const v of map.variables) {
