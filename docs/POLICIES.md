@@ -737,10 +737,12 @@ when?, except?, property, variable }` by Figma variable name only, resolved to C
 an alias of it. A name the export states is never followed through the generated alias graph.
 `--bindings` alone needs no `--handoff` or `--tokens`. Named gaps: a rule that reaches the token
 through a local custom property (`bg-(--action-hover-fill)`) is `CODE_ONLY_TOKEN` only where the
-bound property itself reads it; the chain is not followed. `@apply` is read for `bg|text|border|ring|outline|shadow` utilities. A literal is a hex or a colour function outside any `var()`: a `var()` fallback is not a paint, and a colour function that reads a token (`rgb(from var(--x) r g b / 0.5)`) is a modified use. Fixture: `fixtures/ht137-drift/` (three code-only overrides).
+bound property itself reads it; the chain is not followed. `@apply` is read for `bg|text|border|ring|outline|shadow` utilities. A literal is a hex, a named colour or a colour function outside any `var()` or `url()`: a `var()` fallback is not a paint, and a colour function that reads a colour token (`rgb(from var(--x) r g b / 0.5)`) is a modified use; one that holds only non-colour tokens (`rgb(255 0 0 / var(--opacity-50))`) is a literal. Fixture: `fixtures/ht137-drift/` (three code-only overrides).
 
 Scope: CSS only in 0.3.0. A binding that lives in markup is invisible here, and
 that is a named gap rather than a silent one. Exit 1 on any red.
+
+**Binding map.** `bindings --export <layer export> --variable <name|--css-name>…` answers "which thing is this colour" from the export: per variable, each node that binds it with the property (`tokenBindings`, schema 12+), the nearest enclosing instance or component definition, the path to the node and the exported frame it belongs to. A binding stated only as a bare alias (`variableBindings`, which also carries layout grids) is a row with `property: null`. The library export (`--ds-export`) adds the variable's occurrence count and states that it names at most five consumer nodes with no component or property. An export older than schema 12, or one with no bindings on any node, is a note in the report, never an empty map presented as an answer. A frame image is linked only when the zip carries one named for the exported screenshot (or holding its node id); the render is the frame, not the consumer. Named gaps: a per-consumer thumbnail needs one image per consumer from the exporter, not read by this command; a variable bound only through a style (`styleBindings`) is not a row here. `src/bindings.mjs`, `src/bindings-cli.mjs`
 
 `conform`, `conform.allowNames`, `--bindings` · `src/conform.mjs`, `src/conform-drift.mjs`, `src/conform-cli.mjs`
 
