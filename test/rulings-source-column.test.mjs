@@ -61,3 +61,14 @@ test("the resolve writers follow the source", () => {
   assert.match(renderResolveComponentMarkdown(comp), /\| kind \| figma \| ruling/);
   assert.match(renderResolveComponentMarkdown(comp, { source: storybook }), /\| kind \| source \| ruling/);
 });
+
+test("a legend table with kind and ruling but no second column does not hide the real table below it", () => {
+  const legend = "| kind | ruling | note |\n| --- | --- | --- |\n| token | use | bind it |\n\n";
+  assert.deepEqual(readRulings(legend + table("figma")), readRulings(table("figma")));
+  assert.deepEqual(readRulings(legend + table("source")), readRulings(table("figma")));
+  assert.equal(readRulings(legend + table("figma")).length, 2);
+});
+
+test("neither is an error only when no table has the column", () => {
+  assert.throws(() => readRulings("| kind | ruling | note |\n| --- | --- | --- |\n| token | use | x |\n"), /neither a `figma` nor a `source` column/);
+});
