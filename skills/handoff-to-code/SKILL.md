@@ -132,7 +132,7 @@ waiting, assumed or open ask is a deviation row. Writing a note into the file on
 ### 6. Check the built CSS back against the pair
 
 Run `handoff-css conform` against every rendering of the export's nodes, not the component file
-alone.
+alone. `--config` reads the config's `source` (a stated label names the source in the drift findings; a source with no reader stops the run).
 In brownfield, pass the brief's JSON as `--export`, the project's token stylesheet as `--tokens`, and each ruled `use` name declared outside it as `--allow-name`;
 each `UNMAPPED_BINDING` is a ruled item. Codes: `references/steps.md` § 6.
 **Done when** the run is red-free, or every red has a deviation row and a ruling.

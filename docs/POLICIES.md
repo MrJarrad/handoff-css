@@ -1193,7 +1193,7 @@ resolved by `sourceOf(config)` and never written into the config, and stating `f
 byte. Only `figma` has a reader (the Design Handoff export). Any other kind stops `generate`,
 `generateSet`, `run` and `conform --config` with `SOURCE_READER_NOT_BUILT` before a file is read or
 written. Named gap: commands that take no config (`contrast`, `bindings`, `ladder`) read an export file
-directly and are not gated. Move: state `source` only when it is not Figma, and expect the stop until a
+directly and are not gated. A stated `label` names the source where a finding names its export: `conform` drift (`CODE_ONLY_TOKEN`) and the `bindings` heading read `the <label> export`; the default label changes no word, and codes and JSON keys never change. `bindings --config` and `conform --config` validate the config against the schema, then gate the source, so an unknown `source.kind` is a schema error and `sourceOf` throws on it. Move: state `source` only when it is not Figma, and expect the stop until a
 reader for that kind exists.
 
 `sourceOf`, `assertSourceBuilt`, `schema/config.schema.json` · `src/config.mjs`
