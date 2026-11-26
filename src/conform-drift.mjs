@@ -88,27 +88,60 @@ function closeParen(value, open) {
 
 const COLOUR_FN = /^(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/i;
 const HEX = /^#[0-9a-f]{3,8}(?![\w-])/i;
+const WORD = /^[a-z]+(?![\w(-])/i;
+// CSS named colours (not the keywords `transparent` / `currentcolor`, which paint nothing of their own).
+const NAMED_COLOURS = new Set([
+  "aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque", "black", "blanchedalmond",
+  "blue", "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse", "chocolate", "coral",
+  "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue", "darkcyan", "darkgoldenrod", "darkgray",
+  "darkgreen", "darkgrey", "darkkhaki", "darkmagenta", "darkolivegreen", "darkorange", "darkorchid",
+  "darkred", "darksalmon", "darkseagreen", "darkslateblue", "darkslategray", "darkslategrey", "darkturquoise",
+  "darkviolet", "deeppink", "deepskyblue", "dimgray", "dimgrey", "dodgerblue", "firebrick", "floralwhite",
+  "forestgreen", "fuchsia", "gainsboro", "ghostwhite", "gold", "goldenrod", "gray", "green", "greenyellow",
+  "grey", "honeydew", "hotpink", "indianred", "indigo", "ivory", "khaki", "lavender", "lavenderblush",
+  "lawngreen", "lemonchiffon", "lightblue", "lightcoral", "lightcyan", "lightgoldenrodyellow", "lightgray",
+  "lightgreen", "lightgrey", "lightpink", "lightsalmon", "lightseagreen", "lightskyblue", "lightslategray",
+  "lightslategrey", "lightsteelblue", "lightyellow", "lime", "limegreen", "linen", "magenta", "maroon",
+  "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple", "mediumseagreen", "mediumslateblue",
+  "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream", "mistyrose",
+  "moccasin", "navajowhite", "navy", "oldlace", "olive", "olivedrab", "orange", "orangered", "orchid",
+  "palegoldenrod", "palegreen", "paleturquoise", "palevioletred", "papayawhip", "peachpuff", "peru", "pink",
+  "plum", "powderblue", "purple", "rebeccapurple", "red", "rosybrown", "royalblue", "saddlebrown", "salmon",
+  "sandybrown", "seagreen", "seashell", "sienna", "silver", "skyblue", "slateblue", "slategray", "slategrey",
+  "snow", "springgreen", "steelblue", "tan", "teal", "thistle", "tomato", "turquoise", "violet", "wheat",
+  "white", "whitesmoke", "yellow", "yellowgreen",
+]);
 
 /**
- * The raw colour literals a value paints with, outside any `var()`. A `var()` fallback
+ * The raw colour literals a value paints with (hex, colour function, named colour), outside any
+ * `var()` or `url()`. A `var()` fallback
  * is not a paint (the name check owns an undefined name), and a colour function that
- * reads a token (`rgb(from var(--x) r g b / 0.5)`) is a modified use, not a literal.
+ * reads a colour token (`rgb(from var(--x) r g b / 0.5)`) is a modified use, not a literal.
+ * A colour function whose `var()`s are all non-colour tokens (`rgb(255 0 0 / var(--opacity-50))`)
+ * is still a raw colour, and is a literal as a whole.
+ * `isColourName` says whether a `var()` name reads a colour.
  */
-function literalColours(value) {
+function literalColours(value, isColourName) {
   const out = [];
   for (let i = 0; i < value.length; i += 1) {
     if (/[\w-]/.test(value[i - 1] ?? "")) continue;
     const rest = value.slice(i);
-    if (/^var\(/i.test(rest)) { i = closeParen(value, i + 3) - 1; continue; }
+    if (/^(?:var|url)\(/i.test(rest)) { i = closeParen(value, i + rest.indexOf("(")) - 1; continue; }
     if (COLOUR_FN.test(rest)) {
       const end = closeParen(value, i + rest.indexOf("("));
       const span = value.slice(i, end);
-      if (!/var\(/i.test(span)) out.push(span);
+      const names = [...span.matchAll(VAR)].map((m) => m[1]);
+      if (!names.some(isColourName)) out.push(span);
       i = end - 1;
       continue;
     }
     const hex = HEX.exec(rest);
-    if (hex) { out.push(hex[0]); i += hex[0].length - 1; }
+    if (hex) { out.push(hex[0]); i += hex[0].length - 1; continue; }
+    const named = WORD.exec(rest);
+    if (named) {
+      if (NAMED_COLOURS.has(named[0].toLowerCase())) out.push(named[0]);
+      i += named[0].length - 1;
+    }
   }
   return out;
 }
@@ -116,9 +149,10 @@ function literalColours(value) {
 /** The reads of one declaration that matter to colour: names, and the raw literals beside them. */
 function reads(value, exported, colourNames) {
   const names = [...value.matchAll(VAR)].map((m) => m[1]);
-  const colour = names.filter((n) => colourNames.has(n) || !exported.has(n));
+  const isColourName = (n) => colourNames.has(n) || !exported.has(n);
+  const colour = names.filter(isColourName);
   const bare = /^var\(\s*--[a-z0-9-]+\s*\)$/i.test(value);
-  return { value, colour, bare, literals: literalColours(value) };
+  return { value, colour, bare, literals: literalColours(value, isColourName) };
 }
 
 /** The finding for the token names a declaration reads, or null when they conform. */
