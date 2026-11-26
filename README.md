@@ -7,6 +7,8 @@ exactly what it did and what it refused to guess.
 
 **Input today.** The design system's source of truth is whatever you author it in (Figma, code tokens, Storybook). The one reader built so far reads Figma, so the export, the live read and the write-back below name Figma where they describe that route. Everything else says "the source".
 
+**Where to share it.** The generator, its checks and the agent skill ship together with the link-run export script and the Design System Handoff plugin in the figma-agent-handoff-toolkit repo, which is the repo to give to someone else. It is kept level with this package by a re-import.
+
 Its job is to set up **production-ready code from the handoff** — not to have
 opinions about your design system. Every opinion lives in one config file.
 
