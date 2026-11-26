@@ -236,7 +236,7 @@ export function componentDrift({ doc, bindings, files, graph, source = null }) {
         // A literal beside a token read is a raw value the export never states, whatever the token verdict.
         if (r.literals.length) {
           findings.push({ code: "CODE_ONLY_TOKEN", severity: "amber", ...at, reads: r.literals,
-            message: `${where}: reads the literal ${show(r.literals)} beside ${show(r.colour)}, binds ${show(b.names)} — a raw value the export never states` });
+            message: `${where}: reads the literal ${show(r.literals)} beside ${show(r.colour)}, binds ${show(b.names)} — a raw value ${phrase} never states` });
         }
       }
     }
