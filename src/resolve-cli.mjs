@@ -3,11 +3,12 @@ import path from "node:path";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 
+import { sourceFromFlag } from "./source-flag.mjs";
 import { resolveNeeds, renderResolveMarkdown } from "./resolve-need.mjs";
 import { assertValidExport } from "./validate-export.mjs";
 import { readExports } from "./zip.mjs";
 
-const USAGE = `handoff-css resolve --export <json|json.gz|zip> --need <needs.json> [--rulings <md>] [--out <dir>] [--json]\n`;
+const USAGE = `handoff-css resolve --export <json|json.gz|zip> --need <needs.json> [--rulings <md>] [--out <dir>] [--config <mjs>] [--json]\n`;
 export const RESOLVE_FILES = { json: "resolve-report.json", md: "resolve-report.md" };
 /** Exit code when every need is settled / when a need still waits for a ruling / on a usage or input error. */
 export const EXIT = { settled: 0, error: 1, open: 2 };
@@ -25,6 +26,7 @@ export async function resolveCommand(args, { cwd = process.cwd(), stdout = proce
     return EXIT.error;
   }
   try {
+    const source = await sourceFromFlag(one("--config"), cwd);
     const file = abs(exportPath);
     const docs = /\.gz$/i.test(file) ? [JSON.parse(gunzipSync(readFileSync(file)).toString("utf8"))] : readExports(file);
     if (docs.length !== 1) throw new Error(`${exportPath}: ${docs.length} exports; resolve reads exactly one`);
@@ -41,7 +43,7 @@ export async function resolveCommand(args, { cwd = process.cwd(), stdout = proce
     mkdirSync(outDir, { recursive: true });
     const json = `${JSON.stringify(report, null, 2)}\n`;
     writeFileSync(path.join(outDir, RESOLVE_FILES.json), json);
-    writeFileSync(path.join(outDir, RESOLVE_FILES.md), renderResolveMarkdown(report));
+    writeFileSync(path.join(outDir, RESOLVE_FILES.md), renderResolveMarkdown(report, { source }));
     if (args.includes("--json")) stdout.write(json);
     else stdout.write(`handoff-css (resolve): ${report.needs.length} needs, ${report.open} open (${Object.entries(report.counts).map(([k, v]) => `${v} ${k}`).join(", ") || "none"}); wrote ${Object.values(RESOLVE_FILES).join(", ")} to ${outDir}\n`);
     if (report.open > 0) stderr.write(`handoff-css (resolve): ${report.open} need(s) wait for a ruling; see ${RESOLVE_FILES.md}\n`);

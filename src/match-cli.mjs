@@ -2,10 +2,11 @@
 import path from "node:path";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 
+import { sourceFromFlag } from "./source-flag.mjs";
 import { matchBrownfield, renderMarkdown } from "./match.mjs";
 import { matchRawValues, renderRawValues } from "./raw-values.mjs";
 
-const USAGE = `handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--json]\n`;
+const USAGE = `handoff-css match [--handoff <md>] [--export <brief .json>] --src <path…> [--rulings <md>] [--config <mjs>] [--json]\n`;
 
 /** The link-run file's list of values not bound to a variable, beside the brief and made for it. */
 function unboundValues(briefPath) {
@@ -43,7 +44,7 @@ export function sources(roots, cwd) {
   return out;
 }
 
-export function matchCommand(args, { cwd = process.cwd(), stdout = process.stdout, stderr = process.stderr } = {}) {
+export async function matchCommand(args, { cwd = process.cwd(), stdout = process.stdout, stderr = process.stderr } = {}) {
   const handoffPath = flagValues(args, "--handoff")[0];
   const exportPath = flagValues(args, "--export")[0];
   const roots = flagValues(args, "--src");
@@ -54,7 +55,9 @@ export function matchCommand(args, { cwd = process.cwd(), stdout = process.stdou
   const abs = (p) => (path.isAbsolute(p) ? p : path.join(cwd, p));
   let result = null;
   let raw = null;
+  let source = null;
   try {
+    source = await sourceFromFlag(flagValues(args, "--config")[0], cwd);
     const rulingsPath = flagValues(args, "--rulings")[0];
     const rulings = rulingsPath ? readFileSync(abs(rulingsPath), "utf8") : null;
     const files = sources(roots, cwd);
@@ -65,7 +68,7 @@ export function matchCommand(args, { cwd = process.cwd(), stdout = process.stdou
     return 1;
   }
   if (args.includes("--json")) stdout.write(`${JSON.stringify({ ...(result ?? {}), ...(raw ? { raw } : {}) }, null, 2)}\n`);
-  else stdout.write([result && renderMarkdown(result), raw && renderRawValues(raw)].filter(Boolean).join("\n"));
+  else stdout.write([result && renderMarkdown(result, { source }), raw && renderRawValues(raw, { source })].filter(Boolean).join("\n"));
   // A Figma-variable proposal is not adopted until a human rules it: open items fail the run.
   // A raw value never does: unruled, it is built exact with a deviation row, so it is listed, not a stop.
   return !result || result.items.every((i) => i.status === "ruled") ? 0 : 1;
