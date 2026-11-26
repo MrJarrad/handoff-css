@@ -7,7 +7,7 @@ exactly what it did and what it refused to guess.
 
 **Input today.** The design system's source of truth is whatever you author it in (Figma, code tokens, Storybook). The one reader built so far reads Figma, so the export, the live read and the write-back below name Figma where they describe that route. Everything else says "the source".
 
-**How a design layer arrives.** A layer's brief (the `design-handoff-*.md` and its `.json`) is made from a Figma link by `design-handoff-script` (kept with the Figma plugins), run with a live read of the layer and the latest Design System Handoff export. It writes the brief, a `.link-run.json` and nothing else: screenshots are embedded in the `.md`, and there is no `.zip` and no separate image file. The Design System Handoff plugin still runs in Figma, because only it can read variables.
+**How a design layer arrives.** A layer's brief (the `design-handoff-*.md` and its `.json`) is made from a Figma link by `design-handoff-script` (kept with the Figma plugins, and shipped with this package in the figma-agent-handoff-toolkit repo, the repo to share), run with a live read of the layer and the latest Design System Handoff export. It writes the brief, a `.link-run.json` and nothing else: screenshots are embedded in the `.md`, and there is no `.zip` and no separate image file. The Design System Handoff plugin still runs in Figma, because only it can read variables.
 
 Its job is to set up **production-ready code from the handoff** — not to have
 opinions about your design system. Every opinion lives in one config file.
