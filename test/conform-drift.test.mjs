@@ -135,3 +135,20 @@ test("a var() fallback and a colour function that reads the token are not litera
   });
   assert.deepEqual(found.map((f) => [f.code, f.reads]), [["COMPONENT_TOKEN_MODIFIED", ["--content-action-primary"]]]);
 });
+
+const drift = (text) => componentDrift({ doc: doc(), bindings: bindings(), graph: new Map(), files: [{ path: "a.css", text }] });
+
+test("a colour function holding only a non-colour var() is a literal: raw red with a token alpha is red drift", () => {
+  const found = drift("@utility action-base { color: rgb(255 0 0 / var(--opacity-50)); }");
+  assert.deepEqual(found.map((f) => [f.code, f.severity, f.reads]), [["COMPONENT_TOKEN_DRIFT", "red", ["rgb(255 0 0 / var(--opacity-50))"]]]);
+});
+
+test("a relative colour from a raw hex with a non-colour var() hides nothing: the hex is a literal", () => {
+  const found = drift("@utility action-base { color: rgb(from #f00 r g b / var(--opacity-50)); }");
+  assert.deepEqual(found.map((f) => [f.code, f.severity, f.reads]), [["COMPONENT_TOKEN_DRIFT", "red", ["rgb(from #f00 r g b / var(--opacity-50))"]]]);
+});
+
+test("a colour function that reads a colour token stays skipped, even with a raw alpha or a non-colour var() beside it", () => {
+  const found = drift("@utility action-base { color: rgb(from var(--content-action-primary) r g b / var(--opacity-50)); }");
+  assert.deepEqual(found.map((f) => [f.code, f.reads]), [["COMPONENT_TOKEN_MODIFIED", ["--content-action-primary"]]]);
+});

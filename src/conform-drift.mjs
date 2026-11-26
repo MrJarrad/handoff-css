@@ -92,9 +92,12 @@ const HEX = /^#[0-9a-f]{3,8}(?![\w-])/i;
 /**
  * The raw colour literals a value paints with, outside any `var()`. A `var()` fallback
  * is not a paint (the name check owns an undefined name), and a colour function that
- * reads a token (`rgb(from var(--x) r g b / 0.5)`) is a modified use, not a literal.
+ * reads a colour token (`rgb(from var(--x) r g b / 0.5)`) is a modified use, not a literal.
+ * A colour function whose `var()`s are all non-colour tokens (`rgb(255 0 0 / var(--opacity-50))`)
+ * is still a raw colour, and is a literal as a whole.
+ * `isColourName` says whether a `var()` name reads a colour.
  */
-function literalColours(value) {
+function literalColours(value, isColourName) {
   const out = [];
   for (let i = 0; i < value.length; i += 1) {
     if (/[\w-]/.test(value[i - 1] ?? "")) continue;
@@ -103,7 +106,8 @@ function literalColours(value) {
     if (COLOUR_FN.test(rest)) {
       const end = closeParen(value, i + rest.indexOf("("));
       const span = value.slice(i, end);
-      if (!/var\(/i.test(span)) out.push(span);
+      const names = [...span.matchAll(VAR)].map((m) => m[1]);
+      if (!names.some(isColourName)) out.push(span);
       i = end - 1;
       continue;
     }
@@ -116,9 +120,10 @@ function literalColours(value) {
 /** The reads of one declaration that matter to colour: names, and the raw literals beside them. */
 function reads(value, exported, colourNames) {
   const names = [...value.matchAll(VAR)].map((m) => m[1]);
-  const colour = names.filter((n) => colourNames.has(n) || !exported.has(n));
+  const isColourName = (n) => colourNames.has(n) || !exported.has(n);
+  const colour = names.filter(isColourName);
   const bare = /^var\(\s*--[a-z0-9-]+\s*\)$/i.test(value);
-  return { value, colour, bare, literals: literalColours(value) };
+  return { value, colour, bare, literals: literalColours(value, isColourName) };
 }
 
 /** The finding for the token names a declaration reads, or null when they conform. */
