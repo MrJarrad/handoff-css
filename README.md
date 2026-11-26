@@ -360,9 +360,11 @@ handoff-css bindings --export design-handoff-mediarow.zip --variable color/backg
 ```
 
 For each variable: every node of the layer export that binds it, the property it binds, the
-component and instance it sits in, and its exported frame. A frame's image is extracted to
-`<out>/frames/` and linked from the row when the zip carries one named for the frame's
-screenshot, or holding its node id as a whole number group (`5527-5397` does not match
+component and instance it sits in, and its exported frame. Frame images come only from a zip
+input that contains image entries; a run from a Figma link (the design-handoff script) writes
+no images and no zip, so the Frame column then reads "no frame image in the input". When the
+zip does carry them, a frame's image is extracted to `<out>/frames/` and linked from the row
+when it is named for the frame's screenshot, or holding its node id as a whole number group (`5527-5397` does not match
 `15527-539712`). When several files qualify, the one beside the frame's own export is used,
 else none is; two entries that share a file name are kept apart under a flattened path.
 `frames/` exists only when an image was extracted. Otherwise the row says "no frame image in
