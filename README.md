@@ -364,7 +364,7 @@ component and instance it sits in, and its exported frame. A frame's image is ex
 `<out>/frames/` and linked from the row. It comes from the brief: the Design Handoff plugin and
 the design-handoff script both write each screenshot into the brief's `.md` as
 `![name](data:image/png;base64,...)` and list its `name` and `nodeId` in the layer export's
-`screenshots.exported`, and `bindings` matches the two by that name. The `.md` is found by
+`screenshots.exported`, and `bindings` matches the two by that name: the alt text is the name, followed by ` (exported at <scale>x — too large at 1x)` when the `.json` says the frame was exported below 1x (0.5, 0.25, 0.125), built from the name and scale the `.json` carries, never a prefix match. The `.md` is found by
 file name: `design-handoff-x.json` (or `.json.gz`) reads `design-handoff-x.md` (or `.md.gz`) in
 the same folder; in a zip it is the `.md` with the same name beside the `.json`. A zip may also
 carry image files: one named for the screenshot, or holding the frame's node id as a whole

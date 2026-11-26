@@ -19,7 +19,9 @@ const stem = (name) => path.posix.basename(name).replace(/\.[^.]+$/, "");
 
 const DATA_URI = /!\[([^\n]*?)\]\(data:image\/(png|jpe?g|webp);base64,([A-Za-z0-9+/=]+)\)/g;
 const MAGIC = { png: [0x89, 0x50, 0x4e, 0x47], jpg: [0xff, 0xd8, 0xff], jpeg: [0xff, 0xd8, 0xff], webp: [0x52, 0x49, 0x46, 0x46] };
-const safeName = (s) => s.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^[-._]+|-+$/g, "") || "frame";
+const safeName = (s) => s.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^[-._]+|-+$/g, "").slice(0, 120).replace(/-+$/, "") || "frame";
+/** The alt text the plugin writes for a screenshot: the name, plus the scale when it was exported below 1x. */
+export const briefAlt = (name, scale = 1) => name + (scale < 1 ? ` (exported at ${scale}x — too large at 1x)` : "");
 
 /**
  * The images a brief carries, by alt text (the screenshot name). Only bytes that start like the
@@ -77,6 +79,7 @@ export async function bindingsCommand(args, { cwd = process.cwd(), stdout = proc
     const docs = [];
     const images = [];
     const dirOf = new Map(); // export label -> the zip folder its JSON sits in
+    const scaleOf = new Map(); // export label -> screenshot name -> the scale it was exported at
     const briefOf = new Map(); // export label -> the images in the brief beside its JSON
     for (const p of exportPaths) {
       const file = abs(p);
@@ -113,6 +116,7 @@ export async function bindingsCommand(args, { cwd = process.cwd(), stdout = proc
       if (dsDocs.length !== 1) throw new Error(`handoff-css: ${dsPath}: ${dsDocs.length} exports; bindings reads exactly one`);
       ds = dsDocs[0];
     }
+    for (const d of docs) scaleOf.set(label(d), new Map((d.screenshots?.exported ?? []).map((x) => [x.name, x.scale])));
     const map = bindingMap(docs, { variables, ds });
     const outDir = one("--out") ? abs(one("--out")) : null;
     const extracted = new Map();
@@ -120,7 +124,7 @@ export async function bindingsCommand(args, { cwd = process.cwd(), stdout = proc
     const imageFor = (frame) => {
       // An image file in the zip first (as before), else the brief's own image matched by the name the .json lists.
       const zipHit = frameImage(images, frame, dirOf.get(frame.file));
-      const inBrief = zipHit || !frame.screenshot ? null : briefOf.get(frame.file)?.get(frame.screenshot);
+      const inBrief = zipHit || !frame.screenshot ? null : briefOf.get(frame.file)?.get(briefAlt(frame.screenshot, scaleOf.get(frame.file)?.get(frame.screenshot)));
       const hit = inBrief ? { key: `${frame.file}\0${frame.screenshot}`, base: `${safeName(frame.screenshot)}.${inBrief.ext}`, data: inBrief.data, from: "the brief" }
         : zipHit ? { key: zipHit.name, base: path.posix.basename(zipHit.name), data: zipHit.data, from: "the zip", flat: zipHit.name } : null;
       if (!hit) return null;
@@ -128,7 +132,7 @@ export async function bindingsCommand(args, { cwd = process.cwd(), stdout = proc
       let rel = claimed.get(hit.key);
       if (!rel) {
         // The basename, unless another image already holds it: then a zip entry's whole path, flattened.
-        const taken = (r) => [...claimed.values()].includes(r);
+        const taken = (r) => [...claimed.values()].some((v) => v.toLowerCase() === r.toLowerCase());
         rel = `frames/${hit.base}`;
         if (taken(rel) && hit.flat) rel = `frames/${hit.flat.replace(/[^A-Za-z0-9._-]+/g, "_").replace(/^[._]+/, "")}`;
         for (let n = 2; taken(rel); n += 1) rel = `frames/${n}-${hit.base}`;
