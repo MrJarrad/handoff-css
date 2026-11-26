@@ -1142,6 +1142,8 @@ and the project's sources, and proposes per design-system item the closest code 
 adopts one: a match is a question for a human until the project's ruling table answers it,
 so the run exits 1 while any item is unruled.
 
+The ruling table's second column is headed `figma` or `source`; the two read the same and items keep the key `figma`. A table with both columns, or with a `ruling` column and neither, is an error. The writers (`match`, `resolve`, `components --need`, raw values) head the column `figma` for the default source and `source` for any other kind the config states (`sourceOf`). Existing tables are unchanged. `src/match.mjs` (`readRulings`, `rulingColumn`)
+
 Evidence is three axes, each named in `why`: **name** (the brief's CSS name exactly, else
 the share of `-` segments; components by name with case and punctuation set aside, then
 containment, then shared words), **value** (a declared code value equal to a mode sample or
