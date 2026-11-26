@@ -131,3 +131,69 @@ test("no --variable is a usage error", async () => {
   assert.equal(code, 1);
   assert.match(err, /handoff-css bindings/);
 });
+
+// ---- review follow-ups ----------------------------------------------------------------------
+
+const png = (n) => Buffer.from(`png-${n}`);
+const zipDir = (files) => {
+  const dir = mkdtempSync(path.join(tmpdir(), "ht147-"));
+  writeFileSync(path.join(dir, "in.zip"), makeZip(files));
+  return dir;
+};
+const withShot = (doc, name, extra = {}) => { const d = structuredClone(doc); d.screenshots.exported[0].name = name; Object.assign(d, extra); return Buffer.from(JSON.stringify(d)); };
+
+test("no image in the input: --out creates no frames directory", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "ht147-"));
+  const out = path.join(dir, "out");
+  const { code } = await run(["--export", layerPath, "--variable", "color/background/default/primary", "--out", out], dir);
+  assert.equal(code, 0);
+  assert.ok(existsSync(path.join(out, "bindings.md")));
+  assert.equal(existsSync(path.join(out, "frames")), false);
+});
+
+test("two exports in one zip whose frames share an image name each get their own image", async () => {
+  const dir = zipDir([
+    ["a/one.json", withShot(layer, "MediaRow", { pageName: "A" })], ["a/MediaRow.png", png("a")],
+    ["b/two.json", withShot(layer, "MediaRow", { pageName: "B" })], ["b/MediaRow.png", png("b")],
+  ]);
+  const out = path.join(dir, "out");
+  const { code } = await run(["--export", "in.zip", "--variable", "color/background/default/primary", "--out", out], dir);
+  assert.equal(code, 0);
+  const md = readFileSync(path.join(out, "bindings.md"), "utf8");
+  const links = [...md.matchAll(/\]\((frames\/[^)]+)\)/g)].map((m) => m[1]);
+  assert.equal(links.length, 2);
+  assert.equal(new Set(links).size, 2, "two different files, none overwritten");
+  assert.deepEqual(links.map((l) => readFileSync(path.join(out, l), "utf8")).sort(), ["png-a", "png-b"]);
+  const a = md.split("\n").find((l) => l.includes("MediaRow") && /\.png/.test(l));
+  assert.match(readFileSync(path.join(out, a.match(/\((frames\/[^)]+)\)/)[1]), "utf8"), /png-a/, "the first export's row links its own folder's image");
+});
+
+test("a node id inside an unrelated file name is not a match", async () => {
+  const dir = zipDir([["one.json", withShot(layer, "Other")], ["frame-5527-539712.png", png("x")]]);
+  const out = path.join(dir, "out");
+  const { out: stdout } = await run(["--export", "in.zip", "--variable", "color/background/default/primary", "--out", out], dir);
+  assert.equal(existsSync(path.join(out, "frames")), false);
+  assert.match(readFileSync(path.join(out, "bindings.md"), "utf8"), /no frame image in the input/);
+  assert.match(stdout, /0 frame image/);
+});
+
+test("a node id delimited in the file name still matches, and two such files are ambiguous (none)", async () => {
+  const one = zipDir([["one.json", withShot(layer, "Other")], ["frame_5527-5397.png", png("x")]]);
+  await run(["--export", "in.zip", "--variable", "color/background/default/primary", "--out", path.join(one, "o")], one);
+  assert.ok(existsSync(path.join(one, "o", "frames", "frame_5527-5397.png")));
+  const two = zipDir([["one.json", withShot(layer, "Other")], ["x/5527-5397.png", png("x")], ["y/5527-5397.png", png("y")]]);
+  await run(["--export", "in.zip", "--variable", "color/background/default/primary", "--out", path.join(two, "o")], two);
+  assert.equal(existsSync(path.join(two, "o", "frames")), false);
+});
+
+test("a variable with no consumers does not point at rows above", () => {
+  const ds = gz(dsPath);
+  const doc = structuredClone(layer);
+  const name = "color/background/default/primary";
+  const strip = (n) => { delete n.tokenBindings; delete n.variableBindings; (n.children ?? []).forEach(strip); };
+  doc.layerTree.forEach(strip);
+  const { variables: [v] } = bindingMap([doc], { variables: [name], ds });
+  assert.equal(v.consumers.length, 0);
+  assert.doesNotMatch(v.library.note, /rows above/);
+  assert.match(v.library.note, /places none/);
+});
