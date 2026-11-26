@@ -108,3 +108,30 @@ test("CLI --drift-only reports the drift codes and nothing else", async () => {
   assert.match(out, /3 red/);
   assert.doesNotMatch(out, /LOCAL_ONLY|UNKNOWN_NAME/);
 });
+
+test("a raw literal beside the bound token is surfaced as CODE_ONLY_TOKEN alongside the modified use", () => {
+  const found = componentDrift({
+    doc: doc(), bindings: bindings(), graph: new Map(),
+    files: [{ path: "a.css", text: "@utility action-base { color: linear-gradient(var(--content-action-primary), #f00); }" }],
+  });
+  assert.deepEqual(found.map((f) => [f.code, f.severity, f.reads]), [
+    ["COMPONENT_TOKEN_MODIFIED", "amber", ["--content-action-primary"]],
+    ["CODE_ONLY_TOKEN", "amber", ["#f00"]],
+  ]);
+});
+
+test("a raw literal beside a non-colour token (a ring width) is still a raw literal where a token is bound: red", () => {
+  const found = componentDrift({
+    doc: doc(), bindings: bindings(), graph: new Map(),
+    files: [{ path: "a.css", text: "@utility action-focus-ring { box-shadow: 0 0 0 var(--border-200) #f00; }" }],
+  });
+  assert.deepEqual(found.map((f) => [f.code, f.severity, f.binding]), [["COMPONENT_TOKEN_DRIFT", "red", "action-focus-ring"]]);
+});
+
+test("a var() fallback and a colour function that reads the token are not literals", () => {
+  const found = componentDrift({
+    doc: doc(), bindings: bindings(), graph: new Map(),
+    files: [{ path: "a.css", text: "@utility action-focus-ring { box-shadow: 0 0 0 var(--border-200) var(--border-focused-dark, #f00); }\n@utility action-base { color: color-mix(in oklch, rgb(from var(--content-action-primary) r g b / 0.5), transparent); }" }],
+  });
+  assert.deepEqual(found.map((f) => [f.code, f.reads]), [["COMPONENT_TOKEN_MODIFIED", ["--content-action-primary"]]]);
+});
