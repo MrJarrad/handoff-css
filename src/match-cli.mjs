@@ -64,7 +64,7 @@ export async function matchCommand(args, { cwd = process.cwd(), stdout = process
     if (handoffPath) result = matchBrownfield({ handoff: readFileSync(abs(handoffPath), "utf8"), files, rulings });
     if (exportPath) raw = matchRawValues({ rows: unboundValues(abs(exportPath)), files, rulings });
   } catch (err) {
-    stderr.write(`handoff-css match: ${err.message}\n`);
+    stderr.write(`handoff-css match: ${err.message.replace(/^handoff-css: /, "")}\n`);
     return 1;
   }
   if (args.includes("--json")) stdout.write(`${JSON.stringify({ ...(result ?? {}), ...(raw ? { raw } : {}) }, null, 2)}\n`);

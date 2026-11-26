@@ -13,6 +13,7 @@ import { dispatch } from "../src/cli.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jhdGz = path.join(root, "fixtures", "jhd-v19-2026-10-29", "design-system-handoff.json.gz");
+const overlayGz = path.join(root, "fixtures", "jhd-v19-2026-10-29", "overlay.json.gz");
 const briefMd = gunzipSync(readFileSync(path.join(root, "fixtures", "script-2026-10-29", "navigation.md.gz"))).toString("utf8");
 
 const configWith = (source) => {
@@ -39,13 +40,15 @@ const project = () => {
 const COMMANDS = {
   match: (cwd, extra) => run(["match", "--handoff", "brief.md", "--src", "src", ...extra], cwd),
   resolve: (cwd, extra) => run(["resolve", "--export", jhdGz, "--need", "needs.json", "--out", "out-r", ...extra], cwd),
-  components: (cwd, extra) => run(["components", "--ds-export", jhdGz, "--need", "cneeds.json", "--out", "out-c", ...extra], cwd),
+  components: (cwd, extra) => run(["components", "--export", overlayGz, "--need", "cneeds.json", "--out", "out-c", ...extra], cwd),
 };
 
 for (const [name, go] of Object.entries(COMMANDS)) {
   test(`${name}: a default or stated Figma source writes what no --config writes`, async () => {
     const cwd = project();
     const plain = await go(cwd, []);
+    assert.equal(plain.err.includes("lists no components"), false, plain.err);
+    assert.notEqual(plain.out + plain.err, "");
     assert.equal(plain.out.includes("| kind | figma |") || name !== "match", true);
     for (const source of [undefined, { kind: "figma" }, { kind: "figma", label: "House Figma file" }]) {
       const withConfig = await go(cwd, ["--config", configWith(source)]);

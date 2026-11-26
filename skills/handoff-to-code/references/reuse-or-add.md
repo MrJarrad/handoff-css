@@ -6,7 +6,7 @@ one is read from `system-profile.md`.
 
 ## Resolve
 
-`handoff-css resolve --export <json|json.gz|zip> --need <needs.json> [--rulings <md>] [--out <dir>] [--json]`
+`handoff-css resolve --export <json|json.gz|zip> --need <needs.json> [--rulings <md>] [--out <dir>] [--config <mjs>] [--json]`
 writes `resolve-report.json` and `resolve-report.md`. A need is `{ "id", "name"?, "group"?, "collection"?,
 "wants"? }` with at least one of `name`, `group`, `wants`; `wants` maps a mode name (or `*`) to the raw value
 the build holds. It never invents a name.

@@ -152,7 +152,7 @@ write `var(<name>)`.
 
 A binding with no name (step 3), or a value the pair does not bind (step 4), is a need. **Reuse first;
 add only when nothing fits.** Write the needs as a list (`schema/resolve-need.v1.schema.json`) and run
-`handoff-css resolve --export <design-system-handoff>.json --need <needs.json> [--rulings <md>]`.
+`handoff-css resolve --export <design-system-handoff>.json --need <needs.json> [--rulings <md>] [--config <mjs>]`.
 Verdicts, ranking, rulings and exit codes: `references/reuse-or-add.md`.
 
 - `REUSE` closes the need: build that name. `RULED` closes it too: build the name in the ruling's `code`
@@ -205,7 +205,7 @@ are read from the exports, never from memory of another system.
    with `--ds-export`: it lists every component its file defines, so the count is "N of M"), how they are named, the properties they share, how deep they nest, and which token collections they
    bind. Keep it beside the work. Facts only; a tier or a gap is never a verdict.
 2. Write each component or block the build needs as a list (`schema/resolve-component-need.v1.schema.json`) and
-   run `handoff-css components --export … --need <needs.json> [--rulings <md>]`. Verdicts and the rulings table:
+   run `handoff-css components --export … --need <needs.json> [--rulings <md>] [--config <mjs>]`. Verdicts and the rulings table:
    `references/reuse-or-add.md` § Components. With `--ds-export`, the need is ranked against every component that export
    lists; without it, only the components the layer exports use.
 3. `REUSE` and `REUSE_WITH_PROP` close the need: build the component as it is, setting only the properties the
