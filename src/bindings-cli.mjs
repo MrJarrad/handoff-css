@@ -24,9 +24,9 @@ const safeName = (s) => s.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^[-._]+|-+$
 export const briefAlt = (name, scale = 1) => name + (scale < 1 ? ` (exported at ${scale}x — too large at 1x)` : "");
 
 /**
- * The images a brief carries, by alt text (the screenshot name). Only bytes that start like the
- * format they claim count, so a placeholder or empty payload is no image; a name carried twice is
- * ambiguous and gives none.
+ * The images a brief carries, keyed by alt text: the screenshot name, plus the scale note below 1x.
+ * Only bytes that start like the format they claim count, so a placeholder or empty payload is no
+ * image; a name carried twice is ambiguous and gives none.
  */
 export function briefImages(md) {
   const found = new Map();
